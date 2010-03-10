@@ -1,5 +1,5 @@
 <?php
-
+/* test */
 DEFINE ('DEBUG',1);
 
 DEFINE ('LOAD_CORE',1);
