@@ -118,6 +118,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		return sprintf ('(%s)',implode(",",$table_fields));
 	}
 	function construct_altertable_fields($tablename,$options) {
+		$tf=array();
 		$table_fields=$this->construct_table_fields($options);
 		$old_fields=$this->get_table_fields($tablename);
 
@@ -134,7 +135,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 		$drop_fields=array_diff(array_keys($old_fields),array_keys($table_fields));
 		foreach($drop_fields as $k=>$v) {
-			if (!isset($options['fields'][$k]['type']) && $options['fields'][$v]['type']!='serial') 
+			if (!isset($options['fields'][$v]['type']) || $options['fields'][$v]['type']!='serial') 
 				$tf[]="DROP $v";
 		}
 
