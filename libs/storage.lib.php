@@ -36,7 +36,6 @@ class gs_record implements arrayaccess {
 	}
 
 	public function fill_values($values) {
-		mlog('fill_values:'.get_class($this->get_recordset()));
 		if (!is_array($values)) return FALSE;
 		foreach ($values as $field=>$value) {
 			if($this->__get($field)!==NULL && isset($this->recordsets_array[$field]) && $this->recordsets_array[$field] && is_array($value) ) {
@@ -91,7 +90,8 @@ class gs_record implements arrayaccess {
 			$rs=new $structure['recordset'];
 			$local_field_name=isset($structure['local_field_name']) ? $structure['local_field_name'] : $this->gs_recordset->id_field_name;
 			$id=$this->__get($local_field_name);
-			$foreign_field_name=isset($structure['foreign_field_name']) ? $structure['foreign_field_name'] : $rs->id_field_name;
+			//$foreign_field_name=isset($structure['foreign_field_name']) ? $structure['foreign_field_name'] : $rs->id_field_name;
+			$foreign_field_name=isset($structure['foreign_field_name']) ? $structure['foreign_field_name'] : $this->gs_recordset->id_field_name;
 			$index_field_name=isset($structure['index_field_name']) ? $structure['index_field_name'] : $rs->id_field_name;
 			$structure['options'][$foreign_field_name]=$id;
 
@@ -294,7 +294,6 @@ abstract class gs_recordset_base extends gs_iterator {
 
 
 	public function new_record($values=NULL) {
-		mlog('new_record:'.get_class($this));
 		$rec=new gs_record($this,'',RECORD_NEW);
 		$rec->fill_values($values);
 		$this->add($rec);
