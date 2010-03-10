@@ -133,7 +133,7 @@ class gs_config {
 		$this->lib_kcaptcha_dir=$this->lib_dir.'kcaptcha/';
 		//$this->tpl_blocks=array('top_menu','block_workspace','block1','block2');
 		$this->gs_connectors=array (
-			'mysql1'=>array( 'db_type'=>'mysql', 'db_hostname'=>'127.0.0.1','db_port'=>'3306','db_username'=>'gsshop','db_password'=>'gs123','db_database'=>'gs_shop1'),
+			'mysql1'=>array( 'db_type'=>'mysql', 'db_hostname'=>'127.0.0.1','db_port'=>'3306','db_username'=>'betslab','db_password'=>'betsy','db_database'=>'betslab'),
 			);
 
 		 date_default_timezone_set('Europe/London');
