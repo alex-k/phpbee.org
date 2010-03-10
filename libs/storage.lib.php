@@ -241,10 +241,12 @@ class gs_recordset_view extends gs_recordset {
 		}
 		return TRUE;
 	}
-	public function commit() {		parent::commit();
+	public function commit() {		
+		parent::commit();
 		foreach ($this->rs_o_a as $r) {
 			$r->commit();
 		}
+	}
 	public function install() {
 		foreach ($this->rs_o_a as $r) {
 			$r->install();
