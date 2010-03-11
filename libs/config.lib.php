@@ -1,4 +1,5 @@
 <?php
+/*test22*/
 DEFINE ('DEBUG',1);
 
 DEFINE ('LOAD_CORE',1);
