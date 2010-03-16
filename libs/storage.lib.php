@@ -24,15 +24,16 @@ class gs_fkey {
 		gs_cacher::save($this->key_array,'gs_recordset','gs_fkey_array');
 	}
 
-	public static function register_key($rs_name,$keys) {
+	public static function register_key($rs_name,$keys,$recordsets) {
 		$fk=gs_fkey::get_instance();
-		$fk->update_hash($rs_name,$keys);
+		$fk->update_hash($rs_name,$keys,$recordsets);
 
 		}
 
-	private  function update_hash($rs_name,$keys) {
+	private  function update_hash($rs_name,$keys,$recordsets) {
 		foreach ($keys as $k) {
-			$this->key_array[$k['link']][$rs_name]=$k;
+			$linked_rs=$recordsets[$k['link']]['recordset'];
+			$this->key_array[$linked_rs][$rs_name]=$k;
 		}
 	}
 	private function process_event($ev_name,$record) {
@@ -40,10 +41,13 @@ class gs_fkey {
 		$ev_name=strtolower($ev_name);
 		if (!isset($this->key_array[$rs_name]) || !is_array($this->key_array[$rs_name])) return true;
 		$keys=$this->key_array[$rs_name];
+		$r=true;
 		foreach($keys as $rs_name=>$k) {
 			$option=strtolower(str_replace(' ','_',$k[$ev_name]));
-			$this->{"action_".$ev_name."_".$option}($record,$rs_name);
+			md('call fkey:'."action_".$ev_name."_".$option);
+			$r&=$this->{"action_".$ev_name."_".$option}($record,$rs_name);
 		}
+		return $r;
 	}
 
 	private function action_on_delete_restrict($record,$rs_name) { return true;}
@@ -56,8 +60,8 @@ class gs_fkey {
 	private function action_on_update_no_action($record,$rs_name) { return true;}
 	private function action_on_update_cascade($record,$rs_name) {
 		$rs=$record->init_linked_recordset($rs_name);
-		$id=$record->get_old_value($rs->local_field_name);
-		if ($id===FALSE) return true;
+		$oldid=$record->get_old_value($rs->local_field_name);
+		if ($oldid==$this->get_id() ) return true;
 		$rs->find_records(array($rs->foreign_field_name=>$id));
 		foreach ($rs as $r) {
 			$r->{$rs->foreign_field_name}=$record->__get($rs->local_field_name);
@@ -190,7 +194,7 @@ class gs_record implements arrayaccess {
 		$fields=$this->get_recordset()->structure['fields'];
 		if ($this->recordstate & RECORD_ROLLBACK) {
 			$this->recordstate=RECORD_NEW;
-		} elseif((is_array($fields) && array_key_exists($name,$fields) && (!isset($this->values[$name]) || $value!==$this->values[$name])) 
+		} elseif((is_array($fields) && array_key_exists($name,$fields) && (!isset($this->values[$name]) || $value!=$this->values[$name])) 
 				|| ($this->recordstate & RECORD_NEW)) {
 			$this->recordstate=$this->recordstate|RECORD_CHANGED;
 			if (isset($this->values[$name])) $this->old_values[$name]=$this->values[$name];
@@ -200,25 +204,15 @@ class gs_record implements arrayaccess {
 		return $this->values[$name]=$value;
 	}
 	function get_old_value($name) {
-		return isset($this->old_values[$name]) ? $this->old_values[$name] : false;
+		return isset($this->old_values[$name]) ? $this->old_values[$name] : $this->__get($name);
 	}
 	public function child_modified() {
 		$this->recordstate=$this->recordstate|RECORD_CHILDMOD;
+		if (($rs=$this->get_recordset()->parent_record)!==NULL) $rs->child_modified();
 	}
 
 
 	public function commit($level=0) {
-		if ($level==0) {
-			$parent_record=$this->gs_recordset->parent_record;
-			if ($parent_record) $this->__set($this->gs_recordset->foreign_field_name,$parent_record->{$this->gs_recordset->local_field_name});
-			/*
-			if ($parent_record)  foreach ($this->gs_recordset->structure['recordsets'] as $s) {
-				if ($s['recordset']==get_class($parent_record->get_recordset())) {
-					$this->__set($this->gs_recordset->foreign_field_name,$parent_record->{$this->gs_recordset->local_field_name});
-				}
-			}
-			*/
-		}
 		mlog('+++++++++++'.get_class($this->get_recordset()));
 		mlog('recordstate:'.$this->recordstate);
 		$ret=NULL;
@@ -227,6 +221,10 @@ class gs_record implements arrayaccess {
 			if ($ret===TRUE) return;
 		}
 		if ($this->recordstate & RECORD_NEW) {
+			if ($level==0) {
+				$parent_record=$this->gs_recordset->parent_record;
+				if ($parent_record) $this->__set($this->gs_recordset->foreign_field_name,$parent_record->{$this->gs_recordset->local_field_name});
+			}
 			$ret=$this->gs_recordset->insert($this);
 			$this->set_id($ret);
 		} else if ($this->recordstate & RECORD_DELETED) {
@@ -241,6 +239,7 @@ class gs_record implements arrayaccess {
 			$this->commit_childrens();
 		}
 		$this->recordstate=RECORD_UNCHANGED;
+		$this->old_values=$this->modified_values=array();
 		mlog('---------'.get_class($this->get_recordset()));
 		return $ret;
 	}
@@ -248,9 +247,10 @@ class gs_record implements arrayaccess {
 		$this->recordstate=RECORD_UNCHANGED;
 		foreach ($this->recordsets_array as $rs) {
 			if ($rs) {
-				$rs->commit();
 				$rec=$rs->first();
-				$this->__set($rs->local_field_name,$rec->{$rs->foreign_field_name});
+				$recordstate=$rec->recordstate;
+				$rs->commit();
+				if ($recordstate & RECORD_NEW) $this->__set($rs->local_field_name,$rec->{$rs->foreign_field_name});
 			}
 		}
 		$this->commit(1);
@@ -412,6 +412,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		while ($r=$this->get_connector()->fetch()) {
 			$record=new gs_record($this,$fields);
 			$record->fill_values($r);
+			$record->recordstate = RECORD_UNCHANGED;
 			if (isset($records[$record->$index_field_name])) 
 				$records[]=$record;
 				else $records[$record->$index_field_name]=$record;
@@ -497,7 +498,7 @@ abstract class gs_recordset_base extends gs_iterator {
 			$this->commit();
 		}
 		if (isset($this->structure['fkeys']) && is_array($this->structure['fkeys'])) {
-			gs_fkey::register_key(get_class($this),$this->structure['fkeys']);
+			gs_fkey::register_key(get_class($this),$this->structure['fkeys'],$this->structure['recordsets']);
 		}
 	}
 

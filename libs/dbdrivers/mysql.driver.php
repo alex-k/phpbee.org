@@ -244,14 +244,14 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		}
 		if (sizeof($fields)==0) return;
 		$idname=$rset->id_field_name;
-		$que=sprintf('UPDATE %s SET %s WHERE %s=%s',$rset->db_tablename,implode(',',$fields),$idname,$this->escape_value($record->$idname));
+		$que=sprintf('UPDATE %s SET %s WHERE %s=%s',$rset->db_tablename,implode(',',$fields),$idname,$this->escape_value($record->get_old_value($idname)));
 		return $this->query($que);
 
 	}
 	public function delete($record) {
 		$rset=$record->get_recordset();
 		$idname=$rset->id_field_name;
-		$que=sprintf('DELETE FROM %s  WHERE %s=%s',$rset->db_tablename,$idname,$this->escape_value($record->$idname));
+		$que=sprintf('DELETE FROM %s  WHERE %s=%s',$rset->db_tablename,$idname,$this->escape_value($record->get_old_value($idname)));
 		return $this->query($que);
 
 	}
