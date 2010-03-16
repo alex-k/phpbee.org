@@ -161,7 +161,7 @@ class gs_record implements arrayaccess {
 			$rs->local_field_name=$local_field_name;
 			$rs->foreign_field_name=$foreign_field_name;
 			$rs->index_field_name=$index_field_name;
-			$rs->index_type=isset($structure['type']) ? $structure['type'] : NULL;
+			//$this->gs_recordset->index_type=isset($structure['type']) ? $structure['type'] : NULL;
 			$rs->parent_record=$this;
 
 			return  $rs;
@@ -207,7 +207,18 @@ class gs_record implements arrayaccess {
 	}
 
 
-	public function commit() {
+	public function commit($level=0) {
+		if ($level==0) {
+			$parent_record=$this->gs_recordset->parent_record;
+			if ($parent_record) $this->__set($this->gs_recordset->foreign_field_name,$parent_record->{$this->gs_recordset->local_field_name});
+			/*
+			if ($parent_record)  foreach ($this->gs_recordset->structure['recordsets'] as $s) {
+				if ($s['recordset']==get_class($parent_record->get_recordset())) {
+					$this->__set($this->gs_recordset->foreign_field_name,$parent_record->{$this->gs_recordset->local_field_name});
+				}
+			}
+			*/
+		}
 		mlog('+++++++++++'.get_class($this->get_recordset()));
 		mlog('recordstate:'.$this->recordstate);
 		$ret=NULL;
@@ -225,7 +236,7 @@ class gs_record implements arrayaccess {
 			if (!gs_fkey::event('on_update',$this)) return false;
 			$ret=$this->gs_recordset->update($this);
 		}
-		if ($this->recordstate & RECORD_CHILDMOD) {
+		if ($level==0 && ($this->recordstate & RECORD_CHILDMOD)) {
 			$this->recordstate=RECORD_UNCHANGED;
 			$this->commit_childrens();
 		}
@@ -234,13 +245,15 @@ class gs_record implements arrayaccess {
 		return $ret;
 	}
 	private function commit_childrens() {
+		$this->recordstate=RECORD_UNCHANGED;
 		foreach ($this->recordsets_array as $rs) {
-			foreach ($rs as $r) {
-				if (isset($this->values[$rs->local_field_name])) $r->{$rs->foreign_field_name}=$this->values[$rs->local_field_name];
+			if ($rs) {
+				$rs->commit();
+				$rec=$rs->first();
+				$this->__set($rs->local_field_name,$rec->{$rs->foreign_field_name});
 			}
-			$this->recordstate=RECORD_UNCHANGED;
-			$rs->commit();
 		}
+		$this->commit(1);
 	}
 
 	public function delete() {
@@ -419,11 +432,14 @@ abstract class gs_recordset_base extends gs_iterator {
 		foreach($this as $record) {
 			$ret|=$record->commit();
 		}
+		/*
 		if ($this->parent_record && $this->index_type=='one') {
+			md('ONE:'. get_class($this));
 			$obj=$this->first();
 			$this->parent_record->{$this->local_field_name} = $obj->get_id();
 			$this->parent_record->commit();
 		}
+		*/
 		return $ret;
 	}
 
