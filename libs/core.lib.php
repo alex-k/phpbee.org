@@ -20,6 +20,10 @@ class gs_null extends SimpleXMLElement implements arrayaccess {
 	    }
 	    public function offsetUnset($offset) {
 	    }
+
+	     public function __call($name, $arg) {
+		     throw new gs_dbd_exception('trying call '.$name.' in gs_null object',DBD_GSNULL_CALL);
+	     }
 }
 class gs_data {
 	

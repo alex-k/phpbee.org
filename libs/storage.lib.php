@@ -6,87 +6,30 @@ define ('RECORD_DELETED',4);
 define ('RECORD_ROLLBACK',8);
 define ('RECORD_CHILDMOD',16);
 
+define ('DBD_GSNULL_CALL',2);
+define ('DBD_UPD_RESTRICT',4);
+define ('DBD_DEL_RESTRICT',8);
+define ('DBD_TRIGGER_FUNC_NOT_EXISTS',16);
 
-class gs_fkey {
-	private $key_array=array();
-	
 
-	function get_instance() {
-		static $instance;
-		if (!isset($instance)) $instance = new gs_fkey();
-		return $instance;
-	}
-
-	function __construct() {
-		$this->key_array= ($n=gs_cacher::load('gs_fkey_array','gs_recordset')) ? $n : array();
-	}
-	function __destruct() {
-		gs_cacher::save($this->key_array,'gs_recordset','gs_fkey_array');
-	}
-
-	public static function register_key($rs_name,$keys,$recordsets) {
-		$fk=gs_fkey::get_instance();
-		$fk->update_hash($rs_name,$keys,$recordsets);
-
-		}
-
-	private  function update_hash($rs_name,$keys,$recordsets) {
-		foreach ($keys as $k) {
-			$linked_rs=$recordsets[$k['link']]['recordset'];
-			$this->key_array[$linked_rs][$rs_name]=$k;
-		}
-	}
-	private function process_event($ev_name,$record) {
-		$rs_name=get_class($record->get_recordset());
-		$ev_name=strtolower($ev_name);
-		if (!isset($this->key_array[$rs_name]) || !is_array($this->key_array[$rs_name])) return true;
-		$keys=$this->key_array[$rs_name];
-		$r=true;
-		foreach($keys as $rs_name=>$k) {
-			$option=strtolower(str_replace(' ','_',$k[$ev_name]));
-			md('call fkey:'."action_".$ev_name."_".$option);
-			$r&=$this->{"action_".$ev_name."_".$option}($record,$rs_name);
-		}
-		return $r;
-	}
-
-	private function action_on_delete_restrict($record,$rs_name) { return true;}
-	private function action_on_delete_set_null($record,$rs_name) { return true;}
-	private function action_on_delete_no_action($record,$rs_name) { return true;}
-	private function action_on_delete_cascade($record,$rs_name) { return true;}
-
-	private function action_on_update_restrict($record,$rs_name) { return true;}
-	private function action_on_update_set_null($record,$rs_name) { return true;}
-	private function action_on_update_no_action($record,$rs_name) { return true;}
-	private function action_on_update_cascade($record,$rs_name) {
-		$rs=$record->init_linked_recordset($rs_name);
-		$oldid=$record->get_old_value($rs->local_field_name);
-		if ($oldid==$this->get_id() ) return true;
-		$rs->find_records(array($rs->foreign_field_name=>$id));
-		foreach ($rs as $r) {
-			$r->{$rs->foreign_field_name}=$record->__get($rs->local_field_name);
-		}
-		return true;
-	}
-
-	public static function event($ev_name,$record) {
-		$fk=gs_fkey::get_instance();
-		return $fk->process_event($ev_name,$record);
-	}
-
-}
 
 class gs_record implements arrayaccess {
 	private $gs_recordset;
-	private $values;
-	private $modified_values;
-	private $old_values;
+	private $values=array();
+	private $modified_values=array();
+	private $old_values=array();
 	public $recordstate=RECORD_UNCHANGED;  // !!!!!!!!!!!!!!!!!! private!
 	private $recordsets_array=array();
 
 	public function __construct($gs_recordset,$fields='',$status=RECORD_UNCHANGED) {
 		$this->gs_recordset=$gs_recordset;
 		$this->recordstate=$status;
+	}
+
+	public function append_child(&$child) {
+		$child->parent_record=$this;
+		$this->recordsets_array[]=$child;
+		if (($parent=$this->get_recordset()->parent_record)!==NULL) $parent->child_modified();
 	}
 
 	public function clone_record() {
@@ -128,7 +71,7 @@ class gs_record implements arrayaccess {
 	}
 
 	public function is_modified($name) {
-		return isset($this->modified_values[$name]);
+		return array_key_exists($name,$this->modified_values);
 	}
 
 	public function get_recordset() {
@@ -185,7 +128,7 @@ class gs_record implements arrayaccess {
 
 
 	public function __get($name) {
-		if (isset($this->values[$name])) return $this->values[$name];
+		if (array_key_exists($name,$this->values)) return $this->values[$name];
 		if (isset($this->gs_recordset->structure['recordsets'][$name])) return $this->lazy_load($name);
 		return new gs_null(GS_NULL_XML);
 	}
@@ -200,7 +143,7 @@ class gs_record implements arrayaccess {
 			if (isset($this->values[$name])) $this->old_values[$name]=$this->values[$name];
 			$this->modified_values[$name]=$value;
 		}
-		if (($rs=$this->get_recordset()->parent_record)!==NULL) $rs->child_modified();
+		if (($parent=$this->get_recordset()->parent_record)!==NULL) $parent->child_modified();
 		return $this->values[$name]=$value;
 	}
 	function get_old_value($name) {
@@ -217,7 +160,7 @@ class gs_record implements arrayaccess {
 		mlog('recordstate:'.$this->recordstate);
 		$ret=NULL;
 		if ($this->recordstate!=RECORD_UNCHANGED) {
-			$ret=$this->gs_recordset->attache_record($this);
+			$ret=$this->gs_recordset->attache_record($this); // works only for gs_recordset_view !!
 			if ($ret===TRUE) return;
 		}
 		if ($this->recordstate & RECORD_NEW) {
@@ -228,7 +171,7 @@ class gs_record implements arrayaccess {
 			$ret=$this->gs_recordset->insert($this);
 			$this->set_id($ret);
 		} else if ($this->recordstate & RECORD_DELETED) {
-			if (gs_fkey::event('on_delete',$this)) return false;
+			if (!gs_fkey::event('on_delete',$this)) return false;
 			$ret=$this->gs_recordset->delete($this);
 		} else if ( $this->recordstate & RECORD_CHANGED) {
 			if (!gs_fkey::event('on_update',$this)) return false;
@@ -258,6 +201,7 @@ class gs_record implements arrayaccess {
 
 	public function delete() {
 		$this->recordstate=($this->recordstate & RECORD_NEW) ? RECORD_ROLLBACK:RECORD_DELETED;
+		if (($parent=$this->get_recordset()->parent_record)!==NULL) $parent->child_modified();
 	}
 
 	public function copy() {
@@ -462,18 +406,27 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 
 	public function update($record) {
-		return $this->get_connector()->update($record);
+		$this->process_trigger('before_update',$record);
+		$r=$this->get_connector()->update($record);
+		$this->process_trigger('after_update',$record);
+		return $r;
 	}
 
 	public function delete($record) {
-		return $this->get_connector()->delete($record);
+		$this->process_trigger('before_delete',$record);
+		$r=$this->get_connector()->delete($record);
+		$this->process_trigger('after_delete',$record);
+		return $r;
 	}
 
 	public function copy($record) {
 	}
 
 	public function insert($record) {
-		return $record->set_id($this->get_connector()->insert($record));
+		$this->process_trigger('before_insert',$record);
+		$r=$record->set_id($this->get_connector()->insert($record));
+		$this->process_trigger('after_insert',$record);
+		return $r;
 	}
 
 	public function install() {
@@ -513,6 +466,20 @@ abstract class gs_recordset_base extends gs_iterator {
 		md($this->get_connector()->construct_droptable($this->table_name));
 	}
 	public function fill_values($obj,$data) {
+	}
+	public function current() {
+		return ($r=parent::current()) ? $r : new gs_null(GS_NULL_XML);
+        }
+
+	public function process_trigger($event,&$rec) {
+		if (isset($this->structure['triggers']) && isset($this->structure['triggers'][$event])) {
+			$triggers=$this->structure['triggers'][$event];
+			if (!is_array($triggers)) $triggers=array($triggers);
+			foreach ($triggers as $t) {
+				if (!method_exists($this,$t)) throw new gs_dbd_exception("triggers: no method '$t' exists:".get_class($this).":$event:$t",DBD_TRIGGER_FUNC_NOT_EXISTS);
+				$this->$t($rec);
+			}
+		}
 	}
 }
 
