@@ -8,7 +8,11 @@ class gs_fkey {
 		return $instance;
 	}
 
-	function reset() {
+	static function reset() {
+		$fk=gs_fkey::get_instance();
+		$fk->reset_fkey();
+	}
+	private function reset_fkey() {
 		$this->key_array=array();
 		$this->__destruct();
 	}
@@ -21,26 +25,51 @@ class gs_fkey {
 		md($this->key_array,1);
 	}
 
-	public static function register_key($rs_name,$keys,$recordsets) {
+	public static function register_key($rs) {
 		$fk=gs_fkey::get_instance();
-		$fk->update_hash($rs_name,$keys,$recordsets);
+		$fk->update_hash($rs);
 
 		}
 
-	private  function update_hash($rs_name,$keys,$recordsets) {
-		foreach ($keys as $k) {
-			$linked_rs_name=$recordsets[$k['link']]['recordset'];
+	private  function update_hash($rsa) {
+		$keys=$rsa->structure['fkeys'];
+		if (is_array($keys)) foreach ($keys as $k) {
+			$link=explode('.',$k['link']);
+			if(isset($link[1])) {
+				$rs_name=$link[0];
+				$link_name=$link[1];
 
-			$rs=new $rs_name;
-			$newrec=$rs->new_record();
-			$linked_rs=$newrec->init_linked_recordset($k['link']);
+
+				$rs=new $rs_name;
+				$linked_rs_name=$rs->structure['recordsets'][$link_name]['recordset'];
+
+				$newrec=$rs->new_record();
+				$linked_rs=$newrec->init_linked_recordset($link_name);
+
+				$k['local_field_name']=$linked_rs->foreign_field_name;
+				$k['foreign_field_name']=$linked_rs->local_field_name;
+				$k['index_field_name']=$linked_rs->index_field_name;
+
+				$this->key_array[$rs_name][$linked_rs_name][]=$k;
+
+			} else {
+				$rs_name=get_class($rsa);
+				$link_name=$k['link'];
+
+				$rs=$rsa;
+				$linked_rs_name=$rs->structure['recordsets'][$link_name]['recordset'];
+
+				$newrec=$rs->new_record();
+				$linked_rs=$newrec->init_linked_recordset($link_name);
 
 
-			$k['local_field_name']=$linked_rs->local_field_name;
-			$k['foreign_field_name']=$linked_rs->foreign_field_name;
-			$k['index_field_name']=$linked_rs->index_field_name;
+				$k['local_field_name']=$linked_rs->local_field_name;
+				$k['foreign_field_name']=$linked_rs->foreign_field_name;
+				$k['index_field_name']=$linked_rs->index_field_name;
 
-			$this->key_array[$linked_rs_name][$rs_name][]=$k;
+				$this->key_array[$linked_rs_name][$rs_name][]=$k;
+			}
+
 		}
 	}
 	private function process_event($ev_name,$record) {

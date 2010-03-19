@@ -451,7 +451,7 @@ abstract class gs_recordset_base extends gs_iterator {
 			$this->commit();
 		}
 		if (isset($this->structure['fkeys']) && is_array($this->structure['fkeys'])) {
-			gs_fkey::register_key(get_class($this),$this->structure['fkeys'],$this->structure['recordsets']);
+			gs_fkey::register_key($this);
 		}
 	}
 
