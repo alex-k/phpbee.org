@@ -1,6 +1,11 @@
 <?php
 function smarty_function_controller($params, &$smarty)
 {
+		    //var_dump($params);
+		    //die();
+		    if (isset($params['_params'])) {
+				$params=array_merge($params,$params['_params']);
+		    }
 		    $obj=new $params['_class'];
 		    if ($params['_assign_type']=='class') {
 			    $obj->new_record(array());
