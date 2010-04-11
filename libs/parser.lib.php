@@ -89,7 +89,8 @@ class gs_recurseparser {
 		$parts=explode(':',str_replace(array("{","}"),"",$val));
 		$this->val=$parts[0];
 		$len=count($parts);
-		$params=array();
+		$params=$this->params=array();
+		if ($len<3) return;
 		for ($i=1;$i<$len;$i+=2)
 		{
 			$params[$parts[$i]]=$parts[$i+1];

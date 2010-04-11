@@ -7,6 +7,7 @@ function smarty_function_controller($params, &$smarty)
 				$params=array_merge($params,$params['_params']);
 		    }
 		    $obj=new $params['_class'];
+		    if (isset($params['_params']['_id'])) $params[$obj->id_field_name]=$params['_params']['_id'];
 		    if ($params['_assign_type']=='class') {
 			    $obj->new_record(array());
 			    $smarty->assign($params['_assign'],$obj->current());

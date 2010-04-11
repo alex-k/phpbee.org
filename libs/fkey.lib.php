@@ -22,7 +22,7 @@ class gs_fkey {
 	}
 	function __destruct() {
 		gs_cacher::save($this->key_array,'gs_recordset','gs_fkey_array');
-		md($this->key_array,1);
+		//md($this->key_array,1);
 	}
 
 	public static function register_key($rs) {

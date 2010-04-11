@@ -9,10 +9,11 @@ function smarty_function_htmlforms($params, &$smarty)
 		    $value=isset($data[$field]) ? $data[$field] : (isset($params['value']) ? $params['value'] : $n[$field] );
 
 		    $structure=$n->get_recordset()->structure['htmlforms'][$field];
+		    $options=$n->get_recordset()->structure['fields'][$field];
 		    switch ($structure['type']) {
 			    case 'input':
 			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
-				$ret=smarty_function_htmlforms_input($field,$value,$params);
+				$ret=smarty_function_htmlforms_input($field,$value,$params,$options);
 				break;
 			    case 'datetime':
 			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');

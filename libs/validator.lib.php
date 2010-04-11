@@ -3,6 +3,7 @@ class gs_validator {
 
 
 	static function check_html_confirm_code($gspgid,$arr=array()) {
+		return TRUE; //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 		$gid=base64_encode($gspgid);	
 		$data=gs_session::load('gs_validator_html_confirm_array_'.$gid);
 		if (!is_array($data)) $data=gs_session::load('gs_validator_html_confirm_array_');
