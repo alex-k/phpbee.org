@@ -11,6 +11,33 @@ function html_redirect($gspgid=null,$data=null,$type='302') {
 		break;
 	}
 }
+function object_to_array($obj) {
+	$arr=array();
+        $_arr = is_object($obj) ? get_object_vars($obj) : $obj;
+        if (is_array($_arr)) foreach ($_arr as $key => $val) {
+                $val = (is_array($val) || is_object($val)) ? object_to_array($val) : $val;
+                $arr[$key] = $val;
+        }
+        return $arr;
+}
+function array_merge_recursive_distinct ( array &$array1, array &$array2 )
+{
+  $merged = $array1;
+
+  foreach ( $array2 as $key => &$value )
+  {
+    if ( is_array ( $value ) && isset ( $merged [$key] ) && is_array ( $merged [$key] ) )
+    {
+      $merged [$key] = array_merge_recursive_distinct ( $merged [$key], $value );
+    }
+    else
+    {
+      $merged [$key] = $value;
+    }
+  }
+
+  return $merged;
+}
 function html_fetch($url,$data=array(),$scheme='GET') {
    if (!isset($url)) throw new gs_exception('html_fetch: empty url');
 
@@ -101,7 +128,6 @@ function fetch($url,$sleep=0, $force=true) {
         }
         return $ret;
 }
-
 
 
 

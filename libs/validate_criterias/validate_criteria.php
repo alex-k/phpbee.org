@@ -478,7 +478,7 @@ function gs_validate_criteria_isURL($value, $params=null, $formvars=null) {
 
 
 function gs_validate_criteria_notEmpty($value, $params=null, $formvars=null) {
-    return strlen(trim($value)) > 0;
+    return is_array($value) || strlen(trim($value)) > 0;
 }
 
 

@@ -59,7 +59,7 @@ class gs_init {
 			$mod->install();
 		}
 	}
-		
+
 	
 	public function load_core()
 	{
@@ -253,8 +253,11 @@ TXT;
 
 function gs_exception_handler($ex)
 {
+	md('');
+	md("EXCEPTION!");
 	md($ex->getMessage());
-	var_dump($ex->getMessage());
+	//md($ex->getTrace());
+	gs_logger::dump();
 }
 
 function load_dbdriver($name) {

@@ -7,6 +7,9 @@ function smarty_block_formsblock($params, $content, &$smarty, &$repeat) {
 	case 'tab':
 		$content=smarty_block_formsblock_tab($smarty,$content,$n,$field,$structure);
 		break;
+	case 'list':
+		$content=smarty_block_formsblock_list($smarty,$content,$n,$field,$structure);
+		break;
 	default:
 		return $content;
 	}
@@ -20,6 +23,15 @@ function smarty_block_formsblock_tab($smarty,$content,$n,$field,$structure) {
 		$smarty->assign('smarty_block_formsblock_tab_field',$field);
 		$ret=$smarty->fetch('inc/smarty_block_formsblock_tab.html');
 		//var_dump($ret);
+	}
+	return $ret;
+}
+function smarty_block_formsblock_list($smarty,$content,$n,$field,$structure) {
+	if (is_array($structure['options']['array'])) {
+		$smarty->assign('smarty_block_formsblock_tab_array',$structure['options']['array']);
+		$smarty->assign('smarty_block_formsblock_tab_content',$content);
+		$smarty->assign('smarty_block_formsblock_tab_field',$field);
+		$ret=$smarty->fetch('inc/smarty_block_formsblock_list.html');
 	}
 	return $ret;
 }

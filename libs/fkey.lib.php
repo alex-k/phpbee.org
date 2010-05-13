@@ -5,6 +5,14 @@ class gs_fkey {
 	function get_instance() {
 		static $instance;
 		if (!isset($instance)) $instance = new gs_fkey();
+		/*
+		if ($instance->key_array===false) {
+			$init=new gs_init('user');
+			$init->init(LOAD_CORE | LOAD_STORAGE);
+			$init->load_modules();
+			$init->update_fkeys();
+		}
+		*/
 		return $instance;
 	}
 
@@ -14,15 +22,36 @@ class gs_fkey {
 	}
 	private function reset_fkey() {
 		$this->key_array=array();
-		$this->__destruct();
+		$this->save();
 	}
 
 	function __construct() {
-		$this->key_array= ($n=gs_cacher::load('gs_fkey_array','gs_recordset')) ? $n : array();
+		$this->key_array= ($n=gs_cacher::load('gs_fkey_array','gs_recordset')) ? $n : false;
+		if ($this->key_array===false) $this->_update_fkeys();
 	}
-	function __destruct() {
+	function save() {
 		gs_cacher::save($this->key_array,'gs_recordset','gs_fkey_array');
-		//md($this->key_array,1);
+	}
+
+	private function _update_fkeys() {
+		$this->reset_fkey();
+		//md('update_fkeys',1);
+		$classes=get_declared_classes();
+		foreach($classes as $c) {
+			if(is_subclass_of($c,'gs_recordset') && property_exists($c,'table_name') ) {
+				//md($c,1);
+				$obj=new $c;
+				if (isset($obj->structure['fkeys']) && is_array($obj->structure['fkeys'])) {
+					$this->update_hash($obj);
+				}
+			}
+		}
+		$this->save();
+	}
+
+	public static function update_fkeys() {
+		$fk=gs_fkey::get_instance();
+		$fk->_update_fkeys();
 	}
 
 	public static function register_key($rs) {

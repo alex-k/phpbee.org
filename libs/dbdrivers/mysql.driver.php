@@ -263,7 +263,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$where=$this->construct_where($options);
 		$que=sprintf("SELECT %s FROM %s ", is_array($fields) ? implode(',',$fields) : '*', $rset->db_tablename);
 		if (is_array($options)) foreach($options as $o) {
-			switch($o['type']) {
+			if (isset($o['type'])) switch($o['type']) {
 				case 'limit':
 					$str_limit=sprintf(' LIMIT %d ',$this->escape_value($o['value']));
 					break;

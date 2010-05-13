@@ -47,7 +47,8 @@ class gs_validator {
 
 		$ret=array('STATUS'=>null);
 		foreach ($c_array as $c) {
-			if (gs_validator::validate($c['criteria'],$data[$c['id']],$c,$data)===TRUE) {
+			$d=isset($data[$c['id']]) ? $data[$c['id']] : NULL;
+			if (gs_validator::validate($c['criteria'],$d,$c,$data)===TRUE) {
 				if ($ret['STATUS']===NULL) $ret['STATUS']=TRUE;
 			} else {
 				$ret['STATUS']=false;

@@ -41,7 +41,7 @@ class gs_record implements arrayaccess {
 	public function change_recordset($gs_recordset) {
 		$this->gs_recordset=$gs_recordset;
 	}
-	
+
 	public function set_id($id) {
 		$field=$this->gs_recordset->id_field_name;
 		$this->values[$field]=trim($id);
@@ -49,9 +49,10 @@ class gs_record implements arrayaccess {
 	}
 
 	public function fill_values($values) {
+		//md('==fill_values=='.get_class($this->get_recordset()),1); md($values,1);
 		if (!is_array($values)) return FALSE;
 		foreach ($values as $field=>$value) {
-			if($this->__get($field)!==NULL && isset($this->recordsets_array[$field]) && $this->recordsets_array[$field] && is_array($value) ) {
+			if ($this->__get($field)!==NULL && isset($this->recordsets_array[$field]) && $this->recordsets_array[$field] && is_array($value) ) {
 				$struct=$this->get_recordset()->structure['recordsets'][$field];
 				$local_field_name=$this->__get($field)->local_field_name;
 				if (isset($struct['type']) && $struct['type']=='one') $value=$this->$local_field_name ? array($this->$local_field_name=>$value) : array($value);
@@ -60,6 +61,7 @@ class gs_record implements arrayaccess {
 					if ($this->recordsets_array[$field][$k]) {
 						$this->recordsets_array[$field][$k]->fill_values($v);
 					} else {
+						//md('==new_record=='.$field,1);
 						$this->recordsets_array[$field]->new_record($v);
 					}
 				}
@@ -77,7 +79,7 @@ class gs_record implements arrayaccess {
 	public function get_recordset() {
 		return $this->gs_recordset;
 	}
-	
+
 	private function unescape($val) {
 		if (is_array($val)) foreach ($val as $k=>$v) {
 			if (is_array($v)) $val[$k]=$this->unescape($v);
@@ -89,41 +91,45 @@ class gs_record implements arrayaccess {
 
 	public function get_values($fields='') {
 		//return $this->unescape($this->values);
-		return $this->values;
+		$ret=array();
+		foreach ($this->values as $k=>$v) {
+			$ret[$k]= (is_object($v)) ? get_class($v) : $v;
+		}
+		return $ret;
 	}
-	
+
 	public function get_id() {
 		$field=$this->gs_recordset->id_field_name;
 		return isset($this->values[$field]) ?  $this->values[$field] : NULL;
 	}
 
 	public function init_linked_recordset ($name) {
-			$structure=$this->gs_recordset->structure['recordsets'][$name];
-			$rs=new $structure['recordset'];
-			$local_field_name=isset($structure['local_field_name']) ? $structure['local_field_name'] : $this->gs_recordset->id_field_name;
-			//$foreign_field_name=isset($structure['foreign_field_name']) ? $structure['foreign_field_name'] : $rs->id_field_name;
-			$foreign_field_name=isset($structure['foreign_field_name']) ? $structure['foreign_field_name'] : $this->gs_recordset->id_field_name;
-			$index_field_name=isset($structure['index_field_name']) ? $structure['index_field_name'] : $rs->id_field_name;
+		$structure=$this->gs_recordset->structure['recordsets'][$name];
+		$rs=new $structure['recordset'];
+		$local_field_name=isset($structure['local_field_name']) ? $structure['local_field_name'] : $this->gs_recordset->id_field_name;
+		//$foreign_field_name=isset($structure['foreign_field_name']) ? $structure['foreign_field_name'] : $rs->id_field_name;
+		$foreign_field_name=isset($structure['foreign_field_name']) ? $structure['foreign_field_name'] : $this->gs_recordset->id_field_name;
+		$index_field_name=isset($structure['index_field_name']) ? $structure['index_field_name'] : $rs->id_field_name;
 
-			$rs->local_field_name=$local_field_name;
-			$rs->foreign_field_name=$foreign_field_name;
-			$rs->index_field_name=$index_field_name;
-			//$this->gs_recordset->index_type=isset($structure['type']) ? $structure['type'] : NULL;
-			$rs->parent_record=$this;
+		$rs->local_field_name=$local_field_name;
+		$rs->foreign_field_name=$foreign_field_name;
+		$rs->index_field_name=$index_field_name;
+		//$this->gs_recordset->index_type=isset($structure['type']) ? $structure['type'] : NULL;
+		$rs->parent_record=$this;
 
-			return  $rs;
+		return  $rs;
 	}
 
 	private function lazy_load($name) {
-			mlog('lazy_load:'.$name);
-			$rs=$this->init_linked_recordset($name);
-			$structure=$this->gs_recordset->structure['recordsets'][$name];
-			$id=$this->__get($rs->local_field_name);
+		mlog('lazy_load:'.$name);
+		$rs=$this->init_linked_recordset($name);
+		$structure=$this->gs_recordset->structure['recordsets'][$name];
+		$id=$this->__get($rs->local_field_name);
 
-			$structure['options'][$rs->foreign_field_name]=$id;
-			$rs=$rs->find_records($structure['options'],null,$rs->index_field_name);
-			$this->values[$name]=$this->recordsets_array[$name]=$rs;
-			return $this->__get($name);
+		$structure['options'][$rs->foreign_field_name]=$id;
+		$rs=$rs->find_records($structure['options'],null,$rs->index_field_name);
+		$this->values[$name]=$this->recordsets_array[$name]=$rs;
+		return $this->__get($name);
 	}
 
 
@@ -137,8 +143,9 @@ class gs_record implements arrayaccess {
 		$fields=$this->get_recordset()->structure['fields'];
 		if ($this->recordstate & RECORD_ROLLBACK) {
 			$this->recordstate=RECORD_NEW;
-		} elseif((is_array($fields) && array_key_exists($name,$fields) && (!isset($this->values[$name]) || $value!=$this->values[$name])) 
-				|| ($this->recordstate & RECORD_NEW)) {
+		}
+		elseif((is_array($fields) && array_key_exists($name,$fields) && (!isset($this->values[$name]) || $value!=$this->values[$name]))
+		       || ($this->recordstate & RECORD_NEW)) {
 			$this->recordstate=$this->recordstate|RECORD_CHANGED;
 			if (isset($this->values[$name])) $this->old_values[$name]=$this->values[$name];
 			$this->modified_values[$name]=$value;
@@ -166,7 +173,7 @@ class gs_record implements arrayaccess {
 		if ($this->recordstate & RECORD_NEW) {
 			if ($level==0) {
 				$parent_record=$this->gs_recordset->parent_record;
-				if ($parent_record) $this->__set($this->gs_recordset->foreign_field_name,$parent_record->{$this->gs_recordset->local_field_name});
+				if ($parent_record) $this->__set($this->gs_recordset->foreign_field_name,$parent_record-> {$this->gs_recordset->local_field_name});
 			}
 			$ret=$this->gs_recordset->insert($this);
 			$this->set_id($ret);
@@ -193,7 +200,7 @@ class gs_record implements arrayaccess {
 				$rec=$rs->first();
 				$recordstate=$rec->recordstate;
 				$rs->commit();
-				if ($recordstate & RECORD_NEW) $this->__set($rs->local_field_name,$rec->{$rs->foreign_field_name});
+				if ($recordstate & RECORD_NEW) $this->__set($rs->local_field_name,$rec-> {$rs->foreign_field_name});
 			}
 		}
 		$this->commit(1);
@@ -209,19 +216,19 @@ class gs_record implements arrayaccess {
 	public function offsetGet($offset) {
 		return $this->__get($offset);
 	}
-	    public function offsetSet($offset, $value) {
-		    return $this->__set($offset, $value);
-	    }
-	    public function offsetExists($offset) {
-		    return TRUE && $this->__get($offset);
-	    }
-	    public function offsetUnset($offset) {
-			unset($this->values[$offset]);
-	    }
+	public function offsetSet($offset, $value) {
+		return $this->__set($offset, $value);
+	}
+	public function offsetExists($offset) {
+		return TRUE && $this->__get($offset);
+	}
+	public function offsetUnset($offset) {
+		unset($this->values[$offset]);
+	}
 
 }
-class gs_recordset extends gs_recordset_base {}
-class _gs_recordset extends gs_recordset_base { // кеширование
+abstract class gs_recordset extends gs_recordset_base {}
+abstract class _gs_recordset extends gs_recordset_base { // кеширование
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		if (($ret=$this->load_cache($options))) return $ret;
 		$ret=parent::find_records($options,$fields,$index_field_name);
@@ -257,7 +264,7 @@ class _gs_recordset extends gs_recordset_base { // кеширование
 		}
 	}
 }
-class gs_recordset_view extends gs_recordset {
+abstract class gs_recordset_view extends gs_recordset {
 	protected $rs_o_a;
 	public function __construct($gs_connector_id,$db_tablename,$db_scheme=null) {
 		$this->structure['fields']=array();
@@ -278,7 +285,7 @@ class gs_recordset_view extends gs_recordset {
 		}
 		return TRUE;
 	}
-	public function commit() {		
+	public function commit() {
 		parent::commit();
 		foreach ($this->rs_o_a as $r) {
 			$r->commit();
@@ -289,7 +296,7 @@ class gs_recordset_view extends gs_recordset {
 			$r->install();
 		}
 
-		if(!$this->get_connector()->table_exists($this->table_name)) {
+		if (!$this->get_connector()->table_exists($this->table_name)) {
 			$this->createtable();
 			$this->commit();
 		} else {
@@ -298,6 +305,10 @@ class gs_recordset_view extends gs_recordset {
 		}
 	}
 
+}
+
+function new_rs($classname) {
+        return new $classname;
 }
 
 
@@ -321,7 +332,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		if (!$this->gs_connector) {
 			$gs_connector_pool=gs_connector_pool::get_instance();
 			$this->gs_connector=$gs_connector_pool->get_connector($this->gs_connector_id);
-		} 
+		}
 		return $this->gs_connector;
 	}
 	public function __wakeup() {
@@ -330,20 +341,48 @@ abstract class gs_recordset_base extends gs_iterator {
 
 
 
-	public function new_record($values=NULL) {
+	public function new_record($values=NULL,$id=NULL) {
 		$rec=new gs_record($this,'',RECORD_NEW);
 		$rec->fill_values($values);
-		$this->add($rec);
+		//$this->add_element($rec,$id);
+		$this->add($rec,$id);
 		if (($rs=$this->parent_record)!==NULL) $rs->child_modified();
 		return $rec;
 	}
-	
+
 	public function attache_record($rec) {
 		return false;
 	}
 
 	public function get_by_id($id) {
 		return $this->find_records(array($this->id_field_name=>$id))->current();
+	}
+	public function set($values=array()) {
+		foreach ($this as $i) {
+			$i->fill_values($values);
+		}
+		return $this;
+	}
+
+
+	function find($options,$linkname=null) {
+		if (!$this->first()) return new gs_null(GS_NULL_XML);
+
+		$ids=array();
+		foreach ($this as $r) $ids[]=$r->get_id();
+
+		if ($linkname!==null) {
+			if (!isset($this->recordsets[$linkname])) return new gs_null(GS_NULL_XML);
+
+			$rs=$this->first()->init_linked_recordset($linkname);
+			$options=array_merge($options,array($rs->foreign_field_name=>$ids));
+		} else {
+			$cur_class_name=get_class($this);
+			$rs=new $cur_class_name;
+			$options=array_merge($options,array($rs->id_field_name=>$ids));
+		}
+		$rs->find_records($options);
+		return $rs;
 	}
 
 
@@ -357,9 +396,9 @@ abstract class gs_recordset_base extends gs_iterator {
 			$record=new gs_record($this,$fields);
 			$record->fill_values($r);
 			$record->recordstate = RECORD_UNCHANGED;
-			if (isset($records[$record->$index_field_name])) 
+			if (isset($records[$record->$index_field_name]))
 				$records[]=$record;
-				else $records[$record->$index_field_name]=$record;
+			else $records[$record->$index_field_name]=$record;
 		}
 		if (isset($records)) $this->replace($records);
 		return $this;
@@ -389,6 +428,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 
 	public function get_values() {
+		$ret=array();
 		foreach ($this as $k=>$v) {
 			if (is_object($v) && method_exists($v,'get_values')) {
 				$d=$v->get_values();
@@ -399,8 +439,26 @@ abstract class gs_recordset_base extends gs_iterator {
 			} else {
 				$d=$v;
 			}
+			/*
 			$id = (is_object($v) && method_exists($v,'get_id')) ? $v->get_id() : $k;
 			$ret[$id]=$d;
+			*/
+			$ret[$k]=$d;
+		}
+		return($ret);
+	}
+	public function get_elements_by_name($name) {
+		$ret=new gs_null(GS_NULL_XML);
+		foreach ($this as $k=>$v) {
+			if ($v->$name) {
+				if (!$ret) {
+					$classname=get_class($v->$name);
+					$ret=new $classname;
+				}
+				foreach ($v->$name as $i) {
+					$ret->add_element($i);
+				}
+			}
 		}
 		return($ret);
 	}
@@ -443,15 +501,12 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 		*/
 
-		if(!$this->get_connector()->table_exists($this->table_name)) {
+		if (!$this->get_connector()->table_exists($this->table_name)) {
 			$this->createtable();
 			$this->commit();
 		} else {
 			$this->altertable();
 			$this->commit();
-		}
-		if (isset($this->structure['fkeys']) && is_array($this->structure['fkeys'])) {
-			gs_fkey::register_key($this);
 		}
 	}
 
@@ -469,7 +524,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 	public function current() {
 		return ($r=parent::current()) ? $r : new gs_null(GS_NULL_XML);
-        }
+	}
 
 	public function process_trigger($event,&$rec) {
 		if (isset($this->structure['triggers']) && isset($this->structure['triggers'][$event])) {
@@ -531,35 +586,35 @@ abstract class gs_prepare_sql {
 
 	function __construct() {
 		$this->_index_types=array(
-			'key'=>'',
-			'unique'=>'UNIQUE',
-			//'serial'=>'PRIMARY AUTO_INCREMENT',
-			);
+		                        'key'=>'',
+		                        'unique'=>'UNIQUE',
+		                        //'serial'=>'PRIMARY AUTO_INCREMENT',
+		                    );
 		$this->_field_types=array( 'int'=>'INT',
-			'serial'=>'INT AUTO_INCREMENT PRIMARY KEY',
-			//'serial'=>'INT',
-			'tinyint'=>'TINYINT',
-			'float'=>'FLOAT',
-			'date'=>'DATETIME',
-			'timestamp'=>'TIMESTAMP',
-			'varchar'=>'VARCHAR ({v})',
-			'text'=>'LONGTEXT',
-			'set'=>'SET ({v})',
-			'enum'=>'ENUM ({v})',
-			'blob'=>'BLOB',
-			'longblob'=>'LONGBLOB',
-			'bool'=>'BOOL',
-			);
+		                           'serial'=>'INT AUTO_INCREMENT PRIMARY KEY',
+		                           //'serial'=>'INT',
+		                           'tinyint'=>'TINYINT',
+		                           'float'=>'FLOAT',
+		                           'date'=>'DATETIME',
+		                           'timestamp'=>'TIMESTAMP',
+		                           'varchar'=>'VARCHAR ({v})',
+		                           'text'=>'LONGTEXT',
+		                           'set'=>'SET ({v})',
+		                           'enum'=>'ENUM ({v})',
+		                           'blob'=>'BLOB',
+		                           'longblob'=>'LONGBLOB',
+		                           'bool'=>'BOOL',
+		                         );
 		$this->_escape_case=array(
-			'='=>array('FLOAT'=>'{f} = {v}','NUMERIC'=>'{f} = {v}','STRING'=>'{f} = {v}','NULL'=>'{f} IS {v}','ARRAY'=>'{f} IN {v}'),
-			'!='=>array('FLOAT'=>'{f} != {v}','NUMERIC'=>'{f} != {v}','STRING'=>'{f} != {v}','NULL'=>'{f} IS NOT {v}','ARRAY'=>'{f} NOT IN {v}'),
-			'>'=>array('FLOAT'=>'{f} > {v}','NUMERIC'=>'{f} > {v}','STRING'=>'{f} > {v}','NULL'=>'{f} IS NOT {v}'),
-			'>='=>array('FLOAT'=>'{f} >= {v}','NUMERIC'=>'{f} >= {v}','STRING'=>'{f} >= {v}','NULL'=>'{f} IS NOT {v}'),
-			'<'=>array('FLOAT'=>'{f} < {v}','NUMERIC'=>'{f} < {v}','STRING'=>'{f} < {v}','NULL'=>'{f} IS NOT {v}'),
-			'<='=>array('FLOAT'=>'{f} <= {v}','NUMERIC'=>'{f} <= {v}','STRING'=>'{f} <= {v}','NULL'=>'{f} IS NOT {v}'),
-			'LIKE'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>"{f} LIKE '%%{v}%%'",'NULL'=>'{f} IS NOT {v}'),
-			'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'({f} BETWEEN {v0} AND {v1})'),
-			);
+		                        '='=>array('FLOAT'=>'{f} = {v}','NUMERIC'=>'{f} = {v}','STRING'=>'{f} = {v}','NULL'=>'{f} IS {v}','ARRAY'=>'{f} IN {v}'),
+		                        '!='=>array('FLOAT'=>'{f} != {v}','NUMERIC'=>'{f} != {v}','STRING'=>'{f} != {v}','NULL'=>'{f} IS NOT {v}','ARRAY'=>'{f} NOT IN {v}'),
+		                        '>'=>array('FLOAT'=>'{f} > {v}','NUMERIC'=>'{f} > {v}','STRING'=>'{f} > {v}','NULL'=>'{f} IS NOT {v}'),
+		                        '>='=>array('FLOAT'=>'{f} >= {v}','NUMERIC'=>'{f} >= {v}','STRING'=>'{f} >= {v}','NULL'=>'{f} IS NOT {v}'),
+		                        '<'=>array('FLOAT'=>'{f} < {v}','NUMERIC'=>'{f} < {v}','STRING'=>'{f} < {v}','NULL'=>'{f} IS NOT {v}'),
+		                        '<='=>array('FLOAT'=>'{f} <= {v}','NUMERIC'=>'{f} <= {v}','STRING'=>'{f} <= {v}','NULL'=>'{f} IS NOT {v}'),
+		                        'LIKE'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>"{f} LIKE '%%{v}%%'",'NULL'=>'{f} IS NOT {v}'),
+		                        'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'({f} BETWEEN {v0} AND {v1})'),
+		                    );
 	}
 	protected function construct_table_fields($options) {
 		$table_fields=array();
@@ -578,8 +633,9 @@ abstract class gs_prepare_sql {
 		return $table_fields;
 
 	}
-		
+
 	function  construct_where($options,$type='AND') {
+		$tmpsql=array();
 		if (is_array($options)) foreach ($options as $kkey=>$value) {
 			if ($kkey==="OR") {
 				$txt=$this->construct_where($value,'OR');
@@ -591,11 +647,11 @@ abstract class gs_prepare_sql {
 				}
 				if (!isset($value['case'])) $value['case']='=';
 				if (!isset($value['type'])) $value['type']='value';
-				
+
 
 				switch ($value['type']) {
-					case 'value':
-						$txt=$this->escape($value['field'],$value['case'],$value['value']);
+				case 'value':
+					$txt=$this->escape($value['field'],$value['case'],$value['value']);
 					break;
 				}
 

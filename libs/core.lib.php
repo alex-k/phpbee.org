@@ -14,13 +14,15 @@ class gs_null extends SimpleXMLElement implements arrayaccess {
 	public function offsetGet($offset) {
 		return $this;
 	}
+	public function get_values() {
+		return array();
+	}
 	    public function offsetSet($offset, $value) {
 	    }
 	    public function offsetExists($offset) {
 	    }
 	    public function offsetUnset($offset) {
 	    }
-
 	     public function __call($name, $arg) {
 		     throw new gs_dbd_exception('trying call '.$name.' in gs_null object',DBD_GSNULL_CALL);
 	     }
@@ -80,15 +82,21 @@ class gs_iterator implements Iterator, arrayaccess {
     public $array = array();  
 
 
-    function add_element(&$element) {
+    function add_element(&$element, $id=NULL) {
+	    if ((is_subclass_of($element,'gs_record') || get_class($element)=='gs_record') && ($id!==NULL || $element->get_id() ) ) {
+		    return $this->array[ $id!==NULL ? $id : $element->get_id()]=$element;
+	    }
 	    return $this->array[]=$element;
     }
 
-    function add($elements) {
-	    if (!is_array($elements)) {
-		    $elements=array($elements);
+    function add($elements,$id=NULL) {
+	    if (is_subclass_of($elements,'gs_iterator') || is_array($elements)) {
+		    foreach($elements as $e) {
+			    $this->add_element($e,$id);
+		    }
+		    return true;
 	    }
-	$this->array=array_merge($this->array,$elements);
+	    return $this->add_element($elements,$id);
     }
     function replace($elements) {
 	    $this->reset();
@@ -99,6 +107,14 @@ class gs_iterator implements Iterator, arrayaccess {
 	    $this->rewind();
     }
 
+    function shift() {
+	    $ret=$this->first();
+	    reset($this->array);
+	    $key=key($this->array);
+	    unset($this->array[$key]);
+	    return $ret;
+    }
+
     function rewind() {
 	    reset($this->array);
     }
@@ -106,7 +122,10 @@ class gs_iterator implements Iterator, arrayaccess {
 	    $this->rewind();
 	    return $this->current();
     }
-
+    function reverse() {
+	    $this->array=array_reverse($this->array);
+	    return $this;
+    }
     function current() {
 	    return current($this->array);
     }
