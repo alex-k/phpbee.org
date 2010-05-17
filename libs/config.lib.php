@@ -1,6 +1,6 @@
 <?php
 /*test22*/
-DEFINE ('DEBUG',1);
+#DEFINE ('DEBUG',1);
 
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
