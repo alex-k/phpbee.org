@@ -31,14 +31,106 @@ function gs_forms() {
                     gsf_events.bind(this);   
                 });
             }
-	    //$(selector+' .gsf_b_edit').bind('click',gsf_bindings.show_inline_form);
-            //alert( "Data Saved: " + window.$f );
            }
         });
     }
 }
 
 gsf_events={
+    myforms_inline_form:function() {
+            var gsf_selector=this.getAttribute('gsf_selector');
+            var gsf_id=this.getAttribute('gsf_id');
+            var gsf_action=this.getAttribute('gsf_action');
+            var gsf_message=this.getAttribute('gsf_message');
+            var gsf_template=this.getAttribute('gsf_template');
+            var gsf_template_type=this.getAttribute('gsf_template_type');
+            var gsf_classname=this.getAttribute('gsf_classname');
+
+	    if (gsf_selector) {
+		    var cont=$(gsf_selector);
+	    } else {
+		    var cont=$(this).parents('.gsf_inline');
+		    cont.addClass('gsf_load');
+	    }
+            obj={_id:gsf_id,_action:gsf_action,_message:gsf_message,_template:gsf_template,_template_type:gsf_template_type,_classname:gsf_classname};
+            
+            jQuery.ajax({
+                url: "/admin/gs_forms/myforms/",
+                data: 'json='+escape(Obj2JSON(obj)),
+                success: function(msg) {
+                    var res=$(msg);
+                    cont.replaceWith(res);
+                    //gsf_events.bind(res.get(0));
+                }
+            });
+    },
+    myforms_close_inline_form:function() {
+            var cont=$(this).parents('.gsf_inline');
+            cont.empty();
+    },
+    myforms_show_new_form:function() {
+            var gsf_selector=this.getAttribute('gsf_selector');
+            var gsf_id=this.getAttribute('gsf_id');
+            var gsf_action=this.getAttribute('gsf_action');
+            var gsf_template=this.getAttribute('gsf_template');
+            var gsf_template_type=this.getAttribute('gsf_template_type');
+            var gsf_classname=this.getAttribute('gsf_classname');
+            var cont=$(gsf_selector);
+            obj={_id:gsf_id,_action:gsf_action,_template:gsf_template,_template_type:gsf_template_type,_classname:gsf_classname};
+            jQuery.ajax({
+                url: "/admin/gs_forms/myforms/",
+                data: 'json='+escape(Obj2JSON(obj)),
+                success: function(msg) {
+                    var res=$(msg);
+		    cont.empty();
+                    cont.prepend(res);
+                    gsf_events.bind(res.get(0));
+                }
+            });
+    },
+    myforms_post_form:function() {
+	    /*
+<input type="button" name="" value="save*" class="bedit gsf_b_save" gsf_id="1" gsf_classname="languages" gsf_template_type="all" gsf_template="table" gsf_action="save" _gsf_binded="1">
+	    */
+            var gsf_id=this.getAttribute('gsf_id');
+            var gsf_action=this.getAttribute('gsf_action');
+            var gsf_class=this.getAttribute('gsf_classname');
+            var cont=$(this).parents('.gsf_inline');
+            cont.addClass('gsf_load');
+            obj={_id:gsf_id,_action:gsf_action,_class:gsf_class};
+            var owner=this;
+            var options = {
+                url: "/admin/",
+                type: "POST",
+                dataType:  'json',
+                semantic: true,
+                success: function(res) {
+                    if (res.status) {
+                        obj._id=res.id;
+                        owner.setAttribute('gsf_action','show');
+                        owner.setAttribute('gsf_id',obj._id);
+                        gsf_events.myforms_inline_form.bind(owner)();
+                        return true;
+                    }
+                    cont.removeClass('gsf_load');
+                    $("input",cont).removeClass('gsf_error_field');
+                    for (key in res.error_fields.MESSAGES) {
+                        $("input[name='"+key+"']",cont).addClass('gsf_error_field');
+                    }
+                    if(res.exception) {
+                        alert('ex!');
+                        owner.setAttribute('gsf_action','exception');
+                        owner.setAttribute('gsf_message',res.exception_message);
+                        gsf_events.myforms_inline_form.bind(owner)();
+                        return true;
+                    }
+                    //debug(res.error_fields.MESSAGES);
+                }
+            };
+            cont.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
+            cont.append('<input type="hidden" name="gspgid" value="/admin/gs_forms/post">\n');
+            cont.ajaxSubmit(options);
+    },
     show_inline_form:function() {
             var gsf_selector=this.getAttribute('gsf_selector');
             var gsf_id=this.getAttribute('gsf_id');
@@ -240,9 +332,22 @@ gsf_events={
                 var e=gsf_bindings[attr];
                 for (ev in e) {
                     $('.'+ev,obj).bind('click',e[ev]);
+		    $('.'+ev,obj).each(function() { this.value=this.value+'*'; });
                 }
             }
         }
+    },
+    bind_myforms:function (obj) {
+	    	//alert('bind_myforms:function');
+                var e=gsf_bindings['gsf_myforms'];
+                for (ev in e) {
+		    if ($(obj).hasClass(ev)) {
+                    $(obj).bind('click',e[ev]);
+			//$(obj).each(function() { this.value=this.value+'*'; });
+		    }
+                }
+	        obj.value=obj.value+'*';
+	        obj.setAttribute('_gsf_binded',1);
     }
 }
 
@@ -250,6 +355,14 @@ gsf_bindings={
         gsf_edit:{
             gsf_b_cancel:gsf_events.show_inline_form,
             gsf_b_save:gsf_events.post_form
+        },
+        gsf_myforms:{
+            gsf_b_edit:gsf_events.myforms_inline_form,
+            gsf_b_delete:gsf_events.myforms_inline_form,
+            gsf_b_save:gsf_events.myforms_post_form,
+            gsf_b_cancel:gsf_events.myforms_inline_form,
+            gsf_b_close:gsf_events.myforms_close_inline_form,
+            gsf_b_add:gsf_events.myforms_show_new_form
         },
         gsf_show:{
             gsf_b_edit:gsf_events.show_inline_form,

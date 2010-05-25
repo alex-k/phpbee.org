@@ -327,6 +327,21 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->gs_connector_id=$gs_connector_id;
 		$this->db_tablename=$db_tablename;
 		$this->db_scheme=$db_scheme;
+
+		$this->make_forms();
+	}
+	function make_forms() {
+		$htmlforms=array();
+		$myforms=array();
+		foreach ($this->structure['fields'] as $n=>$f) {
+			$type='input';
+			if ($f['type']=='serial') $type='hidden';
+			if ($f['type']=='text') $type='textarea';
+			$htmlforms[$n]=array('type'=> $type);
+		}
+		$myforms['all.add']=$myforms['all.edit']=$myforms['all.show']=array( 'fields'=>array_keys($htmlforms) );
+		$this->structure['htmlforms']=isset($this->structure['htmlforms']) ? array_merge($htmlforms,$this->structure['htmlforms']) : $htmlforms;
+		$this->structure['myforms']=isset($this->structure['myforms']) ? array_merge($myforms,$this->structure['myforms']) : $myforms;
 	}
 	private  function get_connector() {
 		if (!$this->gs_connector) {
