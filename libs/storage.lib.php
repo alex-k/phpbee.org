@@ -340,6 +340,10 @@ abstract class gs_recordset_base extends gs_iterator {
 			$htmlforms[$n]=array('type'=> $type);
 		}
 		$myforms['all.add']=$myforms['all.edit']=$myforms['all.show']=array( 'fields'=>array_keys($htmlforms) );
+
+		if (isset($this->structure['recordsets'])) foreach ($this->structure['recordsets'] as $n=>$f) {
+			$htmlforms[$n]=array('type'=>'recordset');
+		}
 		$this->structure['htmlforms']=isset($this->structure['htmlforms']) ? array_merge($htmlforms,$this->structure['htmlforms']) : $htmlforms;
 		$this->structure['myforms']=isset($this->structure['myforms']) ? array_merge($myforms,$this->structure['myforms']) : $myforms;
 	}

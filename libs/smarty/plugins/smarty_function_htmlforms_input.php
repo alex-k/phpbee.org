@@ -10,6 +10,10 @@ function smarty_function_htmlforms_checkbox($field,$value,$params=array(),$datat
 						);
 	return $ret;
 }
+function smarty_function_htmlforms_show($field,$value,$params=array(),$datatype=array()) {
+	$ret=sprintf('%s', $value);
+	return $ret;
+}
 function smarty_function_htmlforms_hidden($field,$value,$params=array(),$datatype=array()) {
 	$ret=sprintf('<input type="hidden" name="%s" value="%s">', $field,$value);
 	return $ret;

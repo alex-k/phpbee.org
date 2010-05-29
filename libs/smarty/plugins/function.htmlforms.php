@@ -34,6 +34,10 @@ function smarty_function_htmlforms($params, &$smarty)
 			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
 				$ret=smarty_function_htmlforms_image($field_name,$value,$params,$structure);
 				break;
+			    case 'show':
+			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
+				$ret=smarty_function_htmlforms_show($field_name,$value,$params,$structure);
+				break;
 			    default:
 				return;
 		    }

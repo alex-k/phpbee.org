@@ -12,6 +12,7 @@ function smarty_function_myforms($params, &$smarty) {
 
 	$smarty->assign('_formname',$formname);
 	$smarty->assign('_classname',get_class($rs));
+	$smarty->assign('_htmlforms',$rs->structure['htmlforms']);
 	if (count($forms)) $smarty->assign('_add_forms',count($forms) ? $forms : false);
 
 
@@ -23,9 +24,12 @@ function smarty_function_myforms($params, &$smarty) {
 	$smarty->assign('_fields',$fields);
 
 	$smarty->assign('_item',$obj);
+	$smarty->assign('_template',$params['template']);
 
 	switch ($params['template']) {
 		default:
+			return $smarty->fetch('myforms/'.(string)$params['template'].'.html');
+			break;
 		case 'table':
 			return $smarty->fetch('myforms/table.html');
 		break;
