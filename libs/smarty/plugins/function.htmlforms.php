@@ -13,34 +13,9 @@ function smarty_function_htmlforms($params, &$smarty)
 		    
 		    $structure=$n->get_recordset()->structure['htmlforms'][$field];
 		    $options=$n->get_recordset()->structure['fields'][$field];
-		    switch ($structure['type']) {
-			    case 'input':
-			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
-				$ret=smarty_function_htmlforms_input($field_name,$value,$params,$options);
-				break;
-			    case 'datetime':
-			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
-				$ret=smarty_function_htmlforms_datetime($field_name,$value,$params);
-				break;
-			    case 'select':
-			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
-				$ret=smarty_function_htmlforms_select($field_name,$value,$params,$structure);
-				break;
-			    case 'textarea':
-			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
-				$ret=smarty_function_htmlforms_textarea($field_name,$value,$params,$structure);
-				break;
-			    case 'image':
-			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
-				$ret=smarty_function_htmlforms_image($field_name,$value,$params,$structure);
-				break;
-			    case 'show':
-			    	load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
-				$ret=smarty_function_htmlforms_show($field_name,$value,$params,$structure);
-				break;
-			    default:
-				return;
-		    }
-		    return($ret);
+
+			load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
+			$fname='smarty_function_htmlforms_'.$structure['type'];
+			return $fname($field_name,$value,$params,$options);
 }
 ?>

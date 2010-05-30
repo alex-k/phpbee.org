@@ -1,6 +1,7 @@
 <?php
 
-function smarty_function_myforms($params, &$smarty) {
+function smarty_function_myforms($params, &$tpl) {
+	$smarty=clone($tpl);
 	if (!is_string($params['item']) && ( !is_object($params['item']) || get_class($params['item'])!='gs_record' ) ) return;
 	$rs=is_string($params['item']) ? new $params['item'] : $params['item']->get_recordset();
 
@@ -25,6 +26,8 @@ function smarty_function_myforms($params, &$smarty) {
 
 	$smarty->assign('_item',$obj);
 	$smarty->assign('_template',$params['template']);
+	$smarty->assign('_prefix',$params['prefix']);
+	$smarty->assign('_nobuttons',$params['nobuttons'] && 1);
 
 	switch ($params['template']) {
 		default:
