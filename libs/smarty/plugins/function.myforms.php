@@ -13,9 +13,9 @@ function smarty_function_myforms($params, &$tpl) {
 
 	$smarty->assign('_formname',$formname);
 	$smarty->assign('_classname',get_class($rs));
+	$smarty->assign('_id_field_name',$rs->id_field_name);
 	$smarty->assign('_htmlforms',$rs->structure['htmlforms']);
 	if (count($forms)) $smarty->assign('_add_forms',count($forms) ? $forms : false);
-
 
 	$type=isset($params['type']) ? $params['type']: 'all';
 	$smarty->assign('_formtype',$type);

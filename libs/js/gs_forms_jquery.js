@@ -116,7 +116,8 @@ gsf_events={
                     cont.removeClass('gsf_load');
                     $("input",cont).removeClass('gsf_error_field');
                     for (key in res.error_fields.MESSAGES) {
-                        $("input[name='"+key+"']",cont).addClass('gsf_error_field');
+                        $("input[name='"+key+"'],textarea[name='"+key+"']",cont).addClass('gsf_error_field');
+                        //$("textarea[name='"+key+"']",cont).addClass('gsf_error_field');
                     }
                     if(res.exception) {
                         alert('ex!');
@@ -126,6 +127,7 @@ gsf_events={
                     }
                 }
             };
+	    $("input,textarea",cont).removeClass('gsf_error_field');
             cont.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
             cont.append('<input type="hidden" name="gspgid" value="/admin/gs_forms/post">\n');
             cont.ajaxSubmit(options);

@@ -137,6 +137,13 @@ class gs_iterator implements Iterator, arrayaccess {
     function next() {
 	    return next($this->array);
     }
+    function end() {
+	    return end($this->array);
+    }
+
+    function pop() {
+	    return array_pop($this->array);
+    }
 
     function count() {
 	    return count($this->array);
