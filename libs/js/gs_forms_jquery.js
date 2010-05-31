@@ -59,8 +59,12 @@ gsf_events={
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
+		    /*
 		    cont.empty();
                     cont.prepend(res);
+		    */
+                    cont.replaceWith(res);
+
                 }
             });
     },
@@ -117,7 +121,6 @@ gsf_events={
                     $("input",cont).removeClass('gsf_error_field');
                     for (key in res.error_fields.MESSAGES) {
                         $("input[name='"+key+"'],textarea[name='"+key+"']",cont).addClass('gsf_error_field');
-                        //$("textarea[name='"+key+"']",cont).addClass('gsf_error_field');
                     }
                     if(res.exception) {
                         alert('ex!');
@@ -130,7 +133,11 @@ gsf_events={
 	    $("input,textarea",cont).removeClass('gsf_error_field');
             cont.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
             cont.append('<input type="hidden" name="gspgid" value="/admin/gs_forms/post">\n');
-            cont.ajaxSubmit(options);
+	    if ($('input[type=file]',cont).size()>0) {
+		    cont.parents('form').ajaxSubmit(options);
+	    } else {
+		    cont.ajaxSubmit(options);
+	    }
     },
 
 

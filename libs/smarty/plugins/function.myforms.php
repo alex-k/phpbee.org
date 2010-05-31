@@ -10,6 +10,8 @@ function smarty_function_myforms($params, &$tpl) {
 	$forms=explode(',',$params['forms']);
 	$formname=array_shift($forms);
 
+	//md($rs->structure['myforms'],1);
+
 
 	$smarty->assign('_formname',$formname);
 	$smarty->assign('_classname',get_class($rs));
@@ -27,6 +29,7 @@ function smarty_function_myforms($params, &$tpl) {
 	$smarty->assign('_item',$obj);
 	$smarty->assign('_template',$params['template']);
 	$smarty->assign('_prefix',$params['prefix']);
+	$smarty->assign('_add_string',$params['add_string']);
 	$smarty->assign('_nobuttons',$params['nobuttons'] && 1);
 
 	switch ($params['template']) {

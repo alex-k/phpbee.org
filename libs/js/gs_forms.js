@@ -1,3 +1,7 @@
+
+$('input[type=button]').live('click',function() { if (!this.getAttribute('_gsf_binded')) { gsf_events.bind_myforms(this); this.click();}});
+
+
 function setCal(id) {
 	obj=document.getElementById(id);
     if (typeof obj._gs_calendar == 'undefined') {
