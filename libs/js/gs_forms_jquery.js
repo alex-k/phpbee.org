@@ -41,6 +41,7 @@ gsf_events={
             var gsf_selector=this.getAttribute('gsf_selector');
             var gsf_id=this.getAttribute('gsf_id');
             var gsf_action=this.getAttribute('gsf_action');
+            var gsf_reload_img=this.getAttribute('gsf_reload_img');
             var gsf_message=this.getAttribute('gsf_message');
             var gsf_template=this.getAttribute('gsf_template');
             var gsf_template_type=this.getAttribute('gsf_template_type');
@@ -63,8 +64,18 @@ gsf_events={
 		    cont.empty();
                     cont.prepend(res);
 		    */
-                    cont.replaceWith(res);
 
+		    if (gsf_reload_img) {
+			$('img',res).each(function() {
+				this.setAttribute('src',this.getAttribute('src')+'?'+Math.random());
+			});
+		    }
+
+		    if(cont.get(0).parentNode.tagName.toLowerCase()=='form') {
+			    $(cont.get(0).parentNode).replaceWith(res);
+		    } else {
+                    cont.replaceWith(res);
+		    }
                 }
             });
     },
@@ -114,7 +125,9 @@ gsf_events={
                         obj._id=res.id;
                         owner.setAttribute('gsf_action','show');
                         owner.setAttribute('gsf_id',obj._id);
+                        owner.setAttribute('gsf_reload_img',1);
                         gsf_events.myforms_show_inline.bind(owner)();
+
                         return true;
                     }
                     cont.removeClass('gsf_load');
@@ -131,13 +144,21 @@ gsf_events={
                 }
             };
 	    $("input,textarea",cont).removeClass('gsf_error_field');
+	    //cont.prepend('<td><form></td>\n');
             cont.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
             cont.append('<input type="hidden" name="gspgid" value="/admin/gs_forms/post">\n');
+            //cont.append('<td></form></td>');
+	    cont.wrap(document.createElement("form"));
+
+	    /*
 	    if ($('input[type=file]',cont).size()>0) {
 		    cont.parents('form').ajaxSubmit(options);
 	    } else {
 		    cont.ajaxSubmit(options);
 	    }
+	    */
+	    cont.parents('form').ajaxSubmit(options);
+	    //cont.ajaxSubmit(options);
     },
 
 
