@@ -60,11 +60,6 @@ gsf_events={
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
-		    /*
-		    cont.empty();
-                    cont.prepend(res);
-		    */
-
 		    if (gsf_reload_img) {
 			$('img',res).each(function() {
 				this.setAttribute('src',this.getAttribute('src')+'?'+Math.random());
@@ -111,6 +106,7 @@ gsf_events={
             var gsf_id=this.getAttribute('gsf_id');
             var gsf_action=this.getAttribute('gsf_action');
             var gsf_class=this.getAttribute('gsf_classname');
+            var gsf_ext_vars=this.getAttribute('gsf_ext_vars');
             var cont=$(this).parents('.gsf_inline');
             cont.addClass('gsf_load');
             obj={_id:gsf_id,_action:gsf_action,_class:gsf_class};
@@ -144,21 +140,14 @@ gsf_events={
                 }
             };
 	    $("input,textarea",cont).removeClass('gsf_error_field');
-	    //cont.prepend('<td><form></td>\n');
+
+	    $('.gsf_ext_vars').appendTo(cont);
+
             cont.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
             cont.append('<input type="hidden" name="gspgid" value="/admin/gs_forms/post">\n');
-            //cont.append('<td></form></td>');
 	    cont.wrap(document.createElement("form"));
 
-	    /*
-	    if ($('input[type=file]',cont).size()>0) {
-		    cont.parents('form').ajaxSubmit(options);
-	    } else {
-		    cont.ajaxSubmit(options);
-	    }
-	    */
 	    cont.parents('form').ajaxSubmit(options);
-	    //cont.ajaxSubmit(options);
     },
 
 
