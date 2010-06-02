@@ -1,17 +1,19 @@
 <?php
 
-function smarty_function_myforms($params, &$tpl) {
-	$smarty=clone($tpl);
+function smarty_function_myforms($params, &$smarty) {
+	//md($params['item']->structure,1);
+	//$smarty=clone($tpl);
+	if (is_object($params['item']) && is_subclass_of ($params['item'],'gs_recordset')) {
+		$rs=$params['item']; 
+	} else {
 	if (!is_string($params['item']) && ( !is_object($params['item']) || get_class($params['item'])!='gs_record' ) ) return;
 	$rs=is_string($params['item']) ? new $params['item'] : $params['item']->get_recordset();
+	}
 
 	$obj=is_object($params['item']) && get_class($params['item'])=='gs_record' ? $params['item'] : $rs->new_record();
 
 	$forms=explode(',',$params['forms']);
 	$formname=array_shift($forms);
-
-	//md($rs->structure['myforms'],1);
-
 
 	$smarty->assign('_formname',$formname);
 	$smarty->assign('_classname',get_class($rs));
