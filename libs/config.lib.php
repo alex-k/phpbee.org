@@ -256,7 +256,7 @@ function gs_exception_handler($ex)
 	md('');
 	md("EXCEPTION!");
 	md($ex->getMessage());
-	//md($ex->getTrace());
+	md($ex->getTrace());
 	gs_logger::dump();
 }
 

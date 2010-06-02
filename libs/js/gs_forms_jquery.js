@@ -54,7 +54,7 @@ gsf_events={
 		    cont.addClass('gsf_load');
 	    }
             obj={_id:gsf_id,_action:gsf_action,_message:gsf_message,_template:gsf_template,_template_type:gsf_template_type,_classname:gsf_classname};
-            
+	    $('.gsf_ext_vars').each(function() { obj[this.name]=this.value; });
             jQuery.ajax({
                 url: "/admin/gs_forms/myforms/",
                 data: 'json='+escape(Obj2JSON(obj)),
@@ -93,6 +93,7 @@ gsf_events={
 		    cont.addClass('gsf_load');
 	    }
             obj={_id:gsf_id,_action:gsf_action,_template:gsf_template,_template_type:gsf_template_type,_classname:gsf_classname};
+	    $('.gsf_ext_vars').each(function() { obj[this.name]=this.value; });
             jQuery.ajax({
                 url: "/admin/gs_forms/myforms/",
                 data: 'json='+escape(Obj2JSON(obj)),
@@ -141,7 +142,7 @@ gsf_events={
             };
 	    $("input,textarea",cont).removeClass('gsf_error_field');
 
-	    $('.gsf_ext_vars').appendTo(cont);
+	    $('.gsf_ext_vars').clone().appendTo(cont);
 
             cont.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
             cont.append('<input type="hidden" name="gspgid" value="/admin/gs_forms/post">\n');

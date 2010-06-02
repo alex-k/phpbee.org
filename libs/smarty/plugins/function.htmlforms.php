@@ -16,6 +16,6 @@ function smarty_function_htmlforms($params, &$smarty)
 
 			load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
 			$fname='smarty_function_htmlforms_'.$structure['type'];
-			return $fname($field_name,$value,$params,$options);
+			return function_exists($fname) ? $fname($field_name,$value,$params,$options) : '';
 }
 ?>

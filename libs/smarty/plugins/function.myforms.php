@@ -5,12 +5,16 @@ function smarty_function_myforms($params, &$smarty) {
 	//$smarty=clone($tpl);
 	if (is_object($params['item']) && is_subclass_of ($params['item'],'gs_recordset')) {
 		$rs=$params['item']; 
+		$obj=$rs->first();
 	} else {
-	if (!is_string($params['item']) && ( !is_object($params['item']) || get_class($params['item'])!='gs_record' ) ) return;
-	$rs=is_string($params['item']) ? new $params['item'] : $params['item']->get_recordset();
+		if (!is_string($params['item']) && ( !is_object($params['item']) || get_class($params['item'])!='gs_record' ) ) return;
+		$rs=is_string($params['item']) ? new $params['item'] : $params['item']->get_recordset();
+		$obj=is_object($params['item']) && get_class($params['item'])=='gs_record' ? $params['item'] : $rs->new_record();
 	}
 
-	$obj=is_object($params['item']) && get_class($params['item'])=='gs_record' ? $params['item'] : $rs->new_record();
+	if (isset($params['prepare_options']) && method_exists($rs,'prepare_myforms')) {
+		$rs->prepare_myforms($params['prepare_options']);
+	}
 
 	$forms=explode(',',$params['forms']);
 	$formname=array_shift($forms);
@@ -25,8 +29,12 @@ function smarty_function_myforms($params, &$smarty) {
 	$smarty->assign('_formtype',$type);
 	$type.='.';
 	$fields=array();
+
 	foreach($rs->structure['myforms'] as $k=>$v) if (strpos($k,$type)===0) $fields[str_replace($type,'',$k)]=$v['fields'];
+
+
 	$smarty->assign('_fields',$fields);
+	$smarty->assign('_titles',$rs->structure['myforms']['titles']);
 
 	$smarty->assign('_item',$obj);
 	$smarty->assign('_template',$params['template']);

@@ -336,7 +336,8 @@ abstract class gs_recordset_base extends gs_iterator {
 		$myforms=array();
 		foreach ($this->structure['fields'] as $n=>$f) {
 			$type='input';
-			if ($f['type']=='serial') $type='hidden';
+			//if ($f['type']=='serial') $type='hidden';
+			if ($f['type']=='serial') continue;
 			if ($f['type']=='text') $type='textarea';
 			$htmlforms[$n]=array('type'=> $type);
 		}
