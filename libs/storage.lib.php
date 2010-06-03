@@ -93,8 +93,9 @@ class gs_record implements arrayaccess {
 		//return $this->unescape($this->values);
 		$ret=array();
 		foreach ($this->values as $k=>$v) {
-			$ret[$k]= (is_object($v)) ? get_class($v) : $v;
-			if (is_object($v) && method_exists($v,'get_values')) $ret[$k]=$v->get_values();
+			$val= (is_object($v)) ? get_class($v) : $v;
+			if (is_object($v) && method_exists($v,'get_values')) $val=$v->get_values();
+			$ret[$k]=$val;
 		}
 		return $ret;
 	}

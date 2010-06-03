@@ -11,7 +11,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$this->connect();
 	}
 
-	function escape_value($v) {
+	function escape_value($v,$c=null) {
 		if (is_float($v)) {
 			return sprintf('truncate(%s,5)',$v);
 		}else if (is_numeric($v)) {
@@ -24,6 +24,8 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 				$arr[]=$this->escape_value($l);
 			}
 			return sprintf('(%s)',implode(',',$arr));
+		} else if ($c=='LIKE') {
+			return sprintf('%s',mysql_real_escape_string($v));
 		} else {
 			return sprintf("'%s'",mysql_real_escape_string($v));
 		}
@@ -38,12 +40,12 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 
 		$escape_pattern=$this->_escape_case[$c][$v_type];
-		$ret=$this->replace_pattern($escape_pattern,$v,$f);
+		$ret=$this->replace_pattern($escape_pattern,$v,$f,$c);
 		return $ret;
 
 	}
 
-	function replace_pattern($escape_pattern,$v,$f=null) {
+	function replace_pattern($escape_pattern,$v,$f=null,$c=null) {
 		preg_match_all('/{v/',$escape_pattern,$value_replaces);
 		if (sizeof($value_replaces[0])>1) {
 			$ret=str_replace('{f}',$f,$escape_pattern);
@@ -51,7 +53,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 				$ret=str_replace("{v$i}",$this->escape_value($v[$i]),$ret);
 			}
 		} else {
-			$v=$this->escape_value($v);
+			$v=$this->escape_value($v,$c);
 			$ret=str_replace(array('{f}','{v}'),array($f,$v),$escape_pattern);
 		}
 		return $ret;
