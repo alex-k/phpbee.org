@@ -8,6 +8,9 @@ DEFINE ('GS_DATA_COOKIE','cookie');
 DEFINE ('GS_NULL_XML',"<null></null>");
 
 class gs_null extends SimpleXMLElement implements arrayaccess {
+	public function get_id() {
+		return $this;
+	}
 	public function __get($name) {
 		return $this;
 	}

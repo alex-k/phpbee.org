@@ -40,19 +40,25 @@ function smarty_function_controller($params, &$smarty)
 			    }
 		    }
 
+		    if (isset($params['_offset'])) $_offset=(int)$params['_offset'];
 
 		    if (!empty($params['_paging'])) {
+			    	if (!isset($_offset)) {
+					$get=$smarty->get_template_vars('_gsdata');
+					$_offset=(int)$get[$params['_assign'].'_paging'];
+				}
+
 				$count=$obj->count_records($options);
 				list($_paging_type,$_paging_itemsperpage)=sscanf($params['_paging'],"%[A-Za-z]:%d");
 				require_once('function.controller.paging.php');
-				$pages=gs_controller_paging($params['_assign']."_paging", $_paging_type,$count,$_paging_itemsperpage,$params['_offset']);
+				$pages=gs_controller_paging($params['_assign']."_paging", $_paging_type,$count,$_paging_itemsperpage,$_offset);
 				$smarty->assign($params['_assign']."_paging",$pages);
 		    }
 		    
 		    
 		    if (isset($params['_limit'])) $options[]=array('type'=>'limit','value'=>$params['_limit']);
 		    	else if (isset($params['_paging'])) sscanf($params['_paging'],'pagenums:%d',$limit) && $options[]=array('type'=>'limit','value'=>$limit); 
-		    if (isset($params['_offset'])) $options[]=array('type'=>'offset','value'=>$params['_offset']);
+		    if (isset($_offset)) $options[]=array('type'=>'offset','value'=>$_offset);
 		    if (isset($params['_orderby'])) $options[]=array('type'=>'orderby','value'=>$params['_orderby']);
 		    
 		    $fields=(isset($params['_fields'])) ? $params['_fields'] : NULL;

@@ -1,3 +1,4 @@
+$('input[type=button]').live('click',function() { if (!this.getAttribute('_gsf_binded')) { gsf_events.bind_myforms(this); this.click();}});
 function Obj2JSON(obj) {
     if(typeof JSON=='undefined') {
         var arr=[];
@@ -106,6 +107,8 @@ gsf_events={
     myforms_post_form:function() {
             var gsf_id=this.getAttribute('gsf_id');
             var gsf_action=this.getAttribute('gsf_action');
+            var gsf_suffix_action =this.getAttribute('gsf_suffix_action');
+            var gsf_suffix_params=this.getAttribute('gsf_suffix_params');
             var gsf_class=this.getAttribute('gsf_classname');
             var gsf_ext_vars=this.getAttribute('gsf_ext_vars');
             var cont=$(this).parents('.gsf_inline');
@@ -123,7 +126,12 @@ gsf_events={
                         owner.setAttribute('gsf_action','show');
                         owner.setAttribute('gsf_id',obj._id);
                         owner.setAttribute('gsf_reload_img',1);
-                        gsf_events.myforms_show_inline.bind(owner)();
+
+			if (gsf_suffix_action=='redirect') {
+				window.location.href=gsf_suffix_params;
+			} else {
+				gsf_events.myforms_show_inline.bind(owner)();
+			}
 
                         return true;
                     }
@@ -142,13 +150,18 @@ gsf_events={
             };
 	    $("input,textarea",cont).removeClass('gsf_error_field');
 
-	    $('.gsf_ext_vars').clone().appendTo(cont);
+	    //var cont2=$('<tr>'+cont.get(0).innerHTML+'</tr>');
+	    //var cont2=cont;
+	    var cont2=cont.clone();
 
-            cont.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
-            cont.append('<input type="hidden" name="gspgid" value="/admin/gs_forms/post">\n');
-	    cont.wrap(document.createElement("form"));
 
-	    cont.parents('form').ajaxSubmit(options);
+	    $('.gsf_ext_vars').clone().appendTo(cont2);
+
+            cont2.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
+            cont2.append('<input type="hidden" name="gspgid" value="/admin/gs_forms/post">\n');
+	    cont2.wrap(document.createElement("form"));
+
+	    cont2.parents('form').ajaxSubmit(options);
     },
 
 

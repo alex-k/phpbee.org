@@ -29,7 +29,7 @@ function smarty_function_validate_confirm($params, &$smarty) {
 		}
 	}
 		
-	preg_match_all('/ name=[\'\"]?(\w+).*?[\"\']?[ >]/is',$txt,$matches);
+	preg_match_all('/ name=[\'\"]?([\w:]+).*?[\"\']?[ >]/is',$txt,$matches);
 	preg_match('/ name=[\'\"]?gspgid[\"\']?.*? value=[\'\"]?([\w\/]+).*?[\"\']?[ >]/i',$txt,$m_gspgid);
 	$gid=base64_encode(preg_replace('|^/|','',$m_gspgid[1]));	
 	gs_session::save(array_unique($matches[1]),'gs_validator_html_confirm_array_'.$gid);
