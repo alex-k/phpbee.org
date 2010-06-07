@@ -38,6 +38,15 @@ function gs_forms() {
 }
 
 gsf_events={
+    myforms_gsf_suffix:function(obj) {
+            var gsf_suffix_action=obj.getAttribute('gsf_suffix_action');
+            var gsf_suffix_params=obj.getAttribute('gsf_suffix_params');
+	if (gsf_suffix_action=='redirect') {
+		return window.location.href=gsf_suffix_params;
+	} 
+	return false;
+
+    },
     myforms_show_inline:function() {
             var gsf_selector=this.getAttribute('gsf_selector');
             var gsf_id=this.getAttribute('gsf_id');
@@ -77,6 +86,7 @@ gsf_events={
     },
     myforms_close_inline:function() {
             var cont=$(this).parents('.gsf_inline');
+		if (!gsf_events.myforms_gsf_suffix(this)) 
             cont.remove();
     },
     myforms_add_inline:function() {
@@ -107,8 +117,6 @@ gsf_events={
     myforms_post_form:function() {
             var gsf_id=this.getAttribute('gsf_id');
             var gsf_action=this.getAttribute('gsf_action');
-            var gsf_suffix_action =this.getAttribute('gsf_suffix_action');
-            var gsf_suffix_params=this.getAttribute('gsf_suffix_params');
             var gsf_class=this.getAttribute('gsf_classname');
             var gsf_ext_vars=this.getAttribute('gsf_ext_vars');
             var cont=$(this).parents('.gsf_inline');
@@ -127,11 +135,8 @@ gsf_events={
                         owner.setAttribute('gsf_id',obj._id);
                         owner.setAttribute('gsf_reload_img',1);
 
-			if (gsf_suffix_action=='redirect') {
-				window.location.href=gsf_suffix_params;
-			} else {
+			if (!gsf_events.myforms_gsf_suffix(owner)) 
 				gsf_events.myforms_show_inline.bind(owner)();
-			}
 
                         return true;
                     }
@@ -374,7 +379,7 @@ gsf_events={
                 for (ev in e) {
                     $('.'+ev,obj).unbind('click',e[ev]);
                     $('.'+ev,obj).bind('click',e[ev]);
-		    $('.'+ev,obj).each(function() { this.value=this.value+'*'; });
+		    //$('.'+ev,obj).each(function() { this.value=this.value+'*'; });
                 }
             }
         }
@@ -388,7 +393,7 @@ gsf_events={
 			    $(obj).bind('click',e[ev]);
 		    }
                 }
-	        obj.value=obj.value+'*';
+	        //obj.value=obj.value+'*';
 	        obj.setAttribute('_gsf_binded',1);
     }
 }
