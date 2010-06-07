@@ -12,11 +12,18 @@ function smarty_function_htmlforms($params, &$smarty)
 		    $value=isset($data[$field]) ? $data[$field] : (isset($params['value']) ? $params['value'] : $n[$field] );
 		    
 		    $structure=$n->get_recordset()->structure['htmlforms'][$field];
-		    $options=$n->get_recordset()->structure['fields'][$field];
+		    $options=is_array($n->get_recordset()->structure['fields'][$field]) ? $n->get_recordset()->structure['fields'][$field] : array();
+		    if (is_array($n->get_recordset()->structure['htmlforms'][$field])) $options=array_merge($options, $n->get_recordset()->structure['htmlforms'][$field]);
+
 
 			load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
 			$fname='smarty_function_htmlforms_'.$structure['type'];
 			$ret=function_exists($fname) ? $fname($field_name,$value,$params,$options) : '';
+			
+			if(isset($structure['validate'])) {
+				//$ret.=sprintf("{validate criteria='%s' id='%s' message='*'}",$structure['validate'],$field_name);
+				$ret.=smarty_function_validate(array('criteria'=>$structure['validate'],'id'=>$field_name,'message'=>isset($structure['validate_message'])? $structure['validate_message'] : '*'),$smarty);
+			}
 			//md($ret,1);
 			return $ret;
 }

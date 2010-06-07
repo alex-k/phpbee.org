@@ -17,6 +17,9 @@ class gs_null extends SimpleXMLElement implements arrayaccess {
 	public function offsetGet($offset) {
 		return $this;
 	}
+	public function first() {
+		return $this;
+	}
 	public function get_values() {
 		return array();
 	}

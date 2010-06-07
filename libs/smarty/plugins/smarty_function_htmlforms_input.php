@@ -44,7 +44,9 @@ function smarty_function_htmlforms_select($field,$value,$params=array(),$structu
 					$v
 				    );
 	}
-	$ret=sprintf('<select id="%s" name="%s" value="%s" class="%s" %s>%s</select>',$field,$field,$value,
+	//$ret=sprintf('<input type="hidden" name="%s" id="%s" value="%s"><input onChange="this.previousSibling.value =this.checked ? 1 : 0" type="checkbox"  value="1" %s %s class="%s" %s>', 
+	$ret=sprintf('<input type="hidden" name="%s" id="%s" value="%s"><select id="%s" onChange="this.previousSibling.value =this.value ? this.value : \'\';" class="%s" %s>%s</select>',
+				$field,$field,$value,$field,
 				isset($params['class'])?$params['class']:'edit',
 				isset($params['style'])?'style="'.$params['style'].'"':'',
 				implode("\n",$options)

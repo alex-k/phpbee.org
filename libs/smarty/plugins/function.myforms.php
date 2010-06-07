@@ -1,8 +1,8 @@
 <?php
 
-function smarty_function_myforms($params, &$smarty) {
+function smarty_function_myforms($params, &$smarty2) {
 	//md($params['item']->structure,1);
-	//$smarty=clone($tpl);
+	$smarty= isset($params['clone']) ? clone($smarty2) : $smarty2;
 	if (is_object($params['item']) && is_subclass_of ($params['item'],'gs_recordset')) {
 		$rs=$params['item']; 
 		$obj=$rs->first();
@@ -32,10 +32,9 @@ function smarty_function_myforms($params, &$smarty) {
 
 	foreach($rs->structure['myforms'] as $k=>$v) if (strpos($k,$type)===0) $fields[str_replace($type,'',$k)]=$v['fields'];
 
-
 	$smarty->assign('_fields',$fields);
 	$smarty->assign('_titles',$rs->structure['myforms']['titles']);
-
+	
 	$smarty->assign('_item',$obj);
 	$smarty->assign('_template',$params['template']);
 	$smarty->assign('_prefix',$params['prefix']);
@@ -44,12 +43,13 @@ function smarty_function_myforms($params, &$smarty) {
 
 	switch ($params['template']) {
 		default:
-			return $smarty->fetch('myforms/'.(string)$params['template'].'.html');
+			$ret=$smarty->fetch('myforms/'.(string)$params['template'].'.html');
 			break;
 		case 'table':
-			return $smarty->fetch('myforms/table.html');
+			$ret=$smarty->fetch('myforms/table.html');
 		break;
 	}
+	return $ret;
 }
 
 ?>
