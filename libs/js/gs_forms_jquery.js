@@ -152,6 +152,8 @@ gsf_events={
 
 	    //var cont2=$('<tr>'+cont.get(0).innerHTML+'</tr>');
 	    //var cont2=cont;
+
+	    $('textarea',cont).each(function(){ this.innerHTML=this.value});
 	    var cont2=cont.clone();
 
 
@@ -159,9 +161,13 @@ gsf_events={
 
             cont2.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
             cont2.append('<input type="hidden" name="gspgid" value="/admin/gs_forms/post">\n');
-	    cont2.wrap(document.createElement("form"));
 
+	    if (cont.parents('tbody').size()>0) { 
+		    cont2=cont2.appendTo(cont.parents('tbody')); 
+	    }
+	    cont2.wrap(document.createElement("form"));
 	    cont2.parents('form').ajaxSubmit(options);
+
     },
 
 
