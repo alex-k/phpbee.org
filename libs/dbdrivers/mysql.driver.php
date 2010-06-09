@@ -226,10 +226,10 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$rset=$record->get_recordset();
 		$fields=$values=array();
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
-			//if ($record->is_modified($fieldname)) {
+			if ( $st['type']!='serial') {
 				$fields[]=$fieldname;
 				$values[]=$this->escape_value($record->$fieldname);
-			//}
+			}
 		}
 		$que=sprintf('INSERT INTO %s (%s) VALUES  (%s)',$rset->db_tablename,implode(',',$fields),implode(',',$values));
 		$this->query($que);
