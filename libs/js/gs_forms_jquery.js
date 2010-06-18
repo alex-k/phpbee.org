@@ -1,4 +1,11 @@
-$('input[type=button]').live('click',function() { if (!this.getAttribute('_gsf_binded')) { gsf_events.bind_myforms(this); this.click();}});
+$('input[type=button],a').live('click',function(e) { 
+	if (!this.getAttribute('_gsf_binded')) { 
+		gsf_events.bind_myforms(this,e); 
+		$(this).click();
+	} else {
+	    e.preventDefault(); 
+	}
+});
 function Obj2JSON(obj) {
     if(typeof JSON=='undefined') {
         var arr=[];
@@ -44,8 +51,47 @@ gsf_events={
 	if (gsf_suffix_action=='redirect') {
 		return window.location.href=gsf_suffix_params;
 	} 
-	return false;
 
+    },
+    myforms_reload_selector:function() {
+            var gsf_selector=this.getAttribute('gsf_selector');
+	    var cont=gsf_selector ? $(gsf_selector) : $(this).parents('.gsf_inline');
+	    //alert(cont.size());
+	    gsf_events.myforms_show_inline.bind(cont.get(0))();
+    },
+    myforms_popup_close:function() {
+	    $(".ui-dialog-titlebar-close").click();
+    },
+    myforms_popup:function() {
+	    //alert('myforms_popup:function');
+            var gsf_selector=this.getAttribute('gsf_selector');
+            var gsf_id=this.getAttribute('gsf_id');
+            var gsf_action=this.getAttribute('gsf_action');
+            var gsf_reload_img=this.getAttribute('gsf_reload_img');
+            var gsf_message=this.getAttribute('gsf_message');
+            var gsf_template=this.getAttribute('gsf_template');
+            var gsf_template_type=this.getAttribute('gsf_template_type');
+            var gsf_classname=this.getAttribute('gsf_classname');
+
+
+            obj={_id:gsf_id,_action:gsf_action,_message:gsf_message,_template:gsf_template,_template_type:gsf_template_type,_classname:gsf_classname,_selector:gsf_selector};
+
+
+	    $('.gsf_ext_vars').each(function() { obj[this.name]=this.value; });
+            jQuery.ajax({
+                url: "/admin/gs_forms/myforms/",
+                data: 'json='+escape(Obj2JSON(obj)),
+                success: function(msg) {
+                    var res=$(msg);
+		    if (gsf_reload_img) {
+			$('img',res).each(function() {
+				this.setAttribute('src',this.getAttribute('src')+'?'+Math.random());
+			});
+		    }
+		    res.dialog({modal: true} );
+
+                }
+            });
     },
     myforms_show_inline:function() {
             var gsf_selector=this.getAttribute('gsf_selector');
@@ -60,6 +106,7 @@ gsf_events={
 	    if (gsf_selector) {
 		    var cont=$(gsf_selector);
 	    } else {
+		    //var cont=$(this).children(":first").parents('.gsf_inline');
 		    var cont=$(this).parents('.gsf_inline');
 		    cont.addClass('gsf_load');
 	    }
@@ -114,7 +161,12 @@ gsf_events={
                 }
             });
     },
-    myforms_post_form:function() {
+    myforms_post_form:function(ev) {
+
+	    if (this.getAttribute('gsf_st')) return true;
+
+	    ev.stopImmediatePropagation();
+
             var gsf_id=this.getAttribute('gsf_id');
             var gsf_action=this.getAttribute('gsf_action');
             var gsf_class=this.getAttribute('gsf_classname');
@@ -126,19 +178,25 @@ gsf_events={
             var options = {
                 url: "/admin/",
                 type: "POST",
+		forceSync: true,
                 dataType:  'json',
                 semantic: true,
                 success: function(res) {
+			//alert('--');
                     if (res.status) {
                         obj._id=res.id;
                         owner.setAttribute('gsf_action','show');
                         owner.setAttribute('gsf_id',obj._id);
                         owner.setAttribute('gsf_reload_img',1);
 
-			if (!gsf_events.myforms_gsf_suffix(owner)) 
-				gsf_events.myforms_show_inline.bind(owner)();
+			if (!gsf_events.myforms_gsf_suffix(owner)) {
+				//gsf_events.myforms_show_inline.bind(owner)();
 
+
+			owner.setAttribute('gsf_st',1);
+			$(owner).click();
                         return true;
+			}
                     }
                     cont.removeClass('gsf_load');
                     $("input",cont).removeClass('gsf_error_field');
@@ -149,10 +207,12 @@ gsf_events={
                         alert('ex!');
                         owner.setAttribute('gsf_action','exception');
                         owner.setAttribute('gsf_message',res.exception_message);
-                        return true;
                     }
+		    //ev.stopImmediatePropagation();
+                    //return false;
                 }
             };
+
 	    $("input,textarea",cont).removeClass('gsf_error_field');
 
 	    //var cont2=$('<tr>'+cont.get(0).innerHTML+'</tr>');
@@ -171,7 +231,12 @@ gsf_events={
 		    cont2=cont2.appendTo(cont.parents('tbody')); 
 	    }
 	    cont2.wrap(document.createElement("form"));
+
+
 	    cont2.parents('form').ajaxSubmit(options);
+
+	    return false;
+
 
     },
 
@@ -208,7 +273,6 @@ gsf_events={
 		$(gsf_set_field).each(function() {
 			this.value=gsf_id;
 			});
-		//return gsf_events.show_content.bind(this)();
 		return gsf_events.show_inline_form.bind(this)();
     },
     show_content:function() {
@@ -384,16 +448,33 @@ gsf_events={
             }
         }
     },
-    bind_myforms:function (obj) {
+    /*
+    bind_myforms:function (obj,e_prev) {
 	    	//alert('bind_myforms:function');
                 var e=gsf_bindings['gsf_myforms'];
                 for (ev in e) {
 		    if ($(obj).hasClass(ev)) {
+			    e_prev.preventDefault(); 
 			    $(obj).unbind('click',e[ev]);
 			    $(obj).bind('click',e[ev]);
 		    }
                 }
 	        //obj.value=obj.value+'*';
+	        obj.setAttribute('_gsf_binded',1);
+    }
+    */
+    bind_myforms:function (obj,e_prev) {
+		var arrList = obj.className.split(' ');
+                var e=gsf_bindings['gsf_myforms'];
+		for (i in arrList) {
+			var ev=arrList[i];
+			if (e[ev]) {
+				e_prev.preventDefault(); 
+				$(obj).unbind('click',e[ev]);
+				$(obj).bind('click',e[ev]);
+			}
+		}
+		obj.value=obj.value+'*';
 	        obj.setAttribute('_gsf_binded',1);
     }
 }
@@ -407,6 +488,9 @@ gsf_bindings={
 	    gsf_b_show_inline:gsf_events.myforms_show_inline,
 	    gsf_b_add_inline:gsf_events.myforms_add_inline,
 	    gsf_b_remove_inline:gsf_events.myforms_close_inline,
+	    gsf_b_popup:gsf_events.myforms_popup,
+	    gsf_b_popup_close:gsf_events.myforms_popup_close,
+	    gsf_b_reload_selector:gsf_events.myforms_reload_selector,
 	    gsf_b_post:gsf_events.myforms_post_form
         },
         gsf_show:{
