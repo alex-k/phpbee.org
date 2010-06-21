@@ -291,7 +291,6 @@ $.fn.ajaxSubmit = function(options) {
 				var data, doc;
 
 				doc = io.contentWindow ? io.contentWindow.document : io.contentDocument ? io.contentDocument : io.document;
-				
 				var isXml = opts.dataType == 'xml' || doc.XMLDocument || $.isXMLDoc(doc);
 				log('isXml='+isXml);
 				if (!isXml && (doc.body == null || doc.body.innerHTML == '')) {
@@ -305,6 +304,7 @@ $.fn.ajaxSubmit = function(options) {
 					log('Could not access iframe DOM after 100 tries.');
 					return;
 				}
+
 
 				log('response detected');
 				cbInvoked = true;
@@ -662,6 +662,7 @@ $.fn.selected = function(select) {
 
 // helper fn for console logging
 // set $.fn.ajaxSubmit.debug to true to enable debug logging
+$.fn.ajaxSubmit.debug=true;
 function log() {
 	if ($.fn.ajaxSubmit.debug) {
 		var msg = '[jquery.form] ' + Array.prototype.join.call(arguments,'');

@@ -181,6 +181,7 @@ gsf_events={
 		forceSync: true,
                 dataType:  'json',
                 semantic: true,
+		//iframe: true,
                 success: function(res) {
 			//alert('--');
                     if (res.status) {
@@ -215,11 +216,13 @@ gsf_events={
 
 	    $("input,textarea",cont).removeClass('gsf_error_field');
 
-	    //var cont2=$('<tr>'+cont.get(0).innerHTML+'</tr>');
-	    //var cont2=cont;
 
 	    $('textarea',cont).each(function(){ this.innerHTML=this.value});
-	    var cont2=cont.clone();
+	    if($(cont).parents(".ui-dialog").size()>0) {
+	        var cont2=cont;
+	    } else {
+	    	var cont2=cont.clone();
+	    }
 
 
 	    $('.gsf_ext_vars').clone().appendTo(cont2);
@@ -231,6 +234,8 @@ gsf_events={
 		    cont2=cont2.appendTo(cont.parents('tbody')); 
 	    }
 	    cont2.wrap(document.createElement("form"));
+
+	    //alert(cont2.parents('form').html());
 
 
 	    cont2.parents('form').ajaxSubmit(options);
