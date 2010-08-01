@@ -26,7 +26,7 @@ function gs_forms() {
         this.show_id=obj.show_id;
         var res=escape(Obj2JSON(obj));
         jQuery.ajax({
-           url: "/gsforms_admin/gs_forms/show",
+           url: "/admin/gs_forms/show",
            data: 'json='+res,
            success: function(msg) {
             $(selector).append(msg);
@@ -79,7 +79,7 @@ gsf_events={
 
 	    $('.gsf_ext_vars').each(function() { obj[this.name]=this.value; });
             jQuery.ajax({
-                url: "/gsforms_admin/gs_forms/myforms/",
+                url: "/admin/gs_forms/myforms/",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -113,7 +113,7 @@ gsf_events={
             obj={_id:gsf_id,_action:gsf_action,_message:gsf_message,_template:gsf_template,_template_type:gsf_template_type,_classname:gsf_classname};
 	    $('.gsf_ext_vars').each(function() { obj[this.name]=this.value; });
             jQuery.ajax({
-                url: "/gsforms_admin/gs_forms/myforms/",
+                url: "/admin/gs_forms/myforms/",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -153,7 +153,7 @@ gsf_events={
             obj={_id:gsf_id,_action:gsf_action,_template:gsf_template,_template_type:gsf_template_type,_classname:gsf_classname};
 	    $('.gsf_ext_vars').each(function() { obj[this.name]=this.value; });
             jQuery.ajax({
-                url: "/gsforms_admin/gs_forms/myforms/",
+                url: "/admin/gs_forms/myforms/",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -262,7 +262,7 @@ gsf_events={
             obj={_id:gsf_id,_dir:gsf_dir,_action:gsf_action,_message:gsf_message};
             
             jQuery.ajax({
-                url: "/gsforms_admin/gs_forms/show",
+                url: "/admin/gs_forms/show",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -290,7 +290,7 @@ gsf_events={
             obj={_id:gsf_id,_dir:gsf_dir,_action:gsf_action};
             
             jQuery.ajax({
-                url: "/gsforms_admin/gs_forms/show",
+                url: "/admin/gs_forms/show",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -343,7 +343,7 @@ gsf_events={
             var cont=$(gsf_selector);
             obj={_id:gsf_id,_dir:gsf_dir,_action:gsf_action};
             jQuery.ajax({
-                url: "/gsforms_admin/gs_forms/show",
+                url: "/admin/gs_forms/show",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -479,7 +479,7 @@ gsf_events={
 				$(obj).bind('click',e[ev]);
 			}
 		}
-		obj.value=obj.value+'*';
+		//obj.value=obj.value+'*';
 	        obj.setAttribute('_gsf_binded',1);
     }
 }
