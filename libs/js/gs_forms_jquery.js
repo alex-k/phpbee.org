@@ -171,12 +171,13 @@ gsf_events={
             var gsf_action=this.getAttribute('gsf_action');
             var gsf_class=this.getAttribute('gsf_classname');
             var gsf_ext_vars=this.getAttribute('gsf_ext_vars');
+	    var gsf_handler=this.getAttribute('gsf_handler') ? this.getAttribute('gsf_handler') : '/gsforms_admin/gs_forms/post/';
             var cont=$(this).parents('.gsf_inline');
             cont.addClass('gsf_load');
-            obj={_id:gsf_id,_action:gsf_action,_class:gsf_class};
+            obj={_id:gsf_id,_action:gsf_action,_class:gsf_class,_ext_vars:gsf_ext_vars};
             var owner=this;
             var options = {
-                url: "/gsforms_admin/",
+                url: "/index.php",
                 type: "POST",
 		forceSync: true,
                 dataType:  'json',
@@ -191,21 +192,24 @@ gsf_events={
                         owner.setAttribute('gsf_reload_img',1);
 
 			if (!gsf_events.myforms_gsf_suffix(owner)) {
-				//gsf_events.myforms_show_inline.bind(owner)();
-
-
-			owner.setAttribute('gsf_st',1);
-			$(owner).click();
-                        return true;
+				owner.setAttribute('gsf_st',1);
+				$(owner).click();
+				return true;
 			}
                     }
                     cont.removeClass('gsf_load');
                     $("input",cont).removeClass('gsf_error_field');
+                    $(".gsf_validate_message",cont).text('');
+                    $("#gsf_validate_message",cont).text('');
                     for (key in res.error_fields.MESSAGES) {
                         $("input[name='"+key+"'],textarea[name='"+key+"']",cont).addClass('gsf_error_field');
+                        $("#gsf_validate_message_"+key,cont).text(res.error_fields.MESSAGES[key]);
                     }
+                    if(res.error_message) {
+			    $("#gsf_error_message",cont).text(res.error_message);
+		    }
                     if(res.exception) {
-                        alert('ex!');
+                        alert(res.exception_message);
                         owner.setAttribute('gsf_action','exception');
                         owner.setAttribute('gsf_message',res.exception_message);
                     }
@@ -228,7 +232,7 @@ gsf_events={
 	    $('.gsf_ext_vars').clone().appendTo(cont2);
 
             cont2.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
-            cont2.append('<input type="hidden" name="gspgid" value="/gsforms_admin/gs_forms/post">\n');
+            cont2.append('<input type="hidden" name="gspgid" value="'+gsf_handler+'">\n');
 
 	    if (cont.parents('tbody').size()>0) { 
 		    cont2=cont2.appendTo(cont.parents('tbody')); 

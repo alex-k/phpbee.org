@@ -22,9 +22,11 @@ function smarty_function_htmlforms($params, &$smarty)
 			
 			if(isset($structure['validate'])) {
 				//$ret.=sprintf("{validate criteria='%s' id='%s' message='*'}",$structure['validate'],$field_name);
-				$ret.=smarty_function_validate(array('criteria'=>$structure['validate'],'id'=>$field_name,'message'=>isset($structure['validate_message'])? $structure['validate_message'] : '*'),$smarty);
+				$validate_params=array('criteria'=>$structure['validate'],'id'=>$field_name,'message'=>isset($structure['validate_message'])? $structure['validate_message'] : '*');
+				if (isset($structure['validate_params']) && is_array($structure['validate_params'])) $validate_params=array_merge($validate_params,$structure['validate_params']);
+
+				$ret.=smarty_function_validate($validate_params,$smarty);
 			}
-			//md($ret,1);
 			return $ret;
 }
 ?>

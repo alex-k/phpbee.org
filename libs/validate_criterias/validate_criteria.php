@@ -107,7 +107,6 @@ function gs_validate_criteria_isCCNum($value, $params=null, $formvars=null) {
 
 
 function gs_validate_criteria_checkField($value, $params=null, $formvars=null) {
-
 	$classname=$params['class'];
 	$obj=new $classname;
 	return $obj->check_field($params['field'],$value,$params);
@@ -397,6 +396,9 @@ function gs_validate_criteria_isLength($value, $params=null, $formvars=null) {
 
 
 
+function gs_validate_criteria_isChecked($value, $params=null, $formvars=null) {
+    return 1 && $value;
+}
 
 function gs_validate_criteria_isNumber($value, $params=null, $formvars=null) {
     if(strlen($value) == 0)

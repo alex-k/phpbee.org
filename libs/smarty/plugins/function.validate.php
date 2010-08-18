@@ -21,7 +21,6 @@ function smarty_function_validate($params, &$smarty) {
 	    $ret.="<div class=validate_error_message>".$params['message']."</div>";
     }
     */
-    
     $ret.=sprintf('<input type=hidden name="_validate_%s_%s" value="%s"\n>',$params['id'],$params['criteria'],base64_encode(serialize($params)));
 
     return $ret;

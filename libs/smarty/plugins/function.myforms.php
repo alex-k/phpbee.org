@@ -21,6 +21,7 @@ function smarty_function_myforms($params, &$smarty2) {
 
 	$smarty->assign('_formname',$formname);
 	$smarty->assign('_classname',get_class($rs));
+	$smarty->assign('_htmlclass',$params['htmlclass']);
 	$smarty->assign('_id_field_name',$rs->id_field_name);
 	$smarty->assign('_htmlforms',$rs->structure['htmlforms']);
 	$smarty->assign('_rs',$rs);
@@ -39,6 +40,7 @@ function smarty_function_myforms($params, &$smarty2) {
 	$smarty->assign('_item',$obj);
 	$smarty->assign('_template',$params['template']);
 	$smarty->assign('_prefix',$params['prefix']);
+	$smarty->assign('_gsf_suffix_params',$params['gsf_suffix_params']);
 	$smarty->assign('_add_string',$params['add_string']);
 	$smarty->assign('_nobuttons',$params['nobuttons'] && 1);
 
