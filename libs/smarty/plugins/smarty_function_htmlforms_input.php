@@ -53,6 +53,20 @@ function smarty_function_htmlforms_select($field,$value,$params=array(),$structu
 				);
 	return $ret;
 }
+function smarty_function_htmlforms_radio($field,$value,$params=array(),$structure=array()) {
+	$options=array();
+	if(is_array($structure['options'])) foreach ($structure['options'] as $k=>$v) {
+		$ret.=sprintf('<input type="radio" value="%s" %s name="%s" id="%s" %s %s>%s<br>',
+					$k,
+					$k==$value ? 'checked' : '',
+					$field,$field,
+					isset($params['class'])?$params['class']:'edit',
+					isset($params['style'])?'style="'.$params['style'].'"':'',
+					$v
+				    );
+	}
+	return $ret;
+}
 function smarty_function_htmlforms_datetime($field,$value,$params=array()) {
 	$ret=sprintf('<input type="text" onfocus="setCal(this.id);" id="%s"name="%s" value="%s" class="%s" %s>',$field,$field,$value,
 				isset($params['class'])?$params['class']:'edit',
