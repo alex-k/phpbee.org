@@ -622,7 +622,7 @@ abstract class gs_prepare_sql {
 		                           'varchar'=>'VARCHAR ({v})',
 		                           'text'=>'LONGTEXT',
 		                           'set'=>'SET ({v})',
-		                           'enum'=>'ENUM ({v})',
+		                           'enum'=>'ENUM {v}',
 		                           'blob'=>'BLOB',
 		                           'longblob'=>'LONGBLOB',
 		                           'bool'=>'BOOL',
