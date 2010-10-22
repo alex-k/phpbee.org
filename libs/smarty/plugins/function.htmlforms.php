@@ -8,9 +8,9 @@ function smarty_function_htmlforms($params, &$smarty)
 		    $field_name=isset($params['name_format']) ? sprintf($params['name_format'],$field) : $field;
 		    
 		    $data=$tpl->get_template_vars('_gsdata');
-		    $data=gs_cacher::load($data['_gscacheid'],'sendback_html_form'); $data=is_array($data) && isset($data['data']) ? $data['data']: new gs_null(GS_NULL_XML);
+		    $data=gs_cacher::load($data['_gscacheid'],'sendback_html_form') ? gs_cacher::load($data['_gscacheid'],'sendback_html_form')  : $data; 
+		    $data=is_array($data) && isset($data['data']) ? $data['data']: new gs_null(GS_NULL_XML);
 		    $value=isset($data[$field]) ? $data[$field] : (isset($params['value']) ? $params['value'] : $n[$field] );
-		    
 		    $structure=$n->get_recordset()->structure['htmlforms'][$field];
 		    $options=is_array($n->get_recordset()->structure['fields'][$field]) ? $n->get_recordset()->structure['fields'][$field] : array();
 		    if (is_array($n->get_recordset()->structure['htmlforms'][$field])) $options=array_merge($options, $n->get_recordset()->structure['htmlforms'][$field]);

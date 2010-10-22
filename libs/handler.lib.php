@@ -24,6 +24,14 @@ class gs_base_handler {
 		}
 		return $tpl->assign($name,$value);
 	}
+	function fetch() {
+		if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('_gsdata',$this->data);
+		$tpl->assign('_gsparams',$this->params);
+		if (!$tpl->template_exists($this->params['name'])) throw new gs_exception('gs_base_handler.show: can not find template file for '.$this->params['name']);
+		return $tpl->fetch($this->params['name']);
+	}
 	protected function show($nodebug=FALSE) {
 		if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
 		$tpl=gs_tpl::get_instance();

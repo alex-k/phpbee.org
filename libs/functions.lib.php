@@ -2,7 +2,8 @@
 function html_redirect($gspgid=null,$data=null,$type='302') {
 	$config=gs_config::get_instance();
 	if($gspgid===null) $gspgid=$config->referer_path;
-	$url=$config->www_dir.$gspgid;
+	$scheme=parse_url($gspgid,PHP_URL_SCHEME);
+	$url=$scheme ? $gspgid : $config->www_dir.$gspgid;
 	$datastr='';
 	if ($data) $datastr='?'.http_build_query($data);
 	switch ($type) {
@@ -99,7 +100,6 @@ function pmail($recipients, $body="",$subject="",$add_headers=false,$from=false,
 
 
         $mail_object =& Mail::factory(cfg('mail_type'), $params);
-	md($mail_object,1);
         $ret=$mail_object->send($recipient, $headers, $body);
 
     }

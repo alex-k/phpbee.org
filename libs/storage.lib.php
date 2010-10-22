@@ -25,6 +25,9 @@ class gs_record implements arrayaccess {
 		$this->gs_recordset=$gs_recordset;
 		$this->recordstate=$status;
 	}
+	public function __wakeup() {
+		if(method_exists($this->get_recordset(),'__record_wakeup')) $this->get_recordset()->__record_wakeup($this);
+	}
 
 	public function append_child(&$child) {
 		$child->parent_record=$this;
@@ -123,7 +126,7 @@ class gs_record implements arrayaccess {
 	}
 
 	private function lazy_load($name) {
-		mlog('lazy_load:'.$name);
+		//mlog('lazy_load:'.$name);
 		$rs=$this->init_linked_recordset($name);
 		$structure=$this->gs_recordset->structure['recordsets'][$name];
 		$id=$this->__get($rs->local_field_name);
@@ -350,7 +353,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->structure['htmlforms']=isset($this->structure['htmlforms']) ? array_merge($htmlforms,$this->structure['htmlforms']) : $htmlforms;
 		$this->structure['myforms']=isset($this->structure['myforms']) ? array_merge($myforms,$this->structure['myforms']) : $myforms;
 	}
-	private  function get_connector() {
+	protected function get_connector() {
 		if (!$this->gs_connector) {
 			$gs_connector_pool=gs_connector_pool::get_instance();
 			$this->gs_connector=$gs_connector_pool->get_connector($this->gs_connector_id);
@@ -635,6 +638,7 @@ abstract class gs_prepare_sql {
 		                        '<'=>array('FLOAT'=>'{f} < {v}','NUMERIC'=>'{f} < {v}','STRING'=>'{f} < {v}','NULL'=>'{f} IS NOT {v}'),
 		                        '<='=>array('FLOAT'=>'{f} <= {v}','NUMERIC'=>'{f} <= {v}','STRING'=>'{f} <= {v}','NULL'=>'{f} IS NOT {v}'),
 		                        'LIKE'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>"{f} LIKE '%%{v}%%'",'NULL'=>'{f} IS NOT {v}'),
+		                        'FULLTEXT'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})",'NULL'=>'{f} IS NOT {v}'),
 		                        'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'({f} BETWEEN {v0} AND {v1})'),
 		                    );
 	}

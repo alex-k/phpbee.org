@@ -19,7 +19,9 @@ function smarty_function_htmlforms_hidden($field,$value,$params=array(),$datatyp
 	return $ret;
 }
 function smarty_function_htmlforms_input($field,$value,$params=array(),$datatype=array()) {
-	$ret=sprintf('<input type="text" name="%s" value="%s" %s class="%s" %s>', $field,$value,
+	$ret=sprintf('<input type="%s" name="%s" value="%s" %s class="%s" %s>', 
+						isset($datatype['input_type']) ? $datatype['input_type'] : 'text', 
+						$field,$value,
 						isset($datatype['options']) && !($datatype['options']>15)   ? 'size="'.$datatype['options'].'" maxlength="'.$datatype['options'].'"':'',
 						isset($params['class'])?$params['class']:'edit',
 						isset($params['style'])?'style="'.$params['style'].'"':''

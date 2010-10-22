@@ -1,4 +1,4 @@
-$('input[type=button],a').live('click',function(e) { 
+$('input[type=button],input[type=submit],a').live('click',function(e) { 
 	if (!this.getAttribute('_gsf_binded')) { 
 		gsf_events.bind_myforms(this,e); 
 		$(this).click();
@@ -26,7 +26,7 @@ function gs_forms() {
         this.show_id=obj.show_id;
         var res=escape(Obj2JSON(obj));
         jQuery.ajax({
-           url: "/admin/gs_forms/show",
+           url: "gs_forms/show",
            data: 'json='+res,
            success: function(msg) {
             $(selector).append(msg);
@@ -79,7 +79,7 @@ gsf_events={
 
 	    $('.gsf_ext_vars').each(function() { obj[this.name]=this.value; });
             jQuery.ajax({
-                url: "/admin/gs_forms/myforms/",
+                url: "gs_forms/myforms/",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -113,7 +113,7 @@ gsf_events={
             obj={_id:gsf_id,_action:gsf_action,_message:gsf_message,_template:gsf_template,_template_type:gsf_template_type,_classname:gsf_classname};
 	    $('.gsf_ext_vars').each(function() { obj[this.name]=this.value; });
             jQuery.ajax({
-                url: "/admin/gs_forms/myforms/",
+                url: "gs_forms/myforms/",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -153,7 +153,7 @@ gsf_events={
             obj={_id:gsf_id,_action:gsf_action,_template:gsf_template,_template_type:gsf_template_type,_classname:gsf_classname};
 	    $('.gsf_ext_vars').each(function() { obj[this.name]=this.value; });
             jQuery.ajax({
-                url: "/admin/gs_forms/myforms/",
+                url: "gs_forms/myforms/",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -218,7 +218,9 @@ gsf_events={
                 }
             };
 
+
 	    $("input,textarea",cont).removeClass('gsf_error_field');
+
 
 
 	    $('textarea',cont).each(function(){ this.innerHTML=this.value});
@@ -230,6 +232,10 @@ gsf_events={
 
 
 	    $('.gsf_ext_vars').clone().appendTo(cont2);
+
+	    $("input[type=password]",cont).each( function() { 
+		    cont2.append('<input type="hidden" name="'+this.name+'" value="'+this.value+'">\n');
+		    });
 
             cont2.append('<input type="hidden" name="json" value=\''+Obj2JSON(obj)+'\'>\n');
             cont2.append('<input type="hidden" name="gspgid" value="'+gsf_handler+'">\n');
@@ -266,7 +272,7 @@ gsf_events={
             obj={_id:gsf_id,_dir:gsf_dir,_action:gsf_action,_message:gsf_message};
             
             jQuery.ajax({
-                url: "/admin/gs_forms/show",
+                url: "gs_forms/show",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -294,7 +300,7 @@ gsf_events={
             obj={_id:gsf_id,_dir:gsf_dir,_action:gsf_action};
             
             jQuery.ajax({
-                url: "/admin/gs_forms/show",
+                url: "gs_forms/show",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);
@@ -347,7 +353,7 @@ gsf_events={
             var cont=$(gsf_selector);
             obj={_id:gsf_id,_dir:gsf_dir,_action:gsf_action};
             jQuery.ajax({
-                url: "/admin/gs_forms/show",
+                url: "gs_forms/show",
                 data: 'json='+escape(Obj2JSON(obj)),
                 success: function(msg) {
                     var res=$(msg);

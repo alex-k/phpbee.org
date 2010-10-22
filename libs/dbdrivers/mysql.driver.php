@@ -76,12 +76,16 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 
 	function query($que='') {
+		$t=microtime(true);
 		if (DEBUG) {
 			md($que);
 		}
 		$this->_res=mysql_query($que,$this->db_connection);
 		if ($this->_res===FALSE) {
 			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error().' in query '.$que);
+		}
+		if (DEBUG) {
+			md(sprintf("%.03f secounds, %d rows",microtime(true)-$t, mysql_affected_rows($this->db_connection)));
 		}
 		return $this->_res;
 
