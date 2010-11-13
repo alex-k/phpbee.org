@@ -64,6 +64,7 @@ class gs_init {
 	public function load_core()
 	{
 		load_file($this->config->lib_dir.'tpl.lib.php');
+		load_file($this->config->lib_dir.'tpl_static.lib.php');
 		load_file($this->config->lib_dir.'core.lib.php');
 		load_file($this->config->lib_dir.'parser.lib.php');
 		load_file($this->config->lib_dir.'handler.lib.php');

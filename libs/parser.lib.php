@@ -13,6 +13,10 @@ class gs_parser {
 		$this->registered_handlers=$this->get_handlers();
 		$result=$this->registered_handlers->xpath($data['gspgid']);
 		$this->current_handler=$result->get_handler();
+		$data['handler_key']=$result->handler_key;
+		$data['gspgid_v']=ltrim(str_replace($result->handler_key,'',$data['gspgid']),'/');
+		$data['gspgid_va']=explode('/',$data['gspgid_v']);
+		$this->data=$data;
 	}
 	
 	public function _get_handler()
@@ -206,15 +210,15 @@ class gs_node {
 		$this->parent_name=$node->node_name;
 	}
 	
-	function xpath($path)
+	function xpath($path, $mypath="")
 	{
 		$parts=explode('/',$path);
 		$current=array_shift ($parts);
 		$ret=$this->get_node_by_name($current);
 		if (!is_null($ret)) {
-			return $ret->xpath(implode('/',$parts));
+			return $ret->xpath(implode('/',$parts),$mypath.'/'.$current);
 		}
-		
+		$this->handler_key=ltrim($mypath,'/');
 		return $this;
 	}
 }

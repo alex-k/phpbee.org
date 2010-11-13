@@ -40,6 +40,8 @@ function array_merge_recursive_distinct ( array &$array1, array &$array2 )
   return $merged;
 }
 function html_fetch($url,$data=array(),$scheme='GET') {
+	mlog($url);
+	mlog($data);
    if (!isset($url)) throw new gs_exception('html_fetch: empty url');
 
     $ch = curl_init();
@@ -49,6 +51,9 @@ function html_fetch($url,$data=array(),$scheme='GET') {
 	    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     }
+
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 180);

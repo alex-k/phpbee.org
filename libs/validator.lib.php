@@ -35,7 +35,7 @@ class gs_validator {
 				if ($c===FALSE) throw new gs_exception('gs_validator.validate_form: can not decode c_array / '.$c);
 				$c_array[$k]=$c;
 				$c_array_fields[$c['id']]=$c['id'];
-			} else {
+			} else if (!in_array($k,array('gspgid_v','gspgid_va'))){
 				$c_data[$k]=$d;
 			}
 		}
