@@ -123,7 +123,19 @@ class gs_record implements arrayaccess {
 
 	public function init_linked_recordset ($name) {
 		$structure=$this->gs_recordset->structure['recordsets'][$name];
-		$rs=new $structure['recordset'];
+		/*
+		       'recordset'=>$table_name,
+		                               'rs1_name'=$init_opts['recordset'],
+					                               'rs2_name'=$rname,
+
+
+		*/
+		if (isset($structure['rs1_name']) && isset($structure['rs2_name'])) 
+			$rs=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset']);
+		 else 
+			$rs=new $structure['recordset'];
+
+
 		$local_field_name=isset($structure['local_field_name']) ? $structure['local_field_name'] : $this->gs_recordset->id_field_name;
 		//$foreign_field_name=isset($structure['foreign_field_name']) ? $structure['foreign_field_name'] : $rs->id_field_name;
 		$foreign_field_name=isset($structure['foreign_field_name']) ? $structure['foreign_field_name'] : $this->gs_recordset->id_field_name;
@@ -487,6 +499,12 @@ abstract class gs_recordset_base extends gs_iterator {
 				$obj->install();
 			}
 		}
+		foreach($this->structure['recordsets'] as $structure) {
+			if (isset($structure['rs1_name']) && isset($structure['rs2_name']))  {
+				$obj=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset']);
+				$obj->install();
+			}
+		}
 		/*
 		if (isset($this->structure['recordsets'])) foreach ($this->structure['recordsets'] as $r) {
 			$rs=new $r['recordset'];
@@ -599,14 +617,14 @@ abstract class gs_prepare_sql {
 		                           'bool'=>'BOOL',
 		                         );
 		$this->_escape_case=array(
-		                        '='=>array('FLOAT'=>'{f} = {v}','NUMERIC'=>'{f} = {v}','STRING'=>'{f} = {v}','NULL'=>'{f} IS {v}','ARRAY'=>'{f} IN {v}'),
-		                        '!='=>array('FLOAT'=>'{f} != {v}','NUMERIC'=>'{f} != {v}','STRING'=>'{f} != {v}','NULL'=>'{f} IS NOT {v}','ARRAY'=>'{f} NOT IN {v}'),
-		                        '>'=>array('FLOAT'=>'{f} > {v}','NUMERIC'=>'{f} > {v}','STRING'=>'{f} > {v}','NULL'=>'{f} IS NOT {v}'),
-		                        '>='=>array('FLOAT'=>'{f} >= {v}','NUMERIC'=>'{f} >= {v}','STRING'=>'{f} >= {v}','NULL'=>'{f} IS NOT {v}'),
-		                        '<'=>array('FLOAT'=>'{f} < {v}','NUMERIC'=>'{f} < {v}','STRING'=>'{f} < {v}','NULL'=>'{f} IS NOT {v}'),
-		                        '<='=>array('FLOAT'=>'{f} <= {v}','NUMERIC'=>'{f} <= {v}','STRING'=>'{f} <= {v}','NULL'=>'{f} IS NOT {v}'),
-		                        'LIKE'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>"{f} LIKE '%%{v}%%'",'NULL'=>'{f} IS NOT {v}'),
-		                        'FULLTEXT'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})",'NULL'=>'{f} IS NOT {v}'),
+		                        '='=>array('FLOAT'=>'{f} = {v}','NUMERIC'=>'{f} = {v}','STRING'=>'{f} = {v}','NULL'=>'{f} IS NULL','ARRAY'=>'{f} IN {v}'),
+		                        '!='=>array('FLOAT'=>'{f} != {v}','NUMERIC'=>'{f} != {v}','STRING'=>'{f} != {v}','NULL'=>'{f} IS NOT NULL','ARRAY'=>'{f} NOT IN {v}'),
+		                        '>'=>array('FLOAT'=>'{f} > {v}','NUMERIC'=>'{f} > {v}','STRING'=>'{f} > {v}','NULL'=>'{f} IS NOT NULL'),
+		                        '>='=>array('FLOAT'=>'{f} >= {v}','NUMERIC'=>'{f} >= {v}','STRING'=>'{f} >= {v}','NULL'=>'{f} IS NOT NULL'),
+		                        '<'=>array('FLOAT'=>'{f} < {v}','NUMERIC'=>'{f} < {v}','STRING'=>'{f} < {v}','NULL'=>'{f} IS NOT NULL}'),
+		                        '<='=>array('FLOAT'=>'{f} <= {v}','NUMERIC'=>'{f} <= {v}','STRING'=>'{f} <= {v}','NULL'=>'{f} IS NOT NULL'),
+		                        'LIKE'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>"{f} LIKE '%%{v}%%'",'NULL'=>'FALSE'),
+		                        'FULLTEXT'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})",'NULL'=>'FALSE'),
 		                        'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'({f} BETWEEN {v0} AND {v1})'),
 		                    );
 	}

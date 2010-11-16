@@ -41,26 +41,6 @@ abstract class gs_recordset_view extends gs_recordset {
 	}
 
 }
-class gs_recordset_short extends gs_recordset {
-	function __construct($s=false,$init_opts=false) {
-		$this->init_opts=$init_opts;
-		if (!$s || !is_array($s)) throw new gs_exception('gs_recordset_short :: empty init values');
-		$this->table_name=get_class($this);
-		$this->id_field_name='id';
-		$this->gs_connector_id=key(cfg('gs_connectors'));
-		$this->structure['fields'][$this->id_field_name]=array('type'=>'serial');
-		$this->selfinit($s);
-		parent::__construct($this->gs_connector_id,$this->table_name);
-		//md($this,1);
-	}
-
-	function selfinit($arr) {
-		$struct=field_interface::init($arr,$this->init_opts);
-		foreach ($struct as $k=>$s)
-			$this->structure[$k]=isset($this->structure[$k]) ? array_merge($this->structure[$k],$struct[$k]) : $struct[$k];
-		//md($this->structure,1);
-	}
-}
 
 class field_interface {
 	function init($arr,$init_opts) {
@@ -150,7 +130,6 @@ class field_interface {
 	}
 	function fSelect($field,$opts,&$structure,$init_opts) { self::f___dummy($field,$opts,&$structure,$init_opts);}
 	function fPassword($field,$opts,&$structure,$init_opts) { self::f___dummy($field,$opts,&$structure,$init_opts);}
-	function lMany2Many($field,$opts,&$structure,$init_opts) {}
 	function lOne2One($field,$opts,&$structure,$init_opts) {
 		$fname=$field.'_id';
 		$structure['fields'][$fname]=array('type'=>'int');
@@ -164,7 +143,6 @@ class field_interface {
 			'local_field_name'=>$fname,
 			'foreign_field_name'=>'id',
 			);
-		$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'RESTRICT','on_update'=>'CASCADE');
 
 
 	}
@@ -178,7 +156,105 @@ class field_interface {
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$obj_rs['local_field_name'],
 			);
+		$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'RESTRICT','on_update'=>'CASCADE');
 		
+	}
+	function lMany2Many($field,$opts,&$structure,$init_opts) {
+		@list($rname,$table_name,$foreign_field_name)=explode(':',$opts['linked_recordset']);
+		/*
+		new gs_rs_links($init_opts['recordset'],$rname,$table_name);	
+		нужно переопределить lazy_load в _short чтобы он для rs_links вызывал хитрый конструктор.
+
+		*/
+		$structure['recordsets'][$field]=array(
+			'recordset'=>$table_name,
+			'rs1_name'=>$init_opts['recordset'],
+			'rs2_name'=>$rname,
+			'local_field_name'=>'id',
+			'foreign_field_name'=>$foreign_field_name ? $foreign_field_name : $init_opts['recordset'].'_id',
+			);
+		//$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'CASCADE','on_update'=>'CASCADE');
+	}
+	function install()  {
+
+	}
+}
+
+class gs_rs_links extends gs_recordset{
+        public $id_field_name='id';
+        public $structure=array(
+                'fields'=>array(
+                        'id'=>array('type'=>'serial'),
+			),
+		);
+
+	function __construct($rs1,$rs2,$table_name) { 
+		$this->table_name=$table_name;
+		$this->rs1_name=$rs1;
+		$this->rs2_name=$rs2;
+		$conn_id=key(cfg('gs_connectors'));
+
+		$f1=$rs1.'_id';
+		$f2=$rs1!=$rs2 ? $rs2.'_id': 'id2';
+		$this->structure['fields'][$f1]=array('type'=>'int');
+		$this->structure['fields'][$f2]=array('type'=>'int');
+
+		$this->structure['recordsets']['parents']=array('recordset'=>$rs1,'local_field_name'=>$f1,'foreign_field_name'=>'id');
+		$this->structure['recordsets']['childs']=array('recordset'=>$rs2,'local_field_name'=>$f2,'foreign_field_name'=>'id');
+		/*
+		*/
+		$this->structure['fkeys'][]=array('link'=>'parents','on_delete'=>'CASCADE','on_update'=>'CASCADE');
+		$this->structure['fkeys'][]=array('link'=>'childs','on_delete'=>'CASCADE','on_update'=>'CASCADE');
+                return parent::__construct($conn_id,$table_name);
+
+	}
+	/*
+	function __get($name) {
+		md('-----------',1);
+		md($name,1);
+		return parent::__get('childs');
+	}
+	*/
+	public function find_records($options=null,$fields=null,$index_field_name=null) {
+		parent::find_records($options,$fields,$index_field_name);
+		if (isset($this->parent_record)) {
+			md('gs_rs_links lazy load',1);
+			$idname=$this->structure['recordsets']['childs']['local_field_name'];
+			$ids=array();
+			foreach ($this as $t) $ids[]=$t->$idname;
+			$rsname=$this->structure['recordsets']['childs']['recordset'];
+			$rs=new $rsname();
+			$rs=$rs->find_records(array('id'=>$ids));
+			$this->links=$this->array;
+			$this->array=$rs->array;
+		}
+		return $this;
+	}
+	public function commit() {
+		$ret=parent::commit();
+		if (isset($this->links)) foreach ($this->links as $l) $l->commit();
+		return $ret;
+	}
+}
+class gs_recordset_short extends gs_recordset {
+	function __construct($s=false,$init_opts=false) {
+		$this->init_opts=$init_opts;
+		$this->init_opts['recordset']=get_class($this);
+		if (!$s || !is_array($s)) throw new gs_exception('gs_recordset_short :: empty init values');
+		$this->table_name=get_class($this);
+		$this->id_field_name='id';
+		$this->gs_connector_id=key(cfg('gs_connectors'));
+		$this->structure['fields'][$this->id_field_name]=array('type'=>'serial');
+		$this->selfinit($s);
+		parent::__construct($this->gs_connector_id,$this->table_name);
+		//md($this,1);
+	}
+
+	function selfinit($arr) {
+		$struct=field_interface::init($arr,$this->init_opts);
+		foreach ($struct as $k=>$s)
+			$this->structure[$k]=isset($this->structure[$k]) ? array_merge($this->structure[$k],$struct[$k]) : $struct[$k];
+		//md($this->structure,1);
 	}
 }
 

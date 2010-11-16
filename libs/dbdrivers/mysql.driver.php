@@ -35,7 +35,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$v_type='STRING';
 		if (is_float($v)) {$v_type='FLOAT';}
 		else if (is_numeric($v)) {$v_type='NUMERIC';}
-		else if (is_array($v)) {$v_type='ARRAY';}
+		else if (is_array($v)) {$v_type=!empty($v) ? 'ARRAY' : 'NULL';}
 		else if (is_null($v)) {$v_type='NULL';}
 
 

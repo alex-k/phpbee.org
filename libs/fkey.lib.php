@@ -38,11 +38,16 @@ class gs_fkey {
 		//md('update_fkeys',1);
 		$classes=get_declared_classes();
 		foreach($classes as $c) {
-			if(is_subclass_of($c,'gs_recordset') && property_exists($c,'table_name') ) {
-				//md($c,1);
+			if(is_subclass_of($c,'gs_recordset') &&(is_subclass_of($c,'gs_recordset_short') || property_exists($c,'table_name')) ) {
 				$obj=new $c;
 				if (isset($obj->structure['fkeys']) && is_array($obj->structure['fkeys'])) {
 					$this->update_hash($obj);
+				}
+				if (isset($obj->structure['recordsets'])) foreach($obj->structure['recordsets'] as $structure) {
+					if (isset($structure['rs1_name']) && isset($structure['rs2_name']))  {
+						$rs=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset']);
+						if (isset($rs->structure['fkeys'])) $this->update_hash($rs);
+					}
 				}
 			}
 		}
@@ -65,11 +70,13 @@ class gs_fkey {
 		if (is_array($keys)) foreach ($keys as $k) {
 			$link=explode('.',$k['link']);
 			if(isset($link[1])) {
-				$rs_name=$link[0];
+				$recordset_name=$link[0];
+				$o= new $link[0];
+				$rs_name=$o->table_name;
 				$link_name=$link[1];
 
 
-				$rs=new $rs_name;
+				$rs=new $recordset_name;
 				$linked_rs_name=$rs->structure['recordsets'][$link_name]['recordset'];
 
 				$newrec=$rs->new_record();
@@ -82,7 +89,8 @@ class gs_fkey {
 				$this->key_array[$rs_name][$linked_rs_name][]=$k;
 
 			} else {
-				$rs_name=get_class($rsa);
+				$recordset_name=get_class($rsa);
+				$rs_name=$rsa->table_name;
 				$link_name=$k['link'];
 
 				$rs=$rsa;
@@ -95,6 +103,11 @@ class gs_fkey {
 				$k['local_field_name']=$linked_rs->local_field_name;
 				$k['foreign_field_name']=$linked_rs->foreign_field_name;
 				$k['index_field_name']=$linked_rs->index_field_name;
+				if (isset($rs->rs1_name) && isset($rs->rs2_name))  {
+					$k['table_name']=$rs->table_name;
+					$k['rs1_name']=$rs->rs1_name;
+					$k['rs2_name']=$rs->rs2_name;
+				}
 
 				$this->key_array[$linked_rs_name][$rs_name][]=$k;
 			}
@@ -102,7 +115,9 @@ class gs_fkey {
 		}
 	}
 	private function process_event($ev_name,$record) {
-		$rs_name=get_class($record->get_recordset());
+		//$rs_name=get_class($record->get_recordset());
+		$rs_name=$record->get_recordset()->table_name;
+		$recordset_name=($record->get_recordset());
 		$ev_name=strtolower(str_replace(' ','_',$ev_name));
 		if (!isset($this->key_array[$rs_name]) || !is_array($this->key_array[$rs_name])) return true;
 		$keys=$this->key_array[$rs_name];
@@ -114,7 +129,11 @@ class gs_fkey {
 				$this->foreign_field_name=$k['foreign_field_name'];
 				$this->oldid=$record->get_old_value($this->foreign_field_name);
 				if ($ev_name=='on_update' && $this->oldid==$record->{$this->foreign_field_name} ) continue;
-				$this->rs=new $rs_name;
+				if (isset($k['rs1_name']) && isset($k['rs2_name'])) {
+					$this->rs=new gs_rs_links($k['rs1_name'],$k['rs2_name'],$k['table_name']);
+				} else {
+					$this->rs=new $recordset_name;
+				}
 				$option=strtolower(str_replace(' ','_',$k[$ev_name]));
 				$r&=$this->{"action_".$ev_name."_".$option}($record);
 			}

@@ -36,8 +36,8 @@ class gs_init {
 		}
 	}
 
-	public function load_modules() {
-		$files = glob($this->config->lib_modules_dir.'/*module.php');
+	public function load_modules($mask='*module.php') {
+		$files = glob($this->config->lib_modules_dir.'/'.$mask);
 		foreach ($files as $f) {
 			load_file($f);
 		}

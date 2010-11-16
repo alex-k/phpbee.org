@@ -173,6 +173,22 @@ class gs_iterator implements Iterator, arrayaccess {
     public function offsetGet($offset) {
         return isset($this->array[$offset]) ? $this->array[$offset] : new gs_null(GS_NULL_XML);
     }
+
+    function sort($flag=1) {
+	    if (is_string($flag)) {
+		    if (substr($flag,0,1)=='-') {
+		    $field=substr($flag,1);
+			    usort($this->array,create_function('$a,$b','return -strcmp($a->'.$field.',$b->'.$field.');'));
+		    } else {
+			    usort($this->array,create_function('$a,$b','return strcmp($a->'.$flag.',$b->'.$flag.');'));
+		    }
+
+
+	    } 
+	    else if ($flag<0) krsort($this->array);
+	    else ksort($this->array);
+	    return $this;
+    }
 }
 
 
