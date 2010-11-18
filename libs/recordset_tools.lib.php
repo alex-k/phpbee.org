@@ -65,8 +65,10 @@ class field_interface {
 			$r['func_name']=$r[0];
 			if (in_array($r['func_name'],array('lMany2Many','lMany2One','lOne2One'))) {
 				$r['linked_recordset']=$r[1];
+				if (!isset($r['hidden'])) $r['hidden']=!(isset($r['verbose_name']) || isset($r[2])) ;
 				if (!isset($r['verbose_name'])) $r['verbose_name']=isset($r[2]) ? $r[2] : $k;
 			} else {
+				if (!isset($r['hidden'])) $r['hidden']=!(isset($r['verbose_name']) || isset($r[1])) ;
 				if (!isset($r['verbose_name'])) $r['verbose_name']=isset($r[1]) ? $r[1] : $k;
 			}
 			$ret[$k]=$r;
@@ -84,23 +86,19 @@ class field_interface {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
 		$structure['htmlforms'][$field]=array(
 			'type'=>'input', 
+			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'], 
 			);
 
 		if (strtolower($opts['required'])=='false') {
 			$structure['htmlforms'][$field]['validate']='dummyValid';
 		} else {
-			$structure['htmlforms'][$field]['validate']='isLength';
-			$structure['htmlforms'][$field]['validate_params']=array(
-					'min'=>isset($opts['min_length']) ? (int)($opts['min_length']) : 1,
-					'max'=>isset($opts['max_length']) ? (int)($opts['max_length']) : $structure['fields'][$field]['options'],
-					);
+			$structure['htmlforms'][$field]['validate'][]='isLength';
+			$structure['htmlforms'][$field]['validate_params']['min']=isset($opts['min_length']) ? (int)($opts['min_length']) : 1;
+			$structure['htmlforms'][$field]['validate_params']['max']=isset($opts['max_length']) ? (int)($opts['max_length']) : $structure['fields'][$field]['options'];
 			if (isset($opts['validate_regexp'])) {
-				$structure['htmlforms'][]=array(
-					'id'=>$field,
-					'validate'=>'isRegexp',
-					'options'=>$opts['validate_regexp'],
-					);
+				$structure['htmlforms'][$field]['validate'][]='isRegexp';
+				$structure['htmlforms'][$field]['validate_params']['validate_regexp']=$opts['validate_regexp'];
 			}
 		}
 	}
@@ -108,6 +106,7 @@ class field_interface {
 		$structure['fields'][$field]=array('type'=>'date');
 		$structure['htmlforms'][$field]=array(
 			'type'=>'input',
+			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isDate'
 		);
@@ -116,6 +115,7 @@ class field_interface {
 		$structure['fields'][$field]=array('type'=>'text');
 		$structure['htmlforms'][$field]=array(
 			'type'=>'text',
+			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
@@ -124,6 +124,7 @@ class field_interface {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>255);
 		$structure['htmlforms'][$field]=array(
 			'type'=>'input',
+			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
@@ -135,6 +136,7 @@ class field_interface {
 		$structure['fields'][$fname]=array('type'=>'int');
 		$structure['htmlforms'][$fname]=array(
 			'type'=>'input',
+			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
@@ -166,6 +168,12 @@ class field_interface {
 		нужно переопределить lazy_load в _short чтобы он для rs_links вызывал хитрый конструктор.
 
 		*/
+		$structure['htmlforms'][$field]=array(
+			'type'=>'lMany2Many',
+			'hidden'=>$opts['hidden'],
+			'verbose_name'=>$opts['verbose_name'],
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
+		);
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$table_name,
 			'rs1_name'=>$init_opts['recordset'],

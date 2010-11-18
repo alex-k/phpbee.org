@@ -4,6 +4,7 @@
 
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
+DEFINE ('LOAD_TEMPLATES',4);
 ini_set('display_errors','On');
 error_reporting(E_ALL);
 
@@ -34,6 +35,9 @@ class gs_init {
 		if ($mode & LOAD_STORAGE) {
 			$this->load_storage();
 		}
+		if ($mode & LOAD_TEMPLATES) {
+			$this->load_templates();
+		}
 	}
 
 	public function load_modules($mask='*module.php') {
@@ -61,10 +65,14 @@ class gs_init {
 	}
 
 	
-	public function load_core()
+	public function load_templates()
 	{
 		load_file($this->config->lib_dir.'tpl.lib.php');
 		load_file($this->config->lib_dir.'tpl_static.lib.php');
+		load_file($this->config->lib_dir.'forms.lib.php');
+	}
+	public function load_core()
+	{
 		load_file($this->config->lib_dir.'core.lib.php');
 		load_file($this->config->lib_dir.'parser.lib.php');
 		load_file($this->config->lib_dir.'handler.lib.php');

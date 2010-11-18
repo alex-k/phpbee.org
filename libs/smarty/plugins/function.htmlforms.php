@@ -19,13 +19,16 @@ function smarty_function_htmlforms($params, &$smarty)
 			load_file(cfg('tpl_plugins_dir').'/smarty_function_htmlforms_input.php');
 			$fname='smarty_function_htmlforms_'.$structure['type'];
 			$ret=function_exists($fname) ? $fname($field_name,$value,$params,$options) : '';
-			
+			if (isset($structure['validate']) && !is_array($structure['validate'])) $structure['validate']=array($structure['validate']);
+
 			if(isset($structure['validate'])) {
+				foreach($structure['validate'] as $criteria) {
 				//$ret.=sprintf("{validate criteria='%s' id='%s' message='*'}",$structure['validate'],$field_name);
-				$validate_params=array('criteria'=>$structure['validate'],'id'=>$field_name,'message'=>isset($structure['validate_message'])? $structure['validate_message'] : '*');
+				$validate_params=array('criteria'=>$criteria,'id'=>$field_name,'message'=>isset($structure['validate_message'])? $structure['validate_message'] : '*');
 				if (isset($structure['validate_params']) && is_array($structure['validate_params'])) $validate_params=array_merge($validate_params,$structure['validate_params']);
 
 				$ret.=smarty_function_validate($validate_params,$smarty);
+				}
 			}
 			return $ret;
 }

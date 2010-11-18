@@ -170,6 +170,7 @@ class gs_record implements arrayaccess {
 	}
 
 	public function __set($name,$value) {
+		if ($this->recordstate==RECORD_UNCHANGED) $this->modified_values=array();
 		$fields=$this->get_recordset()->structure['fields'];
 		if ($this->recordstate & RECORD_ROLLBACK) {
 			$this->recordstate=RECORD_NEW;
@@ -315,8 +316,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->gs_connector_id=$gs_connector_id;
 		$this->db_tablename=$db_tablename;
 		$this->db_scheme=$db_scheme;
-
-		$this->make_forms();
+		//$this->make_forms();
 	}
 	function make_forms() {
 		$htmlforms=array();
@@ -372,6 +372,13 @@ abstract class gs_recordset_base extends gs_iterator {
 		return $this;
 	}
 
+	public function __get($name) {
+		if (isset($this->structure['recordsets'][$name]))
+			return $this->find(array(),$name);
+
+		return new gs_null(GS_NULL_XML);
+	}
+
 
 	function find($options,$linkname=null) {
 		if (!$this->first()) return new gs_null(GS_NULL_XML);
@@ -380,8 +387,8 @@ abstract class gs_recordset_base extends gs_iterator {
 		foreach ($this as $r) $ids[]=$r->get_id();
 
 		if ($linkname!==null) {
-			if (!isset($this->recordsets[$linkname])) return new gs_null(GS_NULL_XML);
-
+			//if (!isset($this->recordsets[$linkname])) return new gs_null(GS_NULL_XML);
+			if (!isset($this->structure['recordsets'][$linkname])) return new gs_null(GS_NULL_XML);
 			$rs=$this->first()->init_linked_recordset($linkname);
 			$options=array_merge($options,array($rs->foreign_field_name=>$ids));
 		} else {

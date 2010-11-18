@@ -267,7 +267,9 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	}
 	function select($rset,$options,$fields=NULL) {
 		$where=$this->construct_where($options);
-		$que=sprintf("SELECT %s FROM %s ", is_array($fields) ? implode(',',$fields) : '*', $rset->db_tablename);
+		//md($rset->structure['fields'],1);
+		$fields = is_array($fields) ? $fields : array_keys($rset->structure['fields']);
+		$que=sprintf("SELECT %s FROM %s ", implode(',',$fields), $rset->db_tablename);
 		if (is_array($options)) foreach($options as $o) {
 			if (isset($o['type'])) switch($o['type']) {
 				case 'limit':
