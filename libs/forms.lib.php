@@ -110,7 +110,7 @@ class g_forms_jstpl extends g_forms {
 		foreach($this->htmlforms as $field => $v) {
 			$funcname=$v['type'];
 			if(method_exists($this,$funcname)) {
-			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,'input'=>$this->$funcname($field,"<%=t.$field%>",$v));
+			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,'input'=>$this->$funcname($field,"<%=t.values.$field%>",$v));
 			}
 		}
 		return $arr;

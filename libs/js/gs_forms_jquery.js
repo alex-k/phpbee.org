@@ -1,4 +1,4 @@
-$('input[type=button],input[type=submit],a').live('click',function(e) { 
+$('form input[type=button],input[type=submit],a').live('click',function(e) { 
 	if (!this.getAttribute('_gsf_binded')) { 
 		gsf_events.bind_myforms(this,e); 
 		$(this).click();
