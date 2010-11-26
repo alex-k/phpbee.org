@@ -52,7 +52,10 @@ class gs_record implements arrayaccess {
 	}
 
 	public function fill_values($values) {
-		//md('==fill_values=='.get_class($this->get_recordset()),1); md($values,1);
+		/*
+		md('==fill_values=='.get_class($this->get_recordset()),1); 
+		md($values,1);
+		*/
 		if (!is_array($values)) return FALSE;
 		foreach ($values as $field=>$value) {
 			if ($this->__get($field)!==NULL && isset($this->recordsets_array[$field]) && $this->recordsets_array[$field] && is_array($value) ) {
@@ -72,12 +75,10 @@ class gs_record implements arrayaccess {
 
 				*/
 				if (!isset($struct['type']) || $struct['type']=='one') $value=$this->$local_field_name ? array($this->$local_field_name=>$value) : array($value);
-
 				foreach ($value as $k=>$v) {
 					if ($this->recordsets_array[$field][$k]) {
 						$this->recordsets_array[$field][$k]->fill_values($v);
 					} else {
-						//md('==new_record=='.$field,1);
 						$this->recordsets_array[$field]->new_record($v);
 					}
 				}
@@ -105,15 +106,37 @@ class gs_record implements arrayaccess {
 	}
 
 
-	public function get_values($fields='') {
+	public function get_values($fields=null,$recursive=true) {
 		//return $this->unescape($this->values);
 		$ret=array();
-		foreach ($this->values as $k=>$v) {
+		$values=$this->values;
+		if ($fields !==null) {
+			$values=array();
+			if(!is_array($fields)) $fields=explode(',',$fields);
+			foreach ($fields as $k)  {
+				$this->__get(trim($k));
+				//if($v) $values[$k]=$v;
+				if (array_key_exists($k,$this->values)) $values[$k]=$this->values[$k];
+			}
+
+		}
+		foreach ($values as $k=>$v) {
 			$val= (is_object($v)) ? get_class($v) : $v;
-			if (is_object($v) && method_exists($v,'get_values')) $val=$v->get_values();
+			if (is_object($v) && method_exists($v,'get_values')) {
+				if ($recursive) {
+					$val=$v->get_values();
+				} else {
+					$val=array();
+					foreach ($v as $vv) $val[$vv->get_id()]=$vv->get_id();
+				}
+			}
 			$ret[$k]=$val;
 		}
 		return $ret;
+	}
+
+	public function __toString() {
+		return $this->get_recordset()->record_as_string($this);
 	}
 
 	public function get_id() {
@@ -362,6 +385,21 @@ abstract class gs_recordset_base extends gs_iterator {
 		return false;
 	}
 
+	public function record_as_string($rec) {
+		reset($this->structure['fields']);
+		next($this->structure['fields']);
+		$fieldname=key($this->structure['fields']);
+		reset($this->structure['fields']);
+		return $rec->$fieldname;
+	}
+	public function recordset_as_string_array() {
+		$ret=array();
+		foreach ($this as $rec) {
+			$ret[$rec->get_id()]=trim($rec);
+		}
+		return $ret;
+	}
+
 	public function get_by_id($id) {
 		return $this->find_records(array($this->id_field_name=>$id))->current();
 	}
@@ -439,11 +477,11 @@ abstract class gs_recordset_base extends gs_iterator {
 	public function get_fields() {
 		return array_keys($this->structure['fields']);
 	}
-	public function get_values() {
+	public function get_values($fields=null,$recursive=true) {
 		$ret=array();
 		foreach ($this as $k=>$v) {
 			if (is_object($v) && method_exists($v,'get_values')) {
-				$d=$v->get_values();
+				$d=$v->get_values($fields,$recursive);
 			} else if (is_object($v)) {
 				$d=get_object_vars($v);
 			} else if (is_array($v)) {

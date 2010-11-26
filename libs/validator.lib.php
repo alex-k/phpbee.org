@@ -1,7 +1,5 @@
 <?php 
 class gs_validator {
-
-
 	static function check_html_confirm_code($gspgid,$arr=array()) {
 		return TRUE; //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 		$gid=base64_encode($gspgid);	
@@ -68,14 +66,10 @@ class gs_validator {
 		load_file($config->lib_dir.'validate_criterias/validate_criteria.php');
 
 		$methodname='gs_validate_criteria_'.$type;
-		//if (!method_exists('gs_validator',$methodname)) {
 		if (!function_exists($methodname)) {
 			throw new gs_exception('gs_validator: method '.$methodname.'  not exists');
 		}
 		return $methodname($value,$params,$formvars);
 	}
-
-
-
 }
 ?>

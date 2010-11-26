@@ -70,6 +70,7 @@ class gs_init {
 		load_file($this->config->lib_dir.'tpl.lib.php');
 		load_file($this->config->lib_dir.'tpl_static.lib.php');
 		load_file($this->config->lib_dir.'forms.lib.php');
+		load_file($this->config->lib_dir.'widgets.lib.php');
 	}
 	public function load_core()
 	{
@@ -77,6 +78,7 @@ class gs_init {
 		load_file($this->config->lib_dir.'parser.lib.php');
 		load_file($this->config->lib_dir.'handler.lib.php');
 		load_file($this->config->lib_dir.'validator.lib.php');
+		load_file($this->config->lib_dir.'newvalidator.lib.php');
 		load_file($this->config->lib_dir.'functions.lib.php');
 	}
 

@@ -1,13 +1,69 @@
-<?php
-interface g_forms_interface {
-	function __construct($rs);
-	function as_table();
-	function as_list();
-	function as_labels();
+<?
+interface gs_widget_interface {
+	function __construct($fieldname,$data);
+	function html();
+	function js();
 	function clean();
+	function validate();
+}
+abstract class gs_widget implements gs_widget_interface {
+	function __construct($fieldname,$data,$params=array(),$record=NULL) {
+		$this->fieldname=$fieldname;
+		$this->value=isset($data[$fieldname]) ? $data[$fieldname] : NULL;
+		$this->params=$params;
+		$this->record=$record;
+	}
+	function clean() {
+		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
+		return $this->value;
+	}
+	function validate() {
+		return true;
+	}
+	function js() {
+		return $this->html();
+	}
+	function html() {
+		return sprintf('<input type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
+	}
 }
 
-abstract class g_forms implements g_forms_interface{
+class gs_widget_input extends gs_widget{}
+class gs_widget_lMany2Many extends gs_widget{
+	function js() {
+		$ret="<select multiple=\"on\" name=\"".$this->fieldname."[]\">\n";
+		$ret.="<% for (vid in t.values.".$this->fieldname.".variants) { %>
+			<option value=\"<%=vid%>\" <% if (t.values.".$this->fieldname.".selected[vid]) { %> selected=\"selected\" <% } %>  ><%=t.values.".$this->fieldname.".variants[vid]%></option>
+			<% } %>
+			";
+		$ret.="</select>\n";
+		return $ret;
+	}
+	function html() {
+		$rsl=$this->record->init_linked_recordset($this->fieldname);
+		$rsname=$rsl->structure['recordsets']['childs']['recordset'];
+		$rs=new $rsname();
+		$variants=$rs->find_records();
+		$ret=sprintf("<select multiple=\"on\" name=\"%s[]\">\n", $this->fieldname);
+		foreach ($variants as $v) {
+			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$v->get_id(), (is_array($this->value) && array_key_exists($v->get_id(),$this->value)) ? 'selected="selected"' : '',trim($v));
+		}
+		$ret.="</select>\n";
+
+		return $ret;
+	}
+	function clean() {
+		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
+		$ret=is_array($this->value) ? array_combine(array_values($this->value),array_values($this->value)) : array();
+		if($this->record) {
+			$this->record->{$this->fieldname}->flush($ret);
+		}
+		return $ret;
+	}
+}
+
+
+/*
 	function checkbox($field,$value,$params=array(),$datatype=array()) {
 		$ret=sprintf('<input type="hidden" name="%s" id="%s" value="%s"><input onChange="this.previousSibling.value =this.checked ? 1 : 0" type="checkbox"  value="1" %s %s class="%s" %s>', 
 							$field,$field,
@@ -55,7 +111,6 @@ abstract class g_forms implements g_forms_interface{
 						$v
 					    );
 		}
-		//$ret=sprintf('<input type="hidden" name="%s" id="%s" value="%s"><input onChange="this.previousSibling.value =this.checked ? 1 : 0" type="checkbox"  value="1" %s %s class="%s" %s>', 
 		$ret=sprintf('<input type="hidden" name="%s" id="%s" value="%s"><select id="%s" onChange="this.previousSibling.value =this.value ? this.value : \'\';" class="%s" %s>%s</select>',
 					$field,$field,$value,$field,
 					isset($params['class'])?$params['class']:'edit',
@@ -96,105 +151,7 @@ abstract class g_forms implements g_forms_interface{
 							);
 		return $ret;
 	}
-	function __construct($h,$data=array()) {
-		$this->record=NULL;
-		$this->params=NULL;
-		$this->clean_data=array();
-		if (is_object($h) && get_class($h)=='gs_record') {
-			$this->record=$h;
-			$rs=$this->record->get_recordset();
-			$h=$rs->structure['htmlforms'];
-		}
-		foreach ($h as $k=>$ih) {
-			if(isset($ih['hidden']) && $ih['hidden']) unset($h[$k]);
-		}
-		$this->data=$data;
-		$this->htmlforms=$h;
-	}
-	function clean($name=null) {
-		return $name ? $this->clean_data[$name] : $this->clean_data;
-	}
-	protected function error(&$ret, $k,$m) {
-		$ret['STATUS']=false;
-		$ret['ERRORS'][]=array('FIELD'=>$k,'ERROR'=>$m);
-		$ret['FIELDS'][$k][]=$m;
-	}
+*/
 
-	function validate() {
-		$this->clean_data=array();
-		$ret=array(
-			'STATUS'=>true,
-			'ERRORS'=>array(),
-			'FIELDS'=>array(),
-			);
-		foreach ($this->htmlforms as $k=>$h) {
-			$wclass="gs_widget_".$h['type'];
-			$w =new $wclass($k,$this->data,$this->params,$this->record);
-			try {
-				$value=$w->clean();
-				$this->clean_data[$k]=$value;
-			} catch (gs_widget_validate_exception $e) {
-				$this->error($ret, $k,$e->getMessage());
-			}
-			$validate=is_array($h['validate']) ? $h['validate'] : array($h['validate']);
-			foreach ($validate as $v) {
-				$vname='gs_validate_'.$v;
-				$val=new $vname();
-				if (!$val->validate($k,$value,$this->data,isset($h['validate_params'])?$h['validate_params'] : array() )) {
-					$this->error($ret, $k,$vname);
-				}
-
-			}
-		}
-		return $ret;
-
-	}
-}
-
-class g_forms_html extends g_forms {
-	function _prepare_inputs(){
-		$arr=array();
-		foreach($this->htmlforms as $field => $v) {
-			$wclass="gs_widget_".$v['type'];
-			$w =new $wclass($field,$this->data,$v,$this->record);
-			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
-						'input'=>$w->html()
-						);
-		}
-		return $arr;
-	}
-	function as_table($delimiter="\n"){
-		$arr=array();
-		$inputs=$this->_prepare_inputs();
-		foreach($inputs as $field=>$v) 
-			$arr[]=sprintf('<tr><td><label for="%s">%s</label></td><td>%s</td></tr>',$field, $v['label'],$v['input']);
-
-		return implode($delimiter,$arr);
-	}
-	function as_list(){}
-	function as_labels($delimiter="<br/>\n"){
-		$arr=array();
-		$inputs=$this->_prepare_inputs();
-		foreach($inputs as $field=>$v) 
-			$arr[]=sprintf('<label>%s: %s</label>', $v['label'],$v['input']);
-
-		return implode($delimiter,$arr);
-	}
-
-}
-class g_forms_jstpl extends g_forms_html {
-	function _prepare_inputs(){
-		$arr=array();
-		foreach($this->htmlforms as $field => $v) {
-			$wclass="gs_widget_".$v['type'];
-			$w =new $wclass($field,array($field=>"<%=t.values.$field%>"),$v,$this->record);
-			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
-						//'input'=>$w->html($field,"<%=t.values.$field%>",$v)
-						'input'=>$w->js()
-						);
-		}
-		return $arr;
-	}
-}
 
 ?>

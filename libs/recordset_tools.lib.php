@@ -50,8 +50,6 @@ class field_interface {
 				'fkeys'=>array(),
 				);
 		$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
-		//$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
-		//md($arr,1);
 		$ret=array();
 		foreach ($arr as $k=>$s) {
 			preg_match_all(':(\s(([a-z_]+)=)?[\'\"](.+?)[\'\"]|([^\s]+)):i',$s,$out);
@@ -180,6 +178,7 @@ class field_interface {
 			'rs2_name'=>$rname,
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$foreign_field_name ? $foreign_field_name : $init_opts['recordset'].'_id',
+			'type'=>'many',
 			);
 		//$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'CASCADE','on_update'=>'CASCADE');
 	}
@@ -216,17 +215,9 @@ class gs_rs_links extends gs_recordset{
                 return parent::__construct($conn_id,$table_name);
 
 	}
-	/*
-	function __get($name) {
-		md('-----------',1);
-		md($name,1);
-		return parent::__get('childs');
-	}
-	*/
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		parent::find_records($options,$fields,$index_field_name);
 		if (isset($this->parent_record)) {
-			md('gs_rs_links lazy load',1);
 			$idname=$this->structure['recordsets']['childs']['local_field_name'];
 			$ids=array();
 			foreach ($this as $t) $ids[]=$t->$idname;
@@ -237,6 +228,25 @@ class gs_rs_links extends gs_recordset{
 			$this->array=$rs->array;
 		}
 		return $this;
+	}
+	public function new_record($data) {
+		/*
+		md('==new_record=='.get_class($this),1);
+		md($data,1);
+		md($this->parent_record->get_id(),1);
+		md($this->structure,1);
+		*/
+		$arr=array($this->structure['recordsets']['parents']['local_field_name']=>$this->parent_record->get_id(),
+				$this->structure['recordsets']['childs']['local_field_name']=>$data);
+		return parent::new_record($arr);
+	}
+	public function flush($data) {
+		$fname=$this->structure['recordsets']['childs']['local_field_name'];
+		if (isset($this->links)) foreach ($this->links as $k=>$l) {
+			if (!array_key_exists($l->$fname,$data))  {
+				$l->delete();
+			}
+		}
 	}
 	public function commit() {
 		$ret=parent::commit();
@@ -255,14 +265,12 @@ class gs_recordset_short extends gs_recordset {
 		$this->structure['fields'][$this->id_field_name]=array('type'=>'serial');
 		$this->selfinit($s);
 		parent::__construct($this->gs_connector_id,$this->table_name);
-		//md($this,1);
 	}
 
 	function selfinit($arr) {
 		$struct=field_interface::init($arr,$this->init_opts);
 		foreach ($struct as $k=>$s)
 			$this->structure[$k]=isset($this->structure[$k]) ? array_merge($this->structure[$k],$struct[$k]) : $struct[$k];
-		//md($this->structure,1);
 	}
 }
 
