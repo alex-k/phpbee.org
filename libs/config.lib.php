@@ -115,6 +115,10 @@ class gs_config {
 	
 	function __construct()
 	{
+		if (!isset($_SERVER['REQUEST_METHOD'])) $_SERVER['REQUEST_METHOD']='UNKNOWN';
+		if (!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST']='localhost';
+		if (!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI']=__FILE__;
+
 		$this->host=$_SERVER['HTTP_HOST'];
                 $this->root_dir=dirname(dirname(__FILE__)).'/';
                 $this->root_dir=str_replace('\\','/',$this->root_dir);

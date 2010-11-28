@@ -217,8 +217,10 @@ class gs_record implements arrayaccess {
 
 
 	public function commit($level=0) {
+/*
 		mlog('+++++++++++'.get_class($this->get_recordset()));
 		mlog('recordstate:'.$this->recordstate);
+*/
 		$ret=NULL;
 		if ($this->recordstate!=RECORD_UNCHANGED) {
 			$ret=$this->gs_recordset->attache_record($this); // works only for gs_recordset_view !!
@@ -244,7 +246,6 @@ class gs_record implements arrayaccess {
 		}
 		$this->recordstate=RECORD_UNCHANGED;
 		$this->old_values=$this->modified_values=array();
-		mlog('---------'.get_class($this->get_recordset()));
 		return $ret;
 	}
 	private function commit_childrens() {
@@ -646,9 +647,9 @@ abstract class gs_prepare_sql {
 		                        'unique'=>'UNIQUE',
 		                        //'serial'=>'PRIMARY AUTO_INCREMENT',
 		                    );
-		$this->_field_types=array( 'int'=>'INT',
+		$this->_field_types=array( 
 		                           'serial'=>'INT AUTO_INCREMENT PRIMARY KEY',
-		                           //'serial'=>'INT',
+					   'int'=>'INT',
 		                           'tinyint'=>'TINYINT',
 		                           'float'=>'FLOAT',
 		                           'date'=>'DATETIME',
@@ -709,6 +710,9 @@ abstract class gs_prepare_sql {
 				switch ($value['type']) {
 				case 'value':
 					$txt=$this->escape($value['field'],$value['case'],$value['value']);
+					break;
+				case 'field':
+					$txt=sprintf("%s %s %s",$value['field'],$value['case'],$value['value']);
 					break;
 				}
 

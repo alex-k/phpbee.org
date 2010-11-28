@@ -114,25 +114,6 @@ function pmail($recipients, $body="",$subject="",$add_headers=false,$from=false,
     return $ret;
 }
 
-function fetch($url,$sleep=0, $force=true) {
-        $COOK="";
-        $base_url="";
-        $url=$base_url.$url;
-        md("fetch $url");
-        $m=md5($url,1);
-        $ret=gs_cacher::load($m,'fetch');
-        if (!$ret || $force) {
-                md("-------------downloading $url----------",1);
-                $c = curl_init();
-                curl_setopt($c, CURLOPT_URL, $url);
-                curl_setopt($c, CURLOPT_RETURNTRANSFER,1);
-                curl_setopt($c, CURLOPT_COOKIE,$COOK);
-                $ret=curl_exec($c);
-                gs_cacher::save($ret,'fetch',$m);
-                usleep(rand(0,$sleep*1000000));
-        }
-        return $ret;
-}
 
 
 
