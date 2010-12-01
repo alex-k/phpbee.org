@@ -31,7 +31,7 @@ abstract class gs_widget implements gs_widget_interface {
 class gs_widget_input extends gs_widget{}
 class gs_widget_lMany2Many extends gs_widget{
 	function js() {
-		$ret="<select multiple=\"on\" name=\"".$this->fieldname."[]\">\n";
+		$ret="<select class=\"lMany2Many\" multiple=\"on\" name=\"".$this->fieldname."[]\">\n";
 		$ret.="<% for (vid in t.values.".$this->fieldname.".variants) { %>
 			<option value=\"<%=vid%>\" <% if (t.values.".$this->fieldname.".selected[vid]) { %> selected=\"selected\" <% } %>  ><%=t.values.".$this->fieldname.".variants[vid]%></option>
 			<% } %>

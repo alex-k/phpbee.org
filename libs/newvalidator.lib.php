@@ -24,7 +24,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 class gs_validate_isCCExpDate {
 function validate($field,$value,$data=array(),$params=array()) {
     if(strlen($value) == 0)
-        return $empty;
+        return false;
 
     if ( is_numeric($data[$params[fieldYear]]) && is_numeric($data[$params[fieldMonth]])) {
         $_month = (int)$data[$params[fieldMonth]];
@@ -147,7 +147,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 class gs_validate_isDate {
 function validate($field,$value,$data=array(),$params=array()) {
     if(strlen($value) == 0)
-        return $empty;
+        return false;
 
     return strtotime($value) != -1;
 }
@@ -160,7 +160,7 @@ class gs_validate_isDateAfter {
 function validate($field,$value,$data=array(),$params=array()) {
 
         if(strlen($value) == 0)
-            return $empty;
+            return false;
 
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isDateAfter] parameter 'field2' is missing.");            
@@ -190,7 +190,7 @@ class gs_validate_isDateBefore {
 function validate($field,$value,$data=array(),$params=array()) {
 
         if(strlen($value) == 0)
-            return $empty;
+            return false;
 
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isDateAfter] parameter 'field2' is missing.");            
@@ -220,7 +220,7 @@ class gs_validate_isDateEqual {
 function validate($field,$value,$data=array(),$params=array()) {
 
         if(strlen($value) == 0)
-            return $empty;
+            return false;
 
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isDateAfter] parameter 'field2' is missing.");            
@@ -250,7 +250,7 @@ class gs_validate_isDateOnOrAfter {
 function validate($field,$value,$data=array(),$params=array()) {
 
         if(strlen($value) == 0)
-            return $empty;
+            return false;
 
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isDateAfter] parameter 'field2' is missing.");            
@@ -280,7 +280,7 @@ class gs_validate_isDateOnOrBefore {
 function validate($field,$value,$data=array(),$params=array()) {
 
         if(strlen($value) == 0)
-            return $empty;
+            return false;
 
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isDateAfter] parameter 'field2' is missing.");            
@@ -378,7 +378,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 class gs_validate_isFloat {
 function validate($field,$value,$data=array(),$params=array()) {
     if(strlen($value) == 0)
-        return $empty;
+        return false;
 
     return preg_match('!^\d+\.\d+?$!', $value)==1;
 }
@@ -459,7 +459,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 class gs_validate_isPrice {
 function validate($field,$value,$data=array(),$params=array()) {
     if(strlen($value) == 0)
-        return $empty;
+        return false;
 
     return preg_match('/^\d+(\.\d{1,2})?$/', $value)==1;
 }
@@ -479,7 +479,7 @@ function validate($field,$value,$data=array(),$params=array()) {
                 return false;
         }
         if(strlen($value) == 0)
-            return $empty;
+            return false;
         
         return ($value >=$params['low'] && $value <=$params['high']);
 }
@@ -497,7 +497,7 @@ function validate($field,$value,$data=array(),$params=array()) {
                 return false;
         }
         if(strlen($value) == 0)
-            return $empty;
+            return false;
         setlocale(LC_ALL, 'de_DE.ISO8859-1');
         $ret = (preg_match($params['validate_regexp'], $value));
         setlocale(LC_ALL, 'C');
