@@ -45,6 +45,10 @@ class gs_init {
 		foreach ($files as $f) {
 			load_file($f);
 		}
+		$files = glob($this->config->lib_modules_dir.'/*/'.$mask);
+		foreach ($files as $f) {
+			load_file($f);
+		}
 		$cfg=gs_config::get_instance();
 		$loaded_classes=get_declared_classes();
 		foreach ($loaded_classes as $classname) {

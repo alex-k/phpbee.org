@@ -100,6 +100,15 @@ class field_interface {
 			}
 		}
 	}
+	function fInt($field,$opts,&$structure,$init_opts) {
+		$structure['fields'][$field]=array('type'=>'int');
+		$structure['htmlforms'][$field]=array(
+			'type'=>'input',
+			'hidden'=>$opts['hidden'],
+			'verbose_name'=>$opts['verbose_name'],
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumeric'
+		);
+	}
 	function fDateTime($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'date');
 		$structure['htmlforms'][$field]=array(

@@ -18,7 +18,7 @@ function gs_tpl(filename) {
 				i=tpl.indexOf('%>');
 				if(i>=0){
 					js=tpl.substring(0,i);
-					if(js.substr(0,1)=='=') str.push('html+='+js.substring(1)+';');
+					if(js.substr(0,1)=='=') str.push('html+=(typeof '+js.substring(1)+' == "undefined") ? "" :'+js.substring(1)+';');
 						 else str.push(js);
 
 					tpl=tpl.substring(i+2);
