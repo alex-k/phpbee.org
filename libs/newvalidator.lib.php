@@ -2,7 +2,7 @@
 
 
 class gs_validate_dummyValid {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     return true;
 }
 }
@@ -10,7 +10,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_plain_word {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 	preg_match_all('/\w+/',$value,$ret);
 	$ret=implode('',$ret[0]);
 	return ($ret);
@@ -22,7 +22,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isCCExpDate {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return false;
 
@@ -61,7 +61,7 @@ function validate($field,$value,$data=array(),$params=array()) {
  
 
 class gs_validate_isCCNum {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 	if(strlen($value) == 0)
 		return$params['empty']&&TRUE;
 
@@ -105,10 +105,10 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_checkField {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 	$classname=$params['class'];
 	$obj=new $classname;
-	return $obj->check_field($params['field'],$value,$params);
+	return $obj->check_field($params['field'],$value,$params,$record);
 
 }
 }
@@ -116,7 +116,7 @@ function validate($field,$value,$data=array(),$params=array()) {
  
 
 class gs_validate_isCCType {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 	$ccNum=$data[$params[CCNumField]];
 	$ccDigit=substr($ccNum,0,1);
@@ -145,7 +145,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isDate {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return false;
 
@@ -157,7 +157,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isDateAfter {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
             return false;
@@ -187,7 +187,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isDateBefore {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
             return false;
@@ -217,7 +217,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isDateEqual {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
             return false;
@@ -247,7 +247,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isDateOnOrAfter {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
             return false;
@@ -277,7 +277,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isDateOnOrBefore {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
             return false;
@@ -309,7 +309,7 @@ function validate($field,$value,$data=array(),$params=array()) {
  
 
 class gs_validate_isEmail {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
     if(strlen($value) == 0)
         return false;
@@ -334,14 +334,14 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isEmpty {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     return strlen($value) == 0;
 }
 }
 
 
 class gs_validate_notEqual {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isEqual] parameter 'field2' is missing.");            
                 return false;
@@ -355,7 +355,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isEqual {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isEqual] parameter 'field2' is missing.");            
                 return false;
@@ -376,7 +376,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isFloat {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return false;
 
@@ -388,7 +388,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isInt {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(strlen($value) == 0)
             return false;        
         
@@ -400,7 +400,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isLength {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(!isset($params['min'])) {
                 trigger_error("SmartyValidate: [isLength] parameter 'min' is missing.");            
@@ -425,13 +425,13 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isChecked {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     return 1 && $value;
 }
 }
 
 class gs_validate_isNumber {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return isset($params['empty']) &&$params['empty'];        
 
@@ -443,7 +443,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isOnly {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
 	
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isEqual] parameter 'field2' is missing.");            
@@ -457,7 +457,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isPrice {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return false;
 
@@ -469,7 +469,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isRange {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(!isset($params['low'])) {
                 trigger_error("SmartyValidate: [isRange] parameter 'low' is missing.");            
                 return false;
@@ -491,7 +491,7 @@ function validate($field,$value,$data=array(),$params=array()) {
  
 
 class gs_validate_isRegExp {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(!isset($params['validate_regexp'])) {
                 trigger_error("SmartyValidate: [isRegExp] parameter 'expression' is missing.");            
                 return false;
@@ -510,7 +510,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_isURL {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return$params['empty'];        
 
@@ -522,7 +522,7 @@ function validate($field,$value,$data=array(),$params=array()) {
 
 
 class gs_validate_notEmpty {
-function validate($field,$value,$data=array(),$params=array()) {
+function validate($field,$value,$data=array(),$params=array(),$record=null) {
     return is_array($value) || strlen(trim($value)) > 0;
 }
 }

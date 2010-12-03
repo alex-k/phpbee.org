@@ -27,8 +27,33 @@ abstract class gs_widget implements gs_widget_interface {
 		return sprintf('<input type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
 	}
 }
-
 class gs_widget_input extends gs_widget{}
+
+class gs_widget_select extends gs_widget{
+	function js() {
+		$ret="<select name=\"".$this->fieldname."[]\">\n";
+		foreach ($this->params['options'] as $v) {
+			$ret.="<option value=\"$v\" <% if (t.values.".$this->fieldname."==\"$v\") { %> selected=\"selected\" <% } %> >$v</option>\n";
+		}
+
+		/*
+		$ret.="<% for (vid in t.values.".$this->fieldname.".variants) { %>
+			<option value=\"<%=vid%>\" <% if (t.values.".$this->fieldname.".selected[vid]) { %> selected=\"selected\" <% } %>  ><%=t.values.".$this->fieldname.".variants[vid]%></option>
+			<% } %>
+			";
+		*/
+		$ret.="</select>\n";
+		return $ret;
+	}
+}
+class gs_widget_checkbox extends gs_widget{
+	function html() {
+		$s=sprintf('<input type="hidden" name="%s" value="1">', $this->fieldname);
+		$s.=sprintf('<input type="checkbox" name="%s" value="1" %s>', $this->fieldname,trim($this->value) ? 'checked="checked"' : '');
+		return $s;
+	}
+}
+
 class gs_widget_lMany2Many extends gs_widget{
 	function js() {
 		$ret="<select class=\"lMany2Many\" multiple=\"on\" name=\"".$this->fieldname."[]\">\n";

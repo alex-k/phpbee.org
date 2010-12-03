@@ -136,11 +136,12 @@ abstract class g_forms implements g_forms_interface{
 			} catch (gs_widget_validate_exception $e) {
 				$this->error($ret, $k,$e->getMessage());
 			}
+			if (!isset($h['validate'])) $h['validate']='notEmpty';
 			$validate=is_array($h['validate']) ? $h['validate'] : array($h['validate']);
 			foreach ($validate as $v) {
 				$vname='gs_validate_'.$v;
 				$val=new $vname();
-				if (!$val->validate($k,$value,$this->data,isset($h['validate_params'])?$h['validate_params'] : array() )) {
+				if (!$val->validate($k,$value,$this->data,isset($h['validate_params'])?$h['validate_params'] : array() ,$this->record)) {
 					$this->error($ret, $k,$vname);
 				}
 
