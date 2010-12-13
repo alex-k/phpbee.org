@@ -48,6 +48,7 @@ class field_interface {
 				'recordsets'=>array(),
 				'htmlforms'=>array(),
 				'fkeys'=>array(),
+				'indexes'=>array(),
 				);
 		$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
 		$ret=array();
@@ -99,6 +100,24 @@ class field_interface {
 				$structure['htmlforms'][$field]['validate_params']['validate_regexp']=$opts['validate_regexp'];
 			}
 		}
+		if (isset($opts['unique']) && strtolower($opts['unique'])=='true') {
+			$structure['htmlforms'][$field]['validate'][]='checkField';
+			$structure['htmlforms'][$field]['validate_params']['class']=get_class($this);
+			$structure['htmlforms'][$field]['validate_params']['field']=$field;
+			//'validate_params'=>array('class'=>'users','field'=>'userLogin','message'=>'Login invalid or occupied'
+		}
+	}
+	function fPassword($field,$opts,&$structure,$init_opts) {
+		return self::fString($field,$opts,$structure,$init_opts);
+	}
+	function fCheckbox($field,$opts,&$structure,$init_opts) {
+		$structure['fields'][$field]=array('type'=>'int');
+		$structure['htmlforms'][$field]=array(
+			'type'=>'checkbox',
+			'hidden'=>$opts['hidden'],
+			'verbose_name'=>$opts['verbose_name'],
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumber'
+		);
 	}
 	function fInt($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'int');
@@ -106,13 +125,22 @@ class field_interface {
 			'type'=>'input',
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
-			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumeric'
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumber'
+		);
+	}
+	function fEmail($field,$opts,&$structure,$init_opts) {
+		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
+		$structure['htmlforms'][$field]=array(
+			'type'=>'email',
+			'hidden'=>$opts['hidden'],
+			'verbose_name'=>$opts['verbose_name'],
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
 	}
 	function fDateTime($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'date');
 		$structure['htmlforms'][$field]=array(
-			'type'=>'input',
+			'type'=>'datetime',
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isDate'
@@ -127,6 +155,17 @@ class field_interface {
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
 	}
+	function fSelect($field,$opts,&$structure,$init_opts) {
+		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
+		$structure['htmlforms'][$field]=array(
+			'type'=>'Select',
+			'hidden'=>$opts['hidden'],
+			'verbose_name'=>$opts['verbose_name'],
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
+			'options'=>explode(',',$opts['values']),
+		);
+		$structure['indexes'][$field]=$field;
+	}
 	function f___dummy($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>255);
 		$structure['htmlforms'][$field]=array(
@@ -136,22 +175,23 @@ class field_interface {
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
 	}
-	function fSelect($field,$opts,&$structure,$init_opts) { self::f___dummy($field,$opts,&$structure,$init_opts);}
-	function fPassword($field,$opts,&$structure,$init_opts) { self::f___dummy($field,$opts,&$structure,$init_opts);}
 	function lOne2One($field,$opts,&$structure,$init_opts) {
 		$fname=$field.'_id';
 		$structure['fields'][$fname]=array('type'=>'int');
 		$structure['htmlforms'][$fname]=array(
-			'type'=>'input',
+			'type'=>'lOne2One',
+			'linkname'=>$field,
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
+		$structure['indexes'][$fname]=$fname;
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$opts['linked_recordset'],
 			'local_field_name'=>$fname,
 			'foreign_field_name'=>'id',
 			);
+		$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'RESTRICT','on_update'=>'CASCADE');
 
 
 	}
@@ -165,7 +205,6 @@ class field_interface {
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$obj_rs['local_field_name'],
 			);
-		$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'RESTRICT','on_update'=>'CASCADE');
 		
 	}
 	function lMany2Many($field,$opts,&$structure,$init_opts) {
@@ -215,6 +254,9 @@ class gs_rs_links extends gs_recordset{
 		$this->structure['fields'][$f1]=array('type'=>'int');
 		$this->structure['fields'][$f2]=array('type'=>'int');
 
+		$this->structure['indexes'][$f1]=$f1;
+		$this->structure['indexes'][$f2]=$f2;
+
 		$this->structure['recordsets']['parents']=array('recordset'=>$rs1,'local_field_name'=>$f1,'foreign_field_name'=>'id');
 		$this->structure['recordsets']['childs']=array('recordset'=>$rs2,'local_field_name'=>$f2,'foreign_field_name'=>'id');
 		/*
@@ -223,6 +265,9 @@ class gs_rs_links extends gs_recordset{
 		$this->structure['fkeys'][]=array('link'=>'childs','on_delete'=>'CASCADE','on_update'=>'CASCADE');
                 return parent::__construct($conn_id,$table_name);
 
+	}
+	public function find($opts) {
+		return $this->first()->get_recordset()->find($opts);
 	}
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		parent::find_records($options,$fields,$index_field_name);
@@ -233,21 +278,29 @@ class gs_rs_links extends gs_recordset{
 			$rsname=$this->structure['recordsets']['childs']['recordset'];
 			$rs=new $rsname();
 			$rs=$rs->find_records(array('id'=>$ids));
-			$this->links=$this->array;
+			$rs->parent_recordset=$this;
+			$links=array();
+			foreach ($this->array as $l) {
+				$links[$l->$idname]=$l;
+			}
+			//$this->links=$this->array;
+			$this->links=$links;
 			$this->array=$rs->array;
 		}
 		return $this;
 	}
-	public function new_record($data) {
+	public function new_record($data=null) {
 		/*
 		md('==new_record=='.get_class($this),1);
 		md($data,1);
 		md($this->parent_record->get_id(),1);
 		md($this->structure,1);
 		*/
-		$arr=array($this->structure['recordsets']['parents']['local_field_name']=>$this->parent_record->get_id(),
+		if ($data) {$arr=array($this->structure['recordsets']['parents']['local_field_name']=>$this->parent_record->get_id(),
 				$this->structure['recordsets']['childs']['local_field_name']=>$data);
 		return parent::new_record($arr);
+		}
+		return parent::new_record($data);
 	}
 	public function flush($data) {
 		$fname=$this->structure['recordsets']['childs']['local_field_name'];

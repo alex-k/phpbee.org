@@ -96,7 +96,7 @@ abstract class g_forms implements g_forms_interface{
 							);
 		return $ret;
 	}
-	function __construct($h,$data=array()) {
+	function __construct($h,$data=array(),$rec=null) {
 		$this->record=NULL;
 		$this->params=NULL;
 		$this->clean_data=array();
@@ -104,6 +104,9 @@ abstract class g_forms implements g_forms_interface{
 			$this->record=$h;
 			$rs=$this->record->get_recordset();
 			$h=$rs->structure['htmlforms'];
+		}
+		if (is_object($rec) && get_class($rec)=='gs_record') {
+			$this->record=$rec;
 		}
 		foreach ($h as $k=>$ih) {
 			if(isset($ih['hidden']) && $ih['hidden']) unset($h[$k]);
@@ -150,6 +153,14 @@ abstract class g_forms implements g_forms_interface{
 		return $ret;
 
 	}
+	function as_url() {
+		$arr=array();
+		foreach($this->htmlforms as $k=>$f) {
+			$arr[$k]=$this->data[$k];
+		}
+		return http_build_query($arr);
+	}
+
 }
 
 class g_forms_html extends g_forms {
@@ -163,6 +174,23 @@ class g_forms_html extends g_forms {
 						);
 		}
 		return $arr;
+	}
+	function as_dl($delimiter="\n",$validate=array()){
+		$arr=array();
+		$inputs=$this->_prepare_inputs();
+		foreach($inputs as $field=>$v)  {
+			$e="";
+			if (isset($validate['FIELDS'][$field])) {
+				$e='<div class="error">Error: '.implode(',',$validate['FIELDS'][$field]).'</div>';
+			}
+			if ($this->htmlforms[$field]['type']=='hidden') {
+				$arr[]=$v['input'];
+			} else {
+				$arr[]=sprintf('<dl class="row"><dt><label for="%s">%s:</label></dt> <dd><div>%s</div>%s</dd> </dl>',$field,$v['label'],$v['input'],$e);
+			}
+		}
+
+		return implode($delimiter,$arr);
 	}
 	function as_table($delimiter="\n"){
 		$arr=array();
@@ -181,7 +209,6 @@ class g_forms_html extends g_forms {
 
 		return implode($delimiter,$arr);
 	}
-
 }
 class g_forms_jstpl extends g_forms_html {
 	function _prepare_inputs(){

@@ -20,6 +20,8 @@ class gs_null extends SimpleXMLElement implements arrayaccess {
 	public function first() {
 		return $this;
 	}
+	public function get_recordset() { return $this; }
+	public function find() { return $this; }
 	public function count() {
 		return 0;
 	}

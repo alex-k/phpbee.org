@@ -1,4 +1,5 @@
 <?
+class gs_widget_validate_exception extends gs_exception {}
 interface gs_widget_interface {
 	function __construct($fieldname,$data);
 	function html();
@@ -24,32 +25,74 @@ abstract class gs_widget implements gs_widget_interface {
 		return $this->html();
 	}
 	function html() {
-		return sprintf('<input type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
+		return sprintf('<input class="gs_widget" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
 	}
 }
-class gs_widget_input extends gs_widget{}
+class gs_widget_input extends gs_widget{
+	function html() {
+		return sprintf('<input class="fString" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
+	}
+}
+class gs_widget_password extends gs_widget{
+	function html() {
+		return sprintf('<input class="fPassword" type="password" name="%s" value="%s">', $this->fieldname,trim($this->value));
+	}
+}
+class gs_widget_hidden extends gs_widget{
+	function html() {
+		return sprintf('<input class="fHidden" type="hidden" name="%s" value="%s">', $this->fieldname,trim($this->value));
+	}
+}
+class gs_widget_text extends gs_widget{
+	function html() {
+		return sprintf('<textarea class="fText" name="%s">%s</textarea>', $this->fieldname,trim($this->value));
+	}
+}
+class gs_widget_datetime extends gs_widget{
+	function html() {
+		return sprintf('<input class="fDateTime" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
+	}
+	function clean() {
+		return date('Y-m-d H:i:s',strtotime($this->value));
+	}
+}
+
+class gs_widget_email extends gs_widget{
+	function validate() {
+		$v=new gs_validate_isEmail();
+		return $v->validate($this->fieldname,$this->value);
+	}
+}
 
 class gs_widget_select extends gs_widget{
 	function js() {
-		$ret="<select name=\"".$this->fieldname."[]\">\n";
+		$ret="<select name=\"".$this->fieldname."\">\n";
 		foreach ($this->params['options'] as $v) {
 			$ret.="<option value=\"$v\" <% if (t.values.".$this->fieldname."==\"$v\") { %> selected=\"selected\" <% } %> >$v</option>\n";
 		}
 
-		/*
-		$ret.="<% for (vid in t.values.".$this->fieldname.".variants) { %>
-			<option value=\"<%=vid%>\" <% if (t.values.".$this->fieldname.".selected[vid]) { %> selected=\"selected\" <% } %>  ><%=t.values.".$this->fieldname.".variants[vid]%></option>
-			<% } %>
-			";
-		*/
+		$ret.="</select>\n";
+		return $ret;
+	}
+	function html() {
+		$ret="<select name=\"".$this->fieldname."\">\n";
+		foreach ($this->params['options'] as $v) {
+			$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n", $v, (trim($this->value)==$v) ? 'selected="selected"' : '', $v);
+		}
+
 		$ret.="</select>\n";
 		return $ret;
 	}
 }
 class gs_widget_checkbox extends gs_widget{
 	function html() {
-		$s=sprintf('<input type="hidden" name="%s" value="1">', $this->fieldname);
-		$s.=sprintf('<input type="checkbox" name="%s" value="1" %s>', $this->fieldname,trim($this->value) ? 'checked="checked"' : '');
+		$s=sprintf('<input type="hidden" name="%s" value="0">', $this->fieldname);
+		$s.=sprintf('<input class="fCheckbox" type="checkbox" name="%s" value="1" %s>', $this->fieldname,trim($this->value) ? 'checked="checked"' : '');
+		return $s;
+	}
+	function js() {
+		$s=sprintf('<input type="hidden" class="fCheckbox" name="%s" value="0">', $this->fieldname);
+		$s.="<input type=\"checkbox\" name=\"$this->fieldname\" value=\"1\" <%if(t.values.$this->fieldname == 1) { %> checked=\"checked\"i<% } %> >";
 		return $s;
 	}
 }
@@ -69,7 +112,7 @@ class gs_widget_lMany2Many extends gs_widget{
 		$rsname=$rsl->structure['recordsets']['childs']['recordset'];
 		$rs=new $rsname();
 		$variants=$rs->find_records();
-		$ret=sprintf("<select multiple=\"on\" name=\"%s[]\">\n", $this->fieldname);
+		$ret=sprintf("<select class=\"lMany2Many\" multiple=\"on\" name=\"%s[]\">\n", $this->fieldname);
 		foreach ($variants as $v) {
 			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$v->get_id(), (is_array($this->value) && array_key_exists($v->get_id(),$this->value)) ? 'selected="selected"' : '',trim($v));
 		}
@@ -79,10 +122,32 @@ class gs_widget_lMany2Many extends gs_widget{
 	}
 	function clean() {
 		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
-		$ret=is_array($this->value) ? array_combine(array_values($this->value),array_values($this->value)) : array();
+		$ret=is_array($this->value) && count($this->value)>0 ? array_combine(array_values($this->value),array_values($this->value)) : array();
 		if($this->record) {
 			$this->record->{$this->fieldname}->flush($ret);
 		}
+		return $ret;
+	}
+}
+class gs_widget_lOne2One extends gs_widget{
+	function js() {
+		$ret="<select class=\"lOne2One\" name=\"".$this->fieldname."\">\n";
+		$ret.="<% for (vid in t.values.".$this->fieldname.".variants) { %>
+			<option value=\"<%=vid%>\" <% if (t.values.".$this->fieldname.".selected == vid) { %> selected=\"selected\" <% } %>  ><%=t.values.".$this->fieldname.".variants[vid]%></option>
+			<% } %>
+			";
+		$ret.="</select>\n";
+		return $ret;
+	}
+	function html() {
+		$rsl=$this->record->init_linked_recordset($this->params['linkname']);
+		$variants=$rsl->find_records();
+		$ret=sprintf("<select  class=\"lOne2One\" name=\"%s\">\n", $this->fieldname);
+		foreach ($variants as $v) {
+			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$v->get_id(), ($this->value==$v->get_id()) ? 'selected="selected"' : '',trim($v));
+		}
+		$ret.="</select>\n";
+
 		return $ret;
 	}
 }

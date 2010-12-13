@@ -266,6 +266,12 @@ class gs_record implements arrayaccess {
 		if (($parent=$this->get_recordset()->parent_record)!==NULL) $parent->child_modified();
 	}
 
+	public function unlink() {
+		$pr=$this->get_recordset()->parent_recordset;
+		if (!$pr || get_class($pr)!=='gs_rs_links') return;
+		$pr->links[$this->get_id()]->delete();
+	}
+
 	public function copy() {
 	}
 	public function offsetGet($offset) {
@@ -326,6 +332,7 @@ function new_rs($classname) {
 
 
 abstract class gs_recordset_base extends gs_iterator {
+	const superadmin = 0;
 	private $gs_recordset_classname;
 	private $gs_connector;
 	private $gs_connector_id;
@@ -393,6 +400,9 @@ abstract class gs_recordset_base extends gs_iterator {
 		reset($this->structure['fields']);
 		return $rec->$fieldname;
 	}
+	public function __toString() {
+		return implode(', ',$this->recordset_as_string_array());
+	}
 	public function recordset_as_string_array() {
 		$ret=array();
 		foreach ($this as $rec) {
@@ -424,6 +434,17 @@ abstract class gs_recordset_base extends gs_iterator {
 
 		$ids=array();
 		foreach ($this as $r) $ids[]=$r->get_id();
+
+		if (is_string($options)) {
+			$options=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$options);
+			preg_match_all(':(([a-z_]+)=)?[\'\"]([^a-z]*)(.+?)[\'\"]:i',$options,$out);
+			$options=array();
+			foreach($out[2] as $k=>$v) {
+				$case=isset($out[3][$k]) && !empty($out[3][$k]) ? $out[3][$k] : '=';
+				$options[]=array('field'=>$v,'case'=>$case,'value'=>$out[4][$k]);
+			}
+		}
+
 
 		if ($linkname!==null) {
 			//if (!isset($this->recordsets[$linkname])) return new gs_null(GS_NULL_XML);
@@ -589,7 +610,7 @@ abstract class gs_recordset_base extends gs_iterator {
 			if (!is_array($triggers)) $triggers=array($triggers);
 			foreach ($triggers as $t) {
 				if (!method_exists($this,$t)) throw new gs_dbd_exception("triggers: no method '$t' exists:".get_class($this).":$event:$t",DBD_TRIGGER_FUNC_NOT_EXISTS);
-				$this->$t($rec);
+				$this->$t($rec,$event);
 			}
 		}
 	}

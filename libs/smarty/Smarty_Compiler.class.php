@@ -169,8 +169,12 @@ class Smarty_Compiler extends Smarty {
 
        $this->_obj_params_regexp = '\((?:' . $this->_obj_single_param_regexp
                 . '(?:\s*,\s*' . $this->_obj_single_param_regexp . ')*)?\)';
+		/*
        $this->_obj_start_regexp = '(?:' . $this->_dvar_regexp . '(?:' . $this->_obj_ext_regexp . ')+)';
        $this->_obj_call_regexp = '(?:' . $this->_obj_start_regexp . '(?:' . $this->_obj_params_regexp . ')?(?:' . $this->_dvar_math_regexp . '(?:' . $this->_num_const_regexp . '|' . $this->_dvar_math_var_regexp . ')*)?)';
+       */
+       $this->_obj_start_regexp = '(?:'. $this->_dvar_regexp. '(?:'. $this->_obj_ext_regexp. '(?:'.$this->_obj_params_regexp.')?)+)';
+       $this->_obj_call_regexp = '(?:'. $this->_obj_start_regexp. '(?:'. $this->_dvar_math_regexp. '(?:'. $this->_num_const_regexp .'|'. $this->_dvar_math_var_regexp. ')*)?)'; 
         
         // matches valid modifier syntax:
         // |foo
@@ -1574,7 +1578,10 @@ class Smarty_Compiler extends Smarty {
                         /* We booleanize the token if it's a non-quoted possible
                            boolean value. */
                         if (preg_match('~^(on|yes|true)$~', $token)) {
-                            $token = 'true';
+                            //$token = 'true';
+			    if (i18n::isName($trimmed = trim($token, '"'))) {
+				    $token = '"'. smarty_prefilter_i18n('{'. $trimmed. '}', $smarty). '"';
+			    }
                         } else if (preg_match('~^(off|no|false)$~', $token)) {
                             $token = 'false';
                         } else if ($token == 'null') {

@@ -312,7 +312,7 @@ class gs_validate_isEmail {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
     if(strlen($value) == 0)
-        return false;
+        return true;
 
     // regex taken from Jeffrey Freidl e-mail validation example
     // http://public.yahoo.com/~jfriedl/regex/email-opt.pl

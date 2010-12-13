@@ -114,6 +114,11 @@ function pmail($recipients, $body="",$subject="",$add_headers=false,$from=false,
     return $ret;
 }
 
+function record_by_id($id=0,$classname='gs_null') {
+	$r=new $classname;
+	return $classname->get_by_id($id);
+}
+
 
 
 

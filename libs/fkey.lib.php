@@ -30,6 +30,7 @@ class gs_fkey {
 		if ($this->key_array===false) $this->_update_fkeys();
 	}
 	function save() {
+		md($this->key_array,1);
 		gs_cacher::save($this->key_array,'gs_recordset','gs_fkey_array');
 	}
 
@@ -115,9 +116,8 @@ class gs_fkey {
 		}
 	}
 	private function process_event($ev_name,$record) {
-		//$rs_name=get_class($record->get_recordset());
 		$rs_name=$record->get_recordset()->table_name;
-		$recordset_name=($record->get_recordset());
+		//$recordset_name=($record->get_recordset());
 		$ev_name=strtolower(str_replace(' ','_',$ev_name));
 		if (!isset($this->key_array[$rs_name]) || !is_array($this->key_array[$rs_name])) return true;
 		$keys=$this->key_array[$rs_name];
@@ -132,7 +132,8 @@ class gs_fkey {
 				if (isset($k['rs1_name']) && isset($k['rs2_name'])) {
 					$this->rs=new gs_rs_links($k['rs1_name'],$k['rs2_name'],$k['table_name']);
 				} else {
-					$this->rs=new $recordset_name;
+					//$this->rs=new $recordset_name;
+					$this->rs=new $rs_name;
 				}
 				$option=strtolower(str_replace(' ','_',$k[$ev_name]));
 				$r&=$this->{"action_".$ev_name."_".$option}($record);

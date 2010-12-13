@@ -32,7 +32,7 @@ class gs_parser {
 		if (!class_exists($this->current_handler['class_name'],FALSE)) throw new gs_exception('gs_parser.process: Handler class not exists '.$this->current_handler['class_name']);
 		if (!method_exists($this->current_handler['class_name'],$this->current_handler['method_name'])) throw new gs_exception('gs_parser.process: Handler class method not exists '.$this->current_handler['class_name'].'.'.$this->current_handler['method_name']);
 		$o_h=new $this->current_handler['class_name']($this->data,$this->current_handler['params']);
-		$o_h->{$this->current_handler['method_name']}();
+		return $o_h->{$this->current_handler['method_name']}();
 	}
 	
 	private function get_handlers()
@@ -42,7 +42,13 @@ class gs_parser {
 		$modules=$config->get_registered_modules();
 		if (is_array($modules)) foreach ($modules as $module_name) {
 			$handlers=call_user_func(array($module_name,'get_handlers'));
-			if(is_array($handlers)) $data=array_merge_recursive($data,$handlers);
+			if(is_array($handlers)) {
+				if (isset($handlers['get_post'])) {
+					$handlers['get']=isset($handlers['get']) ? array_merge($handlers['get_post'],$handlers['get']) : $handlers['get_post'];
+					$handlers['post']=isset($handlers['post']) ? array_merge($handlers['get_post'],$handlers['post']) : $handlers['get_post'];
+				}
+				$data=array_merge_recursive($data,$handlers);
+			}
 		}
 		krsort ($data['get']);
 		krsort ($data['post']);
