@@ -50,17 +50,16 @@ class field_interface {
 				'fkeys'=>array(),
 				'indexes'=>array(),
 				);
-		$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
 		$ret=array();
+		/*
+		$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
 		foreach ($arr as $k=>$s) {
 			preg_match_all(':(\s(([a-z_]+)=)?[\'\"](.+?)[\'\"]|([^\s]+)):i',$s,$out);
-			$j=0;
-			$r=array('required'=>'true');
-			foreach ($out[3] as $i => $v) {
-				$key=$v ? $v : $j++;
-				$value = $out[4][$i] ? $out[4][$i] : $out[1][$i];
-				$r[$key]=$value;
-			}
+			*/
+		$arr=string_to_params($arr);
+		foreach ($arr as $k=>$r) {
+			if(!isset($r['required'])) $r['required']='true';
+
 			$r['func_name']=$r[0];
 			if (in_array($r['func_name'],array('lMany2Many','lMany2One','lOne2One'))) {
 				$r['linked_recordset']=$r[1];
@@ -183,7 +182,8 @@ class field_interface {
 			'linkname'=>$field,
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
-			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
+			'nulloption'=>(isset($opts['nulloption']) && $opts['nulloption'] && strtolower($opts['nulloption'])!='false') ? true : false ,
 		);
 		$structure['indexes'][$fname]=$fname;
 		$structure['recordsets'][$field]=array(
@@ -224,10 +224,14 @@ class field_interface {
 			'recordset'=>$table_name,
 			'rs1_name'=>$init_opts['recordset'],
 			'rs2_name'=>$rname,
+			'rs_link'=>false,
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$foreign_field_name ? $foreign_field_name : $init_opts['recordset'].'_id',
 			'type'=>'many',
 			);
+		$structure['recordsets']['_'.$field]=$structure['recordsets'][$field];
+		$structure['recordsets']['_'.$field]['rs_link']=true;
+
 		//$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'CASCADE','on_update'=>'CASCADE');
 	}
 	function install()  {
@@ -243,10 +247,11 @@ class gs_rs_links extends gs_recordset{
 			),
 		);
 
-	function __construct($rs1,$rs2,$table_name) { 
+	function __construct($rs1,$rs2,$table_name,$rs_link=false) { 
 		$this->table_name=$table_name;
 		$this->rs1_name=$rs1;
 		$this->rs2_name=$rs2;
+		$this->rs_link=$rs_link;
 		$conn_id=key(cfg('gs_connectors'));
 
 		$f1=$rs1.'_id';
@@ -271,6 +276,7 @@ class gs_rs_links extends gs_recordset{
 	}
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		parent::find_records($options,$fields,$index_field_name);
+		if ($this->rs_link) return $this;
 		if (isset($this->parent_record)) {
 			$idname=$this->structure['recordsets']['childs']['local_field_name'];
 			$ids=array();

@@ -114,9 +114,58 @@ function pmail($recipients, $body="",$subject="",$add_headers=false,$from=false,
     return $ret;
 }
 
+if(!function_exists('get_called_class')) {
+        class class_tools {
+                static $i = 0;
+                static $fl = null;
+
+                static function get_called_class() {
+                    $bt = debug_backtrace();
+
+                        if (self::$fl == $bt[2]['file'].$bt[2]['line']) {
+                            self::$i++;
+                        } else {
+                            self::$i = 0;
+                            self::$fl = $bt[2]['file'].$bt[2]['line'];
+                        }
+
+                        $lines = file($bt[2]['file']);
+
+                        preg_match_all('/([a-zA-Z0-9\_]+)::'.$bt[2]['function'].'/',
+                            $lines[$bt[2]['line']-1],
+                            $matches);
+
+                return $matches[1][self::$i];
+            }
+        }
+
+        function get_called_class() {
+            return class_tools::get_called_class();
+        }
+}
+
+
 function record_by_id($id=0,$classname='gs_null') {
 	$r=new $classname;
 	return $classname->get_by_id($id);
+}
+
+function string_to_params($inp) {
+	$arr=is_array($inp) ? $inp : array($inp);
+	$ret=array();
+	$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
+	foreach ($arr as $k=>$s) {
+		preg_match_all(':(\s*(([a-z_]+)=)?[\'\"](.+?)[\'\"]|([^\s]+)):i',$s,$out);
+		$r=array();
+		$j=0;
+		foreach ($out[3] as $i => $v) {
+			$key= $v ? $v : $j++;
+			$value = $out[4][$i] ? $out[4][$i] : $out[1][$i];
+			$r[$key]=$value;
+		}
+		$ret[$k]=$r;
+	}
+	return is_array($inp) ? $ret : reset($ret);
 }
 
 

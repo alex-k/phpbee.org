@@ -111,6 +111,12 @@ abstract class g_forms implements g_forms_interface{
 		foreach ($h as $k=>$ih) {
 			if(isset($ih['hidden']) && $ih['hidden']) unset($h[$k]);
 		}
+		if(isset($data['_default'])) {
+			$default=$data['_default'];
+			$default=string_to_params($default);
+			$data=array_merge($default,$data);
+		}
+		$data=array_map(create_function('$a','return (is_string($a) && strpos($a,"array:")===0) ? explode(":",$a) : $a;'),$data);
 		$this->data=$data;
 		$this->htmlforms=$h;
 	}

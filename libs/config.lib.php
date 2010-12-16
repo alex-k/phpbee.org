@@ -88,6 +88,7 @@ class gs_init {
 
 	public function load_storage() {
 		load_file($this->config->lib_dir.'fkey.lib.php');
+		load_file($this->config->lib_dir.'record.lib.php');
 		load_file($this->config->lib_dir.'storage.lib.php');
 		load_file($this->config->lib_dir.'recordset_tools.lib.php');
 	}

@@ -8,6 +8,8 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		parent::__construct();
 		$this->cinfo=$cinfo;
 		$this->_id=rand();
+		$this->_cache=array();
+		$this->_que=null;
 		$this->connect();
 	}
 
@@ -227,6 +229,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		}
 	}
 	public function insert($record) {
+		$this->_cache=array();
 		$rset=$record->get_recordset();
 		$fields=$values=array();
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
@@ -241,6 +244,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 	}
 	public function update($record) {
+		$this->_cache=array();
 		$rset=$record->get_recordset();
 		$fields=array();
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
@@ -255,15 +259,29 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 	}
 	public function delete($record) {
+		$this->_cache=array();
 		$rset=$record->get_recordset();
 		$idname=$rset->id_field_name;
 		$que=sprintf('DELETE FROM %s  WHERE %s=%s',$rset->db_tablename,$idname,$this->escape_value($record->get_old_value($idname)));
 		return $this->query($que);
 
 	}
+	function fetchall() {
+		$ret=array();
+		if (!$this->_que) {
+			while ($r=mysql_fetch_assoc($this->_res)) $ret[]=$r;
+			return $ret;
+		}
+		if (!isset($this->_cache[$this->_que])) {
+			while ($r=mysql_fetch_assoc($this->_res)) $ret[]=$r;
+			$this->_cache[$this->_que]=$ret;
+		}
+		$ret=$this->_cache[$this->_que];
+		$this->_que=null;
+		return $ret;
+	}
 	function fetch() {
-		$ret=mysql_fetch_assoc($this->_res);
-		return($ret);
+		return mysql_fetch_assoc($this->_res);
 	}
 	function select($rset,$options,$fields=NULL) {
 		$where=$this->construct_where($options);
@@ -291,6 +309,12 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		if (!empty($str_orderby)) $que.=$str_orderby;
 		if (!empty($str_limit)) $que.=$str_limit;
 		if (!empty($str_offset)) $que.=$str_offset;
+
+		$this->_que=md5($que);
+		if(isset($this->_cache[$this->_que])) {
+			return true;
+		}
+
 		return $this->query($que);
 	}
 

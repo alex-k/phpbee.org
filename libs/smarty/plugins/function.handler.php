@@ -7,6 +7,8 @@ function smarty_function_handler($params, &$smarty) {
 	*/
 
 	$data=$smarty->get_template_vars('_gsdata');
+	$subdir=$smarty->get_template_vars('_module_subdir');
+	if($subdir) $params['gspgid']=$subdir.'/'.$params['gspgid'];
 	//$data['gspgid']=$params['url'];
 	$data['gspgid_handler']=$data['gspgid'];
 	$data=array_merge($data,$params);
