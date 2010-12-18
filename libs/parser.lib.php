@@ -9,6 +9,7 @@ class gs_parser {
 	
 	function __construct($data)
 	{
+		$data['gspgid']=trim($data['gspgid'],'/');
 		$this->data=$data;
 		$this->registered_handlers=$this->get_handlers();
 		$result=$this->registered_handlers->xpath($data['gspgid']);

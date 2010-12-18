@@ -128,12 +128,14 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 		return $ret;
 	}
-
+	/*
+	// works only in PHP > 5.3
 	static function record_by_id($id) {
 		$name=get_called_class();
 		$rs=new $name;
 		return $rs->get_by_id($id);
 	}
+	*/
 
 	public function get_by_id($id) {
 		return $this->find_records(array($this->id_field_name=>$id))->current();

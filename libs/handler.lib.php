@@ -6,12 +6,14 @@ class gs_base_handler {
 	public function __construct($data=null,$params=null) {
 		$this->data=$data;
 		$this->params=$params;
+
 		/*
 		$cfg=gs_config::get_instance();
 		foreach ($cfg->tpl_blocks as $blockname) {
 			if (!isset($this->blocks[$blockname])) $this->blocks[$blockname]=new gs_tpl_block($this->data);
 		}
 		*/
+
 		$this->register_blocks();
 	}
 	function register_blocks() {
@@ -37,7 +39,11 @@ class gs_base_handler {
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
-		if (!$tpl->template_exists($this->params['name'])) throw new gs_exception('gs_base_handler.show: can not find template file for '.$this->params['name']);
+		if (!$tpl->template_exists($this->params['name'])) {
+			md($this->data,1);
+			md($this->params,1);
+			throw new gs_exception('gs_base_handler.show: can not find template file for '.$this->params['name']);
+		}
 		$txt=ob_get_contents();
 		ob_end_clean();
 		$html=$tpl->fetch($this->params['name']);
