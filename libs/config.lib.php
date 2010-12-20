@@ -5,8 +5,11 @@
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
 DEFINE ('LOAD_TEMPLATES',4);
+
+if (DEBUG) {
 ini_set('display_errors','On');
 error_reporting(E_ALL);
+}
 
 class gs_init {
 	

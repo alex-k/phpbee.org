@@ -295,6 +295,12 @@ class gs_rs_links extends gs_recordset{
 		}
 		return $this;
 	}
+	function implode($d=':') {
+		return implode($d,$this->array_keys());
+	}
+	function array_keys() {
+		return array_keys($this->array);
+	}
 	public function new_record($data=null) {
 		/*
 		md('==new_record=='.get_class($this),1);
@@ -327,9 +333,9 @@ class gs_recordset_short extends gs_recordset {
 		$this->init_opts=$init_opts;
 		$this->init_opts['recordset']=get_class($this);
 		if (!$s || !is_array($s)) throw new gs_exception('gs_recordset_short :: empty init values');
-		$this->table_name=get_class($this);
-		$this->id_field_name='id';
-		$this->gs_connector_id=key(cfg('gs_connectors'));
+		if (!$this->table_name) $this->table_name=get_class($this);
+		if (!$this->id_field_name) $this->id_field_name='id';
+		if (!$this->gs_connector_id) $this->gs_connector_id=key(cfg('gs_connectors'));
 		$this->structure['fields'][$this->id_field_name]=array('type'=>'serial');
 		$this->selfinit($s);
 		parent::__construct($this->gs_connector_id,$this->table_name);

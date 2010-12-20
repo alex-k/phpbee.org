@@ -1,6 +1,6 @@
 <?php
 
-class extSmarty extends Smarty
+class extSmarty extends gs_Smarty
 {
     /**
      * Список зарегистрированных блоков в шаблонизаторе

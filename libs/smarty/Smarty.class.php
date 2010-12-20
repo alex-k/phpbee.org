@@ -61,7 +61,7 @@ define('SMARTY_PHP_ALLOW',      3);
 /**
  * @package Smarty
  */
-class Smarty
+class gs_Smarty
 {
     /**#@+
      * Smarty Configuration Section

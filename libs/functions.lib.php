@@ -68,7 +68,8 @@ function html_fetch($url,$data=array(),$scheme='GET') {
     return $result;
 
 }
-function pmail($recipients, $body="",$subject="",$add_headers=false,$from=false,$debug=1) {
+if (!function_exists('pmail')) {
+	function pmail($recipients, $body="",$subject="",$add_headers=false,$from=false,$debug=1) {
     include_once("Mail.php");
     $recipients=is_array($recipients) ? $recipients : array($recipients);
 
@@ -112,6 +113,7 @@ function pmail($recipients, $body="",$subject="",$add_headers=false,$from=false,
                 md($ret,1);
     }
     return $ret;
+}
 }
 
 
