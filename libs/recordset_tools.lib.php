@@ -190,6 +190,7 @@ class field_interface {
 			'recordset'=>$opts['linked_recordset'],
 			'local_field_name'=>$fname,
 			'foreign_field_name'=>'id',
+			'update_recordset'=>$opts['linked_recordset'],
 			);
 		$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'RESTRICT','on_update'=>'CASCADE');
 
@@ -200,12 +201,15 @@ class field_interface {
 		list($rname,$linkname)=explode(':',$opts['linked_recordset']);
 		$obj=new $rname(array('skip_many2many'=>true));
 		$obj_rs=$obj->structure['recordsets'][$linkname];
+		$counter_fieldname='_'.$field.'_count';
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$rname,
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$obj_rs['local_field_name'],
+			'counter_fieldname'=>$counter_fieldname,
 			);
-		
+		$structure['fields'][$counter_fieldname]=array('type'=>'int','default'=>0);
+		$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
 	}
 	function lMany2Many($field,$opts,&$structure,$init_opts) {
 		@list($rname,$table_name,$foreign_field_name)=explode(':',$opts['linked_recordset']);
@@ -214,12 +218,16 @@ class field_interface {
 		нужно переопределить lazy_load в _short чтобы он для rs_links вызывал хитрый конструктор.
 
 		*/
+		$counter_fieldname='_'.$field.'_count';
 		$structure['htmlforms'][$field]=array(
 			'type'=>'lMany2Many',
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
-			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
 		);
+		$structure['fields'][$counter_fieldname]=array('type'=>'int','default'=>0);
+		$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
+
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$table_name,
 			'rs1_name'=>$init_opts['recordset'],
@@ -228,6 +236,7 @@ class field_interface {
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$foreign_field_name ? $foreign_field_name : $init_opts['recordset'].'_id',
 			'type'=>'many',
+			'counter_fieldname'=>$counter_fieldname,
 			);
 		$structure['recordsets']['_'.$field]=$structure['recordsets'][$field];
 		$structure['recordsets']['_'.$field]['rs_link']=true;
@@ -247,8 +256,9 @@ class gs_rs_links extends gs_recordset{
 			),
 		);
 
-	function __construct($rs1,$rs2,$table_name,$rs_link=false) { 
+	function __construct($rs1,$rs2,$table_name,$rs_link=false,$link_name='') { 
 		$this->table_name=$table_name;
+		$this->link_name=$link_name;
 		$this->rs1_name=$rs1;
 		$this->rs2_name=$rs2;
 		$this->rs_link=$rs_link;
@@ -262,8 +272,8 @@ class gs_rs_links extends gs_recordset{
 		$this->structure['indexes'][$f1]=$f1;
 		$this->structure['indexes'][$f2]=$f2;
 
-		$this->structure['recordsets']['parents']=array('recordset'=>$rs1,'local_field_name'=>$f1,'foreign_field_name'=>'id');
-		$this->structure['recordsets']['childs']=array('recordset'=>$rs2,'local_field_name'=>$f2,'foreign_field_name'=>'id');
+		$this->structure['recordsets']['parents']=array('recordset'=>$rs1,'local_field_name'=>$f1,'foreign_field_name'=>'id','update_recordset'=>$rs2,'update_link'=>$link_name);
+		$this->structure['recordsets']['childs']=array('recordset'=>$rs2,'local_field_name'=>$f2,'foreign_field_name'=>'id','update_recordset'=>$rs1,'update_link'=>$link_name);
 		/*
 		*/
 		$this->structure['fkeys'][]=array('link'=>'parents','on_delete'=>'CASCADE','on_update'=>'CASCADE');
@@ -302,12 +312,6 @@ class gs_rs_links extends gs_recordset{
 		return array_keys($this->array);
 	}
 	public function new_record($data=null) {
-		/*
-		md('==new_record=='.get_class($this),1);
-		md($data,1);
-		md($this->parent_record->get_id(),1);
-		md($this->structure,1);
-		*/
 		if ($data) {$arr=array($this->structure['recordsets']['parents']['local_field_name']=>$this->parent_record->get_id(),
 				$this->structure['recordsets']['childs']['local_field_name']=>$data);
 		return parent::new_record($arr);
@@ -325,6 +329,21 @@ class gs_rs_links extends gs_recordset{
 	public function commit() {
 		$ret=parent::commit();
 		if (isset($this->links)) foreach ($this->links as $l) $l->commit();
+
+		foreach ($this->structure['recordsets'] as $l=>$rs) {
+			if(isset($rs['update_recordset'])) {
+				$ids=array();
+				foreach($this->links as $l) {
+					$ids[$l->{$rs['local_field_name']}]=$l->{$rs['local_field_name']};
+				}
+				if (count($ids)>0) {
+					$u=new $rs['recordset'];
+					$u=$u->find_records(array($rs['foreign_field_name']=>$ids));
+					if($u) $u->update_counters($rs['update_recordset'],$rs['update_link']);
+				}
+			}
+		}
+
 		return $ret;
 	}
 }
@@ -345,6 +364,38 @@ class gs_recordset_short extends gs_recordset {
 		$struct=field_interface::init($arr,$this->init_opts);
 		foreach ($struct as $k=>$s)
 			$this->structure[$k]=isset($this->structure[$k]) ? array_merge($this->structure[$k],$struct[$k]) : $struct[$k];
+	}
+	function commit() {
+		$ret=parent::commit();
+		//md($this->structure['recordsets'],1);
+		foreach ($this->structure['recordsets'] as $l=>$rs) {
+			if(isset($rs['update_recordset'])) {
+				$u=$this->get_elements_by_name($l);
+				if($u) $u->update_counters(get_class($this));
+			}
+		}
+		return $ret;
+	}
+	function update_counters($l,$link=false) {
+		/*
+		md('====',1);
+		md(get_class($this),1);
+		md($l,1);
+		md($this->structure['recordsets'],1);
+		*/
+		$ss=array();
+		foreach ($this->structure['recordsets'] as $n=>$r)  {
+			if ((!$link || $link==$n) && ($r['recordset']==$l || (isset($r['rs2_name']) && $r['rs2_name']==$l) )) $ss[$n]=$r;
+		}
+		foreach ($ss as $l=>$s) {
+			if (isset($s['counter_fieldname'])) {
+				$counter_fieldname=$s['counter_fieldname'];
+				foreach($this as $rec) {
+					$rec->$counter_fieldname=$rec->$l->count();
+					$rec->commit(1);
+				}
+			}
+		}
 	}
 }
 

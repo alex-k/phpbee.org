@@ -139,7 +139,7 @@ class gs_record implements arrayaccess {
 	public function init_linked_recordset ($name) {
 		$structure=$this->gs_recordset->structure['recordsets'][$name];
 		if (isset($structure['rs1_name']) && isset($structure['rs2_name'])) 
-			$rs=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset'],$structure['rs_link']);
+			$rs=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset'],$structure['rs_link'],$name);
 		 else 
 			$rs=new $structure['recordset'];
 

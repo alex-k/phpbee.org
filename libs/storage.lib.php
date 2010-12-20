@@ -290,9 +290,9 @@ abstract class gs_recordset_base extends gs_iterator {
 				$obj->install();
 			}
 		}
-		foreach($this->structure['recordsets'] as $structure) {
+		foreach($this->structure['recordsets'] as $name=>$structure) {
 			if (isset($structure['rs1_name']) && isset($structure['rs2_name']))  {
-				$obj=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset']);
+				$obj=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset'],false,$name);
 				$obj->install();
 			}
 		}
