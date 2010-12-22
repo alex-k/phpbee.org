@@ -65,6 +65,7 @@ class field_interface {
 				$r['linked_recordset']=$r[1];
 				if (!isset($r['hidden'])) $r['hidden']=!(isset($r['verbose_name']) || isset($r[2])) ;
 				if (!isset($r['verbose_name'])) $r['verbose_name']=isset($r[2]) ? $r[2] : $k;
+				$r['counter'] = isset($r['counter']) && $r['counter'] && strtolower($r['counter'])!='false' ? true : false;
 			} else {
 				if (!isset($r['hidden'])) $r['hidden']=!(isset($r['verbose_name']) || isset($r[1])) ;
 				if (!isset($r['verbose_name'])) $r['verbose_name']=isset($r[1]) ? $r[1] : $k;
@@ -201,15 +202,17 @@ class field_interface {
 		list($rname,$linkname)=explode(':',$opts['linked_recordset']);
 		$obj=new $rname(array('skip_many2many'=>true));
 		$obj_rs=$obj->structure['recordsets'][$linkname];
-		$counter_fieldname='_'.$field.'_count';
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$rname,
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$obj_rs['local_field_name'],
-			'counter_fieldname'=>$counter_fieldname,
 			);
-		$structure['fields'][$counter_fieldname]=array('type'=>'int','default'=>0);
-		$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
+		if($opts['counter']) {
+			$counter_fieldname='_'.$field.'_count';
+			$structure['recordsets'][$field]['counter_fieldname']=$counter_fieldname;
+			$structure['fields'][$counter_fieldname]=array('type'=>'int','default'=>0);
+			$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
+		}
 	}
 	function lMany2Many($field,$opts,&$structure,$init_opts) {
 		@list($rname,$table_name,$foreign_field_name)=explode(':',$opts['linked_recordset']);
@@ -218,15 +221,12 @@ class field_interface {
 		нужно переопределить lazy_load в _short чтобы он для rs_links вызывал хитрый конструктор.
 
 		*/
-		$counter_fieldname='_'.$field.'_count';
 		$structure['htmlforms'][$field]=array(
 			'type'=>'lMany2Many',
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
 		);
-		$structure['fields'][$counter_fieldname]=array('type'=>'int','default'=>0);
-		$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
 
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$table_name,
@@ -236,10 +236,16 @@ class field_interface {
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$foreign_field_name ? $foreign_field_name : $init_opts['recordset'].'_id',
 			'type'=>'many',
-			'counter_fieldname'=>$counter_fieldname,
 			);
 		$structure['recordsets']['_'.$field]=$structure['recordsets'][$field];
 		$structure['recordsets']['_'.$field]['rs_link']=true;
+
+		if ($opts['counter']) {
+			$counter_fieldname='_'.$field.'_count';
+			$structure['fields'][$counter_fieldname]=array('type'=>'int','default'=>0);
+			$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
+			$structure['recordsets'][$field]['counter_fieldname']=$counter_fieldname;
+		}
 
 		//$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'CASCADE','on_update'=>'CASCADE');
 	}
