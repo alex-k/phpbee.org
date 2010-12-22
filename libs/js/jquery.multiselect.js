@@ -55,11 +55,11 @@
 			mc.appendChild(document.createElement('br'));
 			mc.appendChild(bb.get(0));
 			var list=from_sel.cloneNode(true);
-			$(list.innerHTML).filter('option').each(function (i) {
+			//if (list.innerHTML!='') $(list).filter('option').each(function (i) {
+			if (list.innerHTML!='') $('option',list).each(function (i) {
 				list_options[this.value]=i;
 				list_names[i]=this.innerHTML;
 			})
-			
 			// start of functions
 			fbutton=function (){
 				var ol=[];
