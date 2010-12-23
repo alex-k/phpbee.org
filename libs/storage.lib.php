@@ -154,6 +154,20 @@ abstract class gs_recordset_base extends gs_iterator {
 		return new gs_null(GS_NULL_XML);
 	}
 
+	private function string2options($options) {
+		if (!is_string($options)) return $options;
+
+		$options=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$options);
+		preg_match_all(':(([a-z_]+)=)?[\'\"]([^a-zA-Z0-9]*)(.+?)[\'\"]:i',$options,$out);
+		$options=array();
+		foreach($out[2] as $k=>$v) {
+			$case=isset($out[3][$k]) && !empty($out[3][$k]) ? $out[3][$k] : '=';
+			$options[]=array('field'=>$v,'case'=>$case,'value'=>$out[4][$k]);
+		}
+		return $options;
+
+	}
+
 
 	function find($options,$linkname=null) {
 		if (!$this->first()) return new gs_null(GS_NULL_XML);
@@ -161,16 +175,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		$ids=array();
 		foreach ($this as $r) $ids[]=$r->get_id();
 
-		if (is_string($options)) {
-			$options=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$options);
-			preg_match_all(':(([a-z_]+)=)?[\'\"]([^a-z]*)(.+?)[\'\"]:i',$options,$out);
-			$options=array();
-			foreach($out[2] as $k=>$v) {
-				$case=isset($out[3][$k]) && !empty($out[3][$k]) ? $out[3][$k] : '=';
-				$options[]=array('field'=>$v,'case'=>$case,'value'=>$out[4][$k]);
-			}
-		}
-
+		$options=$this->string2options($options);
 
 		if ($linkname!==null) {
 			//if (!isset($this->recordsets[$linkname])) return new gs_null(GS_NULL_XML);
@@ -188,6 +193,7 @@ abstract class gs_recordset_base extends gs_iterator {
 
 
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
+		$options=$this->string2options($options);
 		$index_field_name = is_string($index_field_name) ? $index_field_name : $this->id_field_name;
 		$this->reset();
 		$this->get_connector()->select($this,$options,$fields);
@@ -206,6 +212,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		return $this;
 	}
 	public function count_records($options=null) {
+		$options=$this->string2options($options);
 		if (is_array($options)) foreach($options as $k=>$o) {
 			if (in_array(strtolower($o['type']),array('limit','offset','orderby'))) unset($options[$k]);
 		}
