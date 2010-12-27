@@ -97,6 +97,7 @@ abstract class g_forms implements g_forms_interface{
 		return $ret;
 	}
 	function __construct($h,$data=array(),$rec=null) {
+		if (!is_array($data)) $data=array();
 		$this->record=NULL;
 		$this->params=NULL;
 		$this->clean_data=array();
@@ -108,9 +109,12 @@ abstract class g_forms implements g_forms_interface{
 		if (is_object($rec) && get_class($rec)=='gs_record') {
 			$this->record=$rec;
 		}
+		$form_default=array();
 		foreach ($h as $k=>$ih) {
 			if(isset($ih['hidden']) && $ih['hidden']) unset($h[$k]);
+			if(isset($ih['default'])) $form_default[$k]=$ih['default'];
 		}
+		if (count($form_default)>0) $data=array_merge($form_default,$data);
 		if(isset($data['_default'])) {
 			$default=$data['_default'];
 			$default=string_to_params($default);
@@ -166,6 +170,12 @@ abstract class g_forms implements g_forms_interface{
 		}
 		return http_build_query($arr);
 	}
+	function get_input($field,$suffix=null) {
+		$inputs=$this->_prepare_inputs();
+		$v=$inputs[$field];
+		return sprintf('<label>%s%s %s</label>', $v['label'],trim($v['label']) ? $suffix : null ,$v['input']);
+	}
+
 
 }
 
@@ -175,6 +185,10 @@ class g_forms_html extends g_forms {
 		foreach($this->htmlforms as $field => $v) {
 			$wclass="gs_widget_".$v['type'];
 			$w =new $wclass($field,$this->data,$v,$this->record);
+			if($v['type']=='label') {
+				$arr[$field]=array('input'=>$v['verbose_name']);
+				continue;
+			}
 			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
 						'input'=>$w->html()
 						);
@@ -207,11 +221,11 @@ class g_forms_html extends g_forms {
 		return implode($delimiter,$arr);
 	}
 	function as_list(){}
-	function as_labels($delimiter="<br/>\n"){
+	function as_labels($delimiter="<br/>\n",$suffix=':'){
 		$arr=array();
 		$inputs=$this->_prepare_inputs();
 		foreach($inputs as $field=>$v) 
-			$arr[]=sprintf('<label>%s: %s</label>', $v['label'],$v['input']);
+			$arr[]=sprintf('<label>%s%s %s</label>', $v['label'],trim($v['label']) ? $suffix : null ,$v['input']);
 
 		return implode($delimiter,$arr);
 	}

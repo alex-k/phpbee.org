@@ -28,6 +28,14 @@ abstract class gs_widget implements gs_widget_interface {
 		return sprintf('<input class="gs_widget" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
 	}
 }
+class gs_widget_label extends gs_widget{
+	function html() {
+		return $this->value;
+	}
+	function clean() {
+		return null;
+	}
+}
 class gs_widget_input extends gs_widget{
 	function html() {
 		return sprintf('<input class="fString" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
@@ -66,7 +74,7 @@ class gs_widget_email extends gs_widget{
 
 class gs_widget_select extends gs_widget{
 	function js() {
-		$ret="<select name=\"".$this->fieldname."\">\n";
+		$ret="<select class=\"fSelect\" name=\"".$this->fieldname."\">\n";
 		foreach ($this->params['options'] as $v) {
 			$ret.="<option value=\"$v\" <% if (t.values.".$this->fieldname."==\"$v\") { %> selected=\"selected\" <% } %> >$v</option>\n";
 		}
@@ -75,9 +83,10 @@ class gs_widget_select extends gs_widget{
 		return $ret;
 	}
 	function html() {
-		$ret="<select name=\"".$this->fieldname."\">\n";
-		foreach ($this->params['options'] as $v) {
-			$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n", $v, (trim($this->value)==$v) ? 'selected="selected"' : '', $v);
+		$ret="<select class=\"fSelect\"  name=\"".$this->fieldname."\">\n";
+		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
+		foreach ($this->params['options'] as $v=>$l) {
+			$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n", $v, (trim($this->value)==$v) ? 'selected="selected"' : '', $l);
 		}
 
 		$ret.="</select>\n";
@@ -93,6 +102,15 @@ class gs_widget_checkbox extends gs_widget{
 	function js() {
 		$s=sprintf('<input type="hidden" class="fCheckbox" name="%s" value="0">', $this->fieldname);
 		$s.="<input type=\"checkbox\" name=\"$this->fieldname\" value=\"1\" <%if(t.values.$this->fieldname == 1) { %> checked=\"checked\"i<% } %> >";
+		return $s;
+	}
+}
+class gs_widget_radio extends gs_widget{
+	function html() {
+		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
+		foreach ($this->params['options'] as $v=>$l) {
+		$s.=sprintf('<label><input class="fRadio" type="radio" name="%s" value="%s" %s> %s </label>', $this->fieldname,$v, trim($this->value)==$v || (isset($this->params['default']) && $v==$this->params['default']) ? 'checked="checked"' : '', $l);
+		}
 		return $s;
 	}
 }

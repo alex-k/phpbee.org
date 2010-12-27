@@ -16,7 +16,7 @@ function smarty_function_controller($params, &$smarty)
 
 	$vars=array();
 	foreach ($params as $k=>$v) {
-		if ($v!==FALSE && strpos($k,'_')!==0) {
+		if ($v!==FALSE && $v!==NULL && strpos($k,'_')!==0) {
 			if (is_array($v)) {
 				$vars[]=array($k,$v);
 			} else {
@@ -41,7 +41,8 @@ function smarty_function_controller($params, &$smarty)
 	foreach ($vars as $val) {
 		list($k,$v)=$val;
 		if (isset($params['_skip_null_options']) && $params['_skip_null_options'] && empty($v)) continue;
-		if (!is_array($v) && preg_match('/^(LIKE|!=|<=|>=|<|>)(.*)/',$v,$matches)) {
+		if (!is_array($v) && preg_match('/^(LIKE|!=|<=|>=|<|>)(.*)/',$v,$matches) ) {
+			if (isset($params['_skip_null_options']) && $params['_skip_null_options'] && empty($matches[2])) continue;
 			$options[]=array('type'=>'value', 'field'=>$k,'case'=>$matches[1],'value'=>$matches[2]);
 		} else {
 			$options[]=array('type'=>'value','field'=>$k,'value'=>$v);
@@ -71,12 +72,11 @@ function smarty_function_controller($params, &$smarty)
 
 
 	if (isset($params['_limit'])) $options[]=array('type'=>'limit','value'=>$params['_limit']);
-	else if (isset($params['_paging'])) sscanf($params['_paging'],'%[A-Za-z]:%d',$tmp,$limit) && $options[]=array('type'=>'limit','value'=>$limit);
-	if (isset($_offset)) $options[]=array('type'=>'offset','value'=>$_offset);
-	if (isset($params['_orderby']) && $params['_orderby']) $options['orderby']=array('type'=>'orderby','value'=>$params['_orderby']);
+	else if (isset($params['_paging'])) sscanf($params['_paging'],'%[A-Za-z]:%d',$tmp,$limit) && $limit && $options[]=array('type'=>'limit','value'=>$limit);
+	if (isset($_offset) && $limit) $options[]=array('type'=>'offset','value'=>$_offset);
+	if (isset($params['_orderby']) && trim($params['_orderby'])) $options['orderby']=array('type'=>'orderby','value'=>$params['_orderby']);
 
 	$fields=(isset($params['_fields'])) ? $params['_fields'] : NULL;
-
 	$ret=$obj->find_records($options,$fields);
 	//$vars=$ret->get_values();
 	if ($params['_assign_type']=='plain') {

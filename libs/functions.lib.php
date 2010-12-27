@@ -140,6 +140,10 @@ function string_to_params($inp) {
 	return is_array($inp) ? $ret : reset($ret);
 }
 
+function empty_array($a,$b) {
+	return is_array($b) ? $a || array_reduce($b,'empty_array') : $a || ($b && $b!=4);
+}
+
 
 
 
