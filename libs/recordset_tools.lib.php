@@ -65,7 +65,7 @@ class field_interface {
 				$r['linked_recordset']=$r[1];
 				if (!isset($r['hidden'])) $r['hidden']=!(isset($r['verbose_name']) || isset($r[2])) ;
 				if (!isset($r['verbose_name'])) $r['verbose_name']=isset($r[2]) ? $r[2] : $k;
-				$r['counter'] = isset($r['counter']) && $r['counter'] && strtolower($r['counter'])!='false' ? true : false;
+				$r['counter'] = isset($r['counter']) && (!$r['counter'] || strtolower($r['counter'])=='false') ? false : true;
 			} else {
 				if (!isset($r['hidden'])) $r['hidden']=!(isset($r['verbose_name']) || isset($r[1])) ;
 				if (!isset($r['verbose_name'])) $r['verbose_name']=isset($r[1]) ? $r[1] : $k;
@@ -134,8 +134,15 @@ class field_interface {
 			'type'=>'email',
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
-			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
+		$structure['htmlforms'][$field]['validate'][]=strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty';
+		
+		if (isset($opts['unique']) && strtolower($opts['unique'])=='true') {
+			$structure['htmlforms'][$field]['validate'][]='checkField';
+			$structure['htmlforms'][$field]['validate_params']['class']=get_class($this);
+			$structure['htmlforms'][$field]['validate_params']['field']=$field;
+			//'validate_params'=>array('class'=>'users','field'=>'userLogin','message'=>'Login invalid or occupied'
+		}
 	}
 	function fDateTime($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'date');
@@ -383,15 +390,22 @@ class gs_recordset_short extends gs_recordset {
 		return $ret;
 	}
 	function update_counters($l,$link=false) {
-		/*
-		md('====',1);
-		md(get_class($this),1);
-		md($l,1);
-		md($this->structure['recordsets'],1);
-		*/
+		
+		/*md('====',1);
+		md('this:'.get_class($this),1);
+		md('+++',1);
+		md('l:'.$l,1);
+		md('-=-',1);
+		md('link:'.$link,1);*/
+		//md($this->structure['recordsets'],1);
+		
 		$ss=array();
-		foreach ($this->structure['recordsets'] as $n=>$r)  {
-			if ((!$link || $link==$n) && ($r['recordset']==$l || (isset($r['rs2_name']) && $r['rs2_name']==$l) )) $ss[$n]=$r;
+		if ($link && isset($this->structure['recordsets'][$link])) {
+			$ss[]=$this->structure['recordsets'][$link];
+		} else {
+			foreach ($this->structure['recordsets'] as $n=>$r)  {
+				if ($r['recordset']==$l || (isset($r['rs2_name']) && $r['rs2_name']==$l)) $ss[$n]=$r;
+			}
 		}
 		foreach ($ss as $l=>$s) {
 			if (isset($s['counter_fieldname'])) {

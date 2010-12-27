@@ -88,7 +88,6 @@ interface gs_module {
 	//static function register();
 }
 
-
 class gs_iterator implements Iterator, arrayaccess {
     public $array = array();  
 

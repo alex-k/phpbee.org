@@ -1,6 +1,6 @@
 <?php
 /*test22*/
-#DEFINE ('DEBUG',1);
+DEFINE ('DEBUG',1);
 
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
@@ -128,12 +128,12 @@ class gs_config {
 		if (!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI']=__FILE__;
 
 		$this->host=$_SERVER['HTTP_HOST'];
-                $this->root_dir=dirname(dirname(__FILE__)).'/';
-                $this->root_dir=str_replace('\\','/',$this->root_dir);
-                $_document_root=realpath($_SERVER['DOCUMENT_ROOT']).'/';
-                $this->www_dir='/'.str_replace($_document_root,'',$this->root_dir);
-                $this->www_admin_dir='/'.str_replace($_document_root,'',$this->root_dir).'admin/';
-                $this->www_image_dir='/'.str_replace($_document_root,'',$this->root_dir).'img/';
+		$this->root_dir=clean_path(dirname(dirname(__FILE__))).'/';
+		$this->root_dir=str_replace('\\','/',$this->root_dir);
+		$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
+		$this->www_dir='/'.str_replace($_document_root,'',$this->root_dir);
+		$this->www_admin_dir='/'.str_replace($_document_root,'',$this->root_dir).'admin/';
+		$this->www_image_dir='/'.str_replace($_document_root,'',$this->root_dir).'img/';
 		$this->script_dir=dirname($_SERVER['PHP_SELF']).'/';
 		$this->index_filename=$_SERVER['SCRIPT_NAME'];
 		$this->referer_path= isset($_SERVER['HTTP_REFERER']) ?  preg_replace("|^$this->www_dir|",'',parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH)) : '';
@@ -318,6 +318,10 @@ function load_file($file,$return_contents=FALSE,$return_file=FALSE)
 function mlog($data) {
 	$log=gs_logger::get_instance();
 	$log->log($data);
+}
+
+function clean_path($path) {
+	return str_replace('\\','/',$path);
 }
 
 function stripslashes_deep($value)

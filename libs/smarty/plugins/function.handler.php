@@ -12,6 +12,9 @@ function smarty_function_handler($params, &$smarty) {
 	if($subdir) $params['gspgid']=$subdir.'/'.$params['gspgid'];
 	*/
 	$params['gspgid']=trim($params['gspgid'],'/');
+	if (!isset($data['gspgid_root'])) {
+		$data['gspgid_root']=$data['gspgid'];
+	}
 	$data['gspgid_handler']=$data['gspgid'];
 	$data['gspgid']=$params['gspgid'];
 	$data=array_merge($data,$params);

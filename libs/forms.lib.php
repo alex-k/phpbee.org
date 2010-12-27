@@ -229,6 +229,16 @@ class g_forms_html extends g_forms {
 
 		return implode($delimiter,$arr);
 	}
+	
+	function as_inline($delimiter=" \n",$validate=array()){
+		$arr=array();
+		$inputs=$this->_prepare_inputs();
+		foreach($inputs as $field=>$v) 
+			$arr[]=sprintf('<div class="inline"><div>%s</div>%s</div>',$v['label'],$v['input']);
+
+		return implode($delimiter,$arr);
+	}
+
 }
 class g_forms_jstpl extends g_forms_html {
 	function _prepare_inputs(){

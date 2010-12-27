@@ -222,6 +222,7 @@ class gs_node {
 		$parts=explode('/',$path);
 		$current=array_shift ($parts);
 		$ret=$this->get_node_by_name($current);
+		//md($ret,1);
 		if (!is_null($ret)) {
 			return $ret->xpath(implode('/',$parts),$mypath.'/'.$current);
 		}
