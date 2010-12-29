@@ -128,14 +128,16 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 		return $ret;
 	}
-	/*
+
 	// works only in PHP > 5.3
 	static function record_by_id($id) {
-		$name=get_called_class();
-		$rs=new $name;
-		return $rs->get_by_id($id);
+		if(function_exists('get_called_class')) {
+			$name=get_called_class();
+			$rs=new $name;
+			return $rs->get_by_id($id);
+		}
+		throw new gs_exception('static function record_by_id tot works prior php 5.3!');
 	}
-	*/
 
 	public function get_by_id($id) {
 		return $this->find_records(array($this->id_field_name=>$id))->current();
@@ -402,6 +404,7 @@ abstract class gs_prepare_sql {
 		$this->_field_types=array( 
 		                           'serial'=>'INT AUTO_INCREMENT PRIMARY KEY',
 					   'int'=>'INT',
+					   'bigint'=>'BIGINT',
 		                           'tinyint'=>'TINYINT',
 		                           'float'=>'FLOAT',
 		                           'date'=>'DATETIME',

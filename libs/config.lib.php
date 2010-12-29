@@ -1,6 +1,5 @@
 <?php
 /*test22*/
-DEFINE ('DEBUG',1);
 
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
@@ -159,6 +158,8 @@ class gs_config {
 		//$this->tpl_blocks=array('top_menu','block_workspace','block1','block2');
 
 		require_once($this->root_dir.'config.php');
+
+		if (!defined('DEBUG')) DEFINE('DEBUG',0);
 
 	}
 

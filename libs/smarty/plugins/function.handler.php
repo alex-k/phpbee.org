@@ -20,6 +20,7 @@ function smarty_function_handler($params, &$smarty) {
 	$data=array_merge($data,$params);
 	$smarty->assign('gspgid_form',$data['gspgid']);
 	$smarty->assign('gspgid_handler',$data['gspgid_handler']);
+	$smarty->assign('gspgid_root',$data['gspgid_root']);
 	$smarty->assign('gspgdata_form',$data);
 	$o_p=new gs_parser($data);
 	return $o_p->process();
