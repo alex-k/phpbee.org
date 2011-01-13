@@ -233,7 +233,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$rset=$record->get_recordset();
 		$fields=$values=array();
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
-			if ( $st['type']!='serial') {
+			if ( $st['type']!='serial' && $record->is_modified($fieldname)) {
 				$fields[]=$fieldname;
 				$values[]=$this->escape_value($record->$fieldname);
 			}
