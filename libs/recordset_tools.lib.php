@@ -75,8 +75,8 @@ class field_interface {
 		foreach ($ret as $k => $r) {
 			if (!method_exists('field_interface',$r['func_name']))
 				throw new gs_exception("field_interface: no method '".$r['func_name']."'");
-
 			self::$r['func_name']($k,$r,$structure,$init_opts);
+			if (isset($r['default']) && !isset($structure['fields'][$k]['default'])) $structure['fields'][$k]['default']=$r['default'];
 		}
 		return $structure;
 	}
@@ -106,6 +106,9 @@ class field_interface {
 			$structure['htmlforms'][$field]['validate_params']['field']=$field;
 			//'validate_params'=>array('class'=>'users','field'=>'userLogin','message'=>'Login invalid or occupied'
 		}
+		if (isset($opts['default'])) {
+			$structure['htmlforms'][$field]['default']=$opts['default'];
+		}
 	}
 	function fPassword($field,$opts,&$structure,$init_opts) {
 		return self::fString($field,$opts,$structure,$init_opts);
@@ -128,6 +131,12 @@ class field_interface {
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumber'
 		);
 	}
+	
+	function fFloat($field,$opts,&$structure,$init_opts) {
+		$this->fInt($field,$opts,$structure,$init_opts);
+		$structure['fields'][$field]=array('type'=>'float');
+	}
+	
 	function fEmail($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
 		$structure['htmlforms'][$field]=array(
@@ -162,6 +171,17 @@ class field_interface {
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
 	}
+	
+	function fFile($field,$opts,&$structure,$init_opts) {
+		$structure['fields'][$field]=array('type'=>'longblob');
+		$structure['htmlforms'][$field]=array(
+			'type'=>'file',
+			'hidden'=>$opts['hidden'],
+			'verbose_name'=>$opts['verbose_name'],
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
+		);
+	}
+	
 	function fSelect($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
 		$structure['htmlforms'][$field]=array(
