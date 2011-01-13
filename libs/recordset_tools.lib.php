@@ -362,9 +362,12 @@ class gs_rs_links extends gs_recordset{
 	public function commit() {
 		$ret=parent::commit();
 		if (isset($this->links)) foreach ($this->links as $l) $l->commit();
-
+		md('====',1);
+		md($this->structure['recordsets'],1);
 		foreach ($this->structure['recordsets'] as $l=>$rs) {
+			md($l,1);
 			if(isset($rs['update_recordset'])) {
+				md('==--',1);
 				$ids=array();
 				foreach($this->links as $l) {
 					$ids[$l->{$rs['local_field_name']}]=$l->{$rs['local_field_name']};
@@ -373,6 +376,11 @@ class gs_rs_links extends gs_recordset{
 					$u=new $rs['recordset'];
 					$u=$u->find_records(array($rs['foreign_field_name']=>$ids));
 					if($u) $u->update_counters($rs['update_recordset'],$rs['update_link']);
+				}
+				foreach ($this as $rec) {
+					if($rec->$l) {
+						$rec->$l->update_counters($rs['update_recordset'],$rs['update_link']);
+					}
 				}
 			}
 		}
@@ -432,6 +440,7 @@ class gs_recordset_short extends gs_recordset {
 				$counter_fieldname=$s['counter_fieldname'];
 				foreach($this as $rec) {
 					$rec->$counter_fieldname=$rec->$link->count();
+					md('update_counters',1);
 					$rec->commit(1);
 				}
 			}
