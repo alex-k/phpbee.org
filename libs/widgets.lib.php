@@ -56,6 +56,13 @@ class gs_widget_text extends gs_widget{
 		return sprintf('<textarea class="fText" name="%s">%s</textarea>', $this->fieldname,trim($this->value));
 	}
 }
+
+class gs_widget_file extends gs_widget{
+	function html() {
+		return sprintf('<input class="fFile" type="file" name="%s" value="%s">', $this->fieldname,trim($this->value));
+	}
+}
+
 class gs_widget_datetime extends gs_widget{
 	function html() {
 		return sprintf('<input class="fDateTime" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
