@@ -35,7 +35,10 @@ class gs_base_handler {
 		return $tpl->fetch($this->params['name']);
 	}
 	protected function show($nodebug=FALSE) {
-		if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
+		//if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
+		if (empty($this->params['name'])) {
+			$this->params['name']=str_replace('/','_',$this->data['handler_key']).'.html';
+		}
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
@@ -47,7 +50,6 @@ class gs_base_handler {
 		$txt=ob_get_contents();
 		ob_end_clean();
 		$html=$tpl->fetch($this->params['name']);
-		$html=str_replace('<---BL_TITLE--->', ($t=$tpl->get_template_vars('bl_title')) ? $t: cfg('bl_title') ,$html);
 		echo $html;
 		if (DEBUG && !$nodebug) {
 			$log=gs_logger::get_instance();
