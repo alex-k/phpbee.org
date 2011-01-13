@@ -5,7 +5,7 @@ DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
 DEFINE ('LOAD_TEMPLATES',4);
 
-if (DEBUG) {
+if (defined(DEBUG) && DEBUG) {
 ini_set('display_errors','On');
 error_reporting(E_ALL);
 }
@@ -154,12 +154,13 @@ class gs_config {
 		$this->lib_handlers_dir=$this->root_dir.'handlers/';
 		$this->lib_modules_dir=$this->root_dir.'modules/';
 		$this->lib_dbdrivers_dir=$this->lib_dir.'dbdrivers/';
-		$this->lib_kcaptcha_dir=$this->lib_dir.'kcaptcha/';
-		//$this->tpl_blocks=array('top_menu','block_workspace','block1','block2');
 
 		require_once($this->root_dir.'config.php');
 
-		if (!defined('DEBUG')) DEFINE('DEBUG',0);
+		if (defined(DEBUG) && DEBUG) {
+		ini_set('display_errors','On');
+		error_reporting(E_ALL);
+		}
 
 	}
 
