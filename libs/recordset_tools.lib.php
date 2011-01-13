@@ -133,7 +133,7 @@ class field_interface {
 	}
 	
 	function fFloat($field,$opts,&$structure,$init_opts) {
-		$this->fInt($field,$opts,$structure,$init_opts);
+		self::fInt($field,$opts,$structure,$init_opts);
 		$structure['fields'][$field]=array('type'=>'float');
 	}
 	
@@ -410,8 +410,8 @@ class gs_recordset_short extends gs_recordset {
 		return $ret;
 	}
 	function update_counters($l,$link=false) {
-		
-		/*md('====',1);
+		/*
+		md('====',1);
 		md('this:'.get_class($this),1);
 		md('+++',1);
 		md('l:'.$l,1);
@@ -427,11 +427,11 @@ class gs_recordset_short extends gs_recordset {
 				if ($r['recordset']==$l || (isset($r['rs2_name']) && $r['rs2_name']==$l)) $ss[$n]=$r;
 			}
 		}
-		foreach ($ss as $l=>$s) {
+		foreach ($ss as $s) {
 			if (isset($s['counter_fieldname'])) {
 				$counter_fieldname=$s['counter_fieldname'];
 				foreach($this as $rec) {
-					$rec->$counter_fieldname=$rec->$l->count();
+					$rec->$counter_fieldname=$rec->$link->count();
 					$rec->commit(1);
 				}
 			}
