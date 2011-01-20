@@ -295,7 +295,7 @@ class gs_rs_links extends gs_recordset{
 		$this->rs1_name=$rs1;
 		$this->rs2_name=$rs2;
 		$this->rs_link=$rs_link;
-		$conn_id=key(cfg('gs_connectors'));
+		$this->gs_connector_id=$conn_id=key(cfg('gs_connectors'));
 
 		$f1=$rs1.'_id';
 		$f2=$rs1!=$rs2 ? $rs2.'_id': 'id2';
@@ -360,30 +360,34 @@ class gs_rs_links extends gs_recordset{
 		}
 	}
 	public function commit() {
-		$ret=parent::commit();
-		if (isset($this->links)) foreach ($this->links as $l) $l->commit();
-		md('====',1);
-		md($this->structure['recordsets'],1);
-		foreach ($this->structure['recordsets'] as $l=>$rs) {
-			md($l,1);
-			if(isset($rs['update_recordset'])) {
-				md('==--',1);
-				$ids=array();
-				foreach($this->links as $l) {
-					$ids[$l->{$rs['local_field_name']}]=$l->{$rs['local_field_name']};
-				}
-				if (count($ids)>0) {
-					$u=new $rs['recordset'];
-					$u=$u->find_records(array($rs['foreign_field_name']=>$ids));
-					if($u) $u->update_counters($rs['update_recordset'],$rs['update_link']);
-				}
-				foreach ($this as $rec) {
-					if($rec->$l) {
-						$rec->$l->update_counters($rs['update_recordset'],$rs['update_link']);
+
+		foreach ($this->structure['recordsets'] as $l=>$st) {
+			$prec=new $st['recordset'];
+			$update_link=$st['update_link'];
+			if (isset($prec->structure['recordsets'][$update_link])) {
+				$counter_fieldname=$prec->structure['recordsets'][$update_link]['counter_fieldname'];
+			} else {
+				foreach ($prec->structure['recordsets'] as $rs) {
+					if ($rs['recordset']==$this->table_name) {
+						$counter_fieldname=$rs['counter_fieldname'];
+						break;
 					}
 				}
 			}
+			$ids=array();
+			foreach ($this->array as $a) {
+				$ids[]=$a->{$st['local_field_name']};
+			}
+			$prec->find_records(array($st['foreign_field_name']=>array_unique($ids)));
+			if (isset($this->array)) foreach ($this->array as $link) {
+				$link_rec=$prec[$link->{$st['local_field_name']}];
+				if ($link->recordstate & RECORD_NEW) $link_rec->$counter_fieldname++;
+				if ($link->recordstate & RECORD_DELETED) $link_rec->$counter_fieldname--;
+			}
+			$prec->commit();
 		}
+		$ret=parent::commit();
+		if (isset($this->links)) foreach ($this->links as $l) $l->commit();
 
 		return $ret;
 	}

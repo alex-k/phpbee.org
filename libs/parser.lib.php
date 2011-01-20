@@ -67,8 +67,7 @@ class gs_parser {
 	
 	private function parse_handler_for_type(&$node,$type,$data)
 	{
-		foreach ($data as $url => $item)
-		{
+		if (is_array($data)) foreach ($data as $url => $item) {
 			new gs_recurseparser($node,$url,$item,$type);
 		}
 	}

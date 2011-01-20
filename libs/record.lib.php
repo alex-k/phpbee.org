@@ -5,6 +5,29 @@ define ('RECORD_CHANGED',2);
 define ('RECORD_DELETED',4);
 define ('RECORD_ROLLBACK',8);
 define ('RECORD_CHILDMOD',16);
+class gs_recfabric {
+	private $links=array();
+
+	static function get_record($rs,$fields,$values) {
+		static $fabric;
+		if (!isset($fabric)) $fabric=new gs_recfabric();
+		return $fabric->return_record($rs,$fields,$values);
+	}
+	function return_record($rs,$fields,$values) {
+		$conn=$rs->gs_connector_id;
+		$table=$rs->db_tablename;
+		$idname=$rs->id_field_name;
+		$id=$values[$idname];
+		if (isset($this->links[$conn]) && is_array($this->links[$conn]) && isset($this->links[$conn][$table]) && is_array($this->links[$conn][$table]) && array_key_exists($id,$this->links[$conn][$table])) {
+			return $this->links[$conn][$table][$id];
+		}
+		$record=new gs_record($rs,$fields);
+		$record->fill_values($values);
+		$record->recordstate = RECORD_UNCHANGED;
+		$this->links[$conn][$table][$id]=&$record;
+		return $this->links[$conn][$table][$id];
+	}
+}
 class gs_record implements arrayaccess {
 	private $gs_recordset;
 	private $values=array();

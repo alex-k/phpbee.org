@@ -203,6 +203,10 @@ abstract class gs_recordset_base extends gs_iterator {
 		$records=array();
 		$res=$this->get_connector()->fetchall();
 		foreach ($res as $r) {
+
+			/*
+			$record=gs_recfabric::get_record($this,$fields,$r);
+			*/
 			$record=new gs_record($this,$fields);
 			$record->fill_values($r);
 			$record->recordstate = RECORD_UNCHANGED;
