@@ -182,7 +182,7 @@ class gs_record implements arrayaccess {
 	}
 
 	private function lazy_load($name) {
-		//mlog('lazy_load:'.$name);
+		//md('lazy_load:'.$name,1);
 		$rs=$this->init_linked_recordset($name);
 		$structure=$this->gs_recordset->structure['recordsets'][$name];
 		$id=$this->__get($rs->local_field_name);

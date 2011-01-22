@@ -318,10 +318,10 @@ abstract class gs_recordset_base extends gs_iterator {
 
 		if (!$this->get_connector()->table_exists($this->table_name)) {
 			$this->createtable();
-			$this->commit();
+			//$this->commit();
 		} else {
 			$this->altertable();
-			$this->commit();
+			//$this->commit();
 		}
 	}
 

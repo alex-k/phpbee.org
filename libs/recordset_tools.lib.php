@@ -237,6 +237,7 @@ class field_interface {
 		if($opts['counter']) {
 			$counter_fieldname='_'.$field.'_count';
 			$structure['recordsets'][$field]['counter_fieldname']=$counter_fieldname;
+			$structure['recordsets'][$field]['counter_linkname']=$linkname;
 			$structure['fields'][$counter_fieldname]=array('type'=>'int','default'=>0);
 			$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
 		}
@@ -283,6 +284,7 @@ class field_interface {
 
 class gs_rs_links extends gs_recordset{
         public $id_field_name='id';
+		private $links=array();
         public $structure=array(
                 'fields'=>array(
                         'id'=>array('type'=>'serial'),
@@ -319,7 +321,10 @@ class gs_rs_links extends gs_recordset{
 	}
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		parent::find_records($options,$fields,$index_field_name);
-		if ($this->rs_link) return $this;
+		if ($this->rs_link) {
+			$this->links=$this->array;
+			return $this;
+		}
 		if (isset($this->parent_record)) {
 			$idname=$this->structure['recordsets']['childs']['local_field_name'];
 			$ids=array();
@@ -332,7 +337,6 @@ class gs_rs_links extends gs_recordset{
 			foreach ($this->array as $l) {
 				$links[$l->$idname]=$l;
 			}
-			//$this->links=$this->array;
 			$this->links=$links;
 			$this->array=$rs->array;
 		}
@@ -347,9 +351,14 @@ class gs_rs_links extends gs_recordset{
 	public function new_record($data=null) {
 		if ($data) {$arr=array($this->structure['recordsets']['parents']['local_field_name']=>$this->parent_record->get_id(),
 				$this->structure['recordsets']['childs']['local_field_name']=>$data);
-		return parent::new_record($arr);
+			$nr=parent::new_record($arr);
+		} else {
+			$nr=parent::new_record($data);
 		}
-		return parent::new_record($data);
+		//throw new gs_exception("field_interface: no method '".$r['func_name']."'");
+		$this->links[]=$nr;
+		//$this->links[]=4;
+		return $nr;
 	}
 	public function flush($data) {
 		$fname=$this->structure['recordsets']['childs']['local_field_name'];
@@ -360,7 +369,10 @@ class gs_rs_links extends gs_recordset{
 		}
 	}
 	public function commit() {
-
+		/*
+		md('rs_links::commit',1);
+		md($this->links,1);
+		*/
 		foreach ($this->structure['recordsets'] as $l=>$st) {
 			$prec=new $st['recordset'];
 			$update_link=$st['update_link'];
@@ -375,14 +387,18 @@ class gs_rs_links extends gs_recordset{
 				}
 			}
 			$ids=array();
-			foreach ($this->array as $a) {
+			foreach ($this->links as $a) {
 				$ids[]=$a->{$st['local_field_name']};
 			}
 			$prec->find_records(array($st['foreign_field_name']=>array_unique($ids)));
-			if (isset($this->array)) foreach ($this->array as $link) {
-				$link_rec=$prec[$link->{$st['local_field_name']}];
-				if ($link->recordstate & RECORD_NEW) $link_rec->$counter_fieldname++;
-				if ($link->recordstate & RECORD_DELETED) $link_rec->$counter_fieldname--;
+			$counter_arr=array();
+			if (isset($this->links)) foreach ($this->links as $link) {
+				$id=$link->{$st['local_field_name']};
+				if ($link->recordstate & RECORD_NEW) $counter_arr[$id]=$counter_arr[$id]+1;
+				if ($link->recordstate & RECORD_DELETED) $counter_arr[$id]=$counter_arr[$id]-1;
+			}
+			foreach ($counter_arr as $id=>$cnt) {
+				$prec[$id]->$counter_fieldname+=$cnt;
 			}
 			$prec->commit();
 		}
@@ -411,44 +427,39 @@ class gs_recordset_short extends gs_recordset {
 			$this->structure[$k]=isset($this->structure[$k]) ? array_merge($this->structure[$k],$struct[$k]) : $struct[$k];
 	}
 	function commit() {
-		$ret=parent::commit();
-		//md($this->structure['recordsets'],1);
-		foreach ($this->structure['recordsets'] as $l=>$rs) {
-			if(isset($rs['update_recordset'])) {
-				$u=$this->get_elements_by_name($l);
-				if($u) $u->update_counters(get_class($this));
-			}
-		}
-		return $ret;
-	}
-	function update_counters($l,$link=false) {
-		/*
-		md('====',1);
-		md('this:'.get_class($this),1);
-		md('+++',1);
-		md('l:'.$l,1);
-		md('-=-',1);
-		md('link:'.$link,1);*/
-		//md($this->structure['recordsets'],1);
-		
-		$ss=array();
-		if ($link && isset($this->structure['recordsets'][$link])) {
-			$ss[]=$this->structure['recordsets'][$link];
-		} else {
-			foreach ($this->structure['recordsets'] as $n=>$r)  {
-				if ($r['recordset']==$l || (isset($r['rs2_name']) && $r['rs2_name']==$l)) $ss[$n]=$r;
-			}
-		}
-		foreach ($ss as $s) {
-			if (isset($s['counter_fieldname'])) {
-				$counter_fieldname=$s['counter_fieldname'];
-				foreach($this as $rec) {
-					$rec->$counter_fieldname=$rec->$link->count();
-					md('update_counters',1);
-					$rec->commit(1);
+		foreach ($this->structure['recordsets'] as $l=>$st) {
+			if(isset($st['update_recordset'])) {
+				$prec=new $st['update_recordset'];
+				foreach ($prec->structure['recordsets'] as $pl=>$pst) {
+					if ($pst['counter_linkname']==$l) {
+						foreach ($this as $rlink) {
+							$old_id=$rlink->get_old_value($st['local_field_name']);
+							$new_id=$rlink->{$st['local_field_name']};
+
+							if ($rlink->recordstate & RECORD_NEW) {
+									$plink=$prec->get_by_id($new_id);
+									$plink->{$pst['counter_fieldname']}++;
+									$plink->commit(1);
+							} else if ($rlink->recordstate & RECORD_DELETED) {
+									$plink=$prec->get_by_id($old_id);
+									$plink->{$pst['counter_fieldname']}--;
+									$plink->commit(1);
+							} else if ($old_id!=$new_id) {
+									$plink=$prec->get_by_id($new_id);
+									$plink->{$pst['counter_fieldname']}++;
+									$plink->commit(1);
+									$plink=$prec->get_by_id($old_id);
+									$plink->{$pst['counter_fieldname']}--;
+									$plink->commit(1);
+							}
+						}
+
+					}
 				}
 			}
 		}
+		$ret=parent::commit();
+		return $ret;
 	}
 }
 
