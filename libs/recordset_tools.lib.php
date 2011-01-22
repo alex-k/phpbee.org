@@ -189,7 +189,7 @@ class field_interface {
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
-			'options'=>explode(',',$opts['values']),
+			'options'=>array_combine(explode(',',$opts['values']),explode(',',$opts['values'])),
 		);
 		$structure['indexes'][$field]=$field;
 	}
