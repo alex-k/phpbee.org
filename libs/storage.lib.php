@@ -116,7 +116,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		next($this->structure['fields']);
 		$fieldname=key($this->structure['fields']);
 		reset($this->structure['fields']);
-		return $rec->$fieldname;
+		return $rec->$fieldname ? $rec->$fieldname : '';
 	}
 	public function __toString() {
 		return implode(', ',$this->recordset_as_string_array());
@@ -172,7 +172,7 @@ abstract class gs_recordset_base extends gs_iterator {
 
 
 	function find($options,$linkname=null) {
-         if (!is_array($options)) $options=array();
+		 $options=$this->string2options($options);
          if (!$this->first()) return new gs_null(GS_NULL_XML);
 
          $ids=array();
@@ -382,7 +382,7 @@ class gs_connector  {
 	function __construct($gs_connector_id) {
 		$cfg=gs_config::get_instance();
 		if (!isset($cfg->gs_connectors[$gs_connector_id])) {
-			throw new gs_exception('gs_connector: '.$gs_connector_id.'  not exists in config');
+			throw new gs_dbd_exception('gs_connector: '.$gs_connector_id.'  not exists in config');
 		}
 		$cinfo=$cfg->gs_connectors[$gs_connector_id];
 		load_dbdriver($cinfo['db_type']);

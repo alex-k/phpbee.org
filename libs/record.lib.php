@@ -55,6 +55,25 @@ class gs_record implements arrayaccess {
 		if (isset($this->gs_recordset->id_field_name)) unset($values[$this->gs_recordset->id_field_name]);
 		return $this->gs_recordset->new_record($values);
 	}
+	public function clone_values() {
+		$values=$this->get_values();
+		foreach ($this->gs_recordset->structure['recordsets'] as $k=>$s) {
+			if(substr($k,0,1)!=='_') {
+				$val=$this->__get($k)->get_values();
+				if (isset($s['rs1_name']) && isset($s['rs2_name'])) {
+					$val=array_combine(array_keys($val),array_keys($val)); 
+				} else {
+					$val=reset($val);
+				}
+				$values[$k]=$val;
+			}
+			//$this->__get($k);
+		}
+		
+		unset($values['schedule']);
+		unset($values['id']);
+		return $values;
+	}
 
 	public function change_recordset($gs_recordset) {
 		$this->gs_recordset=$gs_recordset;
@@ -134,7 +153,7 @@ class gs_record implements arrayaccess {
 				if (array_key_exists($k,$this->values)) $values[$k]=$this->values[$k];
 			}
 
-		}
+		} 
 		foreach ($values as $k=>$v) {
 			$val= (is_object($v)) ? get_class($v) : $v;
 			if (is_object($v) && method_exists($v,'get_values')) {

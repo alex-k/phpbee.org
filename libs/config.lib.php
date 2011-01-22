@@ -280,7 +280,7 @@ TXT;
 function gs_exception_handler($ex)
 {
 	md('');
-	md("EXCEPTION!");
+	md("EXCEPTION ".get_class($ex));
 	md($ex->getMessage());
 	md($ex->getTrace());
 	gs_logger::dump();
