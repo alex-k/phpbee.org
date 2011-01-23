@@ -173,7 +173,10 @@ class field_interface {
 	}
 	
 	function fFile($field,$opts,&$structure,$init_opts) {
-		$structure['fields'][$field]=array('type'=>'longblob');
+		$structure['fields'][$field.'_filename']=array('type'=>'varchar','options'=>255);
+		$structure['fields'][$field.'_data']=array('type'=>'longblob');
+		$structure['fields'][$field.'_mimetype']=array('type'=>'varchar','options'=>'16');
+		$structure['fields'][$field.'_size']=array('type'=>'bigint');
 		$structure['htmlforms'][$field]=array(
 			'type'=>'file',
 			'hidden'=>$opts['hidden'],

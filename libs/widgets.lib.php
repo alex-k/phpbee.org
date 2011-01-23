@@ -61,6 +61,15 @@ class gs_widget_file extends gs_widget{
 	function html() {
 		return sprintf('<input class="fFile" type="file" name="%s" value="%s">', $this->fieldname,trim($this->value));
 	}
+	function clean() {
+		return array(
+				'data'=>file_get_contents($this->value['tmp_name']),
+				'filename'=>$this->value['name'],
+				'mimetype'=>$this->value['type'],
+				'size'=>$this->value['size'],
+				);
+				
+	}
 }
 
 class gs_widget_datetime extends gs_widget{

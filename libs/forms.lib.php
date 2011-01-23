@@ -145,7 +145,13 @@ abstract class g_forms implements g_forms_interface{
 			$w =new $wclass($k,$this->data,$this->params,$this->record);
 			try {
 				$value=$w->clean();
-				$this->clean_data[$k]=$value;
+				if (is_array($value)) {
+					foreach ($value as $vk=>$vv) {
+						$this->clean_data[$k.'_'.$vk]=$vv;
+					}
+				} else {
+					$this->clean_data[$k]=$value;
+				}
 			} catch (gs_widget_validate_exception $e) {
 				$this->error($ret, $k,$e->getMessage());
 			}

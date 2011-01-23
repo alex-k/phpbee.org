@@ -34,7 +34,7 @@ class gs_base_handler {
 		if (!$tpl->template_exists($this->params['name'])) throw new gs_exception('gs_base_handler.show: can not find template file for '.$this->params['name']);
 		return $tpl->fetch($this->params['name']);
 	}
-	protected function show($nodebug=FALSE) {
+	function show($nodebug=FALSE) {
 		//if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
 		if (empty($this->params['name'])) {
 			$this->params['name']=str_replace('/','_',$this->data['handler_key']).'.html';
@@ -42,6 +42,23 @@ class gs_base_handler {
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
+
+		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname(__FILE__).'/'),'/');
+		$subdir=explode('/',$this->data['handler_key'],2);
+		$subdir=trim($subdir[0],'/');
+		$www_subdir=trim(cfg('www_dir').$subdir.'/','/');
+		$tpl=gs_tpl::get_instance();
+		$tpl->template_dir=cfg('lib_modules_dir')."/$subdir/templates";
+		$tpl->assign('tpl',$this);
+		$tpl->assign('_module_subdir',$subdir);
+		$tpl->assign('subdir',$subdir);
+		$tpl->assign('www_subdir',$www_subdir);
+		$tpl->assign('root_dir',cfg('root_dir'));
+		$this->subdir=$subdir;
+		$this->www_subdir=$www_subdir;
+
+
+
 		if (!$tpl->template_exists($this->params['name'])) {
 			md($this->data,1);
 			md($this->params,1);
@@ -66,6 +83,90 @@ class gs_base_handler {
 TXT;
 			}
 		}
+	}
+	function get_form() {
+		$params=$this->params;
+		$data=$this->data;
+		$id=isset($data['gspgid_va'][1]) ? $data['gspgid_va'][1] : null;
+		$classname=$params['classname'];
+
+		$obj=new $classname;
+		if (is_numeric($id)) {
+			$rec=$obj->get_by_id($id);
+		} else {
+			$rec=$obj->new_record();
+		}
+		$h=$obj->structure['htmlforms'];
+		$hh=$h;
+		if(isset($params['fields'])) {
+		$fields=array_filter(explode(',',$params['fields']));
+		$fields_minus=array_filter($fields,create_function('$a','return substr($a,0,1)=="-";'));
+		$fields_plus=array_diff($fields,$fields_minus);
+		$fields_minus=array_map(create_function('$a','return substr($a,1);'),$fields_minus);
+		if (count($fields_plus)>0) {
+			$hh=array();
+			foreach ($fields_plus as $f) if(isset($h[$f])) $hh[$f]=$h[$f]; 
+		} else if (count($fields_minus)>0) {
+			$hh=array();
+			foreach ($h as $f=>$v)  if (!in_array($f,$fields_minus)) $hh[$f]=$h[$f];
+		}
+		}
+
+		if(isset($params['hidden'])) {
+			$fields_hidden=array_filter(explode(',',$params['hidden']));
+			foreach($fields_hidden as $f) {
+				if(isset($h[$f])) {
+					$hh[$f]=$h[$f];
+					$hh[$f]['type']='hidden';
+				}
+			}
+		}
+		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
+		$f=new $form_class_name($hh,array_merge($rec->get_values(),$data),$rec);
+		$f->rec=$rec;
+		return $f;
+	}
+	function showform() {
+		$tpl=gs_tpl::get_instance();
+		$f=$this->get_form();
+		$tpl->assign('formfields',$f->as_dl());
+		$tpl->assign('form',$f);
+		return $tpl->fetch($this->params['name']);
+	}
+	function postform() {
+		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+
+		$tpl=gs_tpl::get_instance();
+		$f=$this->get_form();
+		$validate=$f->validate();
+		if ($validate['STATUS']===true) {
+			$f->rec->fill_values($this->explode_data($f->clean()));
+			$f->rec->get_recordset()->commit();
+			if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id());
+			return html_redirect($this->data['gspgid_handler']);
+			//return $tpl->fetch($this->params['name']);
+		}
+		$tpl->assign('formfields',$f->as_dl("\n",$validate));
+		$tpl->assign('form',$f);
+		return $tpl->fetch($this->params['name']);
+	}
+	function explode_data($data) {
+			$newdata=array();
+			foreach ($data as $k=>$v) {
+					$s=explode(':',$k);
+					while (($i=array_pop($s))!==NULL) {
+							$dd=array();
+							$dd[$i]=$v;
+							$v=$dd;
+					}       
+					$newdata=array_merge_recursive_distinct($newdata,$v);
+			}       
+			
+			if(isset($newdata['i2i'])) {
+					$newi2i=array_reduce($newdata['i2i']['']['childrens']['values'],'empty_array',0);
+					if ($newi2i==0) unset($newdata['i2i']['']);
+			}       
+			return array_merge($data,$newdata);
 	}
 }
 class gs_tpl_block {
