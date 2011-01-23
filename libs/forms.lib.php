@@ -145,7 +145,7 @@ abstract class g_forms implements g_forms_interface{
 			$w =new $wclass($k,$this->data,$this->params,$this->record);
 			try {
 				$value=$w->clean();
-				if (is_array($value)) {
+				if (is_array($value) && !is_numeric(key($value))) {
 					foreach ($value as $vk=>$vv) {
 						$this->clean_data[$k.'_'.$vk]=$vv;
 					}
