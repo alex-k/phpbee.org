@@ -43,13 +43,13 @@ class gs_init {
 	}
 
 	public function load_modules($mask='*module.php') {
-		$files = glob($this->config->lib_modules_dir.'/'.$mask);
+		$files = array_merge(glob($this->config->lib_modules_dir.'*/'.$mask),glob($this->config->lib_modules_dir.$mask));
+		$classes=get_declared_classes();
 		foreach ($files as $f) {
 			load_file($f);
-		}
-		$files = glob($this->config->lib_modules_dir.'/*/'.$mask);
-		foreach ($files as $f) {
-			load_file($f);
+			$nc=array_diff(get_declared_classes(),$classes);
+			foreach($nc as $c) $this->config->class_files[$c]=$f;
+			$classes=get_declared_classes();
 		}
 		$cfg=gs_config::get_instance();
 		$loaded_classes=get_declared_classes();
@@ -116,6 +116,7 @@ class gs_config {
 	public $lib_modules_dir;
 	public $lib_dbdrivers_dir;
 	public $tpl_blocks;
+	public $class_files=array();
 	private $view;
 	private $registered_gs_modules;
 	

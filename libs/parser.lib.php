@@ -48,6 +48,13 @@ class gs_parser {
 					$handlers['get']=isset($handlers['get']) ? array_merge($handlers['get_post'],$handlers['get']) : $handlers['get_post'];
 					$handlers['post']=isset($handlers['post']) ? array_merge($handlers['get_post'],$handlers['post']) : $handlers['get_post'];
 				}
+
+				foreach ($handlers as $k=>$h) {
+					foreach ($h as $kk=>$hv) {
+						$handlers[$k][$kk]=$hv.":module_name:$module_name";
+					}
+				}
+
 				$data=array_merge_recursive($data,$handlers);
 			}
 		}

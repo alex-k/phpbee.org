@@ -43,9 +43,11 @@ class gs_base_handler {
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
 
-		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname(__FILE__).'/'),'/');
-		$subdir=explode('/',$this->data['handler_key'],2);
-		$subdir=trim($subdir[0],'/');
+		$config=gs_config::get_instance();
+		$filename=$config->class_files[$this->params['module_name']];
+
+
+		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname($filename).'/'),'/');
 		$www_subdir=trim(cfg('www_dir').$subdir.'/','/');
 		$tpl=gs_tpl::get_instance();
 		$tpl->template_dir=cfg('lib_modules_dir')."/$subdir/templates";
