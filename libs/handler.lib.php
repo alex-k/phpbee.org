@@ -86,7 +86,7 @@ TXT;
 			}
 		}
 	}
-	function get_form() {
+	protected function get_form() {
 		$params=$this->params;
 		$data=$this->data;
 		$id=isset($data['gspgid_va'][1]) ? $data['gspgid_va'][1] : null;
