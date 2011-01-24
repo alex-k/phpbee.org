@@ -30,7 +30,7 @@ class gs_fkey {
 		if ($this->key_array===false) $this->_update_fkeys();
 	}
 	function save() {
-		md($this->key_array,1);
+		//md($this->key_array,1);
 		gs_cacher::save($this->key_array,'gs_recordset','gs_fkey_array');
 	}
 
@@ -151,6 +151,8 @@ class gs_fkey {
 	}
 	private function action_on_delete_cascade(&$record) {
 		$this->rs->find_records(array($this->local_field_name=>$this->oldid));
+		//md('action_on_delete_cascade',1);
+		//die('action_on_delete_cascade');
 		$record->append_child($this->rs);
 		foreach ($this->rs as $r) {
 			$r->delete();
