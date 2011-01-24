@@ -197,7 +197,8 @@ class gs_widget_form_add extends gs_widget{
 	function clean() {
 		return $this->value;
 	}
-	function form_add_ok($data) {
+	function form_add_ok() {
+		$data=$this->fieldname;
 		printf("<script>
 			window.top.document.getElementById('%s').value=%d;
 		</script>",$data['gspgid_va'][1],$data['gspgid_va'][0]);
