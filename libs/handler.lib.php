@@ -7,15 +7,7 @@ class gs_base_handler {
 		$this->data=$data;
 		$this->params=$params;
 
-		/*
-		$cfg=gs_config::get_instance();
-		foreach ($cfg->tpl_blocks as $blockname) {
-			if (!isset($this->blocks[$blockname])) $this->blocks[$blockname]=new gs_tpl_block($this->data);
-		}
-		*/
 		$tpl=gs_tpl::get_instance();
-		$tpl->assign('_gsdata',$this->data);
-		$tpl->assign('_gsparams',$this->params);
 		$config=gs_config::get_instance();
 		$filename=$config->class_files[$this->params['module_name']];
 		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname($filename).'/'),'/');
@@ -57,6 +49,8 @@ class gs_base_handler {
 		}
 
 		$tpl=gs_tpl::get_instance();
+		$tpl->assign('_gsdata',$this->data);
+		$tpl->assign('_gsparams',$this->params);
 
 
 		if (!$tpl->template_exists($this->params['name'])) {
