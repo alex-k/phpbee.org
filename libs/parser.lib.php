@@ -33,7 +33,8 @@ class gs_parser {
 		if (!class_exists($this->current_handler['class_name'],FALSE)) throw new gs_exception('gs_parser.process: Handler class not exists '.$this->current_handler['class_name']);
 		if (!method_exists($this->current_handler['class_name'],$this->current_handler['method_name'])) throw new gs_exception('gs_parser.process: Handler class method not exists '.$this->current_handler['class_name'].'.'.$this->current_handler['method_name']);
 		$o_h=new $this->current_handler['class_name']($this->data,$this->current_handler['params']);
-		return $o_h->{$this->current_handler['method_name']}($this->data);
+		//return $o_h->{$this->current_handler['method_name']}($this->data);
+		return $o_h->{$this->current_handler['method_name']}();
 	}
 	
 	private function get_handlers()
