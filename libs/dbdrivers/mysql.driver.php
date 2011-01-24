@@ -4,13 +4,23 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	private $db_connection;
 	private $_res;
 	private $_id;
+	private $stats;
 	function __construct($cinfo) {
 		parent::__construct();
 		$this->cinfo=$cinfo;
 		$this->_id=rand();
 		$this->_cache=array();
 		$this->_que=null;
+		$this->stats['total_time']=0;
+		$this->stats['total_queries']=0;
+		$this->stats['total_rows']=0;
 		$this->connect();
+	}
+	
+	function __destruct() {
+		if (DEBUG) {
+			//var_dump($this->stats);
+		}
 	}
 
 	function escape_value($v,$c=null) {
@@ -83,12 +93,18 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 			md($que);
 		}
 		$this->_res=mysql_query($que,$this->db_connection);
+		
 		if ($this->_res===FALSE) {
 			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error().' in query '.$que);
 		}
+		$t=microtime(true)-$t;
+		$rows=mysql_affected_rows($this->db_connection);
 		if (DEBUG) {
-			md(sprintf("%.03f secounds, %d rows",microtime(true)-$t, mysql_affected_rows($this->db_connection)));
+			md(sprintf("%.03f secounds, %d rows",$t, $rows));
 		}
+		$this->stats['total_time']+=$t;
+		$this->stats['total_queries']+=1;
+		$this->stats['total_rows']+=$rows;
 		return $this->_res;
 
 	}
