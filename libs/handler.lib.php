@@ -13,6 +13,22 @@ class gs_base_handler {
 			if (!isset($this->blocks[$blockname])) $this->blocks[$blockname]=new gs_tpl_block($this->data);
 		}
 		*/
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('_gsdata',$this->data);
+		$tpl->assign('_gsparams',$this->params);
+		$config=gs_config::get_instance();
+		$filename=$config->class_files[$this->params['module_name']];
+		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname($filename).'/'),'/');
+		$www_subdir=trim(cfg('www_dir').$subdir.'/','/');
+		$tpl=gs_tpl::get_instance();
+		$tpl->template_dir=cfg('lib_modules_dir')."/$subdir/templates";
+		$tpl->assign('tpl',$this);
+		$tpl->assign('_module_subdir',$subdir);
+		$tpl->assign('subdir',$subdir);
+		$tpl->assign('www_subdir',$www_subdir);
+		$tpl->assign('root_dir',cfg('root_dir'));
+		$this->subdir=$subdir;
+		$this->www_subdir=$www_subdir;
 
 		$this->register_blocks();
 	}
@@ -39,26 +55,8 @@ class gs_base_handler {
 		if (empty($this->params['name'])) {
 			$this->params['name']=str_replace('/','_',$this->data['handler_key']).'.html';
 		}
+
 		$tpl=gs_tpl::get_instance();
-		$tpl->assign('_gsdata',$this->data);
-		$tpl->assign('_gsparams',$this->params);
-
-		$config=gs_config::get_instance();
-		$filename=$config->class_files[$this->params['module_name']];
-
-
-		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname($filename).'/'),'/');
-		$www_subdir=trim(cfg('www_dir').$subdir.'/','/');
-		$tpl=gs_tpl::get_instance();
-		$tpl->template_dir=cfg('lib_modules_dir')."/$subdir/templates";
-		$tpl->assign('tpl',$this);
-		$tpl->assign('_module_subdir',$subdir);
-		$tpl->assign('subdir',$subdir);
-		$tpl->assign('www_subdir',$www_subdir);
-		$tpl->assign('root_dir',cfg('root_dir'));
-		$this->subdir=$subdir;
-		$this->www_subdir=$www_subdir;
-
 
 
 		if (!$tpl->template_exists($this->params['name'])) {
@@ -124,7 +122,8 @@ TXT;
 			}
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
-		$f=new $form_class_name($hh,array_merge($rec->get_values(),$data),$rec);
+		//$f=new $form_class_name($hh,array_merge($rec->get_values(),$data),$rec);
+		$f=new $form_class_name($hh,array_merge($rec->get_values(array_keys($hh)),$data),$rec);
 		$f->rec=$rec;
 		return $f;
 	}
@@ -144,13 +143,18 @@ TXT;
 		if ($validate['STATUS']===true) {
 			$f->rec->fill_values($this->explode_data($f->clean()));
 			$f->rec->get_recordset()->commit();
-			if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id());
+			if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.$this->data['gspgid_v']);
 			return html_redirect($this->data['gspgid_handler']);
 			//return $tpl->fetch($this->params['name']);
 		}
 		$tpl->assign('formfields',$f->as_dl("\n",$validate));
 		$tpl->assign('form',$f);
 		return $tpl->fetch($this->params['name']);
+	}
+	function displayform() {
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('gspgid_form',$this->data['gspgid']);
+		echo $this->postform();
 	}
 	function explode_data($data) {
 			$newdata=array();

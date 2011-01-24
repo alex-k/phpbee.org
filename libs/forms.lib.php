@@ -141,7 +141,7 @@ abstract class g_forms implements g_forms_interface{
 			'FIELDS'=>array(),
 			);
 		foreach ($this->htmlforms as $k=>$h) {
-			$wclass="gs_widget_".$h['type'];
+			$wclass="gs_widget_".(isset($h['widget']) ? $h['widget'] : $h['type']);
 			$w =new $wclass($k,$this->data,$this->params,$this->record);
 			try {
 				$value=$w->clean();
@@ -189,7 +189,7 @@ class g_forms_html extends g_forms {
 	function _prepare_inputs(){
 		$arr=array();
 		foreach($this->htmlforms as $field => $v) {
-			$wclass="gs_widget_".$v['type'];
+			$wclass="gs_widget_".(isset($v['widget']) ? $v['widget'] : $v['type']);
 			$w =new $wclass($field,$this->data,$v,$this->record);
 			if($v['type']=='label') {
 				$arr[$field]=array('input'=>$v['verbose_name']);
@@ -245,12 +245,13 @@ class g_forms_html extends g_forms {
 		return implode($delimiter,$arr);
 	}
 
+
 }
 class g_forms_jstpl extends g_forms_html {
 	function _prepare_inputs(){
 		$arr=array();
 		foreach($this->htmlforms as $field => $v) {
-			$wclass="gs_widget_".$v['type'];
+			$wclass="gs_widget_".(isset($v['widget']) ? $v['widget'] : $v['type']);
 			$w =new $wclass($field,array($field=>"<%=t.values.$field%>"),$v,$this->record);
 			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
 						//'input'=>$w->html($field,"<%=t.values.$field%>",$v)

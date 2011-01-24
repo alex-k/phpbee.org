@@ -13,6 +13,7 @@ abstract class gs_widget implements gs_widget_interface {
 		$this->value=isset($data[$fieldname]) ? $data[$fieldname] : NULL;
 		$this->params=$params;
 		$this->record=$record;
+		$this->tpl=gs_tpl::get_instance();
 	}
 	function clean() {
 		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
@@ -59,7 +60,7 @@ class gs_widget_text extends gs_widget{
 
 class gs_widget_file extends gs_widget{
 	function html() {
-		return sprintf('<input class="fFile" type="file" name="%s" value="%s">', $this->fieldname,trim($this->value));
+		return sprintf('<input class="fFile" type="file" name="%s" >', $this->fieldname);
 	}
 	function clean() {
 		return array(
@@ -146,11 +147,9 @@ class gs_widget_lMany2Many extends gs_widget{
 		$rsname=$rsl->structure['recordsets']['childs']['recordset'];
 		$rs=new $rsname();
 		$variants=$rs->find_records();
-
-
 		$ret=sprintf("<select class=\"lMany2Many\" multiple=\"on\" name=\"%s[]\">\n", $this->fieldname);
 		foreach ($variants as $v) {
-			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$v->get_id(), (is_array($this->value) && in_array($v->get_id(),$this->value)) ? 'selected="selected"' : '',trim($v));
+			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$v->get_id(), (is_array($this->value) && (in_array($v->get_id(),$this->value) || array_key_exists($v->get_id(),$this->value))) ? 'selected="selected"' : '',trim($v));
 		}
 		$ret.="</select>\n";
 
@@ -186,6 +185,22 @@ class gs_widget_lOne2One extends gs_widget{
 		$ret.="</select>\n";
 
 		return $ret;
+	}
+}
+class gs_widget_form_add extends gs_widget{
+	function html() {
+		$idname=$this->fieldname.'_'.md5(rand());
+		$s=sprintf('<input type="input" name="%s" id="%s" value="%s">', $this->fieldname,$idname,$this->value);
+		$s.=sprintf('<iframe src="%s/form_add/%s/%s"></iframe>', $this->tpl->www_subdir, $this->params['options']['recordset'],$idname);
+		return $s;
+	}
+	function clean() {
+		return $this->value;
+	}
+	function form_add_ok($data) {
+		printf("<script>
+			window.top.document.getElementById('%s').value=%d;
+		</script>",$data['gspgid_va'][1],$data['gspgid_va'][0]);
 	}
 }
 

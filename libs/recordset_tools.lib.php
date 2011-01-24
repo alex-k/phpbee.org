@@ -109,6 +109,7 @@ class field_interface {
 		if (isset($opts['default'])) {
 			$structure['htmlforms'][$field]['default']=$opts['default'];
 		}
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	function fPassword($field,$opts,&$structure,$init_opts) {
 		return self::fString($field,$opts,$structure,$init_opts);
@@ -121,6 +122,7 @@ class field_interface {
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumber'
 		);
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	function fInt($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'int');
@@ -130,11 +132,13 @@ class field_interface {
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumber'
 		);
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	
 	function fFloat($field,$opts,&$structure,$init_opts) {
 		self::fInt($field,$opts,$structure,$init_opts);
 		$structure['fields'][$field]=array('type'=>'float');
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	
 	function fEmail($field,$opts,&$structure,$init_opts) {
@@ -152,6 +156,7 @@ class field_interface {
 			$structure['htmlforms'][$field]['validate_params']['field']=$field;
 			//'validate_params'=>array('class'=>'users','field'=>'userLogin','message'=>'Login invalid or occupied'
 		}
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	function fDateTime($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'date');
@@ -161,6 +166,7 @@ class field_interface {
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isDate'
 		);
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	function fText($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'text');
@@ -170,6 +176,7 @@ class field_interface {
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	
 	function fFile($field,$opts,&$structure,$init_opts) {
@@ -183,6 +190,7 @@ class field_interface {
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	
 	function fSelect($field,$opts,&$structure,$init_opts) {
@@ -195,6 +203,7 @@ class field_interface {
 			'options'=>array_combine(explode(',',$opts['values']),explode(',',$opts['values'])),
 		);
 		$structure['indexes'][$field]=$field;
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	function f___dummy($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>255);
@@ -204,6 +213,7 @@ class field_interface {
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	function lOne2One($field,$opts,&$structure,$init_opts) {
 		$fname=$field.'_id';
@@ -223,7 +233,9 @@ class field_interface {
 			'foreign_field_name'=>'id',
 			'update_recordset'=>$opts['linked_recordset'],
 			);
+		$structure['htmlforms'][$fname]['options']=$structure['recordsets'][$field];
 		$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'RESTRICT','on_update'=>'CASCADE');
+		if (isset($opts['widget'])) $structure['htmlforms'][$fname]['widget']=$opts['widget'];
 
 
 	}
@@ -244,6 +256,7 @@ class field_interface {
 			$structure['fields'][$counter_fieldname]=array('type'=>'int','default'=>0);
 			$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
 		}
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	function lMany2Many($field,$opts,&$structure,$init_opts) {
 		@list($rname,$table_name,$foreign_field_name)=explode(':',$opts['linked_recordset']);
@@ -277,6 +290,8 @@ class field_interface {
 			$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
 			$structure['recordsets'][$field]['counter_fieldname']=$counter_fieldname;
 		}
+		$structure['htmlforms'][$field]['options']=$structure['recordsets'][$field];
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 
 		//$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'CASCADE','on_update'=>'CASCADE');
 	}
