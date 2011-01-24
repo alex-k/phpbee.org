@@ -10,7 +10,7 @@ interface gs_widget_interface {
 abstract class gs_widget implements gs_widget_interface {
 	function __construct($fieldname,$data,$params=array(),$record=NULL) {
 		$this->fieldname=$fieldname;
-		$this->value=isset($data[$fieldname]) ? $data[$fieldname] : NULL;
+		$this->value=is_string($fieldname) && isset($data[$fieldname]) ? $data[$fieldname] : NULL;
 		$this->params=$params;
 		$this->record=$record;
 		$this->tpl=gs_tpl::get_instance();
