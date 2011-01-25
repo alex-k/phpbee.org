@@ -190,8 +190,8 @@ class gs_widget_lOne2One extends gs_widget{
 class gs_widget_form_add extends gs_widget{
 	function html() {
 		$idname=$this->fieldname.'_'.md5(rand());
-		$s=sprintf('<input type="input" name="%s" id="%s" value="%s">', $this->fieldname,$idname,$this->value);
-		$s.=sprintf('<iframe src="%s/form_add/%s/%s"></iframe>', $this->tpl->www_subdir, $this->params['options']['recordset'],$idname);
+		$s=sprintf('<input type="hidden" name="%s" id="%s" value="%s">', $this->fieldname,$idname,$this->value);
+		$s.=sprintf('<iframe src="%sform_add/%s/%s" style="width:100%%; border: 0px;"></iframe>', $this->tpl->get_template_vars('www_subdir'), $this->params['options']['recordset'],$idname);
 		return $s;
 	}
 	function clean() {
@@ -199,102 +199,16 @@ class gs_widget_form_add extends gs_widget{
 	}
 	function form_add_ok() {
 		$data=$this->fieldname;
-		printf("<script>
+		$rec=new $data['gspgid_va'][1];
+		$rec=$rec->get_by_id($data['gspgid_va'][0]);
+		printf("
+		%s
+		<script>
 			window.top.document.getElementById('%s').value=%d;
-		</script>",$data['gspgid_va'][1],$data['gspgid_va'][0]);
+		</script>",$rec,$data['gspgid_va'][2],$data['gspgid_va'][0]);
 	}
 }
 
-
-/*
-	function checkbox($field,$value,$params=array(),$datatype=array()) {
-		$ret=sprintf('<input type="hidden" name="%s" id="%s" value="%s"><input onChange="this.previousSibling.value =this.checked ? 1 : 0" type="checkbox"  value="1" %s %s class="%s" %s>', 
-							$field,$field,
-							$value ? 1 : 0 ,
-							$value ? 'CHECKED="CHECKED"' : '' ,
-							isset($datatype['options']) && !($datatype['options']>15)   ? 'size="'.$datatype['options'].'" maxlength="'.$datatype['options'].'"':'',
-							isset($params['class'])?$params['class']:'edit',
-							isset($params['style'])?'style="'.$params['style'].'"':''
-							);
-		return $ret;
-	}
-	function show($field,$value,$params=array(),$datatype=array()) {
-		$ret=sprintf('%s', $value);
-		return $ret;
-	}
-	function hidden($field,$value,$params=array(),$datatype=array()) {
-		$ret=sprintf('<input type="hidden" name="%s" value="%s">', $field,$value);
-		return $ret;
-	}
-	function input($field,$value,$params=array(),$datatype=array()) {
-		$ret=sprintf('<input type="%s" name="%s" value="%s" %s class="%s" %s>', 
-							isset($datatype['input_type']) ? $datatype['input_type'] : 'text', 
-							$field,$value,
-							isset($datatype['options']) && !($datatype['options']>15)   ? 'size="'.$datatype['options'].'" maxlength="'.$datatype['options'].'"':'',
-							isset($params['class'])?$params['class']:'edit',
-							isset($params['style'])?'style="'.$params['style'].'"':''
-							);
-		return $ret;
-	}
-	function textarea($field,$value,$params=array(),$datatype=array()) {
-		$ret=sprintf('<textarea name="%s" %s class="%s" %s>%s</textarea>', $field,
-							isset($datatype['options']) && !($datatype['options']>15)   ? 'size="'.$datatype['options'].'" maxlength="'.$datatype['options'].'"':'',
-							isset($params['class'])?$params['class']:'edit',
-							isset($params['style'])?'style="'.$params['style'].'"':''
-							,$value);
-		return $ret;
-	}
-	function select($field,$value,$params=array(),$structure=array()) {
-		$options=array();
-		$options[]='<option value="0"></option>';
-		if(is_array($structure['options'])) foreach ($structure['options'] as $k=>$v) {
-			$options[]=sprintf('<option value="%s" %s>%s</option>',
-						$k,
-						$k==$value ? 'selected' : '',
-						$v
-					    );
-		}
-		$ret=sprintf('<input type="hidden" name="%s" id="%s" value="%s"><select id="%s" onChange="this.previousSibling.value =this.value ? this.value : \'\';" class="%s" %s>%s</select>',
-					$field,$field,$value,$field,
-					isset($params['class'])?$params['class']:'edit',
-					isset($params['style'])?'style="'.$params['style'].'"':'',
-					implode("\n",$options)
-					);
-		return $ret;
-	}
-	function radio($field,$value,$params=array(),$structure=array()) {
-		$options=array();
-		if(is_array($structure['options'])) foreach ($structure['options'] as $k=>$v) {
-			$ret.=sprintf('<input type="radio" value="%s" %s name="%s" id="%s" %s %s>%s<br>',
-						$k,
-						$k==$value ? 'checked' : '',
-						$field,$field,
-						isset($params['class'])?$params['class']:'edit',
-						isset($params['style'])?'style="'.$params['style'].'"':'',
-						$v
-					    );
-		}
-		return $ret;
-	}
-	function datetime($field,$value,$params=array()) {
-		$ret=sprintf('<input type="text" onfocus="setCal(this.id);" id="%s"name="%s" value="%s" class="%s" %s>',$field,$field,$value,
-					isset($params['class'])?$params['class']:'edit',
-					isset($params['style'])?'style="'.$params['style'].'"':''
-					);
-		return $ret;
-	}
-	function image($field,$value,$params=array(),$datatype=array()) {
-		$ret='';
-		if(is_numeric($value)) $ret.=sprintf("<img src='/img/%d/110.jpg'><br>\n",$value);
-		$ret.=sprintf('<input type="file" name="%s"  %s class="%s" %s>', $field,
-							isset($datatype['options']) && !($datatype['options']>15)   ? 'size="'.$datatype['options'].'" maxlength="'.$datatype['options'].'"':'',
-							isset($params['class'])?$params['class']:'edit',
-							isset($params['style'])?'style="'.$params['style'].'"':'',
-							$field
-							);
-		return $ret;
-	}
-*/
 
 
 ?>

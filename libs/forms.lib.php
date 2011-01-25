@@ -215,7 +215,6 @@ class g_forms_html extends g_forms {
 				$arr[]=sprintf('<dl class="row"><dt><label for="%s">%s:</label></dt> <dd><div>%s</div>%s</dd> </dl>',$field,$v['label'],$v['input'],$e);
 			}
 		}
-
 		return implode($delimiter,$arr);
 	}
 	function as_table($delimiter="\n"){
