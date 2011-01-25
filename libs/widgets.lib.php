@@ -189,6 +189,7 @@ class gs_widget_lOne2One extends gs_widget{
 }
 class gs_widget_form_add extends gs_widget{
 	function html() {
+		if ($this->value) return $this->form_add_ok($this->value);
 		$idname=$this->fieldname.'_'.md5(rand());
 		$s=sprintf('<input type="hidden" name="%s" id="%s" value="%s">', $this->fieldname,$idname,$this->value);
 		$s.=sprintf('<iframe src="%sform_add/%s/%s" style="width:100%%; border: 0px;"></iframe>', $this->tpl->get_template_vars('www_subdir'), $this->params['options']['recordset'],$idname);
@@ -197,15 +198,17 @@ class gs_widget_form_add extends gs_widget{
 	function clean() {
 		return $this->value;
 	}
-	function form_add_ok() {
+	function form_add_ok($value=false) {
+		if ($value) {
+			$s=$this->params['options']['recordset'];
+			$rec=new $s;
+			$rec=$rec->get_by_id($value);
+			return trim($rec);
+		}
 		$data=$this->fieldname;
 		$rec=new $data['gspgid_va'][1];
 		$rec=$rec->get_by_id($data['gspgid_va'][0]);
-		printf("
-		%s
-		<script>
-			window.top.document.getElementById('%s').value=%d;
-		</script>",$rec,$data['gspgid_va'][2],$data['gspgid_va'][0]);
+		printf("%s<script>window.top.document.getElementById('%s').value=%d;</script>",$rec,$data['gspgid_va'][2],$data['gspgid_va'][0]);
 	}
 }
 
