@@ -3,6 +3,3 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php
-
-#deny from all
-#allow from 80.254.53.98 194.58.78.109 89.223.25.246
