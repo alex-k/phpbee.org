@@ -1,6 +1,6 @@
 <?php
 ob_start();
-require_once(dirname(__FILE__).'/libs/config.lib.php');
+require_once(dirname(__FILE__).'/../libs/config.lib.php');
 $gs_node_id=1;
 $cfg=gs_config::get_instance();
 if (strpos($_SERVER['REQUEST_URI'],'/superadmin')===0) $init=new gs_init('superadmin');
