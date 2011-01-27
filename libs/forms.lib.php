@@ -142,7 +142,7 @@ abstract class g_forms implements g_forms_interface{
 			'FIELDS'=>array(),
 			);
 		foreach ($this->htmlforms as $field=>$h) {
-			if($h['type']=='lMany2One') {
+			if($h['type']=='lMany2One' || $h['type']=='lOne2One') {
 				$rs=new $h['options']['recordset'];
 				$obj=$rs->new_record();
 				$f=gs_base_handler::get_form_for_record($obj,$this->params,$this->data,$this->prefix."$field:");
@@ -201,8 +201,7 @@ class g_forms_html extends g_forms {
 	function _prepare_inputs(){
 		$arr=array();
 		foreach($this->htmlforms as $field => $v) {
-			//md($v,1);
-			if($v['type']=='lMany2One') {
+			if($v['type']=='lMany2One' || $v['type']=='lOne2One') {
 				$rs=new $v['options']['recordset'];
 				$obj=$rs->new_record();
 				$f=gs_base_handler::get_form_for_record($obj,$this->params,$this->data,$this->prefix."$field:");

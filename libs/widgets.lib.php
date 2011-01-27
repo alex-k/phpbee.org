@@ -63,6 +63,7 @@ class gs_widget_file extends gs_widget{
 		return sprintf('<input class="fFile" type="file" name="%s" >', $this->fieldname);
 	}
 	function clean() {
+		if (!$this->value) return $this->value;
 		return array(
 				'data'=>file_get_contents($this->value['tmp_name']),
 				'filename'=>$this->value['name'],
