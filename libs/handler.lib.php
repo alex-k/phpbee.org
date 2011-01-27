@@ -91,7 +91,11 @@ TXT;
 		} else {
 			$rec=$obj->new_record();
 		}
-		$h=$obj->structure['htmlforms'];
+
+		return self::get_form_for_record($rec,$this->params,$this->data);
+	}
+	static function get_form_for_record($rec,$params,$data,$prefix='') {
+		$h=$rec->get_recordset()->structure['htmlforms'];
 		$hh=$h;
 		if(isset($params['fields'])) {
 		$fields=array_filter(explode(',',$params['fields']));
@@ -117,8 +121,7 @@ TXT;
 			}
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
-		$f=new $form_class_name($hh,array_merge($rec->get_values(),$data),$rec);
-		//$f=new $form_class_name($hh,array_merge($rec->get_values(array_keys($hh)),$data),$rec);
+		$f=new $form_class_name($hh,array_merge($rec->get_values(),$data),$rec,$prefix);
 		$f->rec=$rec;
 		return $f;
 	}

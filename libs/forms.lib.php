@@ -96,11 +96,12 @@ abstract class g_forms implements g_forms_interface{
 							);
 		return $ret;
 	}
-	function __construct($h,$data=array(),$rec=null) {
+	function __construct($h,$data=array(),$rec=null,$prefix='') {
 		if (!is_array($data)) $data=array();
 		$this->record=NULL;
 		$this->params=NULL;
 		$this->clean_data=array();
+		$this->prefix=$prefix;
 		if (is_object($h) && get_class($h)=='gs_record') {
 			$this->record=$h;
 			$rs=$this->record->get_recordset();
@@ -140,32 +141,43 @@ abstract class g_forms implements g_forms_interface{
 			'ERRORS'=>array(),
 			'FIELDS'=>array(),
 			);
-		foreach ($this->htmlforms as $k=>$h) {
-			$wclass="gs_widget_".(isset($h['widget']) ? $h['widget'] : $h['type']);
-			$w =new $wclass($k,$this->data,$this->params,$this->record);
-			try {
-				$value=$w->clean();
-				if (is_array($value) && !is_numeric(key($value))) {
-					foreach ($value as $vk=>$vv) {
-						$this->clean_data[$k.'_'.$vk]=$vv;
+		foreach ($this->htmlforms as $field=>$h) {
+			if($h['type']=='lMany2One') {
+				$rs=new $h['options']['recordset'];
+				$obj=$rs->new_record();
+				$f=gs_base_handler::get_form_for_record($obj,$this->params,$this->data,$this->prefix."$field:");
+				$f_arr=$f->validate();
+				$this->clean_data=array_merge($this->clean_data,$f->clean());
+				$ret=array_merge_recursive($ret,$f_arr);
+			} else {
+				$k=$this->prefix.$field;
+				$wclass="gs_widget_".(isset($h['widget']) ? $h['widget'] : $h['type']);
+				$w =new $wclass($k,$this->data,$this->params,$this->record);
+				try {
+					$value=$w->clean();
+					if (is_array($value) && !is_numeric(key($value))) {
+						foreach ($value as $vk=>$vv) {
+							$this->clean_data[$k.'_'.$vk]=$vv;
+						}
+					} else {
+						$this->clean_data[$k]=$value;
 					}
-				} else {
-					$this->clean_data[$k]=$value;
+				} catch (gs_widget_validate_exception $e) {
+					$this->error($ret, $k,$e->getMessage());
 				}
-			} catch (gs_widget_validate_exception $e) {
-				$this->error($ret, $k,$e->getMessage());
-			}
-			if (!isset($h['validate'])) $h['validate']='notEmpty';
-			$validate=is_array($h['validate']) ? $h['validate'] : array($h['validate']);
-			foreach ($validate as $v) {
-				$vname='gs_validate_'.$v;
-				$val=new $vname();
-				if (!$val->validate($k,$value,$this->data,isset($h['validate_params'])?$h['validate_params'] : array() ,$this->record)) {
-					$this->error($ret, $k,$vname);
-				}
+				if (!isset($h['validate'])) $h['validate']='notEmpty';
+				$validate=is_array($h['validate']) ? $h['validate'] : array($h['validate']);
+				foreach ($validate as $v) {
+					$vname='gs_validate_'.$v;
+					$val=new $vname();
+					if (!$val->validate($k,$value,$this->data,isset($h['validate_params'])?$h['validate_params'] : array() ,$this->record)) {
+						$this->error($ret, $k,$vname);
+					}
 
+				}
 			}
 		}
+		if(is_array($ret['STATUS'])) $ret['STATUS']=!in_array(FALSE,$ret['STATUS']);
 		return $ret;
 
 	}
@@ -189,15 +201,24 @@ class g_forms_html extends g_forms {
 	function _prepare_inputs(){
 		$arr=array();
 		foreach($this->htmlforms as $field => $v) {
-			$wclass="gs_widget_".(isset($v['widget']) ? $v['widget'] : $v['type']);
-			$w =new $wclass($field,$this->data,$v,$this->record);
-			if($v['type']=='label') {
-				$arr[$field]=array('input'=>$v['verbose_name']);
-				continue;
+			//md($v,1);
+			if($v['type']=='lMany2One') {
+				$rs=new $v['options']['recordset'];
+				$obj=$rs->new_record();
+				$f=gs_base_handler::get_form_for_record($obj,$this->params,$this->data,$this->prefix."$field:");
+				$f_arr=$f->_prepare_inputs();
+				$arr=array_merge($arr,$f_arr);
+			} else {
+				$wclass="gs_widget_".(isset($v['widget']) ? $v['widget'] : $v['type']);
+				$w =new $wclass($this->prefix.$field,$this->data,$v,$this->record);
+				if($v['type']=='label') {
+					$arr[$field]=array('input'=>$v['verbose_name']);
+					continue;
+				}
+				$arr[$this->prefix.$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
+							'input'=>$w->html()
+							);
 			}
-			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
-						'input'=>$w->html()
-						);
 		}
 		return $arr;
 	}

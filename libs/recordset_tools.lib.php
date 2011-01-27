@@ -256,6 +256,15 @@ class field_interface {
 			$structure['fields'][$counter_fieldname]=array('type'=>'int','default'=>0);
 			$structure['htmlforms'][$counter_fieldname]=array( 'type'=>'fInt', 'hidden'=>'true',);
 		}
+		$structure['htmlforms'][$field]=array(
+			'type'=>'lMany2One',
+			'linkname'=>$field,
+			'hidden'=>$opts['hidden'],
+			'verbose_name'=>$opts['verbose_name'],
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
+			'nulloption'=>(isset($opts['nulloption']) && $opts['nulloption'] && strtolower($opts['nulloption'])!='false') ? true : false ,
+			'options'=>$structure['recordsets'][$field],
+		);
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	function lMany2Many($field,$opts,&$structure,$init_opts) {
