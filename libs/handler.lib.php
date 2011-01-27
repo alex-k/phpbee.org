@@ -121,7 +121,8 @@ TXT;
 			}
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
-		$f=new $form_class_name($hh,array_merge($rec->get_values(),$data),$rec,$prefix);
+		$fields=implode(',',array_keys($hh));
+		$f=new $form_class_name($hh,array_merge($rec->get_values($fields),$data),$rec,$prefix);
 		$f->rec=$rec;
 		return $f;
 	}
