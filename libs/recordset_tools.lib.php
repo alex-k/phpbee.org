@@ -1,47 +1,4 @@
 <?php
-abstract class gs_recordset_view extends gs_recordset {
-	protected $rs_o_a;
-	public function __construct($gs_connector_id,$db_tablename,$db_scheme=null) {
-		$this->structure['fields']=array();
-		foreach($this->structure['recordsets'] as $rs_name) {
-			$this->rs_o_a[$rs_name]=$obj=new $rs_name;
-			if (!isset($this->primary_rs) && isset($obj->id_field_name) && !empty($obj->id_field_name)) $this->primary_rs=$obj;
-			$this->structure['fields']=array_merge($this->structure['fields'],$obj->structure['fields']);
-		}
-		$this->id_field_name=$this->primary_rs->id_field_name;
-		parent::__construct($gs_connector_id,$db_tablename,$db_scheme);
-	}
-
-	public function attache_record($rec) {
-		foreach ($this->rs_o_a as $r) {
-			$nrec=clone($rec);
-			$nrec->change_recordset($r);
-			$r->add($nrec);
-		}
-		return TRUE;
-	}
-	public function commit() {
-		parent::commit();
-		foreach ($this->rs_o_a as $r) {
-			$r->commit();
-		}
-	}
-	public function install() {
-		foreach ($this->rs_o_a as $r) {
-			$r->install();
-		}
-
-		if (!$this->get_connector()->table_exists($this->table_name)) {
-			$this->createtable();
-			$this->commit();
-		} else {
-			$this->altertable();
-			$this->commit();
-		}
-	}
-
-}
-
 class field_interface {
 	function init($arr,$init_opts) {
 		$structure =array('fields'=>array(),
@@ -51,11 +8,6 @@ class field_interface {
 				'indexes'=>array(),
 				);
 		$ret=array();
-		/*
-		$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
-		foreach ($arr as $k=>$s) {
-			preg_match_all(':(\s(([a-z_]+)=)?[\'\"](.+?)[\'\"]|([^\s]+)):i',$s,$out);
-			*/
 		$arr=string_to_params($arr);
 		foreach ($arr as $k=>$r) {
 			if(!isset($r['required'])) $r['required']='true';
@@ -445,6 +397,8 @@ class gs_recordset_short extends gs_recordset {
 		if (!$this->gs_connector_id) $this->gs_connector_id=key(cfg('gs_connectors'));
 		$this->structure['fields'][$this->id_field_name]=array('type'=>'serial');
 		$this->selfinit($s);
+		$this->structure['fields']['_ctime']=array('type'=>'date');
+		$this->structure['fields']['_mtime']=array('type'=>'date');
 		parent::__construct($this->gs_connector_id,$this->table_name);
 	}
 
@@ -487,6 +441,9 @@ class gs_recordset_short extends gs_recordset {
 		}
 		$ret=parent::commit();
 		return $ret;
+	}
+	function html_list() {
+		return trim($this);
 	}
 }
 

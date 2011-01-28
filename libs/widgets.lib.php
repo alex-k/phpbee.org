@@ -9,10 +9,12 @@ interface gs_widget_interface {
 }
 abstract class gs_widget implements gs_widget_interface {
 	function __construct($fieldname,$data,$params=array(),$record=NULL) {
+		$this->validate_errors=NULL;
 		$this->fieldname=$fieldname;
 		$this->value=is_string($fieldname) && isset($data[$fieldname]) ? $data[$fieldname] : NULL;
 		$this->params=$params;
 		$this->record=$record;
+		$this->data=$data;
 		$this->tpl=gs_tpl::get_instance();
 	}
 	function clean() {
@@ -65,10 +67,10 @@ class gs_widget_file extends gs_widget{
 	function clean() {
 		if (!$this->value) return $this->value;
 		return array(
-				'data'=>file_get_contents($this->value['tmp_name']),
-				'filename'=>$this->value['name'],
-				'mimetype'=>$this->value['type'],
-				'size'=>$this->value['size'],
+				$this->fieldname.'_data'=>file_get_contents($this->value['tmp_name']),
+				$this->fieldname.'_filename'=>$this->value['name'],
+				$this->fieldname.'_mimetype'=>$this->value['type'],
+				$this->fieldname.'_size'=>$this->value['size'],
 				);
 				
 	}
@@ -210,6 +212,34 @@ class gs_widget_form_add extends gs_widget{
 		$rec=new $data['gspgid_va'][1];
 		$rec=$rec->get_by_id($data['gspgid_va'][0]);
 		printf("%s<script>window.top.document.getElementById('%s').value=%d;</script>",$rec,$data['gspgid_va'][2],$data['gspgid_va'][0]);
+	}
+}
+
+class gs_widget_lMany2One extends gs_widget {
+	function clean() {
+		md('==============');
+		$ret=array();
+		$rs=new $this->params['options']['recordset'];
+		$obj=$rs->new_record();
+		$f=gs_base_handler::get_form_for_record($obj,$this->params['gs_form_params'],$this->data,$this->fieldname.":");
+		$f_val=$f->validate();
+		if (!$f_val['STATUS']) {
+			$this->validate_errors=$f_val;
+			throw new gs_widget_validate_exception($this->fieldname);
+		}
+		$ret=$f->clean();
+		return $ret;
+	}
+	function html() {
+		$f_arr=array();
+		$f_arr[]=array('label'=>'',
+				'input'=>$this->record->{$this->fieldname}->html_list(),
+				);
+		$rs=new $this->params['options']['recordset'];
+		$obj=$rs->new_record();
+		$f=gs_base_handler::get_form_for_record($obj,$this->params['gs_form_params'],$this->data,$this->fieldname.":");
+		$f_arr=array_merge($f_arr,$f->_prepare_inputs());
+		return $f_arr;
 	}
 }
 

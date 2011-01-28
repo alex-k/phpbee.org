@@ -128,7 +128,11 @@ abstract class g_forms implements g_forms_interface{
 	function clean($name=null) {
 		return $name ? $this->clean_data[$name] : $this->clean_data;
 	}
-	protected function error(&$ret, $k,$m) {
+	protected function error(&$ret, $k,$m,$err_array=null) {
+		if(is_array($err_array)) {
+			$ret=array_merge_recursive($ret,$err_array);
+			return;
+		}
 		$ret['STATUS']=false;
 		$ret['ERRORS'][]=array('FIELD'=>$k,'ERROR'=>$m);
 		$ret['FIELDS'][$k][]=$m;
@@ -162,19 +166,21 @@ abstract class g_forms implements g_forms_interface{
 					} else {
 						$this->clean_data[$k]=$value;
 					}
-				} catch (gs_widget_validate_exception $e) {
-					$this->error($ret, $k,$e->getMessage());
+				} else {
+					$this->clean_data[$k]=$value;
 				}
-				if (!isset($h['validate'])) $h['validate']='notEmpty';
-				$validate=is_array($h['validate']) ? $h['validate'] : array($h['validate']);
-				foreach ($validate as $v) {
-					$vname='gs_validate_'.$v;
-					$val=new $vname();
-					if (!$val->validate($k,$value,$this->data,isset($h['validate_params'])?$h['validate_params'] : array() ,$this->record)) {
-						$this->error($ret, $k,$vname);
-					}
+			} catch (gs_widget_validate_exception $e) {
+				$this->error($ret, $k,$e->getMessage(),$w->validate_errors);
+			}
+			if (!isset($h['validate'])) $h['validate']='notEmpty';
+			$validate=is_array($h['validate']) ? $h['validate'] : array($h['validate']);
+			foreach ($validate as $v) {
+				$vname='gs_validate_'.$v;
+				$val=new $vname();
+				if (!$val->validate($k,$value,$this->data,isset($h['validate_params'])?$h['validate_params'] : array() ,$this->record)) {
+					$this->error($ret, $k,$vname);
+				}
 
-				}
 			}
 		}
 		if(is_array($ret['STATUS'])) $ret['STATUS']=!in_array(FALSE,$ret['STATUS']);
@@ -218,12 +224,15 @@ class g_forms_html extends g_forms {
 							'input'=>$w->html()
 							);
 			}
+			$arr[$this->prefix.$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
+						'input'=>$w->html()
+						);
 		}
 		return $arr;
 	}
-	function as_dl($delimiter="\n",$validate=array()){
+	function as_dl($delimiter="\n",$validate=array(),$inputs=null){
 		$arr=array();
-		$inputs=$this->_prepare_inputs();
+		if($inputs===null) $inputs=$this->_prepare_inputs();
 		foreach($inputs as $field=>$v)  {
 			$e="";
 			if (isset($validate['FIELDS'][$field])) {
@@ -232,7 +241,8 @@ class g_forms_html extends g_forms {
 			if ($this->htmlforms[$field]['type']=='hidden') {
 				$arr[]=$v['input'];
 			} else {
-				$arr[]=sprintf('<dl class="row"><dt><label for="%s">%s:</label></dt> <dd><div>%s</div>%s</dd> </dl>',$field,$v['label'],$v['input'],$e);
+				if(is_array($v['input'])) $v['input']=$this->as_dl($delimiter,$validate,$v['input']);
+				$arr[]=sprintf('<dl class="row"><dt><label for="%s">%s%s</label></dt> <dd><div>%s</div>%s</dd> </dl>',$field,$v['label'],$v['label']?':':'',$v['input'],$e);
 			}
 		}
 		return implode($delimiter,$arr);
