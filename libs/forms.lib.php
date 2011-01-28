@@ -146,25 +146,15 @@ abstract class g_forms implements g_forms_interface{
 			'FIELDS'=>array(),
 			);
 		foreach ($this->htmlforms as $field=>$h) {
-			if($h['type']=='lMany2One' || $h['type']=='lOne2One') {
-				$rs=new $h['options']['recordset'];
-				$obj=$rs->new_record();
-				$f=gs_base_handler::get_form_for_record($obj,$this->params,$this->data,$this->prefix."$field:");
-				$f_arr=$f->validate();
-				$this->clean_data=array_merge($this->clean_data,$f->clean());
-				$ret=array_merge_recursive($ret,$f_arr);
-			} else {
-				$k=$this->prefix.$field;
-				$wclass="gs_widget_".(isset($h['widget']) ? $h['widget'] : $h['type']);
-				$w =new $wclass($k,$this->data,$this->params,$this->record);
-				try {
-					$value=$w->clean();
-					if (is_array($value) && !is_numeric(key($value))) {
-						foreach ($value as $vk=>$vv) {
-							$this->clean_data[$k.'_'.$vk]=$vv;
-						}
-					} else {
-						$this->clean_data[$k]=$value;
+			$k=$this->prefix.$field;
+			$wclass="gs_widget_".(isset($h['widget']) ? $h['widget'] : $h['type']);
+			$h['gs_form_params']=$this->params;
+			$w =new $wclass($k,$this->data,$h,$this->record);
+			try {
+				$value=$w->clean();
+				if (is_array($value) && !is_numeric(key($value))) {
+					foreach ($value as $vk=>$vv) {
+						$this->clean_data[$vk]=$vv;
 					}
 				} else {
 					$this->clean_data[$k]=$value;
@@ -207,22 +197,12 @@ class g_forms_html extends g_forms {
 	function _prepare_inputs(){
 		$arr=array();
 		foreach($this->htmlforms as $field => $v) {
-			if($v['type']=='lMany2One' || $v['type']=='lOne2One') {
-				$rs=new $v['options']['recordset'];
-				$obj=$rs->new_record();
-				$f=gs_base_handler::get_form_for_record($obj,$this->params,$this->data,$this->prefix."$field:");
-				$f_arr=$f->_prepare_inputs();
-				$arr=array_merge($arr,$f_arr);
-			} else {
-				$wclass="gs_widget_".(isset($v['widget']) ? $v['widget'] : $v['type']);
-				$w =new $wclass($this->prefix.$field,$this->data,$v,$this->record);
-				if($v['type']=='label') {
-					$arr[$field]=array('input'=>$v['verbose_name']);
-					continue;
-				}
-				$arr[$this->prefix.$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
-							'input'=>$w->html()
-							);
+			$wclass="gs_widget_".(isset($v['widget']) ? $v['widget'] : $v['type']);
+			$v['gs_form_params']=$this->params;
+			$w =new $wclass($this->prefix.$field,$this->data,$v,$this->record);
+			if($v['type']=='label') {
+				$arr[$field]=array('input'=>$v['verbose_name']);
+				continue;
 			}
 			$arr[$this->prefix.$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
 						'input'=>$w->html()
