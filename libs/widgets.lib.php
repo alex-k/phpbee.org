@@ -150,7 +150,8 @@ class gs_widget_lMany2Many extends gs_widget{
 		$rsname=$rsl->structure['recordsets']['childs']['recordset'];
 		$rs=new $rsname();
 		$variants=$rs->find_records();
-		$ret=sprintf("<select class=\"lMany2Many\" multiple=\"on\" name=\"%s[]\">\n", $this->fieldname);
+		$ret="<input type=\"hidden\" name=\"".$this->fieldname."\" value=\"0\">";
+		$ret.=sprintf("<select class=\"lMany2Many\" multiple=\"on\" name=\"%s[]\">\n", $this->fieldname);
 		foreach ($variants as $v) {
 			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$v->get_id(), (is_array($this->value) && (in_array($v->get_id(),$this->value) || array_key_exists($v->get_id(),$this->value))) ? 'selected="selected"' : '',trim($v));
 		}
@@ -217,7 +218,6 @@ class gs_widget_form_add extends gs_widget{
 
 class gs_widget_lMany2One extends gs_widget {
 	function clean() {
-		md('==============');
 		$ret=array();
 		$rs=new $this->params['options']['recordset'];
 		$obj=$rs->new_record();

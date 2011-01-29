@@ -97,6 +97,7 @@ abstract class g_forms implements g_forms_interface{
 		return $ret;
 	}
 	function __construct($h,$data=array(),$rec=null,$prefix='') {
+		//md($data,1);
 		if (!is_array($data)) $data=array();
 		$this->record=NULL;
 		$this->params=NULL;
@@ -116,12 +117,7 @@ abstract class g_forms implements g_forms_interface{
 			if(isset($ih['default'])) $form_default[$k]=$ih['default'];
 		}
 		if (count($form_default)>0) $data=array_merge($form_default,$data);
-		if(isset($data['_default'])) {
-			$default=$data['_default'];
-			$default=string_to_params($default);
-			$data=array_merge($default,$data);
-		}
-		$data=array_map(create_function('$a','return (is_string($a) && strpos($a,"array:")===0) ? explode(":",$a) : $a;'),$data);
+		//$data=array_map(create_function('$a','return (is_string($a) && strpos($a,"array:")===0) ? explode(":",$a) : $a;'),$data);
 		$this->data=$data;
 		$this->htmlforms=$h;
 	}

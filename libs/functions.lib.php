@@ -133,6 +133,8 @@ function string_to_params($inp) {
 		foreach ($out[3] as $i => $v) {
 			$key= $v ? $v : $j++;
 			$value = $out[4][$i] ? $out[4][$i] : $out[1][$i];
+			$prefix=explode(':',$value,2);
+			if(strtoupper($prefix[0])=='ARRAY') $value=explode(':',$prefix[1]);
 			$r[$key]=$value;
 		}
 		$ret[$k]=$r;
