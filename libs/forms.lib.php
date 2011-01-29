@@ -217,8 +217,17 @@ class g_forms_html extends g_forms {
 			if ($this->htmlforms[$field]['type']=='hidden') {
 				$arr[]=$v['input'];
 			} else {
-				if(is_array($v['input'])) $v['input']=$this->as_dl($delimiter,$validate,$v['input']);
-				$arr[]=sprintf('<dl class="row"><dt><label for="%s">%s%s</label></dt> <dd><div>%s</div>%s</dd> </dl>',$field,$v['label'],$v['label']?':':'',$v['input'],$e);
+				$outstr='<dl class="row"><dt><label for="%s">%s%s</label></dt> <dd><div>%s</div>%s</dd> </dl>';
+				if(is_array($v['input'])) {
+					if ($this->htmlforms[$field]['widget_params']=='inline') {
+						$arr[]=$this->as_dl($delimiter,$validate,$v['input']);
+					} else {
+						$v['input']=$this->as_dl($delimiter,$validate,$v['input']);
+						$arr[]=sprintf($outstr,$field,$v['label'],$v['label']?':':'',$v['input'],$e);
+					}
+				} else {
+					$arr[]=sprintf($outstr,$field,$v['label'],$v['label']?':':'',$v['input'],$e);
+				}
 			}
 		}
 		return implode($delimiter,$arr);

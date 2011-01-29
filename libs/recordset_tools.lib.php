@@ -11,7 +11,6 @@ class field_interface {
 		$arr=string_to_params($arr);
 		foreach ($arr as $k=>$r) {
 			if(!isset($r['required'])) $r['required']='true';
-
 			$r['func_name']=$r[0];
 			if (in_array($r['func_name'],array('lMany2Many','lMany2One','lOne2One'))) {
 				$r['linked_recordset']=$r[1];
@@ -218,6 +217,7 @@ class field_interface {
 			'options'=>$structure['recordsets'][$field],
 		);
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
+		if (isset($opts['widget_params'])) $structure['htmlforms'][$field]['widget_params']=$opts['widget_params'];
 	}
 	function lMany2Many($field,$opts,&$structure,$init_opts) {
 		@list($rname,$table_name,$foreign_field_name)=explode(':',$opts['linked_recordset']);
