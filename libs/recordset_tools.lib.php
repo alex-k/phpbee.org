@@ -16,7 +16,9 @@ class field_interface {
 				$r['linked_recordset']=$r[1];
 				if (!isset($r['hidden'])) $r['hidden']=!(isset($r['verbose_name']) || isset($r[2])) ;
 				if (!isset($r['verbose_name'])) $r['verbose_name']=isset($r[2]) ? $r[2] : $k;
-				$r['counter'] = isset($r['counter']) && (!$r['counter'] || strtolower($r['counter'])=='false') ? false : true;
+				$r['counter'] = isset($r['counter']) && (!$r['counter'] || strtolower($r['counter'])=='false') ? false : true; // by default: on
+				//$r['counter'] = (isset($r['counter']) && $r['counter'] && strtolower($r['counter'])!='false') ? true : false; // by default: off
+
 			} else {
 				if (!isset($r['hidden'])) $r['hidden']=!(isset($r['verbose_name']) || isset($r[1])) ;
 				if (!isset($r['verbose_name'])) $r['verbose_name']=isset($r[1]) ? $r[1] : $k;

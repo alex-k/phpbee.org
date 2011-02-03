@@ -1556,7 +1556,7 @@ class Smarty_Compiler extends gs_Smarty {
                 case 0:
                     /* If the token is a valid identifier, we set attribute name
                        and go to state 1. */
-                    if (preg_match('~^\w+$~', $token)) {
+                    if (preg_match('~^[\w:]+$~', $token)) {
                         $attr_name = $token;
                         $state = 1;
                     } else

@@ -116,7 +116,8 @@ TXT;
 			foreach($fields_hidden as $f) {
 				if(isset($h[$f])) {
 					$hh[$f]=$h[$f];
-					$hh[$f]['type']='hidden';
+					$hh[$f]['widget']='hidden';
+					//$hh[$f]['type']='hidden';
 				}
 			}
 		}

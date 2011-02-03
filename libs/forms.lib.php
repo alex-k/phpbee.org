@@ -113,7 +113,9 @@ abstract class g_forms implements g_forms_interface{
 		}
 		$form_default=array();
 		foreach ($h as $k=>$ih) {
-			if(isset($ih['hidden']) && $ih['hidden']) unset($h[$k]);
+			if(isset($ih['hidden']) && $ih['hidden']) {
+				unset($h[$k]);
+			}
 			if(isset($ih['default'])) $form_default[$k]=$ih['default'];
 		}
 		if (count($form_default)>0) $data=array_merge($form_default,$data);
@@ -206,7 +208,7 @@ class g_forms_html extends g_forms {
 		}
 		return $arr;
 	}
-	function as_dl($delimiter="\n",$validate=array(),$inputs=null){
+	function as_dl($delimiter="\n",$validate=array(),$inputs=null,$outstr='<dl class="row"><dt><label for="%s">%s%s</label></dt> <dd><div>%s</div>%s</dd> </dl>'){
 		$arr=array();
 		if($inputs===null) $inputs=$this->_prepare_inputs();
 		foreach($inputs as $field=>$v)  {
@@ -214,15 +216,14 @@ class g_forms_html extends g_forms {
 			if (isset($validate['FIELDS'][$field])) {
 				$e='<div class="error">Error: '.implode(',',$validate['FIELDS'][$field]).'</div>';
 			}
-			if ($this->htmlforms[$field]['type']=='hidden') {
+			if ($this->htmlforms[$field]['type']=='hidden' || $this->htmlforms[$field]['widget']=='hidden') {
 				$arr[]=$v['input'];
 			} else {
-				$outstr='<dl class="row"><dt><label for="%s">%s%s</label></dt> <dd><div>%s</div>%s</dd> </dl>';
 				if(is_array($v['input'])) {
 					if ($this->htmlforms[$field]['widget_params']=='inline') {
-						$arr[]=$this->as_dl($delimiter,$validate,$v['input']);
+						$arr[]=$this->as_dl($delimiter,$validate,$v['input'],$outstr);
 					} else {
-						$v['input']=$this->as_dl($delimiter,$validate,$v['input']);
+						$v['input']=$this->as_dl($delimiter,$validate,$v['input'],$outstr);
 						$arr[]=sprintf($outstr,$field,$v['label'],$v['label']?':':'',$v['input'],$e);
 					}
 				} else {
