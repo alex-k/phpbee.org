@@ -96,11 +96,11 @@ abstract class g_forms implements g_forms_interface{
 							);
 		return $ret;
 	}
-	function __construct($h,$data=array(),$rec=null,$prefix='') {
+	function __construct($h,$params=array(),$data=array(),$rec=null,$prefix='') {
 		//md($data,1);
 		if (!is_array($data)) $data=array();
 		$this->record=NULL;
-		$this->params=NULL;
+		$this->params=$params;
 		$this->clean_data=array();
 		$this->prefix=$prefix;
 		if (is_object($h) && get_class($h)=='gs_record') {

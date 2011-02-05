@@ -231,6 +231,7 @@ class gs_widget_lMany2One extends gs_widget {
 		return $ret;
 	}
 	function html() {
+		//md($this->params,1);
 		$f_arr=array();
 		$f_arr[]=array('label'=>'',
 				'input'=>$this->record->{$this->fieldname}->html_list(),

@@ -116,9 +116,25 @@ TXT;
 			foreach($fields_hidden as $f) {
 				if(isset($h[$f])) {
 					$hh[$f]=$h[$f];
-					$hh[$f]['widget']='hidden';
+					//$hh[$f]['widget']='hidden';
 					//$hh[$f]['type']='hidden';
+					$hh[$f]['hidden']=1;
 				}
+			}
+		}
+		foreach ($hh as $k=>$v) {
+			switch($v['type']) {
+				case 'lMany2One':
+						md('====='.$k,1);
+						$nrs=new $v['options']['recordset'];
+						$nobj=$nrs->new_record();
+						$f=self::get_form_for_record($nobj,$params,$data,$k.":");
+						unset($hh[$k]);
+						md($f->_prepare_inputs(),1);
+						md('------',1);
+						$hh=array_merge($hh,$f->_prepare_inputs());
+				break;
+				default: 
 			}
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
@@ -128,7 +144,7 @@ TXT;
 			$default=string_to_params($default);
 			$data=array_merge($default,$data);
 		}
-		$f=new $form_class_name($hh,array_merge($rec->get_values($fields),$data),$rec,$prefix);
+		$f=new $form_class_name($hh,$params,array_merge($rec->get_values($fields),$data),$rec,$prefix);
 		$f->rec=$rec;
 		return $f;
 	}
@@ -146,6 +162,10 @@ TXT;
 		$f=$this->get_form();
 		$validate=$f->validate();
 		if ($validate['STATUS']===true) {
+			md($this->data,1);
+			md($f->clean(),1);
+			exit();
+
 			$f->rec->fill_values($this->explode_data($f->clean()));
 			$f->rec->get_recordset()->commit();
 			if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
