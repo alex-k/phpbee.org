@@ -180,7 +180,7 @@ class gs_config {
 	}
 
 	
-	function &get_instance()
+	static function &get_instance()
 	{
 		static $instance;
 		if (!isset($instance)) $instance = new gs_config;
@@ -211,7 +211,7 @@ function md($output,$type=false)
 final class gs_logger {
 	
 	private $messages=array();	
-	function &get_instance()
+	static function &get_instance()
 	{
 		static $instance;
 		if (!isset($instance))

@@ -195,7 +195,9 @@ class g_forms_html extends g_forms {
 	function _prepare_inputs(){
 		$arr=array();
 		foreach($this->htmlforms as $field => $v) {
-			$wclass="gs_widget_".(isset($v['widget']) ? $v['widget'] : $v['type']);
+			$wclass=isset($v['widget']) ? $v['widget'] : $v['type'];
+			if (!$wclass) continue;
+			$wclass="gs_widget_$wclass";
 			$v['gs_form_params']=$this->params;
 			$w =new $wclass($this->prefix.$field,$this->data,$v,$this->record);
 			if($v['type']=='label') {

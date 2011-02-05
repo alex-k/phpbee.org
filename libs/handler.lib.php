@@ -125,14 +125,14 @@ TXT;
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
 				case 'lMany2One':
-						md('====='.$k,1);
 						$nrs=new $v['options']['recordset'];
 						$nobj=$nrs->new_record();
-						$f=self::get_form_for_record($nobj,$params,$data,$k.":");
+						$f=self::get_form_for_record($nobj,$params,$data);
 						unset($hh[$k]);
-						md($f->_prepare_inputs(),1);
-						md('------',1);
-						$hh=array_merge($hh,$f->_prepare_inputs());
+						$forms=$f->htmlforms;
+						foreach($forms as $fk=>$fv) {
+							$hh["$k:$fk"]=$fv;
+						}
 				break;
 				default: 
 			}

@@ -1,6 +1,6 @@
 <?php
 class field_interface {
-	function init($arr,$init_opts) {
+	static function init($arr,$init_opts) {
 		$structure =array('fields'=>array(),
 				'recordsets'=>array(),
 				'htmlforms'=>array(),
@@ -34,7 +34,7 @@ class field_interface {
 		return $structure;
 	}
 
-	function fString($field,$opts,&$structure,$init_opts) {
+	static function fString($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
 		$structure['htmlforms'][$field]=array(
 			'type'=>'input', 
@@ -64,10 +64,10 @@ class field_interface {
 		}
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
-	function fPassword($field,$opts,&$structure,$init_opts) {
+	static function fPassword($field,$opts,&$structure,$init_opts) {
 		return self::fString($field,$opts,$structure,$init_opts);
 	}
-	function fCheckbox($field,$opts,&$structure,$init_opts) {
+	static function fCheckbox($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'int');
 		$structure['htmlforms'][$field]=array(
 			'type'=>'checkbox',
@@ -77,7 +77,7 @@ class field_interface {
 		);
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
-	function fInt($field,$opts,&$structure,$init_opts) {
+	static function fInt($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'int');
 		$structure['htmlforms'][$field]=array(
 			'type'=>'input',
@@ -88,13 +88,13 @@ class field_interface {
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	
-	function fFloat($field,$opts,&$structure,$init_opts) {
+	static function fFloat($field,$opts,&$structure,$init_opts) {
 		self::fInt($field,$opts,$structure,$init_opts);
 		$structure['fields'][$field]=array('type'=>'float');
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	
-	function fEmail($field,$opts,&$structure,$init_opts) {
+	static function fEmail($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
 		$structure['htmlforms'][$field]=array(
 			'type'=>'email',
@@ -111,7 +111,7 @@ class field_interface {
 		}
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
-	function fDateTime($field,$opts,&$structure,$init_opts) {
+	static function fDateTime($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'date');
 		$structure['htmlforms'][$field]=array(
 			'type'=>'datetime',
@@ -121,7 +121,7 @@ class field_interface {
 		);
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
-	function fText($field,$opts,&$structure,$init_opts) {
+	static function fText($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'text');
 		$structure['htmlforms'][$field]=array(
 			'type'=>'text',
@@ -132,7 +132,7 @@ class field_interface {
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	
-	function fFile($field,$opts,&$structure,$init_opts) {
+	static function fFile($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field.'_filename']=array('type'=>'varchar','options'=>255);
 		$structure['fields'][$field.'_data']=array('type'=>'longblob');
 		$structure['fields'][$field.'_mimetype']=array('type'=>'varchar','options'=>'16');
@@ -146,7 +146,7 @@ class field_interface {
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	
-	function fSelect($field,$opts,&$structure,$init_opts) {
+	static function fSelect($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
 		$structure['htmlforms'][$field]=array(
 			'type'=>'Select',
@@ -158,7 +158,7 @@ class field_interface {
 		$structure['indexes'][$field]=$field;
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
-	function f___dummy($field,$opts,&$structure,$init_opts) {
+	static function f___dummy($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>255);
 		$structure['htmlforms'][$field]=array(
 			'type'=>'input',
@@ -168,7 +168,7 @@ class field_interface {
 		);
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
-	function lOne2One($field,$opts,&$structure,$init_opts) {
+	static function lOne2One($field,$opts,&$structure,$init_opts) {
 		$fname=$field.'_id';
 		$structure['fields'][$fname]=array('type'=>'int');
 		$structure['htmlforms'][$fname]=array(
@@ -192,7 +192,7 @@ class field_interface {
 
 
 	}
-	function lMany2One($field,$opts,&$structure,$init_opts) {
+	static function lMany2One($field,$opts,&$structure,$init_opts) {
 		if(isset($init_opts['skip_many2many'])) return;
 		list($rname,$linkname)=explode(':',$opts['linked_recordset']);
 		$obj=new $rname(array('skip_many2many'=>true));
@@ -221,7 +221,7 @@ class field_interface {
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 		if (isset($opts['widget_params'])) $structure['htmlforms'][$field]['widget_params']=$opts['widget_params'];
 	}
-	function lMany2Many($field,$opts,&$structure,$init_opts) {
+	static function lMany2Many($field,$opts,&$structure,$init_opts) {
 		@list($rname,$table_name,$foreign_field_name)=explode(':',$opts['linked_recordset']);
 		/*
 		new gs_rs_links($init_opts['recordset'],$rname,$table_name);	

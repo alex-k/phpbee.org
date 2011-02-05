@@ -16,7 +16,7 @@ final class gs_tpl {
 		return $tpl;
 	}
 	
-	function &get_instance()
+	static function &get_instance()
 	{
 		static $instance;
 		if (!isset($instance))

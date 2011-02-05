@@ -369,7 +369,7 @@ class gs_connector_pool {
 		return $this->db_connectors_pool[$gs_connector_id]->o_dbd;
 	}
 
-	function &get_instance()
+	static function &get_instance()
 	{
 		static $instance;
 		if (!isset($instance)) $instance = new gs_connector_pool;
