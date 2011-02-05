@@ -95,6 +95,7 @@ TXT;
 		return self::get_form_for_record($rec,$this->params,$this->data);
 	}
 	static function get_form_for_record($rec,$params,$data,$prefix='') {
+		md($params,1);
 		$h=$rec->get_recordset()->structure['htmlforms'];
 		$hh=$h;
 		if(isset($params['fields'])) {
