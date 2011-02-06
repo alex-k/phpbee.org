@@ -297,8 +297,8 @@ class gs_rs_links extends gs_recordset{
                 return parent::__construct($conn_id,$table_name);
 
 	}
-	public function find($opts) {
-		return $this->first()->get_recordset()->find($opts);
+	public function find($opts,$linkname=null) {
+		return $this->first()->get_recordset()->find($opts,$linkname);
 	}
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		parent::find_records($options,$fields,$index_field_name);
@@ -329,7 +329,7 @@ class gs_rs_links extends gs_recordset{
 	function array_keys() {
 		return array_keys($this->array);
 	}
-	public function new_record($data=null) {
+	public function new_record($data=null,$id=NULL) {
 		if ($data) {$arr=array($this->structure['recordsets']['parents']['local_field_name']=>$this->parent_record->get_id(),
 				$this->structure['recordsets']['childs']['local_field_name']=>$data);
 			$nr=parent::new_record($arr);

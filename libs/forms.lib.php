@@ -218,7 +218,8 @@ class g_forms_html extends g_forms {
 			if (isset($validate['FIELDS'][$field])) {
 				$e='<div class="error">Error: '.implode(',',$validate['FIELDS'][$field]).'</div>';
 			}
-			if ($this->htmlforms[$field]['type']=='hidden' || $this->htmlforms[$field]['widget']=='hidden') {
+			if ($this->htmlforms[$field]['type']=='private') {
+			} else if ($this->htmlforms[$field]['type']=='hidden' || $this->htmlforms[$field]['widget']=='hidden') {
 				$arr[]=$v['input'];
 			} else {
 				if(is_array($v['input'])) {

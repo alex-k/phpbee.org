@@ -110,18 +110,17 @@ TXT;
 			foreach ($h as $f=>$v)  if (!in_array($f,$fields_minus)) $hh[$f]=$h[$f];
 		}
 		}
-
+		/*
 		if(isset($params['hidden'])) {
 			$fields_hidden=array_filter(explode(',',$params['hidden']));
 			foreach($fields_hidden as $f) {
 				if(isset($h[$f])) {
 					$hh[$f]=$h[$f];
-					//$hh[$f]['widget']='hidden';
-					//$hh[$f]['type']='hidden';
 					$hh[$f]['hidden']=1;
 				}
 			}
 		}
+		*/
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
 				case 'lMany2One':
@@ -135,6 +134,13 @@ TXT;
 						}
 				break;
 				default: 
+			}
+		}
+		if(isset($data['handler_params']) && is_array($data['handler_params'])) foreach ($data['handler_params'] as $hk=>$hv) {
+			if(isset($hh[$hk])) {
+				$hh[$hk]['type']='private';
+				$hh[$hk]['hidden']=false;
+				$data[$hk]=$hv;
 			}
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
@@ -162,9 +168,11 @@ TXT;
 		$f=$this->get_form();
 		$validate=$f->validate();
 		if ($validate['STATUS']===true) {
+			/*
 			md($this->data,1);
 			md($f->clean(),1);
 			exit();
+			*/
 
 			$f->rec->fill_values($this->explode_data($f->clean()));
 			$f->rec->get_recordset()->commit();

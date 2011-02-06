@@ -243,6 +243,11 @@ class gs_widget_lMany2One extends gs_widget {
 		return $f_arr;
 	}
 }
+class gs_widget_private extends gs_widget {
+	function html() {
+		return '';
+	}
+}
 
 
 

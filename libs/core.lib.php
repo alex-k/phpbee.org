@@ -45,7 +45,7 @@ class gs_null extends SimpleXMLElement implements arrayaccess {
 }
 class gs_data {
 	
-	static private $data;
+	private $data;
 	private $data_drivers;
 	
 	public function __construct()
