@@ -201,6 +201,7 @@ class field_interface {
 			'recordset'=>$rname,
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$obj_rs['local_field_name'],
+			'type'=>'many',
 			);
 		if($opts['counter']) {
 			$counter_fieldname='_'.$field.'_count';

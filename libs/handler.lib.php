@@ -127,11 +127,18 @@ TXT;
 						$nrs=new $v['options']['recordset'];
 						$nobj=$nrs->new_record();
 						$f=self::get_form_for_record($nobj,$params,$data);
-						unset($hh[$k]);
 						$forms=$f->htmlforms;
-						foreach($forms as $fk=>$fv) {
-							$hh["$k:$fk"]=$fv;
+						for($i=1;$i<=2;$i++) {
+							foreach($forms as $fk=>$fv) {
+								$pfx_key="$k:$i:$fk";
+								$key="$k:$fk";
+								$hh[$pfx_key]=$fv;
+								if(isset($data['handler_params'][$key])) {
+									$data['handler_params'][$pfx_key]=$data['handler_params'][$key];
+								}
+							}
 						}
+						unset($hh[$k]);
 				break;
 				default: 
 			}
@@ -145,8 +152,8 @@ TXT;
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
 		$fields=implode(',',array_keys($hh));
-		if(isset($data['_default'])) {
-			$default=$data['_default'];
+		if(isset($data['handler_params']['_default'])) {
+			$default=$data['handler_params']['_default'];
 			$default=string_to_params($default);
 			$data=array_merge($default,$data);
 		}
@@ -168,9 +175,10 @@ TXT;
 		$f=$this->get_form();
 		$validate=$f->validate();
 		if ($validate['STATUS']===true) {
-			/*
-			md($this->data,1);
-			md($f->clean(),1);
+				/*
+			md($this->explode_data($f->clean()),1);
+			$f->rec->fill_values($this->explode_data($f->clean()));
+			md($f->rec->get_values(),1);
 			exit();
 			*/
 
