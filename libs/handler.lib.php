@@ -94,7 +94,7 @@ TXT;
 
 		return self::get_form_for_record($rec,$this->params,$this->data);
 	}
-	static function get_form_for_record($rec,$params,$data,$prefix='') {
+	static function get_form_for_record($rec,$params,$data) {
 		$h=$rec->get_recordset()->structure['htmlforms'];
 		$hh=$h;
 		if(isset($params['fields'])) {
@@ -110,25 +110,29 @@ TXT;
 			foreach ($h as $f=>$v)  if (!in_array($f,$fields_minus)) $hh[$f]=$h[$f];
 		}
 		}
-		/*
-		if(isset($params['hidden'])) {
-			$fields_hidden=array_filter(explode(',',$params['hidden']));
-			foreach($fields_hidden as $f) {
-				if(isset($h[$f])) {
-					$hh[$f]=$h[$f];
-					$hh[$f]['hidden']=1;
-				}
-			}
-		}
-		*/
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
+				case 'lMany2Many':
+					$rsl=$rec->init_linked_recordset($k);
+					$rsname=$rsl->structure['recordsets']['childs']['recordset'];
+					$rs=new $rsname();
+					$vrecs=$rs->find_records();
+					foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
+					$hh[$k]['variants']=$variants;
+				break;
+				case 'lOne2One':
+					$variants=array();
+					$vrecs=$rec->init_linked_recordset($v['linkname'])->find_records();
+					foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
+					$hh[$k]['variants']=$variants;
+				break;
 				case 'lMany2One':
-						$nrs=new $v['options']['recordset'];
-						$nobj=$nrs->new_record();
-						$f=self::get_form_for_record($nobj,$params,$data);
-						$forms=$f->htmlforms;
-						for($i=1;$i<=2;$i++) {
+						$nrs=$rec->$k;
+						$nrs->new_record();
+						foreach($nrs as $nobj) {
+							$f=self::get_form_for_record($nobj,$params,$data);
+							$forms=$f->htmlforms;
+							$i=intval($nobj->get_id());
 							foreach($forms as $fk=>$fv) {
 								$pfx_key="$k:$i:$fk";
 								$key="$k:$fk";
@@ -157,7 +161,7 @@ TXT;
 			$default=string_to_params($default);
 			$data=array_merge($default,$data);
 		}
-		$f=new $form_class_name($hh,$params,array_merge($rec->get_values($fields),$data),$rec,$prefix);
+		$f=new $form_class_name($hh,$params,array_merge($rec->get_values($fields),$data));
 		$f->rec=$rec;
 		return $f;
 	}
@@ -175,7 +179,7 @@ TXT;
 		$f=$this->get_form();
 		$validate=$f->validate();
 		if ($validate['STATUS']===true) {
-				/*
+			/*
 			md($this->explode_data($f->clean()),1);
 			$f->rec->fill_values($this->explode_data($f->clean()));
 			md($f->rec->get_values(),1);

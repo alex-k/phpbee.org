@@ -96,20 +96,15 @@ abstract class g_forms implements g_forms_interface{
 							);
 		return $ret;
 	}
-	function __construct($h,$params=array(),$data=array(),$rec=null,$prefix='') {
+	function __construct($h,$params=array(),$data=array()) {
 		//md($data,1);
 		if (!is_array($data)) $data=array();
-		$this->record=NULL;
 		$this->params=$params;
 		$this->clean_data=array();
-		$this->prefix=$prefix;
 		if (is_object($h) && get_class($h)=='gs_record') {
-			$this->record=$h;
-			$rs=$this->record->get_recordset();
+			//$this->record=$h;
+			$rs=$h->get_recordset();
 			$h=$rs->structure['htmlforms'];
-		}
-		if (is_object($rec) && get_class($rec)=='gs_record') {
-			$this->record=$rec;
 		}
 		$form_default=array();
 		foreach ($h as $k=>$ih) {
@@ -144,10 +139,12 @@ abstract class g_forms implements g_forms_interface{
 			'FIELDS'=>array(),
 			);
 		foreach ($this->htmlforms as $field=>$h) {
-			$k=$this->prefix.$field;
-			$wclass="gs_widget_".(isset($h['widget']) ? $h['widget'] : $h['type']);
+			$k=$field;
+			$wclass=(isset($h['widget']) ? $h['widget'] : $h['type']);
+			if(empty($wclass)) continue;
+			$wclass='gs_widget_'.$wclass;
 			$h['gs_form_params']=$this->params;
-			$w =new $wclass($k,$this->data,$h,$this->record);
+			$w =new $wclass($k,$this->data,$h);
 			try {
 				$value=$w->clean();
 				if (is_array($value) && !is_numeric(key($value))) {
@@ -165,7 +162,7 @@ abstract class g_forms implements g_forms_interface{
 			foreach ($validate as $v) {
 				$vname='gs_validate_'.$v;
 				$val=new $vname();
-				if (!$val->validate($k,$value,$this->data,isset($h['validate_params'])?$h['validate_params'] : array() ,$this->record)) {
+				if (!$val->validate($k,$value,$this->data,isset($h['validate_params'])?$h['validate_params'] : array())) {
 					$this->error($ret, $k,$vname);
 				}
 
@@ -199,12 +196,12 @@ class g_forms_html extends g_forms {
 			if (!$wclass) continue;
 			$wclass="gs_widget_$wclass";
 			$v['gs_form_params']=$this->params;
-			$w =new $wclass($this->prefix.$field,$this->data,$v,$this->record);
+			$w =new $wclass($field,$this->data,$v);
 			if($v['type']=='label') {
 				$arr[$field]=array('input'=>$v['verbose_name']);
 				continue;
 			}
-			$arr[$this->prefix.$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
+			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
 						'input'=>$w->html()
 						);
 		}
@@ -270,7 +267,7 @@ class g_forms_jstpl extends g_forms_html {
 		$arr=array();
 		foreach($this->htmlforms as $field => $v) {
 			$wclass="gs_widget_".(isset($v['widget']) ? $v['widget'] : $v['type']);
-			$w =new $wclass($field,array($field=>"<%=t.values.$field%>"),$v,$this->record);
+			$w =new $wclass($field,array($field=>"<%=t.values.$field%>"),$v);
 			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
 						//'input'=>$w->html($field,"<%=t.values.$field%>",$v)
 						'input'=>$w->js()

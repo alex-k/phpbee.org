@@ -8,12 +8,11 @@ interface gs_widget_interface {
 	function validate();
 }
 abstract class gs_widget implements gs_widget_interface {
-	function __construct($fieldname,$data,$params=array(),$record=NULL) {
+	function __construct($fieldname,$data,$params=array()) {
 		$this->validate_errors=NULL;
 		$this->fieldname=$fieldname;
 		$this->value=is_string($fieldname) && isset($data[$fieldname]) ? $data[$fieldname] : NULL;
 		$this->params=$params;
-		$this->record=$record;
 		$this->data=$data;
 		$this->tpl=gs_tpl::get_instance();
 	}
@@ -146,14 +145,10 @@ class gs_widget_lMany2Many extends gs_widget{
 		return $ret;
 	}
 	function html() {
-		$rsl=$this->record->init_linked_recordset($this->fieldname);
-		$rsname=$rsl->structure['recordsets']['childs']['recordset'];
-		$rs=new $rsname();
-		$variants=$rs->find_records();
 		$ret="<input type=\"hidden\" name=\"".$this->fieldname."\" value=\"0\">";
 		$ret.=sprintf("<select class=\"lMany2Many\" multiple=\"on\" name=\"%s[]\">\n", $this->fieldname);
-		foreach ($variants as $v) {
-			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$v->get_id(), (is_array($this->value) && (in_array($v->get_id(),$this->value) || array_key_exists($v->get_id(),$this->value))) ? 'selected="selected"' : '',trim($v));
+		foreach ($this->params['variants'] as $k=>$v) {
+			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$k, (is_array($this->value) && (in_array($k,$this->value) || array_key_exists($k,$this->value))) ? 'selected="selected"' : '',$v);
 		}
 		$ret.="</select>\n";
 
@@ -179,12 +174,10 @@ class gs_widget_lOne2One extends gs_widget{
 		return $ret;
 	}
 	function html() {
-		$rsl=$this->record->init_linked_recordset($this->params['linkname']);
-		$variants=$rsl->find_records();
 		$ret=sprintf("<select  class=\"lOne2One\" name=\"%s\">\n", $this->fieldname);
 		if ($this->params['nulloption']) $ret.='<option value=""></option>';
-		foreach ($variants as $v) {
-			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$v->get_id(), ($this->value==$v->get_id()) ? 'selected="selected"' : '',trim($v));
+		foreach ($this->params['variants'] as $k=>$v) {
+			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$k, ($this->value==$k) ? 'selected="selected"' : '',$v);
 		}
 		$ret.="</select>\n";
 
