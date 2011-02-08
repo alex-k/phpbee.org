@@ -168,7 +168,7 @@ TXT;
 	function showform() {
 		$tpl=gs_tpl::get_instance();
 		$f=$this->get_form();
-		$tpl->assign('formfields',$f->as_dl());
+		$tpl->assign('formfields',$f->show());
 		$tpl->assign('form',$f);
 		return $tpl->fetch($this->params['name']);
 	}
@@ -192,7 +192,7 @@ TXT;
 			return html_redirect($this->data['gspgid_handler']);
 			//return $tpl->fetch($this->params['name']);
 		}
-		$tpl->assign('formfields',$f->as_dl("\n",$validate));
+		$tpl->assign('formfields',$f->show($validate));
 		$tpl->assign('form',$f);
 		return $tpl->fetch($this->params['name']);
 	}

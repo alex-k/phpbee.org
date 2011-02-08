@@ -77,6 +77,7 @@ class gs_init {
 		load_file($this->config->lib_dir.'tpl_static.lib.php');
 		load_file($this->config->lib_dir.'forms.lib.php');
 		load_file($this->config->lib_dir.'widgets.lib.php');
+		load_file($this->config->lib_dir.'helpers.lib.php');
 	}
 	public function load_core()
 	{
