@@ -6,6 +6,78 @@ interface g_forms_interface {
 	function as_labels();
 	function clean();
 }
+class gs_glyph {
+	private $tagName;
+	private $parent=NULL;
+	private $children=array();
+	private $attributes=array();
+	function __construct($name='',$attributes=array()) {
+		$this->tagName=$name;
+		foreach ($attributes as $k=>$v) {
+			$this->addAttribute($k,$v);
+		}
+	}
+	function setParent($obj) {
+		$this->parent=$obj;
+	}
+	function addNode($name,$attributes=array(),$childs=array()) {
+		$node=$this->addChild($name);
+		foreach ($attributes as $k=>$v) {
+			$node->addAttribute($k,$v);
+		}
+		foreach ($childs as $k=>$v) {
+			$node->addNode('field',array('name'=>$v));
+		}
+		return $node;
+	}
+	function addAttribute($k,$v) {
+		$this->attributes[$k]=$v;
+	}
+	function addChild($name) {
+		$c= is_object($name) && is_a($name,'gs_glyph') ? $name :  new gs_glyph($name);
+		$c->setParent($this);
+		$this->children[]=$c;
+		return $c;
+	}
+	function replaceNode($new) {
+		$this->parent->replaceChild($this,$new);
+	}
+	function replaceChild($old,$new) {
+		$k=array_search($old,$this->children);
+		if ($k) {
+			$this->children[$k]=$new;
+			$new->setParent($this);
+		}
+	}
+	function removeNode(&$nodes) {
+		if (!is_array($nodes)) $nodes=array($nodes);
+		foreach ($this->children as $k=>$c) {
+			$c->removeNode($nodes);
+			if (in_array($c,$nodes)) {
+				$c->setParent(NULL);
+				unset($this->children[$k]);
+			}
+		}
+		return $nodes;
+	}
+	function __get($name) {
+		return $this->attributes[$name];
+	}
+	function getName() {
+		return $this->tagName;
+	}
+	function children() {
+		return $this->children;
+	}
+	function find($name,$value) {
+		$ret=array();
+		if (strpos($this->$name,$value)===0) $ret[]=&$this;
+		foreach ($this->children as $c) {
+			$ret=array_merge($ret,$c->find($name,$value));
+		}
+		return $ret;
+	}
+}
 
 abstract class g_forms implements g_forms_interface{
 	function __construct($h,$params=array(),$data=array()) {
@@ -22,26 +94,33 @@ abstract class g_forms implements g_forms_interface{
 		if (count($form_default)>0) $data=array_merge($form_default,$data);
 		$this->data=$data;
 		$this->htmlforms=$h;
-		$this->view=array('type'=>'helper','class'=>'dl','elements'=>array(
-							array('type'=>'helper','class'=>'dt','elements'=>$h),
-					)
-			);
+		$this->view = new gs_glyph('helper',array('class'=>'dl'));
+		$this->view->addNode('helper',array('class'=>'dt'),array_keys($h));
 	}
 	function show($validate=array(),$view=NULL) {
 		$delimiter="\n";
 		$arr=array();
 		$inputs=$this->_prepare_inputs();
 		if($view===NULL) $view=$this->view;
-		$hclass='helper_'.$view['class'];
+		$hclass='helper_'.$view->class;
 		$helper=new $hclass();
-		foreach($view['elements'] as $field=>$v)  {
-			$value=$inputs[$field];
-			if ($v['type']=='helper') $value['input']=$this->show($validate,$v);
-			if ($this->htmlforms[$field]['type']=='private') {
-			} else if ($this->htmlforms[$field]['type']=='hidden' || $this->htmlforms[$field]['widget']=='hidden') {
-				$arr[]=$value['input'];
+		$str='';
+		foreach ($view->children() as $k=>$e) {
+			if($e->getName()=='helper') { 
+				$value=array('label'=>(string)$e->label,'input'=>$this->show($validate,$e));
+				$arr[]=$helper->show($value['label'],$value['input']);
 			} else {
-				$arr[]=$helper->show($value['label'],$value['input'],$validate['FIELDS'][$field]);
+				$name=(string)$e->name;
+				$field=$this->htmlforms[$name];
+				$value=$inputs[$name];
+
+				if ($field['type']=='private') continue;
+
+				if ($field['type']=='hidden' || $field['widget']=='hidden') {
+					$arr[]=$value['input'];
+				} else {
+					$arr[]=$helper->show($value['label'],$value['input'],$validate['FIELDS'][$name]);
+				}
 			}
 		}
 		return implode($delimiter,$arr);

@@ -146,6 +146,16 @@ function empty_array($a,$b) {
 	return is_array($b) ? $a || array_reduce($b,'empty_array') : $a || ($b && $b!=4);
 }
 
+function xml_print($xml) {
+        $dom = new DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml);
+        return $dom->saveXML();
+}
+
+
+
 
 
 
