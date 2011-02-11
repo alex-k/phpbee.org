@@ -161,7 +161,7 @@ TXT;
 			$default=string_to_params($default);
 			$data=array_merge($default,$data);
 		}
-		$f=new $form_class_name($hh,$params,array_merge($rec->get_values($fields),$data));
+		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
 		$f->rec=$rec;
 		return $f;
 	}
@@ -195,6 +195,14 @@ TXT;
 		$tpl->assign('gspgid_handler',$this->data['gspgid']);
 		echo $this->postform();
 	}
+	static function implode_data($data,$prefix='') {
+		$newdata=array();
+		foreach ($data as $k=>$v) {
+			if(is_array($v)) $newdata=array_merge($newdata,self::implode_data($v,$prefix.':'.$k));
+			else $newdata[trim("$prefix:$k",':')]=$v;
+		}
+		return $newdata;
+	}
 	static function explode_data($data) {
 			$newdata=array();
 			foreach ($data as $k=>$v) {
@@ -205,11 +213,6 @@ TXT;
 							$v=$dd;
 					}       
 					$newdata=array_merge_recursive_distinct($newdata,$v);
-			}       
-			
-			if(isset($newdata['i2i'])) {
-					$newi2i=array_reduce($newdata['i2i']['']['childrens']['values'],'empty_array',0);
-					if ($newi2i==0) unset($newdata['i2i']['']);
 			}       
 			return array_merge($data,$newdata);
 	}
