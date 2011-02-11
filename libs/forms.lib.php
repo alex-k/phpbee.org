@@ -191,6 +191,38 @@ abstract class g_forms implements g_forms_interface{
 		$v=$inputs[$field];
 		return sprintf('<label>%s%s %s</label>', $v['label'],trim($v['label']) ? $suffix : null ,$v['input']);
 	}
+	function add_helper_clone($fieldname) {
+		$posts=$this->view->find("name",$fieldname);
+		if($posts) {
+			$ids=array();
+			foreach (array_keys($this->data) as $data_field_name) {
+				if (strpos($data_field_name,$fieldname)===0) {
+					preg_match("/$fieldname:(-?\d+):/",$data_field_name,$id);
+					$ids[$id[1]]=$id[1];
+				}
+			}
+
+			$helper=new gs_glyph('helper',array('class'=>'clone'));
+			$posts[0]->replaceNode($helper);
+			$helper=$helper->addNode('helper',array('class'=>'dl','label'=>$fieldname))->addNode('helper',array('class'=>'dt'));
+			$this->view->removeNode($posts);
+			foreach($posts as $p) {
+				$helper->addChild($p);
+				$this->htmlforms[$p->name]['clonable']=TRUE;
+			}
+		
+			$first_id=reset($ids);
+			foreach ($ids as $id) {
+				foreach($posts as $p) {
+					$newname=str_replace("$fieldname:$first_id","$fieldname:$id",$p->name);
+					if ($p->name!=$newname) {
+						$this->htmlforms[$newname]=$this->htmlforms[$p->name];
+					}
+				}
+			}
+
+		}
+	}
 
 
 }
