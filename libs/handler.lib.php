@@ -179,14 +179,7 @@ TXT;
 		$f=$this->get_form();
 		$validate=$f->validate();
 		if ($validate['STATUS']===true) {
-			/*
-			md($this->explode_data($f->clean()),1);
-			$f->rec->fill_values($this->explode_data($f->clean()));
-			md($f->rec->get_values(),1);
-			exit();
-			*/
-
-			$f->rec->fill_values($this->explode_data($f->clean()));
+			$f->rec->fill_values(self::explode_data($f->clean()));
 			$f->rec->get_recordset()->commit();
 			if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
 			return html_redirect($this->data['gspgid_handler']);
@@ -202,7 +195,7 @@ TXT;
 		$tpl->assign('gspgid_handler',$this->data['gspgid']);
 		echo $this->postform();
 	}
-	function explode_data($data) {
+	static function explode_data($data) {
 			$newdata=array();
 			foreach ($data as $k=>$v) {
 					$s=explode(':',$k);
