@@ -96,6 +96,7 @@ TXT;
 	}
 	static function get_form_for_record($rec,$params,$data) {
 		$h=$rec->get_recordset()->structure['htmlforms'];
+		
 		$hh=$h;
 		if(isset($params['fields'])) {
 		$fields=array_filter(explode(',',$params['fields']));
@@ -110,6 +111,7 @@ TXT;
 			foreach ($h as $f=>$v)  if (!in_array($f,$fields_minus)) $hh[$f]=$h[$f];
 		}
 		}
+		$fields=implode(',',array_keys($hh));
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
 				case 'lMany2Many':
@@ -127,6 +129,10 @@ TXT;
 					$hh[$k]['variants']=$variants;
 				break;
 				case 'lMany2One':
+						if ($v['hidden']=='true') continue;
+						if ($v['as_link']=='true') {
+							break;
+						}
 						$nrs=$rec->$k;
 						$nrs->new_record();
 						foreach($nrs as $nobj) {
@@ -155,13 +161,15 @@ TXT;
 			}
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
-		$fields=implode(',',array_keys($hh));
+		//$fields=implode(',',array_keys($hh));
 		if(isset($data['handler_params']['_default'])) {
 			$default=$data['handler_params']['_default'];
 			$default=string_to_params($default);
 			$data=array_merge($default,$data);
 		}
-		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
+		/* if widget need all data of record */
+		//$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
+		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values()),$data));
 		$f->rec=$rec;
 		return $f;
 	}
@@ -198,8 +206,11 @@ TXT;
 	static function implode_data($data,$prefix='') {
 		$newdata=array();
 		foreach ($data as $k=>$v) {
-			if(is_array($v)) $newdata=array_merge($newdata,self::implode_data($v,$prefix.':'.$k));
-			else $newdata[trim("$prefix:$k",':')]=$v;
+			if(is_array($v)) {
+				$newdata=array_merge($newdata,self::implode_data($v,$prefix.':'.$k));
+			} else {
+				$newdata[trim("$prefix:$k",':')]=$v;
+			}
 		}
 		return $newdata;
 	}
