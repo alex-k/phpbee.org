@@ -192,6 +192,7 @@ class field_interface {
 			'local_field_name'=>$fname,
 			'foreign_field_name'=>'id',
 			'update_recordset'=>$opts['linked_recordset'],
+			'mode'=>isset($opts['mode']) ? $opts['mode'] : null,
 			);
 		$structure['htmlforms'][$fname]['options']=$structure['recordsets'][$field];
 		$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'RESTRICT','on_update'=>'CASCADE');
@@ -209,7 +210,12 @@ class field_interface {
 			'local_field_name'=>'id',
 			'foreign_field_name'=>$obj_rs['local_field_name'],
 			'type'=>'many',
+			'mode'=>isset($obj_rs['mode']) ? $obj_rs['mode'] : null,
 			);
+		$structure['htmlforms'][$field.'_hash']=array(
+			'type'=>'hidden',
+			'validate'=>'dummyValid'
+		);
 		if($opts['counter']) {
 			$counter_fieldname='_'.$field.'_count';
 			$structure['recordsets'][$field]['counter_fieldname']=$counter_fieldname;
@@ -420,6 +426,17 @@ class gs_recordset_short extends gs_recordset {
 	}
 	function commit() {
 		foreach ($this->structure['recordsets'] as $l=>$st) {
+			// Block for commit preloaded linked "Many2One" records 
+			if ($st['type']=='many' && $st['mode']=='link') {
+				$id_name=$st['foreign_field_name'];
+				$root_name=$l.'_hash';
+				$hash_name=$st['foreign_field_name'].'_hash';
+				$rs=new $st['recordset'];
+				foreach ($this as $record) {
+					$ret=$record->find_childs($l,array($hash_name=>$record->$root_name,$id_name=>0));
+				}
+			}
+			// End block
 			if(isset($st['update_recordset'])) {
 				$prec=new $st['update_recordset'];
 				foreach ($prec->structure['recordsets'] as $pl=>$pst) {
@@ -445,8 +462,8 @@ class gs_recordset_short extends gs_recordset {
 									$plink->commit(1);
 							}
 						}
-
 					}
+					
 				}
 			}
 		}
