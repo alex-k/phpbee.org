@@ -64,6 +64,12 @@ class gs_widget_image extends gs_widget{
 	}
 }
 
+class gs_widget_wysiwyg extends gs_widget{
+	function html() {
+		return sprintf('<textarea class="fText" name="%s">%s</textarea>', $this->fieldname,trim($this->value));
+	}
+}
+
 class gs_widget_file extends gs_widget{
 	function html() {
 		return sprintf('<input class="fFile" type="file" name="%s" >', $this->fieldname);
@@ -75,8 +81,18 @@ class gs_widget_file extends gs_widget{
 				$this->fieldname.'_filename'=>$this->value['name'],
 				$this->fieldname.'_mimetype'=>$this->value['type'],
 				$this->fieldname.'_size'=>$this->value['size'],
+				//$this->fieldname=>$this->get_id(),
 				);
 				
+	}
+}
+
+class gs_widget_image extends gs_widget_file{
+	function html() {
+		md($this->fieldname,1);
+		md($this->data,1);
+		//if ($this->value) return sprintf('img src="%s">', $this->value);
+			return parent::html();
 	}
 }
 
@@ -216,29 +232,12 @@ class gs_widget_form_add extends gs_widget{
 
 class gs_widget_lMany2One extends gs_widget {
 	function clean() {
-		$ret=array();
-		$rs=new $this->params['options']['recordset'];
-		$obj=$rs->new_record();
-		$f=gs_base_handler::get_form_for_record($obj,$this->params['gs_form_params'],$this->data,$this->fieldname.":");
-		$f_val=$f->validate();
-		if (!$f_val['STATUS']) {
-			$this->validate_errors=$f_val;
-			throw new gs_widget_validate_exception($this->fieldname);
-		}
-		$ret=$f->clean();
-		return $ret;
+		return true;
 	}
 	function html() {
-		//md($this->params,1);
-		$f_arr=array();
-		$f_arr[]=array('label'=>'',
-				'input'=>$this->record->{$this->fieldname}->html_list(),
-				);
-		$rs=new $this->params['options']['recordset'];
-		$obj=$rs->new_record();
-		$f=gs_base_handler::get_form_for_record($obj,$this->params['gs_form_params'],$this->data,$this->fieldname.":");
-		$f_arr=array_merge($f_arr,$f->_prepare_inputs());
-		return $f_arr;
+		$rid_name=$this->params['options']['local_field_name'];
+		$rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
+		return sprintf('<a href="/admin/many2one/%s/%s/%d" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,dic::get('LOAD_IMAGES'));
 	}
 }
 class gs_widget_private extends gs_widget {
