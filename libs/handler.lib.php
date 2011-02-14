@@ -112,7 +112,7 @@ TXT;
 			foreach ($h as $f=>$v)  if (!in_array($f,$fields_minus)) $hh[$f]=$h[$f];
 		}
 		}
-		$fields=implode(',',array_keys($hh));
+		$fields=$rec->get_recordset()->id_field_name.','.implode(',',array_keys($hh));
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
 				case 'lMany2Many':
