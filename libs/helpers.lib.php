@@ -1,8 +1,8 @@
 <?php
 class helper_clone {
 	function show($label,$txt,$errors=array()) {
-		return sprintf('<fieldset class="helper_clone">
-		%s</fieldset>
+		return sprintf('<div class="helper_clone">
+		%s</div>
 		<input type="button" value="+" class="button_helper_clone">
 
 		<script>

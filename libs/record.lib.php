@@ -126,6 +126,9 @@ class gs_record implements arrayaccess {
 	public function is_modified($name) {
 		return array_key_exists($name,$this->modified_values);
 	}
+	public function get_modified_values($name=null) {
+		return $name===null ? $this->modified_values : $this->modified_values[$name];
+	}
 
 	public function get_recordset() {
 		return $this->gs_recordset;

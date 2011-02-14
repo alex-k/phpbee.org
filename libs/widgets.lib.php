@@ -58,6 +58,11 @@ class gs_widget_text extends gs_widget{
 		return sprintf('<textarea class="fText" name="%s">%s</textarea>', $this->fieldname,trim($this->value));
 	}
 }
+class gs_widget_image extends gs_widget{
+	function html() {
+		return trim($this->value) ? sprintf('<img src=/img/%s>',trim($this->value)) : '';
+	}
+}
 
 class gs_widget_file extends gs_widget{
 	function html() {

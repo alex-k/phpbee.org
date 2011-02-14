@@ -98,6 +98,7 @@ TXT;
 		$h=$rec->get_recordset()->structure['htmlforms'];
 		
 		$hh=$h;
+		if (!isset($params['fields']) && isset($data['handler_params']['fields'])) $params['fields']=$data['handler_params']['fields'];
 		if(isset($params['fields'])) {
 		$fields=array_filter(explode(',',$params['fields']));
 		$fields_minus=array_filter($fields,create_function('$a','return substr($a,0,1)=="-";'));
@@ -161,15 +162,14 @@ TXT;
 			}
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
-		//$fields=implode(',',array_keys($hh));
 		if(isset($data['handler_params']['_default'])) {
 			$default=$data['handler_params']['_default'];
 			$default=string_to_params($default);
 			$data=array_merge($default,$data);
 		}
 		/* if widget need all data of record */
-		//$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
-		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values()),$data));
+		//$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values()),$data));
+		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
 		$f->rec=$rec;
 		return $f;
 	}
