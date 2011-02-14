@@ -105,7 +105,7 @@ class field_interface {
 		
 		if (isset($opts['unique']) && strtolower($opts['unique'])=='true') {
 			$structure['htmlforms'][$field]['validate'][]='checkField';
-			$structure['htmlforms'][$field]['validate_params']['class']=get_class($this);
+			$structure['htmlforms'][$field]['validate_params']['class']=get_class();
 			$structure['htmlforms'][$field]['validate_params']['field']=$field;
 			//'validate_params'=>array('class'=>'users','field'=>'userLogin','message'=>'Login invalid or occupied'
 		}
@@ -214,6 +214,7 @@ class field_interface {
 			'type'=>'lMany2One',
 			'linkname'=>$field,
 			'hidden'=>$opts['hidden'],
+			'as_link'=>$opts['as_link'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
 			'nulloption'=>(isset($opts['nulloption']) && $opts['nulloption'] && strtolower($opts['nulloption'])!='false') ? true : false ,
