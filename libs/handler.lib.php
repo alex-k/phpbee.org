@@ -131,7 +131,7 @@ TXT;
 				break;
 				case 'lMany2One':
 						if ($v['hidden']=='true') continue;
-						if ($v['as_link']=='true') {
+						if (!empty($v['widget'])) {
 							break;
 						}
 						$nrs=$rec->$k;
