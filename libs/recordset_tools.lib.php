@@ -171,6 +171,13 @@ class field_interface {
 	static function lOne2One($field,$opts,&$structure,$init_opts) {
 		$fname=$field.'_id';
 		$structure['fields'][$fname]=array('type'=>'int');
+		if (isset($opts['mode']) && $opts['mode']=='link') {
+			$structure['fields'][$fname.'_hash']=array('type'=>'varchar','options'=>16);
+			$structure['htmlforms'][$fname.'_hash']=array(
+			'type'=>'hidden',
+			'validate'=>'dummyValid'
+		);
+		}
 		$structure['htmlforms'][$fname]=array(
 			'type'=>'lOne2One',
 			'linkname'=>$field,
@@ -214,7 +221,7 @@ class field_interface {
 			'type'=>'lMany2One',
 			'linkname'=>$field,
 			'hidden'=>$opts['hidden'],
-			'as_link'=>$opts['as_link'],
+			'widget'=>isset($opts['widget']) ? $opts['widget'] : '',
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
 			'nulloption'=>(isset($opts['nulloption']) && $opts['nulloption'] && strtolower($opts['nulloption'])!='false') ? true : false ,
