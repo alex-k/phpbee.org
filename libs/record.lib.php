@@ -5,6 +5,7 @@ define ('RECORD_CHANGED',2);
 define ('RECORD_DELETED',4);
 define ('RECORD_ROLLBACK',8);
 define ('RECORD_CHILDMOD',16);
+define ('RECORD_CHILDAPPEND',32);
 class gs_recfabric {
 	private $links=array();
 
@@ -48,6 +49,17 @@ class gs_record implements arrayaccess {
 		$child->parent_record=$this;
 		$this->recordsets_array[]=$child;
 		if (($parent=$this->get_recordset()->parent_record)!==NULL) $parent->child_modified();
+	}
+	
+	public function find_childs($link_name,$options) {
+		$rs=$this->init_linked_recordset($link_name);
+		$rs->find_records($options);
+		
+		foreach ($rs as $id => $r) {
+			$rs[$id]->recordstate=$rs[$id]->recordstate|RECORD_CHILDAPPEND;
+		}
+		$this->values[$link_name]=$this->recordsets_array[$link_name]=$rs;
+		return $this->__get($link_name);
 	}
 
 	public function clone_record() {
@@ -244,7 +256,7 @@ class gs_record implements arrayaccess {
 		$this->recordstate=$this->recordstate|RECORD_CHILDMOD;
 		if (($rs=$this->get_recordset()->parent_record)!==NULL) $rs->child_modified();
 	}
-
+	
 
 	public function commit($level=0) {
 /*
@@ -275,6 +287,12 @@ class gs_record implements arrayaccess {
 			$this->_mtime=date("c");
 			$ret=$this->gs_recordset->update($this);
 		}
+		if ($this->recordstate & RECORD_CHILDAPPEND) {
+			$parent_record=$this->gs_recordset->parent_record;
+			if ($parent_record) $this->__set($this->gs_recordset->foreign_field_name,$parent_record-> {$this->gs_recordset->local_field_name});
+			$ret=$this->gs_recordset->update($this);
+		}
+		
 		if ($level==0 && ($this->recordstate & RECORD_CHILDMOD)) {
 			$this->recordstate=RECORD_UNCHANGED;
 			$this->commit_childrens();
@@ -291,6 +309,7 @@ class gs_record implements arrayaccess {
 				$recordstate=$rec->recordstate;
 				$rs->commit();
 				if ($recordstate & RECORD_NEW) $this->__set($rs->local_field_name,$rec-> {$rs->foreign_field_name});
+				
 			}
 		}
 		$this->commit(1);
