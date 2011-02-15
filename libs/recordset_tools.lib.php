@@ -431,7 +431,6 @@ class gs_recordset_short extends gs_recordset {
 				$id_name=$st['foreign_field_name'];
 				$root_name=$l.'_hash';
 				$hash_name=$st['foreign_field_name'].'_hash';
-				$rs=new $st['recordset'];
 				foreach ($this as $record) {
 					$ret=$record->find_childs($l,array($hash_name=>$record->$root_name,$id_name=>0));
 				}
