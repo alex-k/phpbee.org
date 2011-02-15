@@ -58,11 +58,11 @@ class gs_widget_text extends gs_widget{
 		return sprintf('<textarea class="fText" name="%s">%s</textarea>', $this->fieldname,trim($this->value));
 	}
 }
-class gs_widget_image extends gs_widget{
+/*class gs_widget_image extends gs_widget{
 	function html() {
 		return trim($this->value) ? sprintf('<img src=/img/%s>',trim($this->value)) : '';
 	}
-}
+}*/
 
 class gs_widget_wysiwyg extends gs_widget{
 	function html() {
@@ -230,14 +230,23 @@ class gs_widget_form_add extends gs_widget{
 	}
 }
 
+/*
+* {controller _class=$_gsdata.gspgid_va.0 _params=$params _assign="list"}
+* output form: {handler gspgid="$subdir/form/`$_gsdata.gspgid_va.0`" _params=$params}
+*/
 class gs_widget_lMany2One extends gs_widget {
 	function clean() {
-		return true;
+		//md($this->data,1);
+		return array('fake'=>true);
 	}
 	function html() {
 		$rid_name=$this->params['options']['local_field_name'];
 		$rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
-		return sprintf('<a href="/admin/many2one/%s/%s/%d" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,dic::get('LOAD_IMAGES'));
+		$hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
+		$s=sprintf('<a href="/admin/many2one/%s/%s/%d/%s" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,$hash,gs_dict::get('LOAD_IMAGES'));
+		//$s.=sprintf('<input type="text" name="%s" value="%s">', $this->params['linkname'].'_hash',$this->params['hash']);
+		$s.=sprintf('<input type="hidden" name="%s" value="%s">', $this->params['linkname'].'_hash',$hash);
+		return $s;
 	}
 }
 class gs_widget_private extends gs_widget {
