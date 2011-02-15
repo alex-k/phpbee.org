@@ -154,9 +154,4 @@ function xml_print($xml) {
         return $dom->saveXML();
 }
 
-
-
-
-
-
 ?>

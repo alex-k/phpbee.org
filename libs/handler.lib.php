@@ -228,6 +228,7 @@ TXT;
 			return array_merge($data,$newdata);
 	}
 }
+
 class gs_tpl_block {
 	protected $tpl_filename;
 	protected $data;
