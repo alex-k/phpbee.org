@@ -110,6 +110,16 @@ abstract class gs_recordset_base extends gs_iterator {
 	public function attache_record($rec) {
 		return false;
 	}
+	
+	public function bind() {
+		foreach ($this as $rec) {
+			$this->add($rec,$rec->get_id());
+			$rec->recordstate=$rec->recordstate|RECORD_NEW_BIND;
+			if (($rs=$this->parent_record)!==NULL) $rs->child_modified();
+		}
+		return $this;
+	}
+
 
 	public function record_as_string($rec) {
 		reset($this->structure['fields']);
