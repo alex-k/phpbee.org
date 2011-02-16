@@ -66,7 +66,7 @@ class gs_widget_text extends gs_widget{
 
 class gs_widget_wysiwyg extends gs_widget{
 	function html() {
-		return sprintf('<textarea class="fText" name="%s">%s</textarea>', $this->fieldname,trim($this->value));
+		return sprintf('<textarea class="fWysiwyg" name="%s" _images="lMany2One_%s">%s</textarea>', $this->fieldname,$this->params['images_key'],trim($this->value));
 	}
 }
 
@@ -243,8 +243,7 @@ class gs_widget_lMany2One extends gs_widget {
 		$rid_name=$this->params['options']['local_field_name'];
 		$rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
 		$hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
-		$s=sprintf('<a href="/admin/many2one/%s/%s/%d/%s" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,$hash,gs_dict::get('LOAD_IMAGES'));
-		//$s.=sprintf('<input type="text" name="%s" value="%s">', $this->params['linkname'].'_hash',$this->params['hash']);
+		$s=sprintf('<a href="/admin/many2one/%s/%s/%d/%s" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;" id="lMany2One_%s">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,$hash,$this->params['linkname'],gs_dict::get('LOAD_IMAGES'));
 		$s.=sprintf('<input type="hidden" name="%s" value="%s">', $this->params['linkname'].'_hash',$hash);
 		return $s;
 	}

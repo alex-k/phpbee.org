@@ -130,6 +130,7 @@ class field_interface {
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
+		if (isset($opts['images_key'])) $structure['htmlforms'][$field]['images_key']=$opts['images_key'];
 	}
 	
 	static function fFile($field,$opts,&$structure,$init_opts) {
