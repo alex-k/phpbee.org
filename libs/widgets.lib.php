@@ -65,6 +65,21 @@ class gs_widget_text extends gs_widget{
 }*/
 
 class gs_widget_wysiwyg extends gs_widget{
+	
+	function clean() {
+		parent::clean();
+		//$result=iconv('CP1251','UTF-8',$result);
+		if (function_exists ('tidy_parse_string')) {
+			$config = array('indent' => TRUE,
+				'output-xhtml' => TRUE,
+				);
+			$tidy = tidy_parse_string($this->value, $config, 'UTF8');
+			$tidy->cleanRepair();
+			$this->value=trim($tidy);
+		}
+		return $this->value;
+	}
+	
 	function html() {
 		return sprintf('<textarea class="fWysiwyg" name="%s" _images="lMany2One_%s">%s</textarea>', $this->fieldname,$this->params['images_key'],trim($this->value));
 	}

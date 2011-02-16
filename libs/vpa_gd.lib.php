@@ -12,9 +12,7 @@ class vpa_gd_layer {
 		$this->layer=imagecreatetruecolor($w,$h);
 	}
 	
-	function fill()
-	{
-	}
+	function fill() {}
 }
 
 class vpa_gd {
@@ -532,7 +530,8 @@ class vpa_gd {
 	function show()
 	{
 		header("Content-type: image/jpeg");
-		imagejpeg($this->new_img,null,80);
+		$img=($this->new_img) ? $this->new_img : $this->old_img;
+		imagejpeg($img,null,80);
 	}
 	
 	function save($filename,$quality=0)
