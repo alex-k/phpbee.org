@@ -27,14 +27,18 @@ class gs_parser {
 
 	function process() {
 		$config=gs_config::get_instance();
-		if (!class_exists($this->current_handler['class_name'],FALSE)) {
-			load_file($config->lib_handlers_dir.$this->current_handler['class_name'].'.class.php');
+		foreach ($this->current_handler as $handler) {
+			if (!class_exists($handler['class_name'],FALSE)) {
+				load_file($config->lib_handlers_dir.$handler['class_name'].'.class.php');
+			}
+			if (!class_exists($handler['class_name'],FALSE)) throw new gs_exception('gs_parser.process: Handler class not exists '.$handler['class_name']);
+			if (!method_exists($handler['class_name'],$handler['method_name'])) throw new gs_exception('gs_parser.process: Handler class method not exists '.$handler['class_name'].'.'.$handler['method_name']);
+			$o_h=new $handler['class_name']($this->data,$handler['params']);
+			//return $o_h->{$handler['method_name']}($this->data);
+			$ret=$o_h->{$handler['method_name']}();
+			if($ret===false) return $ret;
 		}
-		if (!class_exists($this->current_handler['class_name'],FALSE)) throw new gs_exception('gs_parser.process: Handler class not exists '.$this->current_handler['class_name']);
-		if (!method_exists($this->current_handler['class_name'],$this->current_handler['method_name'])) throw new gs_exception('gs_parser.process: Handler class method not exists '.$this->current_handler['class_name'].'.'.$this->current_handler['method_name']);
-		$o_h=new $this->current_handler['class_name']($this->data,$this->current_handler['params']);
-		//return $o_h->{$this->current_handler['method_name']}($this->data);
-		return $o_h->{$this->current_handler['method_name']}();
+		return $ret;
 	}
 	
 	private function get_handlers()
@@ -50,9 +54,15 @@ class gs_parser {
 					$handlers['post']=isset($handlers['post']) ? array_merge($handlers['get_post'],$handlers['post']) : $handlers['get_post'];
 				}
 
+
 				foreach ($handlers as $k=>$h) {
 					foreach ($h as $kk=>$hv) {
-						$handlers[$k][$kk]=$hv.":module_name:$module_name";
+						if (!is_array($hv)) $hv=array($hv);
+						$hv_arr=array();
+						foreach ($hv as $handler_value) {
+							$hv_arr[]=$handler_value.":module_name:$module_name";
+						}
+						$handlers[$k][$kk]=$hv_arr;
 					}
 				}
 
@@ -84,17 +94,16 @@ class gs_parser {
 class gs_recurseparser {
 	var $node;
 	var $str;
-	var $val;
 	var $params;
 	var $parts;
 	var $len;
 	var $pos;
 	var $type;
 	
-	function __construct(&$root,$str,$val,$type)
+	function __construct(&$root,$str,$item,$type)
 	{
 		$this->str=$str;
-		$this->parse_val($val);
+		$this->parse_val($item);
 		$this->type=$type;
 		$this->pos=0;
 		$this->parts=explode('/',$str);
@@ -102,18 +111,20 @@ class gs_recurseparser {
 		$this->parse($root);
 	}
 	
-	function parse_val($val)
+	function parse_val($vals)
 	{
-		$parts=explode(':',str_replace(array("{","}"),"",$val));
-		$this->val=$parts[0];
-		$len=count($parts);
-		$params=$this->params=array();
-		if ($len<3) return;
-		for ($i=1;$i<$len;$i+=2)
-		{
-			$params[$parts[$i]]=$parts[$i+1];
+		$this->params=array();
+		foreach ($vals as $val) {
+			$params=array();
+			$parts=explode(':',str_replace(array("{","}"),"",$val));
+			$len=count($parts);
+			if ($len<3) return;
+			for ($i=1;$i<$len;$i+=2)
+			{
+				$params[$parts[$i]]=$parts[$i+1];
+			}
+		$this->params[]=array('val'=>$parts[0],'params'=>$params);
 		}
-		$this->params=$params;
 	}
 	
 	function parse(&$node)
@@ -131,11 +142,11 @@ class gs_recurseparser {
 			$child=$node->get_node_by_name($this->parts[$this->pos]);
 			if (is_null($child))
 			{
-				$child=new gs_node($this->parts[$this->pos],$this->val,$this->type,$this->params);
+				$child=new gs_node($this->parts[$this->pos],$this->type,$this->params);
 			}
 			else
 			{
-				$child->_set_attibutes($this->val,$this->type,$this->params);
+				$child->_set_attibutes($this->type,$this->params);
 			}
 			$node->append_child($child);
 		}
@@ -148,30 +159,41 @@ class gs_node {
 	var $parent_name;
 	var $childs;
 	var $name;
-	var $controller;
+	var $controller=array();
 	//static $gs_node_id=1;
 	
-	function __construct($name,$c_name='',$c_type='',$c_params=null)
+	function __construct($name,$c_type='',$c_params=array())
 	{
 		global $gs_node_id;
 		$this->name=$name;
-		$this->_set_attibutes($c_name,$c_type,$c_params);
+		$this->_set_attibutes($c_type,$c_params);
 		$this->node_name=$gs_node_id;
 		$gs_node_id++;
 	}
 	
-	function _set_attibutes($c_name='',$c_type='',$c_params=null)
+	function _set_attibutes($c_type='',$c_params=array())
 	{
+		foreach ($c_params as $par) {
+			$controller=array(
+				'name'=>$par['val'],
+				'type'=>$c_type,
+				'params'=>$par['params'],
+				);
+			@list($controller['class_name'],$controller['method_name'])=explode('.',$controller['name']);
+			$this->controller[]=$controller;
+		}
+		/*
 		$this->controller['name']=$c_name;
 		$this->controller['type']=$c_type;
 		$this->controller['params']=$c_params;
 		// NOTICE !!! 
 		@list($this->controller['class_name'],$this->controller['method_name'])=explode('.',$c_name);
+		*/
 	}
 	
 	function get_handler()
 	{
-		if (!empty($this->controller['type']))
+		if ($this->controller)
 		{
 			return $this->controller;
 		}
