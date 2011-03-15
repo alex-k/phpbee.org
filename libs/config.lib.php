@@ -78,6 +78,8 @@ class gs_init {
 		load_file($this->config->lib_dir.'forms.lib.php');
 		load_file($this->config->lib_dir.'widgets.lib.php');
 		load_file($this->config->lib_dir.'helpers.lib.php');
+		load_file($this->config->lib_dir.'dict.lib.php');
+		load_file($this->config->lib_dir.'vpa_gd.lib.php');
 	}
 	public function load_core()
 	{
@@ -159,7 +161,8 @@ class gs_config {
 
 		require_once($this->root_dir.'config.php');
 
-		if (defined(DEBUG) && DEBUG) {
+		if (!defined('DEBUG')) define('DEBUG',FALSE);
+		if (DEBUG) {
 		ini_set('display_errors','On');
 		error_reporting(E_ALL);
 		}
