@@ -134,9 +134,15 @@ class gs_config {
 		$this->root_dir=clean_path(dirname(dirname(__FILE__))).'/';
 		$this->root_dir=str_replace('\\','/',$this->root_dir);
 		$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
-		$this->www_dir='/'.str_replace($_document_root,'',$this->root_dir);
-		$this->www_admin_dir='/'.str_replace($_document_root,'',$this->root_dir).'admin/';
-		$this->www_image_dir='/'.str_replace($_document_root,'',$this->root_dir).'img/';
+
+		if ($this->root_dir>$_document_root) {
+			$this->www_dir='/'.trim(str_replace($_document_root,'',$this->root_dir),'/');
+		} else {
+			$this->www_dir='/';
+		}
+
+		$this->www_admin_dir=$this->www_dir.'admin/';
+                $this->www_image_dir=$this->www_dir.'img/';
 		$this->script_dir=dirname($_SERVER['PHP_SELF']).'/';
 		$this->index_filename=$_SERVER['SCRIPT_NAME'];
 		$this->referer_path= isset($_SERVER['HTTP_REFERER']) ?  preg_replace("|^$this->www_dir|",'',parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH)) : '';
@@ -159,7 +165,9 @@ class gs_config {
 		$this->lib_modules_dir=$this->root_dir.'modules/';
 		$this->lib_dbdrivers_dir=$this->lib_dir.'dbdrivers/';
 
-		require_once($this->root_dir.'config.php');
+		foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {
+			if (file_exists($cfg_filename)) require_once($cfg_filename);
+		}
 
 		if (!defined('DEBUG')) define('DEBUG',FALSE);
 		if (DEBUG) {

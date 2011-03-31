@@ -13,6 +13,7 @@ class gs_base_handler {
 		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname($filename).'/'),'/');
 		$www_subdir=trim(cfg('www_dir').$subdir.'/','/');
 		$www_subdir=$www_subdir ? "/$www_subdir/" : '/';
+		$subdir=$subdir ? "/$subdir/" : '/';
 		$tpl=gs_tpl::get_instance();
 		$tpl->template_dir=cfg('lib_modules_dir')."/$subdir/templates";
 		$tpl->assign('tpl',$this);
@@ -203,6 +204,15 @@ TXT;
 		$tpl->assign('gspgid_handler',$this->data['gspgid']);
 		echo $this->postform();
 	}
+        function deleteform() {
+		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+		$f=$this->get_form();
+		$f->rec->delete();
+		$f->rec->commit();
+		if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
+		return html_redirect($this->data['gspgid_handler']);
+        }
+
 	static function implode_data($data,$prefix='') {
 		$newdata=array();
 		foreach ($data as $k=>$v) {

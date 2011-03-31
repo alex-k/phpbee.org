@@ -316,4 +316,20 @@ class g_forms_jstpl extends g_forms_html {
 	}
 }
 
+class g_forms_table extends  g_forms_html {
+    function __construct($h,$data=array(),$rec=null)  {
+         parent::__construct($h,$data,$rec);
+         $this->view = new gs_glyph('helper',array('class'=>'table'));
+         $this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
+    }
+}
+class g_forms_table_submit extends  g_forms_html {
+    function __construct($h,$data=array(),$rec=null)  {
+         parent::__construct($h,$data,$rec);
+         $this->view = new gs_glyph('helper',array('class'=>'table_submit'));
+         $this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
+    }
+}
+
+
 ?>

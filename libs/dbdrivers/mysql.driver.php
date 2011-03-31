@@ -84,6 +84,9 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		if (mysql_select_db($cinfo['db_database'],$this->db_connection)===FALSE) {
 			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error());
 		}
+		if (isset($cinfo['codepage']) && !empty($cinfo['codepage'])) {
+			$this->query(sprintf('SET NAMES %s',$cinfo['codepage']));
+		}
 	}
 
 

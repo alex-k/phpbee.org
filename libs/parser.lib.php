@@ -15,7 +15,7 @@ class gs_parser {
 		$result=$this->registered_handlers->xpath($data['gspgid']);
 		$this->current_handler=$result->get_handler();
 		$data['handler_key']=$result->handler_key;
-		$data['gspgid_v']=ltrim(str_replace($result->handler_key,'',$data['gspgid']),'/');
+		$data['gspgid_v']=ltrim(preg_replace("|$result->handler_key|",'',$data['gspgid'],1),'/');
 		$data['gspgid_va']=explode('/',$data['gspgid_v']);
 		$this->data=$data;
 	}

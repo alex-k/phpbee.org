@@ -255,10 +255,15 @@ class gs_widget_lMany2One extends gs_widget {
 		return array('fake'=>true);
 	}
 	function html() {
+		$e_data=gs_base_handler::explode_data($this->data);
+		$rs=new $this->params['options']['recordset'];
+		$options=array($rs->id_field_name=>array_keys($e_data[$this->fieldname]));
+		$links=$rs->find_records($options);
 		$rid_name=$this->params['options']['local_field_name'];
 		$rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
 		$hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
-		$s=sprintf('<a href="/admin/many2one/%s/%s/%d/%s" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;" id="lMany2One_%s">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,$hash,$this->params['linkname'],gs_dict::get('LOAD_IMAGES'));
+		$s.=$links;
+		$s.=sprintf('<br><a href="'.cfg('www_dir').cfg('www_subdir').'many2one/%s/%s/%d/%s" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;" id="lMany2One_%s">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,$hash,$this->params['linkname'],gs_dict::get('LOAD_IMAGES'));
 		$s.=sprintf('<input type="hidden" name="%s" value="%s">', $this->params['linkname'].'_hash',$hash);
 		return $s;
 	}
