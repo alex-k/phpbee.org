@@ -1,7 +1,7 @@
 <?php
 function smarty_function_controller($params, &$smarty)
 {
-	//md($params,1);
+	
 	//die();
 	if (isset($params['_params'])) {
 		$params=array_merge($params,$params['_params']);
@@ -16,7 +16,8 @@ function smarty_function_controller($params, &$smarty)
 
 	$vars=array();
 	foreach ($params as $k=>$v) {
-		if ($v!==FALSE && $v!==NULL && strpos($k,'_')!==0) {
+		if ($v!==FALSE && $v!==NULL && (strpos($k,'_')!==0 || strpos($k,'__')===0)) {
+			$k=str_replace("__","_",$k);
 			if (is_array($v)) {
 				$vars[]=array($k,$v);
 			} else {
