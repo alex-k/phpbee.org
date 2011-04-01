@@ -55,9 +55,8 @@ class field_interface {
 		}
 		if (isset($opts['unique']) && strtolower($opts['unique'])=='true') {
 			$structure['htmlforms'][$field]['validate'][]='checkField';
-			$structure['htmlforms'][$field]['validate_params']['class']=get_class($this);
+			$structure['htmlforms'][$field]['validate_params']['class']=$init_opts['recordset'];
 			$structure['htmlforms'][$field]['validate_params']['field']=$field;
-			//'validate_params'=>array('class'=>'users','field'=>'userLogin','message'=>'Login invalid or occupied'
 		}
 		if (isset($opts['default'])) {
 			$structure['htmlforms'][$field]['default']=$opts['default'];
@@ -102,12 +101,10 @@ class field_interface {
 			'verbose_name'=>$opts['verbose_name'],
 		);
 		$structure['htmlforms'][$field]['validate'][]=strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty';
-		
 		if (isset($opts['unique']) && strtolower($opts['unique'])=='true') {
 			$structure['htmlforms'][$field]['validate'][]='checkField';
-			$structure['htmlforms'][$field]['validate_params']['class']=get_class();
+			$structure['htmlforms'][$field]['validate_params']['class']=$init_opts['recordset'];
 			$structure['htmlforms'][$field]['validate_params']['field']=$field;
-			//'validate_params'=>array('class'=>'users','field'=>'userLogin','message'=>'Login invalid or occupied'
 		}
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
