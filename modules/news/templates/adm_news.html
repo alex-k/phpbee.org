@@ -1,0 +1,43 @@
+{include file="inc_menu.html"}
+
+<h3>Новости</h3>
+
+    <a href="#" onClick="$('#new_ticket_form').toggle(); return false;">{if $_gsdata.gspgid_va.1|is_numeric}Edit{else}Add New{/if}</a>
+{assign var=d value=$smarty.now|date_format:"%Y-%m-%d"}
+{handler gspgid="$subdir/form/tw_news/`$_gsdata.gspgid_v`" 
+	_default="date=$d"}
+
+     {if $_gsdata.gspgtype=='get' && !$_gsdata.gspgid_va.1|is_numeric}
+    <script>
+    $('#new_ticket_form').hide();
+    </script>
+    {/if}
+
+
+
+{controller _class=tw_news _assign=news _paging="pagenums:20"}
+<table class="main">
+<tbody>
+<tr>
+<th class="ttitle">Новость</th><th class="ttitle">горячая</th><th class="ttitle">скрытая</th>
+<th class="ttitle"></th>
+</tr>
+{foreach from=$news item=n}
+<tr class="tbody">
+<td>
+	<a href="{$www_subdir}adm_news/edit/{$n.id}">{$n.subject}</a>
+	{if $n.Images}
+	<div>
+	{$n.Images}
+	</div>
+	{/if}
+</td><td>{$n.hot}</td><td>{$n.hidden}</td>
+<td>
+<a href="{$www_subdir}adm_news/edit/{$n.id}">Редактировать</a>
+{handler gspgid="$subdir/form/tw_news/delete/delete/`$n.id`" title="Удалить"}
+</td>
+</tr>
+{/foreach}
+</tbody>
+</table>
+<div class="pages">{$news_paging}</div>

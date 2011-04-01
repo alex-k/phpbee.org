@@ -1,0 +1,16 @@
+{include file="inc_header.php"}
+<table class="tb">
+         <thead>
+         <tr><th>#</th><th>Название</th><th> </th><th> </th></tr>
+         </thead>
+         {controller _class=$_gsdata.gspgid_va.0 _params=$params _assign="list"}
+         {foreach from=$list item="e"}
+         <tr>
+              <td>{$e.id}</td>
+              <td>{$e|@trim}</td>
+              <td class="cnt">&raquo;</td>
+              <td class="cnt">X</td>
+         </tr>
+         {/foreach}
+         </table>
+         {handler gspgid="$subdir/form/`$_gsdata.gspgid_va.0`/edit/`$_gsdata.gspgid_va.4`" _params=$params}
