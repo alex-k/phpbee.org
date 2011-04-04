@@ -13,7 +13,7 @@ class gs_base_handler {
 		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname($filename).'/'),'/');
 		$www_subdir=trim(cfg('www_dir').$subdir.'/','/');
 		$www_subdir=$www_subdir ? "/$www_subdir/" : '/';
-		$subdir=$subdir ? "/$subdir/" : '/';
+		$subdir=$subdir ? "/$subdir/" : '';
 		$tpl=gs_tpl::get_instance();
 		$tpl->template_dir=cfg('lib_modules_dir')."/$subdir/templates";
 		$tpl->assign('tpl',$this);
@@ -113,7 +113,8 @@ TXT;
 			foreach ($h as $f=>$v)  if (!in_array($f,$fields_minus)) $hh[$f]=$h[$f];
 		}
 		}
-		$fields=$rec->get_recordset()->id_field_name.','.implode(',',array_keys($hh));
+		
+		$fields=array_combine(array_keys($hh),array_keys($hh));
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
 				case 'lMany2Many':
@@ -123,6 +124,11 @@ TXT;
 					$vrecs=$rs->find_records();
 					foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
 					$hh[$k]['variants']=$variants;
+					if (isset($data[$k])) {
+					    unset($fields[$k]);
+					    $data[$k]=array_combine($data[$k],$data[$k]);
+					    $rec->$k->flush($data[$k]);
+					}
 				break;
 				case 'lOne2One':
 					$variants=array();
@@ -155,6 +161,8 @@ TXT;
 				default: 
 			}
 		}
+		$fields=$rec->get_recordset()->id_field_name.','.implode(',',$fields);
+		
 		if(isset($data['handler_params']) && is_array($data['handler_params'])) foreach ($data['handler_params'] as $hk=>$hv) {
 			if(isset($hh[$hk])) {
 				$hh[$hk]['type']='private';
@@ -171,6 +179,7 @@ TXT;
 		/* if widget need all data of record */
 		//$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values()),$data));
 		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
+		//$f=new $form_class_name($hh,$params,self::implode_data(array_merge($rec->get_values($fields)),$data));
 		$f->rec=$rec;
 		return $f;
 	}
@@ -179,6 +188,7 @@ TXT;
 		$f=$this->get_form();
 		$tpl->assign('formfields',$f->show());
 		$tpl->assign('form',$f);
+		//echo $tpl->fetch($this->params['name']);
 		return $tpl->fetch($this->params['name']);
 	}
 	function postform() {
@@ -187,6 +197,7 @@ TXT;
 		$tpl=gs_tpl::get_instance();
 		$f=$this->get_form();
 		$validate=$f->validate();
+		md($f->clean(),1);
 		if ($validate['STATUS']===true) {
 			$f->rec->fill_values(self::explode_data($f->clean()));
 			$f->rec->get_recordset()->commit();

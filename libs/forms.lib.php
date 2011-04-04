@@ -281,11 +281,16 @@ class g_forms_html extends g_forms {
 		return implode($delimiter,$arr);
 	}
 	function as_list(){}
-	function as_labels($delimiter="<br/>\n",$suffix=':'){
+	function as_labels($delimiter="<br/>\n",$suffix=':',$validate=array()){
 		$arr=array();
 		$inputs=$this->_prepare_inputs();
-		foreach($inputs as $field=>$v) 
-			$arr[]=sprintf('<label>%s%s %s</label>', $v['label'],trim($v['label']) ? $suffix : null ,$v['input']);
+		foreach($inputs as $field=>$v) {
+			$e="";
+			if (isset($validate['FIELDS'][$field])) {
+				$e='<div class="error">Поле '.$v['label'].' не может быть пустым.</div>';
+			}
+			$arr[]=sprintf('<label>%s%s %s<br>%s</label>', $v['label'],trim($v['label']) ? $suffix : null ,$v['input'],$e);
+		}
 
 		return implode($delimiter,$arr);
 	}
