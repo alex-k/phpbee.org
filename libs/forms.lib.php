@@ -166,6 +166,7 @@ abstract class g_forms implements g_forms_interface{
 			}
 			if (!isset($h['validate'])) $h['validate']='notEmpty';
 			$validate=is_array($h['validate']) ? $h['validate'] : array($h['validate']);
+			$h['validate_params']['rec_id']=$this->params['rec_id'];
 			foreach ($validate as $v) {
 				$vname='gs_validate_'.$v;
 				$val=new $vname();

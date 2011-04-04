@@ -182,7 +182,7 @@ class gs_widget_lMany2Many extends gs_widget{
 	}
 	function html() {
 		$e_data=gs_base_handler::explode_data($this->data);
-		if (isset($e_data[$this->fieldname]) && is_array($e_data[$this->fieldname])) {
+		if (isset($e_data[$this->fieldname]) && is_array($e_data[$this->fieldname]) && !empty($e_data[$this->fieldname])) {
 			//$this->value=array_combine(array_values($e_data[$this->fieldname]),array_values($e_data[$this->fieldname]));
 			$this->value=array_combine(array_keys($e_data[$this->fieldname]),array_keys($e_data[$this->fieldname]));
 		}

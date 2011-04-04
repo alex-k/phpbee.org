@@ -126,7 +126,7 @@ TXT;
 					$hh[$k]['variants']=$variants;
 					if (isset($data[$k])) {
 					    unset($fields[$k]);
-					    $data[$k]=array_combine($data[$k],$data[$k]);
+					    $data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
 					    $rec->$k->flush($data[$k]);
 					}
 				break;
@@ -178,6 +178,7 @@ TXT;
 		}
 		/* if widget need all data of record */
 		//$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values()),$data));
+		$params['rec_id']=$rec->get_id();
 		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
 		//$f=new $form_class_name($hh,$params,self::implode_data(array_merge($rec->get_values($fields)),$data));
 		$f->rec=$rec;
@@ -197,7 +198,6 @@ TXT;
 		$tpl=gs_tpl::get_instance();
 		$f=$this->get_form();
 		$validate=$f->validate();
-		md($f->clean(),1);
 		if ($validate['STATUS']===true) {
 			$f->rec->fill_values(self::explode_data($f->clean()));
 			$f->rec->get_recordset()->commit();
