@@ -311,19 +311,22 @@ class gs_widget_alex_gal extends gs_widget {
         function html() {
                 $rid_name=$this->params['options']['local_field_name'];
                 $rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
-                $r=new $this->params['options']['recordset'];
-                $find=array();
-                $find[$this->params['options']['foreign_field_name']]=$rid;
                 $hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
-                $images=$r->find_records($find,array('id,name'));
-                $images=$images->get_values();
-
                 $s='<div class="many2one_gallery" id="gallery_'.$hash.'">';
-                        if (count($images)) {foreach ($images as $im) {
-                                $s.=sprintf('<img src="/img/h/%s/100/%d.jpg" title="%s">',$this->params['options']['recordset'],$im['id'],$im['name']);
-                        }}
-                $s.='<div class="clear"></div></div>';
+                if ($rid>0) {
+                        $r=new $this->params['options']['recordset'];
+                        $find=array();
+                        $find[$this->params['options']['foreign_field_name']]=$rid;
+                        $images=$r->find_records($find,array('id,name'));
+                        $images=$images->get_values();
 
+                        
+                                if (count($images)) {foreach ($images as $im) {
+                                        $s.=sprintf('<img src="/img/h/%s/100/%d.jpg" title="%s">',$this->params['options']['recordset'],$im['id'],$im['name']);
+                                }}
+                }
+                $s.='<div class="clear"></div></div>';
+                
 
 
                 $s.=sprintf('<a href="/admin/alex_gal/%s/%s/%d/%s" target="gal_%s">%s</a>',
@@ -332,7 +335,7 @@ class gs_widget_alex_gal extends gs_widget {
                         $rid,
                         $hash,
                         $hash,
-                        gs_dict::get('LOAD_RECORDS'));
+                        gs_dict::get('GALLERY_MANAGE_RECORDS'));
                 $s.='<iframe name="gal_'.$hash.'" class="gallery_ifr" id="gal_'.$hash.'" frameBorder="0"></iframe>';
                 $s.=sprintf('<input type="hidden" name="%s" value="%s">', $this->params['linkname'].'_hash',$hash);
                 return $s;
