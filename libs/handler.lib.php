@@ -7,7 +7,6 @@ class gs_base_handler {
 		$this->data=$data;
 		$this->params=$params;
 
-		$tpl=gs_tpl::get_instance();
 		$config=gs_config::get_instance();
 		$filename=$config->class_files[$this->params['module_name']];
 		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname($filename).'/'),'/');
@@ -15,7 +14,10 @@ class gs_base_handler {
 		$www_subdir=$www_subdir ? "/$www_subdir/" : '/';
 		$subdir=$subdir ? "/$subdir/" : '';
 		$tpl=gs_tpl::get_instance();
-		$tpl->template_dir=cfg('lib_modules_dir')."/$subdir/templates";
+		if (is_array($tpl->template_dir))
+			array_unshift($tpl->template_dir, cfg('lib_modules_dir')."/$subdir/templates");
+		else 
+			$tpl->template_dir = cfg('lib_modules_dir')."/$subdir/templates";
 		$tpl->assign('tpl',$this);
 		$tpl->assign('_module_subdir',$subdir);
 		$tpl->assign('subdir',$subdir);
@@ -41,8 +43,13 @@ class gs_base_handler {
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
-		if (!$tpl->template_exists($this->params['name'])) throw new gs_exception('gs_base_handler.show: can not find template file for '.$this->params['name']);
+		if (!$tpl->templateExists($this->params['name'])) throw new gs_exception('gs_base_handler.show: can not find template file for '.$this->params['name']);
 		return $tpl->fetch($this->params['name']);
+	}
+	function show404() {
+		header("HTTP/1.0 404 Not Found");
+		return $this->show();
+		return false;
 	}
 	function show($nodebug=FALSE) {
 		//if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
@@ -55,7 +62,7 @@ class gs_base_handler {
 		$tpl->assign('_gsparams',$this->params);
 
 
-		if (!$tpl->template_exists($this->params['name'])) {
+		if (!$tpl->templateExists($this->params['name'])) {
 			md($this->data,1);
 			md($this->params,1);
 			throw new gs_exception('gs_base_handler.show: can not find template file for '.$this->params['name']);
@@ -114,7 +121,7 @@ TXT;
 		}
 		}
 		
-		$fields=array_combine(array_keys($hh),array_keys($hh));
+		$fields=$hh ? array_combine(array_keys($hh),array_keys($hh)) : array();
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
 				case 'lMany2Many':
@@ -223,6 +230,31 @@ TXT;
 		if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
 		return html_redirect($this->data['gspgid_handler']);
         }
+	function many2one() {
+		 if ($this->data['gspgid_va'][4]=='delete') {
+		      $rid=intval($this->data['gspgid_va'][5]);
+		      $rs_name=$this->data['gspgid_va'][0];
+		      $rs=new $rs_name;
+		      $rec=$rs->get_by_id($rid);
+		      if ($rec) {
+			   $rec->delete();
+			   $rec->commit();
+		      }
+		      $res=preg_replace("|/delete/\d+|is","//",$this->data['gspgid']);
+		      return html_redirect($res);
+		 }
+		 $params=array(
+		      $this->data['gspgid_va'][1]=>$this->data['gspgid_va'][2],
+		 );
+		 $url=$this->data['gspgid_va'][0].'/'.$this->data['gspgid_va'][1].'/'.$this->data['gspgid_va'][2].'/'.$this->data['gspgid_va'][3];
+		 if ($this->data['gspgid_va'][2]==0) {
+			   $params[$this->data['gspgid_va'][1].'_hash']=$this->data['gspgid_va'][3];
+		      }
+		 $tpl=gs_tpl::get_instance();
+		 $tpl->assign('url',$url);
+		 $tpl->assign('params',$params);
+		 $this->show();
+	}
 
 	static function implode_data($data,$prefix='') {
 		$newdata=array();

@@ -52,4 +52,12 @@ class extSmarty extends gs_Smarty
 
         return '';
     }
+
+	public function templateExists($name) {
+	       return $this->template_exists($name);
+	}
+	public function getTemplateVars($name) {
+	       return $this->get_template_vars($name);
+	}
+
 }

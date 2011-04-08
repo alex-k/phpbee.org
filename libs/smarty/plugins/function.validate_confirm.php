@@ -4,10 +4,10 @@ function smarty_function_validate_confirm($params, &$smarty) {
 	//$val=gs_validator::get_html_confirm_code($val);
 	
 	
-	$txt=$smarty->get_template_vars($params['id']);
+	$txt=$smarty->getTemplateVars($params['id']);
 	
 	
-	$valid=$smarty->get_template_vars('validate');
+	$valid=$smarty->getTemplateVars('validate');
 	if (!isset($valid['STATUS']) || !$valid['STATUS']) {
 		if (is_array($valid['MESSAGES'])) foreach ($valid['MESSAGES'] as $k=>$e) {
 			/*

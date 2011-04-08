@@ -231,28 +231,28 @@ class gs_widget_lOne2One extends gs_widget{
         }
 }
 class gs_widget_form_add extends gs_widget{
-        function html() {
-                if ($this->value) return $this->form_add_ok($this->value);
-                $idname=$this->fieldname.'_'.md5(rand());
-                $s=sprintf('<input type="hidden" name="%s" id="%s" value="%s">', $this->fieldname,$idname,$this->value);
-                $s.=sprintf('<iframe src="%sform_add/%s/%s" style="width:100%%; border: 0px;"></iframe>', $this->tpl->get_template_vars('www_subdir'), $this->params['options']['recordset'],$idname);
-                return $s;
-        }
-        function clean() {
-                return $this->value;
-        }
-        function form_add_ok($value=false) {
-                if ($value) {
-                        $s=$this->params['options']['recordset'];
-                        $rec=new $s;
-                        $rec=$rec->get_by_id($value);
-                        return trim($rec);
-                }
-                $data=$this->fieldname;
-                $rec=new $data['gspgid_va'][1];
-                $rec=$rec->get_by_id($data['gspgid_va'][0]);
-                printf("%s<script>window.top.document.getElementById('%s').value=%d;</script>",$rec,$data['gspgid_va'][2],$data['gspgid_va'][0]);
-        }
+	function html() {
+		if ($this->value) return $this->form_add_ok($this->value);
+		$idname=$this->fieldname.'_'.md5(rand());
+		$s=sprintf('<input type="hidden" name="%s" id="%s" value="%s">', $this->fieldname,$idname,$this->value);
+		$s.=sprintf('<iframe src="%sform_add/%s/%s" style="width:100%%; border: 0px;"></iframe>', $this->tpl->getTemplateVars('www_subdir'), $this->params['options']['recordset'],$idname);
+		return $s;
+	}
+	function clean() {
+		return $this->value;
+	}
+	function form_add_ok($value=false) {
+		if ($value) {
+			$s=$this->params['options']['recordset'];
+			$rec=new $s;
+			$rec=$rec->get_by_id($value);
+			return trim($rec);
+		}
+		$data=$this->fieldname;
+		$rec=new $data['gspgid_va'][1];
+		$rec=$rec->get_by_id($data['gspgid_va'][0]);
+		printf("%s<script>window.top.document.getElementById('%s').value=%d;</script>",$rec,$data['gspgid_va'][2],$data['gspgid_va'][0]);
+	}
 }
 
 /*
@@ -265,6 +265,10 @@ class gs_widget_lMany2One extends gs_widget {
 		return array('fake'=>true);
 	}
 	function html() {
+		$e_data=gs_base_handler::explode_data($this->data);
+		$rs=new $this->params['options']['recordset'];
+		$options=array($rs->id_field_name=>isset($e_data[$this->fieldname]) ? array_keys($e_data[$this->fieldname]) : array());
+		$links=$rs->find_records($options);
 		$rid_name=$this->params['options']['local_field_name'];
 		$rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
 		$hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
@@ -305,7 +309,6 @@ class gs_widget_gallery extends gs_widget {
 
 class gs_widget_alex_gal extends gs_widget {
         function clean() {
-                //md($this->data,1);
                 return array('fake'=>true);
         }
         function html() {
@@ -317,13 +320,14 @@ class gs_widget_alex_gal extends gs_widget {
                         $r=new $this->params['options']['recordset'];
                         $find=array();
                         $find[$this->params['options']['foreign_field_name']]=$rid;
-                        $images=$r->find_records($find,array('id,name'));
-                        $images=$images->get_values();
-
-                        
+                        $images=$r->find_records($find,array('id,file_filename,file_mimetype'));
+			$s.=(string)$images;
+                       /* 
+				$images=$images->get_values();
                                 if (count($images)) {foreach ($images as $im) {
                                         $s.=sprintf('<img src="/img/h/%s/100/%d.jpg" title="%s">',$this->params['options']['recordset'],$im['id'],$im['name']);
                                 }}
+			*/
                 }
                 $s.='<div class="clear"></div></div>';
                 

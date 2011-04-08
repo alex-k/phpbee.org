@@ -16,7 +16,7 @@ function smarty_function_validate($params, &$smarty) {
         return;
     }
     /*
-    $validate=($smarty->get_template_vars('validate'));
+    $validate=($smarty->getTemplateVars('validate'));
     if (isset($validate['ERRORS'][$params['id']]) && $validate['ERRORS'][$params['id']]==$params['criteria']) {
 	    $ret.="<div class=validate_error_message>".$params['message']."</div>";
     }

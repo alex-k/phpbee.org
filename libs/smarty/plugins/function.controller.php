@@ -61,7 +61,7 @@ function smarty_function_controller($params, &$smarty)
 
 	if (!empty($params['_paging'])) {
 		if (!isset($_offset)) {
-			$get=$smarty->get_template_vars('_gsdata');
+			$get=$smarty->getTemplateVars('_gsdata');
 			$_offset=(int)$get[$params['_assign'].'_paging'];
 		}
 
@@ -92,7 +92,7 @@ function smarty_function_controller($params, &$smarty)
 
 		$vars=$ret->get_values();
 		if ($params['_skip_filled'] && is_array($vars)) {
-			$tpl_vars=$smarty->get_template_vars();
+			$tpl_vars=$smarty->getTemplateVars();
 			foreach ($vars as $k=>$v) {
 				if (isset($tpl_vars[$k])) unset($vars[$k]);
 			}

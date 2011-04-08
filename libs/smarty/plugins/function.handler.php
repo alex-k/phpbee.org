@@ -1,7 +1,7 @@
 <?php
 function smarty_function_handler($params, &$smarty) {
-	$data=$smarty->get_template_vars('_gsdata');
-	$gsparams=$smarty->get_template_vars('_gsparams');
+	$data=$smarty->getTemplateVars('_gsdata');
+	$gsparams=$smarty->getTemplateVars('_gsparams');
 	if (is_array($params['_params'])) $params=array_merge($params,$params['_params']);
 	$params['gspgid']=trim($params['gspgid'],'/');
 	if (!isset($data['gspgid_root'])) {
