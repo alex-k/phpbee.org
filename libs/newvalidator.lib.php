@@ -106,7 +106,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 class gs_validate_checkField {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
-	$classname=$params['class'];
+    $classname=$params['class'];
 	$obj=new $classname;
 	return $obj->check_field($params['field'],$value,$params,$params['rec_id']);
 

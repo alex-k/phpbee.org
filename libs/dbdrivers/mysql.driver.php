@@ -85,7 +85,8 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error());
 		}
 		if (isset($cinfo['codepage']) && !empty($cinfo['codepage'])) {
-			$this->query(sprintf('SET NAMES %s',$cinfo['codepage']));
+			$this->query(sprintf('SET NAMES %s COLLATE %s_general_ci',$cinfo['codepage'],$cinfo['codepage']));
+			//$this->query(sprintf('SET NAMES %s',$cinfo['codepage']));
 		}
 	}
 
@@ -241,7 +242,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		default:
 			$construct_fields=$this->construct_createtable_fields($structure);
 			$this->construct_droptable($tablename);
-			$que=sprintf('CREATE TABLE  %s %s',$tablename, $construct_fields);
+			$que=sprintf('CREATE TABLE  %s %s ENGINE=MyISAM',$tablename, $construct_fields);
 			$this->query($que);
 			$this->construct_indexes($tablename,$structure);
 			break;

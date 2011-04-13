@@ -144,6 +144,28 @@ class field_interface {
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	
+		static function fCoords($field,$opts,&$structure,$init_opts) {
+		$structure['fields'][$field.'_x']=array('type'=>'int');
+		$structure['fields'][$field.'_y']=array('type'=>'int');
+		$structure['htmlforms'][$field]=array(
+			'type'=>'coords',
+			'hidden'=>$opts['hidden'],
+			'verbose_name'=>$opts['verbose_name'],
+			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
+		);
+		$structure['htmlforms'][$field.'_x']=array(
+			'type'=>'input',
+			'hidden'=>true,
+		);
+		$structure['htmlforms'][$field.'_y']=array(
+			'type'=>'input',
+			'hidden'=>true,
+		);
+		
+			
+		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
+	}
+	
 	static function fSelect($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
 		$structure['htmlforms'][$field]=array(
@@ -195,9 +217,8 @@ class field_interface {
 		$structure['htmlforms'][$fname]['options']=$structure['recordsets'][$field];
 		$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'RESTRICT','on_update'=>'CASCADE');
 		if (isset($opts['widget'])) $structure['htmlforms'][$fname]['widget']=$opts['widget'];
-
-
 	}
+	
 	static function lMany2One($field,$opts,&$structure,$init_opts) {
 		if(isset($init_opts['skip_many2many'])) return;
 		list($rname,$linkname)=explode(':',$opts['linked_recordset']);

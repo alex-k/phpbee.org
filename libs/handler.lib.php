@@ -169,7 +169,7 @@ TXT;
 			}
 		}
 		$fields=$rec->get_recordset()->id_field_name.','.implode(',',$fields);
-		
+		md($fields,1);
 		if(isset($data['handler_params']) && is_array($data['handler_params'])) foreach ($data['handler_params'] as $hk=>$hv) {
 			if(isset($hh[$hk])) {
 				$hh[$hk]['type']='private';

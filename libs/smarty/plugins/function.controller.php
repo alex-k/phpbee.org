@@ -42,7 +42,7 @@ function smarty_function_controller($params, &$smarty)
 	foreach ($vars as $val) {
 		list($k,$v)=$val;
 		if (isset($params['_skip_null_options']) && $params['_skip_null_options'] && empty($v)) continue;
-		if (!is_array($v) && preg_match('/^(LIKE|!=|<=|>=|<|>)(.*)/',$v,$matches) ) {
+		if (!is_array($v) && preg_match('/^(FULLTEXT|LIKE|!=|<=|>=|<|>)(.*)/',$v,$matches) ) {
 			if (isset($params['_skip_null_options']) && $params['_skip_null_options'] && empty($matches[2])) continue;
 			$options[]=array('type'=>'value', 'field'=>$k,'case'=>$matches[1],'value'=>$matches[2]);
 		/*

@@ -413,6 +413,7 @@ abstract class gs_prepare_sql {
 		$this->_index_types=array(
 		                        'key'=>'',
 		                        'unique'=>'UNIQUE',
+		                        'fulltext'=>'FULLTEXT',
 		                        //'serial'=>'PRIMARY AUTO_INCREMENT',
 		                    );
 		$this->_field_types=array( 

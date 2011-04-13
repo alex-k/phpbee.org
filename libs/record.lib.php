@@ -264,8 +264,10 @@ class gs_record implements arrayaccess {
 				$parent_record=$this->gs_recordset->parent_record;
 				if ($parent_record) $this->__set($this->gs_recordset->foreign_field_name,$parent_record-> {$this->gs_recordset->local_field_name});
 			}
-			$this->_ctime=date("c");
-			$this->_mtime=date("c");
+			//$this->_ctime=date("c");
+			$this->_ctime=date("Y-m-d H:i:s");
+			//$this->_mtime=date("c");
+			$this->_mtime=date("Y-m-d H:i:s");
 			$ret=$this->gs_recordset->insert($this);
 			$this->set_id($ret);
 		} else if ($this->recordstate & RECORD_DELETED) {
@@ -273,7 +275,8 @@ class gs_record implements arrayaccess {
 			$ret=$this->gs_recordset->delete($this);
 		} else if ( $this->recordstate & RECORD_CHANGED) {
 			if (!gs_fkey::event('on_update',$this)) return false;
-			$this->_mtime=date("c");
+			//$this->_mtime=date("c");
+			$this->_mtime=date("Y-m-d H:i:s");
 			$ret=$this->gs_recordset->update($this);
 		}
 		if ($this->recordstate & RECORD_NEW_BIND) {
