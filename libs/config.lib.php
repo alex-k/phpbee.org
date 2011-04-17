@@ -89,6 +89,7 @@ class gs_init {
 		load_file($this->config->lib_dir.'validator.lib.php');
 		load_file($this->config->lib_dir.'newvalidator.lib.php');
 		load_file($this->config->lib_dir.'functions.lib.php');
+		load_file($this->config->lib_dir.'vpa_mail.lib.php');
 	}
 
 	public function load_storage() {

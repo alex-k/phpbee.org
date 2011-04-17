@@ -1,4 +1,4 @@
-<?
+<?php
 function html_redirect($gspgid=null,$data=null,$type='302') {
 	$config=gs_config::get_instance();
 	if($gspgid===null) $gspgid=$config->referer_path;
