@@ -145,7 +145,9 @@ abstract class g_forms implements g_forms_interface{
 			'ERRORS'=>array(),
 			'FIELDS'=>array(),
 			);
+		$readonly=isset($this->params['readonly']) ? explode(',',$this->params['readonly']) : array();
 		foreach ($this->htmlforms as $field=>$h) {
+			if (in_array($field,$readonly)) continue;
 			$k=$field;
 			$wclass=(isset($h['widget']) ? $h['widget'] : $h['type']);
 			if(empty($wclass)) continue;

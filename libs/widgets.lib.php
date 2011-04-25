@@ -28,7 +28,7 @@ abstract class gs_widget implements gs_widget_interface {
 				return $this->html();
 		}
 		function html() {
-				return sprintf('<input class="gs_widget" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
+				return sprintf('<input class="gs_widget" type="text" name="%s" value="%s"%s>', $this->fieldname,trim($this->value),$this->params['readonly'] ? 'disabled="disabled"' : '');
 		}
 }
 class gs_widget_label extends gs_widget{
