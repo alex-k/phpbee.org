@@ -83,7 +83,8 @@ class helper_table_admin {
 
 class helper_tr {
 	function show($label,$txt,$errors=array()) {
-		$e = $errors ? '<div class="error">Error: '.implode(',',$errors).'</div>' : '';
+		$e = $errors ? '<div class="error">'.gs_dict::get('FORM_VALIDATE_ERROR').': '.implode(',',gs_dict::get($errors)).'</div>' : '';
 		return sprintf('<tr class="helper_tr"><td class="helper_tr_title">%s</td><td class="helper_tr_field">%s%s</td></tr>',$label,$txt,$e);
 	}
 }
+

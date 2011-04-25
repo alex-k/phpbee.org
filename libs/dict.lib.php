@@ -8,6 +8,10 @@ class gs_dict {
 	}
 	
 	static function get($key) {
+		if (is_array($key)) {
+			foreach ($key as $k=>$v) $key[$k]=gs_dict::get($v);
+			return $key;
+		}
 		return isset(self::$words[$key]) ? self::$words[$key] : $key;
 	}
 }
