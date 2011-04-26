@@ -41,25 +41,25 @@ class gs_widget_label extends gs_widget{
 }
 class gs_widget_input extends gs_widget{
 		function html() {
-				return sprintf('<input class="fString" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
+				return sprintf('<input class="fString" type="text" name="%s" value="%s">', $this->fieldname,htmlspecialchars(trim($this->value)));
 		}
 }
 
 class gs_widget_int extends gs_widget{
 		function html() {
-				return sprintf('<input class="fInt" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
+				return sprintf('<input class="fInt" type="text" name="%s" value="%d">', $this->fieldname,trim($this->value));
 		}
 }
 
 
 class gs_widget_password extends gs_widget{
 		function html() {
-				return sprintf('<input class="fPassword" type="password" name="%s" value="%s">', $this->fieldname,trim($this->value));
+				return sprintf('<input class="fPassword" type="password" name="%s" value="%s">', $this->fieldname,htmlspecialchars(trim($this->value)));
 		}
 }
 class gs_widget_hidden extends gs_widget{
 		function html() {
-				return sprintf('<input class="fHidden" type="hidden" name="%s" value="%s">', $this->fieldname,trim($this->value));
+				return sprintf('<input class="fHidden" type="hidden" name="%s" value="%s">', $this->fieldname,htmlspecialchars(trim($this->value)));
 		}
 }
 class gs_widget_text extends gs_widget{
@@ -139,7 +139,7 @@ class gs_widget_image extends gs_widget_file{
 
 class gs_widget_datetime extends gs_widget{
 		function html() {
-				return sprintf('<input class="fDateTime" type="text" name="%s" value="%s">', $this->fieldname,trim($this->value));
+				return sprintf('<input class="fDateTime" type="text" name="%s" value="%s">', $this->fieldname,htmlspecialchars(trim($this->value)));
 		}
 		function clean() {
 				return date('Y-m-d H:i:s',strtotime($this->value));
@@ -167,7 +167,7 @@ class gs_widget_select extends gs_widget{
 				$ret="<select class=\"fSelect\"  name=\"".$this->fieldname."\">\n";
 				if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 				foreach ($this->params['options'] as $v=>$l) {
-						$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n", $v, (trim($this->value)==$v) ? 'selected="selected"' : '', $l);
+						$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n", htmlspecialchars($v), (trim($this->value)==$v) ? 'selected="selected"' : '', $l);
 				}
 
 				$ret.="</select>\n";
@@ -190,7 +190,7 @@ class gs_widget_radio extends gs_widget{
 		function html() {
 				if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 				foreach ($this->params['options'] as $v=>$l) {
-				$s.=sprintf('<label><input class="fRadio" type="radio" name="%s" value="%s" %s> %s </label>', $this->fieldname,$v, trim($this->value)==$v || (isset($this->params['default']) && $v==$this->params['default']) ? 'checked="checked"' : '', $l);
+				$s.=sprintf('<label><input class="fRadio" type="radio" name="%s" value="%s" %s> %s </label>', $this->fieldname,htmlspecialchars($v), trim($this->value)==$v || (isset($this->params['default']) && $v==$this->params['default']) ? 'checked="checked"' : '', $l);
 				}
 				return $s;
 		}
@@ -349,12 +349,13 @@ class gs_widget_alex_gal extends gs_widget {
 				
 
 
-				$s.=sprintf('<a href="/admin/alex_gal/%s/%s/%d/%s" target="gal_%s">%s</a>',
+				$s.=sprintf('<a href="/admin/alex_gal/%s/%s/%d/%s" target="gal_%s" id="lMany2One_%s">%s</a>',
 						$this->params['options']['recordset'],
 						$this->params['options']['foreign_field_name'],
 						$rid,
 						$hash,
 						$hash,
+						$this->params['linkname'],
 						gs_dict::get('GALLERY_MANAGE_RECORDS'));
 				$s.='<iframe name="gal_'.$hash.'" class="gallery_ifr" id="gal_'.$hash.'" frameBorder="0"></iframe>';
 				$s.=sprintf('<input type="hidden" name="%s" value="%s">', $this->params['linkname'].'_hash',$hash);
