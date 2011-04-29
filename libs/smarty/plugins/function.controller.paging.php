@@ -5,7 +5,7 @@ function gs_controller_paging($firstitemname, $type,$total_items,$itemsperpage,$
 	if (!$itemsperpage || $itemsperpage==0) $itemsperpage=1;
 	
 
-	$href=preg_replace("/[?&]$firstitemname=\S+/","",$_SERVER[REQUEST_URI]);
+	$href=preg_replace("/[?&]$firstitemname=\S+/","",$_SERVER['REQUEST_URI']);
 	$href.=(strpos($href,'?')>0) ? "&" : "?";
 
 	$ret=array();

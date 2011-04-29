@@ -59,15 +59,13 @@ function smarty_function_controller($params, &$smarty)
 	if (!empty($params['_paging'])) {
 		if (!isset($_offset)) {
 			$get=$smarty->getTemplateVars('_gsdata');
-			$_offset=(int)$get[$params['_assign'].'_paging'];
+			$_offset=isset($get[$params['_assign'].'_paging']) ? (int)$get[$params['_assign'].'_paging'] : 0;
 		}
 
 		list($_paging_type,$_paging_itemsperpage)=sscanf($params['_paging'],"%[A-Za-z]:%d");
 		require_once('function.controller.paging.php');
 
 		$rows_count=$obj->count_records($options);
-		$smarty->assign($params['_assign']."_paging",$pages);
-
 		$pages=gs_controller_paging($params['_assign']."_paging", $_paging_type,$rows_count,$_paging_itemsperpage,$_offset);
 		$smarty->assign($params['_assign']."_paging",$pages);
 		$smarty->assign($params['_assign']."_count",$rows_count);
