@@ -349,7 +349,7 @@ class gs_widget_alex_gal extends gs_widget {
 				
 
 
-				$s.=sprintf('<a href="/admin/alex_gal/%s/%s/%d/%s" target="gal_%s" id="lMany2One_%s">%s</a>',
+				$s.=sprintf('<a href="alex_gal/%s/%s/%d/%s" target="gal_%s">%s</a>',
 						$this->params['options']['recordset'],
 						$this->params['options']['foreign_field_name'],
 						$rid,
