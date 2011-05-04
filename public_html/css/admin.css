@@ -1,0 +1,234 @@
+* {
+	font-family:arial;
+	font-size:12px;
+}
+
+a {
+	color:#aa0000;
+}
+
+body {
+	width:100%;
+	height:100%;
+	margin:0px;
+	padding:0px;
+	background:#FFFFFF url('/i/admin/bg.jpg');
+	background-attachment: fixed;
+}
+
+img {
+	border:0px;
+}
+
+.main {
+	width:100%;
+	background:url('/i/admin/shadow.jpg') 1000px 0 repeat-y;
+	background-attachment: fixed;
+}
+
+.tb {
+	width:100%;
+	border:1px solid #e0e0e0;
+	border-collapse:collapse;
+}
+
+.tb * {
+	
+}
+
+.tb thead * {
+	background-color:#e0e0e0;
+	color:#000000;
+	border-right:1px solid #ffffff;
+}
+
+.tb thead .path {
+	background-color:#FFFFFF;
+	border-right:1px solid #e0e0e0;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-left:20px;
+	text-align:left;
+}
+
+.tb thead .path a{
+	background-color:#FFFFFF;
+	color:#aa0000;
+}
+
+
+.tb td {
+	border:1px solid #e0e0e0;
+	padding-left:10px;
+	padding-right:10px;
+}
+
+.sel_filter {
+	width:30px;
+}
+
+.cnt {
+	text-align:center;
+}
+
+.main_tb {
+	width:100%;
+}
+
+.l_menu {
+	width:170px;
+	vertical-align:top;
+}
+
+.l_menu ul {
+	display:block;
+	background:#ffffff;
+	margin:0px;
+	margin-top:29px;
+	padding:0px;
+	padding-top:20px;
+	padding-bottom:20px;
+	border:1px solid #e0e0e0;
+	border-left:0px;
+	list-style:none;
+}
+
+.l_menu li {
+	margin:0px;
+	display:block;
+	height:25px;
+	line-height:20px;
+	padding-left:20px;
+	padding-right:20px;
+	border-bottom:1px dashed #e0e0e0;
+}
+
+.r_block {
+	padding:10px;
+	vertical-align:top;
+}
+
+.minfo {
+	margin:20px;
+	padding:20px;
+	border:1px solid #e0e0e0;
+	background-color:#FFFFFF;
+}
+
+.odd td{
+	background-color:#FFFFFF;
+}
+
+.even td{
+	background-color:#f0f0f0;
+}
+
+hr {
+	border:0px;
+	color:#e0e0e0;
+	background-color:#e0e0e0;
+	height:1px;
+}
+
+h5 {
+	margin-bottom:5px;
+}
+
+
+.helper_table {
+	width:100%;
+}
+
+.helper_table input[type=submit] {
+	border:1px solid #a0a0a0;
+	cursor:pointer;
+}
+
+.helper_tr_title {
+	font-weight:bold;
+	text-align:right;
+	width:150px;
+	padding-right:10px;
+}
+
+.helper_table_submit_l {
+	text-align:left;
+}
+
+.helper_table_submit_r {
+	text-align:right;
+}
+
+input.fString {
+	width:90%;
+	border:1px solid #a0a0a0;
+}
+
+input.fInt {
+	width:100px;
+	border:1px solid #a0a0a0;
+}
+
+
+textarea.fText {
+	width:90%;
+	height:200px;
+	border:1px solid #a0a0a0;
+}
+
+.fWysiwyg {
+	width:100%;
+	height:300px;
+}
+
+.lMany2Many {
+	width:250px;
+}
+
+.lMany2Many_tree {
+	width:250px;
+}
+
+
+.helper_clone {
+	padding:10px;
+	border:1px solid #e0e0e0;
+}
+
+.ui-datepicker {
+	border:1px solid #e0e0e0;
+	background-color:#ffffff;
+	padding:10px;
+}
+
+.error {
+	color:#FF0000;
+	padding-bottom:10px;
+}
+
+.m2m_tree_0 {
+	font-weight:bold;
+}
+
+.m2m_tree_1 {
+	padding-left:20px;
+}
+
+
+<!-- Wysiwyg editor styles -->
+.editor { border:1px solid #e0e0e0;background-color:#BDC6CE;}
+.editor .menu { background-color:#e0e0e0; }
+.win_header { background-color:#BDC6CE;font-size:10px;font-family:arial;height:12px;}
+.win_body { border-top:1px solid #e0e0e0; background-color:#E7EFEF; vertical-align:top}
+.win_string {font-size:10px; font-family:arial;}
+.win_page_close {font-size:10px; font-family:arial; padding-left:7px; padding-right:7px;border:1px solid #e0e0e0; height:12px }
+.win_page_open {font-size:10px; font-family:arial; padding-left:7px; padding-right:7px; border-top:1px solid #000;border-left:1px solid #000;border-right:1px solid #000; height:12px}
+.win_page_block { border-bottom:1px solid #e0e0e0; height:12px}
+.win_page_main { border-bottom:1px solid #e0e0e0; border-right:1px solid #e0e0e0;border-left:1px solid #e0e0e0;}
+.win_text { border:1px solid #e0e0e0; font-family:arial;font-size:12px}
+.win_button_v { border:1px solid #000; display:block}
+.win_button_h { display:none }
+.list {border:1px solid #e0e0e0; font-size: 10px; font-family:arial; background-color:#E7EFEF;}
+.alpha { filter:Alpha(Opacity=50,style=0); -moz-opacity: 0.5; background-color: #E7EFEF; }
+.alpha  *{ filter:Alpha(Opacity=50,style=0); -moz-opacity: 0.5; background-color: #E7EFEF; }
+.nonalpha {filter:Alpha(Opacity=100,style=0); -moz-opacity: 1;  background-color: #E7EFEF; }

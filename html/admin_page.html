@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{$title|default:"Административная зона"}</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<link href="/css/admin.css" rel="stylesheet" type="text/css" title="CSS for site" />
+<link href="/css/jquery.rte.css" rel="stylesheet" type="text/css" title="CSS for site" />
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/jquery-ui.js"></script>
+<script type="text/javascript" src="/js/jquery.form.js"></script>
+<script type="text/javascript" src="/js/jquery.rsv.js"></script>
+<script type="text/javascript" src="/js/jquery.rte.js"></script>
+<script type="text/javascript" src="/js/jquery.rte.tb.js"></script>
+<script type="text/javascript" src="/libs/js/jquery.multiselect.js"></script>
+<script type="text/javascript" src="/libs/js/jquery.sel_filter.js"></script>
+<script type="text/javascript" src="/js/common_admin.js"></script>
+</head>
+<body>
+<table class="main_tb">
+<tr>
+<td class="l_menu">
+	{handler gspgid="/admin/menu"}
+</td>
+<td class="r_block">
+<div class="minfo">
+{block name="main"}
+{/block}
+</div>
+</td>
+</tr>
+</body>
+</html>
