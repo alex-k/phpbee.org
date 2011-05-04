@@ -12,6 +12,7 @@ class module  implements gs_module {
 			),
 			'get'=>array(
 				''=>'gs_base_handler.show:{name:index.html}',
+				'/admin'=>'admin_handler.show:{name:admin_page.html}',
 				'/admin/menu'=>'admin_handler.show_menu',
 			),
 		);
