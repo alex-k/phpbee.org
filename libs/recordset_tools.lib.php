@@ -135,6 +135,8 @@ class field_interface {
 		$structure['fields'][$field.'_data']=array('type'=>'longblob');
 		$structure['fields'][$field.'_mimetype']=array('type'=>'varchar','options'=>'16');
 		$structure['fields'][$field.'_size']=array('type'=>'bigint');
+		$structure['fields'][$field.'_width']=array('type'=>'int');
+		$structure['fields'][$field.'_height']=array('type'=>'int');
 		$structure['htmlforms'][$field]=array(
 			'type'=>'file',
 			'hidden'=>$opts['hidden'],

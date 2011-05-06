@@ -4,6 +4,7 @@ function html_redirect($gspgid=null,$data=null,$type='302') {
 	if($gspgid===null) $gspgid=$config->referer_path;
 	$scheme=parse_url($gspgid,PHP_URL_SCHEME);
 	$url=$scheme ? $gspgid : $config->www_dir.$gspgid;
+	$url='/'.ltrim($url,'/');
 	$datastr='';
 	if ($data) $datastr='?'.http_build_query($data);
 	switch ($type) {

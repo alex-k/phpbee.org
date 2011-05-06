@@ -76,8 +76,8 @@ class vpa_gd {
 	**/
 	function resize($width,$height,$type)
 	{
-		$this->new_width=$width;
-		$this->new_height=$height;
+		$this->new_width=min($width,$this->old_width);
+		$this->new_height=min($height,$this->old_height);
 		switch($type)
 		{
 			case 'use_width':

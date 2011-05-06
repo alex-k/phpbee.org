@@ -61,7 +61,7 @@ class gs_glyph {
 		return $nodes;
 	}
 	function __get($name) {
-		return $this->attributes[$name];
+		return isset($this->attributes[$name]) ? $this->attributes[$name] : NULL;
 	}
 	function getName() {
 		return $this->tagName;
@@ -111,15 +111,16 @@ abstract class g_forms implements g_forms_interface{
 				$arr[]=$helper->show($value['label'],$value['input']);
 			} else {
 				$name=(string)$e->name;
+				if (!isset($this->htmlforms[$name])) continue;
 				$field=$this->htmlforms[$name];
 				$value=$inputs[$name];
 
 				if ($field['type']=='private') continue;
 
-				if ($field['type']=='hidden' || $field['widget']=='hidden') {
+				if ($field['type']=='hidden' || (isset($field['widget']) && $field['widget']=='hidden')) {
 					$arr[]=$value['input'];
 				} else {
-					$arr[]=$helper->show($value['label'],$value['input'],$validate['FIELDS'][$name]);
+					$arr[]=$helper->show($value['label'],$value['input'],isset($validate['FIELDS'][$name]) ? $validate['FIELDS'][$name] : NULL);
 				}
 			}
 		}

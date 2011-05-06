@@ -198,7 +198,7 @@ class gs_node {
 		{
 			return $this->controller;
 		}
-		return isset($this->parent) ? $this->parent->get_handler() :$this->get_node_by_name('default')->controller;
+		return isset($this->parent) ? $this->parent->get_handler() : $this->get_node_by_name('default')->controller;
 	}
 	
 	function append_child($node)

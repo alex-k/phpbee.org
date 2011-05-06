@@ -2,7 +2,7 @@
 function smarty_function_handler($params, &$smarty) {
 	$data=$smarty->getTemplateVars('_gsdata');
 	$gsparams=$smarty->getTemplateVars('_gsparams');
-	if (is_array($params['_params'])) $params=array_merge($params,$params['_params']);
+	if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
 	$params['gspgid']=trim($params['gspgid'],'/');
 	if (!isset($data['gspgid_root'])) {
 		$data['gspgid_root']=$data['gspgid'];

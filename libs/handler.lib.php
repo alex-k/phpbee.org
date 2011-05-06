@@ -120,7 +120,6 @@ TXT;
 			foreach ($h as $f=>$v)  if (!in_array($f,$fields_minus)) $hh[$f]=$h[$f];
 		}
 		}
-		
 		$fields=$hh ? array_combine(array_keys($hh),array_keys($hh)) : array();
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
@@ -132,14 +131,17 @@ TXT;
 					foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
 					$hh[$k]['variants']=$variants;
 					if (isset($data[$k])) {
-					    unset($fields[$k]);
-					    $data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
-					    $rec->$k->flush($data[$k]);
+						unset($fields[$k]);
+						$data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
+						$rec->$k->flush($data[$k]);
 					}
 				break;
 				case 'lOne2One':
+					if ($hh[$k]['hidden']) break;
 					$variants=array();
-					$vrecs=$rec->init_linked_recordset($v['linkname'])->find_records();
+					$rname=get_class($rec->init_linked_recordset($v['linkname']));
+					$vro=new $rname;
+					$vrecs=$vro->find_records();
 					foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
 					$hh[$k]['variants']=$variants;
 				break;
@@ -188,6 +190,7 @@ TXT;
 		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
 		//$f=new $form_class_name($hh,$params,self::implode_data(array_merge($rec->get_values($fields)),$data));
 		$f->rec=$rec;
+
 		return $f;
 	}
 	function showform() {
@@ -207,7 +210,16 @@ TXT;
 		if ($validate['STATUS']===true) {
 			$f->rec->fill_values(self::explode_data($f->clean()));
 			$f->rec->get_recordset()->commit();
-			if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
+			if (isset($this->params['href'])) {
+				$href=$this->params['href'];
+				if (strpos($this->params['href'],'/')!==0) {
+					$href=$this->subdir.$href;
+				}
+				return html_redirect($href,array(
+					'id'=>$f->rec->get_id(),
+					'classname'=>get_class($f->rec->get_recordset()),
+				));
+			}
 			return html_redirect($this->data['gspgid_handler']);
 			//return $tpl->fetch($this->params['name']);
 		}
@@ -221,14 +233,14 @@ TXT;
 		$tpl->assign('gspgid_handler',$this->data['gspgid']);
 		echo $this->postform();
 	}
-        function deleteform() {
+	function deleteform() {
 		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
 		$f=$this->get_form();
 		$f->rec->delete();
 		$f->rec->commit();
 		if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
 		return html_redirect($this->data['gspgid_handler']);
-        }
+	}
 	function many2one() {
 		 if ($this->data['gspgid_va'][4]=='delete') {
 		      $rid=intval($this->data['gspgid_va'][5]);

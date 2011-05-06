@@ -43,7 +43,7 @@ class gs_init {
 	}
 
 	public function load_modules($mask='*module.php') {
-		$files = array_merge(glob($this->config->lib_modules_dir.'*/'.$mask),glob($this->config->lib_modules_dir.$mask));
+		$files = array_merge(glob($this->config->lib_modules_dir.$mask),glob($this->config->lib_modules_dir.'*/'.$mask));
 		$classes=get_declared_classes();
 		foreach ($files as $f) {
 			load_file($f);
