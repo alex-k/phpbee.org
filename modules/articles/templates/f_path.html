@@ -1,0 +1,10 @@
+{controller _class="tw_articles" id=$root.pid_id _assign="item"}
+{assign var="item" value=$item->first()->get_values()}
+{if $item && $pid!=$root.pid_id}
+{include file="f_path.html" root=$item pid=$pid}&nbsp;&raquo;&nbsp;
+{/if}
+{if $pid!=$root.id}
+<a href="/admin/tw_articles/root/{$root.id}">{$root.Name}</a>
+{else}
+{$root.Name}
+{/if}

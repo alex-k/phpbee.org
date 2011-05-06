@@ -1,0 +1,23 @@
+{controller _class=tw_news _assign=n _assign_type=plain id=9 hidden=0}
+{extends file="about2.html"}
+{block name="page_title"}
+<a href="/news/">НОВОСТИ</a>
+{/block}
+{block name="page_tag"}
+{$n.subject}
+{/block}
+{block name="page_center"}
+	<p><a href="/img/show/tw_news_images/1000/{$n.Images->first()->id}"><img src="/img/show/tw_news_images/200/{$n.Images->first()->id}"></a></p>
+        <p>
+        {$n.text}
+        </p>
+	<p>
+	{foreach from=$n.Images item=i}
+	{if !$i@first}<a href="/img/show/tw_news_images/1000/{$i.id}">{$i}</a>{/if}
+	{/foreach}
+	</p>
+{$n.date}
+<p>
+<a href="/news/">ВСЕ НОВОСТИ</a>
+</p>
+{/block}

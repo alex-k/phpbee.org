@@ -8,14 +8,14 @@
 	{foreach from=$list item="e"}
 	<tr class="{cycle values="odd,even"}">
 			<td>{$e.id}</td>
-			<td>{$e|@trim}</td>
+			<td>{$e.subject}</td>
 			<td>{$e._ctime|date_format:"%d.%m.%Y"}</td>
 			<td class="cnt"><a href="/admin/news/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
 			<td class="cnt"><a href="/admin/news/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
 	</tr>
 	{/foreach}
 	</table>
-	<h5>Редактировать/<a href="{$www_subdir}{$_gsparams.classname}#form">создать</a> новость:</h5>
+	<h5>Редактировать/<a href="/admin/news#form">создать</a> новость:</h5>
 	<hr><br>
 	<a name="form"></a>
 	{handler gspgid="admin/form/`$_gsparams.classname`/edit/`$_gsdata.gspgid_va.0`"}

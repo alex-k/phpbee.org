@@ -26,13 +26,12 @@ class module_news implements gs_module {
 			''=>'gs_base_handler.show:{name:news.html}',
 			'*'=>'gs_base_handler.show:{name:news_show.html}',
 			'/admin/news'=>'gs_base_handler.show:{name:adm_news.html:classname:tw_news}',
-			'/admin/form/tw_news'=>'gs_base_handler.postform:{name:form.html:form_class:g_forms_table:classname:tw_news:href:admin/news}',
-			'/admin/news/delete'=>'handler_news.deleteform',
+			'/admin/form/tw_news'=>'gs_base_handler.postform:{name:form.html:form_class:g_forms_table:classname:tw_news:href:/admin/news}',
+			'/admin/news/delete'=>'admin_handler.deleteform:{classname:tw_news}',
 			'images'=>'handler_news.many2one:{name:images.html}',
 			'images/show'=>'handler_news.show_images',
 			'img/show'=>'handler_news.show_images',
-			'many2one'=>'handler_news.many2one:{name:many2one.html}',
-			'form/tw_news_images'=>'gs_base_handler.postform:{name:form.html:classname:tw_news_images}',
+			'/admin/form/tw_news_images'=>'gs_base_handler.postform:{name:form.html:classname:tw_news_images}',
 		),
 	);
 	return self::add_subdir($data);
@@ -54,41 +53,7 @@ class module_news implements gs_module {
 }
 
 class handler_news extends gs_base_handler {
-	function deleteform() {
-		$id=intval($this->data['gspgid_va'][0]);
-		$res=preg_replace("|/delete/\d+|is","//",$this->data['gspgid']);
-		$rs=new tw_news;
-		$rec=$rs->get_by_id($id);
-		$rec->delete();
-		$rec->commit();
-		return html_redirect($res);
-	}
-
-	function many2one() {
-		 if ($this->data['gspgid_va'][4]=='delete') {
-			$rid=intval($this->data['gspgid_va'][5]);
-			$rs_name=$this->data['gspgid_va'][0];
-			$rs=new $rs_name;
-			$rec=$rs->get_by_id($rid);
-			if ($rec) {
-				$rec->delete();
-				$rec->commit();
-			}
-			$res=preg_replace("|/delete/\d+|is","//",$this->data['gspgid']);
-			return html_redirect($res);
-		 }
-		 $params=array(
-			  $this->data['gspgid_va'][1]=>$this->data['gspgid_va'][2],
-		 );
-		 $url=$this->data['gspgid_va'][0].'/'.$this->data['gspgid_va'][1].'/'.$this->data['gspgid_va'][2].'/'.$this->data['gspgid_va'][3];
-		 if ($this->data['gspgid_va'][2]==0) {
-			   $params[$this->data['gspgid_va'][1].'_hash']=$this->data['gspgid_va'][3];
-			  }
-		 $tpl=gs_tpl::get_instance();
-		 $tpl->assign('url',$url);
-		 $tpl->assign('params',$params);
-		 parent::show();
-	}
+	
  function show_images() {
 		 $rs_name=$this->data['gspgid_va'][0];
 		 $size=$this->data['gspgid_va'][1];
@@ -118,28 +83,15 @@ class tw_news extends gs_recordset_short {
 	}
 }
 
-class tw_news_images extends gs_recordset_short {
-		function __construct($init_opts=false) {
-				parent::__construct(array(
-				'file'=>"fFile verbose_name='File' required=false ",
-				'Parent'=>"lOne2One tw_news mode=link",
-				),$init_opts);
-				$this->structure['fkeys']=array(
-										array('link'=>'Parent','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
-										);
-		}
-		function record_as_string($rec) {
-				if (strpos($rec->file_mimetype,'image')===0) {
-						$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname(__FILE__).'/'),'/');
-						$www_subdir=trim(cfg('www_dir').$subdir.'/','/');
-						$www_subdir=$www_subdir ? "/$www_subdir/" : '/';
-						$name=parent::record_as_string($rec);
-						return sprintf('<img src="/img/show/tw_news_images/50/%d" alt="%s">',$rec->get_id(),$name);
-				}
-				return parent::record_as_string($rec);
-		}
+class tw_news_images extends tw_images {
+	function __construct($init_opts=false) {
+		$this->fields['Parent']="lOne2One tw_news mode=link";
+		parent::__construct($this->fields,$init_opts);
+		$this->structure['fkeys']=array(
+			array('link'=>'Parent','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
+		);
+	}
 }
-
 
 
 
