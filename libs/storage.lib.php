@@ -49,8 +49,15 @@ function new_rs($classname) {
 }
 
 
+define ('RS_STATE_NULL',0);
+define ('RS_STATE_UNLOADED',1);
+define ('RS_STATE_COUNTED',2);
+define ('RS_STATE_LOADED',4);
+
 abstract class gs_recordset_base extends gs_iterator {
 	const superadmin = 0;
+	public $state=RS_STATE_NULL;
+	private $query_options=array();
 	private $gs_recordset_classname;
 	private $gs_connector;
 	private $gs_connector_id;
@@ -201,22 +208,59 @@ abstract class gs_recordset_base extends gs_iterator {
          $rs->find_records($options);
          return $rs;
 	}
+	
+	
+	function preload() {
+		if ($this->state==RS_STATE_UNLOADED || $this->state==RS_STATE_COUNTED) {
+			$this->load_records();
+		}
+	}
+
+	function valid() {
+		$this->preload();
+		return parent::valid();
+	}
+
+	function count() {
+		if ($this->state==RS_STATE_UNLOADED) {
+			$cnt=$this->count_records($this->query_options['options']);
+			$this->array=$cnt>0 ? array_fill(0,$cnt,NULL) : array();
+			$this->state=RS_STATE_COUNTED;
+		}
+		return parent::count();
+	}
 
 
 
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
-		$options=$this->string2options($options);
-		$index_field_name = is_string($index_field_name) ? $index_field_name : $this->id_field_name;
+		$this->query_options['options']=$this->string2options($options);
+		$this->query_options['index_field_name'] = is_string($index_field_name) ? $index_field_name : $this->id_field_name;
+		$this->query_options['fields']=$fields;
+		//$this->query_options['loaded_fields']=is_array($this->query_options['loaded_fields']) ? array_merge($fields,$this->query_options['loaded_fields']) : $fields;
 		$this->reset();
+		$this->state=RS_STATE_UNLOADED;
+		return $this;
+	}
+	public function load_records($fields=NULL) {
+		$options=$this->query_options['options'];
+		$index_field_name=$this->query_options['index_field_name'];
+		$fields=$fields ? array_merge($fields,array($index_field_name)) : $this->query_options['fields'];
+
+		if(!$fields) $fields=array($index_field_name);
 		$this->get_connector()->select($this,$options,$fields);
 		$ret=NULL;
-		$records=array();
+		$records=$this->state==RS_STATE_LOADED ? $this->array : array();
 		$res=$this->get_connector()->fetchall();
 		foreach ($res as $r) {
-
 			/*
 			$record=gs_recfabric::get_record($this,$fields,$r);
 			*/
+			if ($this->state==RS_STATE_LOADED) {
+				if(isset($records[$r[$index_field_name]])) {
+					$records[$r[$index_field_name]]->fill_values($r);
+				}
+				continue;
+			} 
 			$record=new gs_record($this,$fields);
 			$record->fill_values($r);
 			$record->recordstate = RECORD_UNCHANGED;
@@ -225,6 +269,7 @@ abstract class gs_recordset_base extends gs_iterator {
 			else $records[$record->$index_field_name]=$record;
 		}
 		if (isset($records)) $this->replace($records);
+		$this->state=RS_STATE_LOADED;
 		return $this;
 	}
 	public function count_records($options=null) {
@@ -348,6 +393,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	public function fill_values($obj,$data) {
 	}
 	public function current() {
+		$this->preload();
 		return ($r=parent::current()) ? $r : new gs_null(GS_NULL_XML);
 	}
 

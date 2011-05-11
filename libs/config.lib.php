@@ -221,7 +221,7 @@ function md($output,$type=false)
 		$log->log($output);
 	}
 }
-final class gs_logger {
+class gs_logger {
 	
 	private $messages=array();	
 	static function &get_instance()

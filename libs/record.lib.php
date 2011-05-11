@@ -93,7 +93,7 @@ class gs_record implements arrayaccess {
 		*/
 		if (!is_array($values)) return FALSE;
 		foreach ($values as $field=>$value) {
-			if ($this->__get($field)!==NULL && isset($this->recordsets_array[$field]) && $this->recordsets_array[$field] && is_array($value) ) {
+			if (isset($this->recordsets_array[$field]) && $this->recordsets_array[$field] && is_array($value) && $this->__get($field)!==NULL) {
 				$struct=$this->get_recordset()->structure['recordsets'][$field];
 				$local_field_name=$this->__get($field)->local_field_name;
 
@@ -220,6 +220,10 @@ class gs_record implements arrayaccess {
 	public function __get($name) {
 		if (array_key_exists($name,$this->values)) return $this->values[$name];
 		if (isset($this->gs_recordset->structure['recordsets'][$name])) return $this->lazy_load($name);
+		if(isset($this->get_recordset()->structure['fields'][$name]) && $this->get_recordset()->state==RS_STATE_LOADED) {
+			$this->get_recordset()->load_records(array($name));
+			if (array_key_exists($name,$this->values)) return $this->values[$name];
+		}
 		return new gs_null(GS_NULL_XML);
 	}
 

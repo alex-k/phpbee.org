@@ -72,6 +72,7 @@ class gs_base_handler {
 		$html=$tpl->fetch($this->params['name']);
 		echo $html;
 		if (DEBUG && !$nodebug) {
+			mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
 			$log=gs_logger::get_instance();
 			$txt2=$log->show();
 			if (trim($txt) || trim($txt2)) {
@@ -92,7 +93,6 @@ TXT;
 		$data=$this->data;
 		$id=isset($data['gspgid_va'][1]) ? $data['gspgid_va'][1] : null;
 		$classname=$params['classname'];
-
 		$obj=new $classname;
 		if (is_numeric($id)) {
 			$rec=$obj->get_by_id($id);
@@ -104,7 +104,6 @@ TXT;
 	}
 	static function get_form_for_record($rec,$params,$data) {
 		$h=$rec->get_recordset()->structure['htmlforms'];
-		
 		$hh=$h;
 		if (!isset($params['fields']) && isset($data['handler_params']['fields'])) $params['fields']=$data['handler_params']['fields'];
 		if(isset($params['fields'])) {

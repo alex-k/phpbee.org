@@ -327,7 +327,7 @@ class gs_widget_gallery extends gs_widget {
 		}
 }
 
-class gs_widget_alex_gal extends gs_widget {
+class gs_widget_iframe_gallery extends gs_widget {
 		function clean() {
 				return array('fake'=>true);
 		}
@@ -353,7 +353,7 @@ class gs_widget_alex_gal extends gs_widget {
 				
 
 
-				$s.=sprintf('<a href="alex_gal/%s/%s/%d/%s" target="gal_%s">%s</a>',
+				$s.=sprintf('<a href="/admin/news/iframe_gallery/%s/%s/%d/%s" target="gal_%s">%s</a>',
 						$this->params['options']['recordset'],
 						$this->params['options']['foreign_field_name'],
 						$rid,
@@ -366,6 +366,7 @@ class gs_widget_alex_gal extends gs_widget {
 				return $s;
 		}
 }
+class gs_widget_alex_gal extends gs_widget_iframe_gallery {}
 
 
 class gs_widget_private extends gs_widget {
