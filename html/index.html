@@ -1,11 +1,16 @@
 {*extends file="index_page.html"*}
 {block name="content"}
-{controller _class="tw_articles" _assign=arr _limit=20}
-{$arr->count()}
-{foreach from=$arr item=a}
-id:{$a.id}<br>
-name:{$a.name} {$a._ctime}<br>
-count_images:{$a.Images->count()}<br>
+
+{contr _class="tw_articles" _assign=arr _limit=20}
+{literal}
+id:{$arr.id}<br>
+name:{$arr.name}<br>
+ctime:{$arr._ctime}<br>
+mtime:{$arr._mtime}<br>
+{*count_images:{$arr.Images->count()}<br>*}
 <hr>
-{/foreach}
+{/literal}
+{/contr}
+
+
 {/block}
