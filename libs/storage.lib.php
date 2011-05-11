@@ -53,11 +53,12 @@ define ('RS_STATE_NULL',0);
 define ('RS_STATE_UNLOADED',1);
 define ('RS_STATE_COUNTED',2);
 define ('RS_STATE_LOADED',4);
+define ('RS_STATE_LATE_LOAD',8);
 
 abstract class gs_recordset_base extends gs_iterator {
 	const superadmin = 0;
 	public $state=RS_STATE_NULL;
-	private $query_options=array();
+	public $query_options=array();
 	private $gs_recordset_classname;
 	private $gs_connector;
 	private $gs_connector_id;
@@ -73,6 +74,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->db_tablename=$db_tablename;
 		$this->db_scheme=$db_scheme;
 		//$this->make_forms();
+		$this->query_options['late_load_fields']=array();
 	}
 	function make_forms() {
 		$htmlforms=array();
@@ -211,6 +213,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	
 	
 	function preload() {
+		var_dump('preload:'.rand());
 		if ($this->state==RS_STATE_UNLOADED || $this->state==RS_STATE_COUNTED) {
 			$this->load_records();
 		}
@@ -240,6 +243,10 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->reset();
 		$this->state=RS_STATE_UNLOADED;
 		return $this;
+	}
+	public function late_load_records() {
+		$this->load_records($this->query_options['late_load_fields']);
+		$this->query_options['late_load_fields']=array();
 	}
 	public function load_records($fields=NULL) {
 		$options=$this->query_options['options'];

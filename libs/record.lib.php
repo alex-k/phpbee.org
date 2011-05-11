@@ -220,6 +220,11 @@ class gs_record implements arrayaccess {
 	public function __get($name) {
 		if (array_key_exists($name,$this->values)) return $this->values[$name];
 		if (isset($this->gs_recordset->structure['recordsets'][$name])) return $this->lazy_load($name);
+
+		if(isset($this->get_recordset()->structure['fields'][$name]) && $this->get_recordset()->state==RS_STATE_LATE_LOAD) {
+			return $this->get_recordset()->query_options['late_load_fields'][$name]=$name;
+		}
+
 		if(isset($this->get_recordset()->structure['fields'][$name]) && $this->get_recordset()->state==RS_STATE_LOADED) {
 			$this->get_recordset()->load_records(array($name));
 			if (array_key_exists($name,$this->values)) return $this->values[$name];
