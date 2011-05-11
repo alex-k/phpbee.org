@@ -24,7 +24,7 @@
 		{foreach from=$list item="e"}
 		<tr class="{cycle values="odd,even"}">
 			<td>{$e.id}</td>
-			<td><a href="/admin/articles/root/{$e.id}">{$e.Name}</a></td>
+			<td><a href="/admin/articles/root/{$e.id}">{$e.name}</a></td>
 			<td class="cnt"><a href="/admin/articles/root/{$pid}/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
 			<td class="cnt"><a href="/admin/articles/root/{$pid}/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
 		</tr>

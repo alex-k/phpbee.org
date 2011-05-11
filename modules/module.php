@@ -10,13 +10,11 @@ class module implements gs_module {
 			'default'=>array(
 				'default'=>'gs_base_handler.show404:{name:404.html}',
 			),
-			'get'=>array(
+			'get_post'=>array(
 				''=>'gs_base_handler.show:{name:index.html}',
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
 				'/admin/menu'=>'admin_handler.show_menu',
 				'img/show'=>'images_handler.show',
-			),
-			'get_post'=>array(
 				'/admin/many2one'=>'admin_handler.many2one:{name:many2one.html}',
 				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
 			),

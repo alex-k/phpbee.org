@@ -4,7 +4,7 @@
 {include file="f_path.html" root=$item pid=$pid}&nbsp;&raquo;&nbsp;
 {/if}
 {if $pid!=$root.id}
-<a href="/admin/tw_articles/root/{$root.id}">{$root.Name}</a>
+<a href="/admin/tw_articles/root/{$root.id}">{$root.name}</a>
 {else}
-{$root.Name}
+{$root.name}
 {/if}

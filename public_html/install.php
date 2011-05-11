@@ -11,4 +11,13 @@ gs_fkey::update_fkeys();
 
 gs_logger::dump();
 
+$a=new tw_articles();
+for($i=0;$i<100;$i++) {
+	$r=$a->new_record(array('name'=>rand(),'description'=>str_repeat(md5(rand()),100)));
+	for ($j=0;$j<4;$j++) {
+		$r->Images->new_record(array('Name'=>rand()));
+	}
+	$r->commit();
+}
+
 ?>

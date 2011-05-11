@@ -18,7 +18,7 @@ class module_articles implements gs_module {
 	}
 	
 	function get_menu() {
-		return '<a href="/admin/articles">Статьи</a>';
+		return '<a href="/admin/articles/">Статьи</a>';
 	}
 	
 	static function get_handlers() {
@@ -30,7 +30,7 @@ class module_articles implements gs_module {
 			''=>'gs_base_handler.show:{name:articles.html}',
 			'*'=>'gs_base_handler.show:{name:articles_show.html}',
 			'/admin/articles'=>'gs_base_handler.show:{name:adm_articles.html:classname:tw_articles}',
-			'/admin/form/tw_articles'=>'gs_base_handler.postform:{name:form.html:form_class:g_forms_table:classname:tw_articles:href:/admin/articles:form_class:form_admin}',
+			'/admin/form/tw_articles'=>'gs_base_handler.postform:{name:form.html:form_class:g_forms_table:classname:tw_articles:href:/admin/articles/:form_class:form_admin}',
 			'/admin/articles/delete'=>'admin_handler.deleteform:{classname:tw_articles}',
 			'images'=>'admin_handler.many2one:{name:images.html}',
 			'/admin/form/tw_article_images'=>'gs_base_handler.postform:{name:form.html:classname:tw_article_images:form_class:form_admin}',
@@ -57,8 +57,8 @@ class module_articles implements gs_module {
 class tw_articles extends gs_recordset_short {
 	const superadmin = 1;
 	function __construct($init_opts=false) { parent::__construct(array(
-		'Name'=> "fString 'Название'",
-		'Description'=> "fText 'Содержание' widget=wysiwyg images_key=Images required=false",
+		'name'=> "fString 'Название'",
+		'description'=> "fText 'Содержание' widget=wysiwyg images_key=Images required=false",
 		'pid'=> "lOne2One tw_articles",
 		'Images'=> "lMany2One tw_article_images:Parent 'Картинки' widget=lMany2One",
 		'text_id'=> "fString 'Идентификатор статьи' required=false",

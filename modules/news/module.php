@@ -14,7 +14,7 @@ class module_news implements gs_module {
 	}
 	
 	function get_menu() {
-		return '<a href="/admin/news">Новости</a>';
+		return '<a href="/admin/news/">Новости</a>';
 	}
 	
 	static function get_handlers() {
@@ -32,6 +32,7 @@ class module_news implements gs_module {
 			'images/show'=>'handler_news.show_images',
 			'img/show'=>'handler_news.show_images',
 			'/admin/form/tw_news_images'=>'gs_base_handler.postform:{name:form.html:classname:tw_news_images}',
+			'/admin/news/iframe_gallery'=>'gs_base_handler.many2one:{name:iframe_gallery.html}',
 		),
 	);
 	return self::add_subdir($data);
@@ -76,7 +77,7 @@ class tw_news extends gs_recordset_short {
 		'date'=>"fDatetime дата",
 		'subject'=>"fString заголовок",
 		'text'=>"fText текст widget=wysiwyg images_key=Images",
-	'Images'=>"lMany2One tw_news_images:Parent 'Картинки' widget=lMany2One",
+		'Images'=>"lMany2One tw_news_images:Parent 'Картинки' widget=iframe_gallery",
 		'hot'=>"fCheckbox горячая",
 		'hidden'=>"fCheckbox спрятать",
 	),$init_opts);
@@ -91,6 +92,16 @@ class tw_news_images extends tw_images {
 			array('link'=>'Parent','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
 		);
 	}
+        function record_as_string($rec) {
+                if (strpos($rec->File_mimetype,'image')===0) {
+                        return sprintf('<img src="/img/show/%s" alt="%s" title="%s">',base64_encode(sprintf('tw_news_images/b/100/100/%d',$rec->get_id())),$rec->File_filename,$rec->File_filename);
+                }
+                return parent::record_as_string($rec);
+        }
+        public function __toString() {
+                return implode(' ',$this->recordset_as_string_array());
+        }
+
 }
 
 
