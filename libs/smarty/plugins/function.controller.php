@@ -102,7 +102,5 @@ function smarty_function_controller($params, &$smarty)
 	}
 	//$smarty->assign($params['_assign'],$vars);
 	$smarty->assign($params['_assign'],$ret);
-	return $ret;
-
 }
 ?>

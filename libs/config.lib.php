@@ -224,6 +224,9 @@ function md($output,$type=false)
 class gs_logger {
 	
 	private $messages=array();	
+	function __construct() {
+		$this->time_start=microtime(true);
+	}
 	static function &get_instance()
 	{
 		static $instance;
@@ -248,6 +251,7 @@ class gs_logger {
 		}
 	}
 	function show() {
+		mlog(sprintf('total time: %.4f seconds',microtime(TRUE)-$this->time_start));
 		$ret='';
 		if (is_array($this->messages)) foreach ($this->messages as $msg) {
 			ob_start();

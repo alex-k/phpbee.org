@@ -6,8 +6,13 @@ function smarty_block_contr($params, $content, $smarty, &$repeat) {
 	if(!$repeat) {
 		$ret='';
 		if (isset($content)) {
-			include_once('function.controller.php');
-			$rs=smarty_function_controller($params, $smarty);
+			if (isset($params['_recordset'])) {
+				$rs=$params['_recordset'];
+			} else {
+				include_once('function.controller.php');
+				smarty_function_controller($params, $smarty);
+				$rs=$smarty->getTemplateVars($params['_assign']);
+			}
 			$smarty->assign($params['_assign'],$rs->first());
 			$rs->state=RS_STATE_LATE_LOAD;
 			$smarty->fetch('string:'.$content);
