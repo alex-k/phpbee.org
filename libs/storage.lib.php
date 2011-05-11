@@ -213,7 +213,6 @@ abstract class gs_recordset_base extends gs_iterator {
 	
 	
 	function preload() {
-		var_dump('preload:'.rand());
 		if ($this->state==RS_STATE_UNLOADED || $this->state==RS_STATE_COUNTED) {
 			$this->load_records();
 		}
