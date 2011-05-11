@@ -1,16 +1,23 @@
 {*extends file="index_page.html"*}
 {block name="content"}
-
-{contr _class="tw_articles" _assign=arr _limit=20}
+{controller _class="tw_articles" _assign=arr _paging="pagenums:10"}
+{$arr_paging}
+<hr>
+{contr _recordset=$arr _assign=arr}
 {literal}
 id:{$arr.id}<br>
 name:{$arr.name}<br>
 ctime:{$arr._ctime}<br>
 mtime:{$arr._mtime}<br>
-{*count_images:{$arr.Images->count()}<br>*}
+count_images:{$arr.Images->count()}<br>
+	{foreach from=$arr.Images item=i}
+	{$i.id}/{$i._ctime} : 
+	{/foreach}
 <hr>
 {/literal}
 {/contr}
+<hr>
+{$arr_paging}
 
 
 {/block}
