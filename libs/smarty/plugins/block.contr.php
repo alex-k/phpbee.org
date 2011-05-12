@@ -17,7 +17,6 @@ function smarty_block_contr($params, $content, $smarty, &$repeat) {
 			$rs->state=RS_STATE_LATE_LOAD;
 			$smarty->fetch('string:'.$content);
 			$rs->late_load_records();
-
 			foreach ($rs as $rec) {
 				$smarty->assign($params['_assign'],$rec);
 				$ret.=$smarty->fetch('string:'.$content);

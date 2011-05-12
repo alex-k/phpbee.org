@@ -80,6 +80,7 @@ class gs_widget_wysiwyg extends gs_widget{
 				//$result=iconv('CP1251','UTF-8',$result);
 				if (function_exists ('tidy_parse_string')) {
 						$config = array('indent' => TRUE,
+								'show-body-only' => TRUE,
 								'output-xhtml' => TRUE,
 								);
 						$tidy = tidy_parse_string($this->value, $config, 'UTF8');
@@ -292,7 +293,13 @@ class gs_widget_lMany2One extends gs_widget {
 		$rid_name=$this->params['options']['local_field_name'];
 		$rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
 		$hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
-		$s=sprintf('<a href="/admin/many2one/%s/%s/%d/%s" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;" id="lMany2One_%s">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,$hash,$this->params['linkname'],gs_dict::get('LOAD_RECORDS'));
+		$s=sprintf('<a href="/admin/many2one/%s/%s/%d/%s" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;" id="lMany2One_%s">%s</a>',
+		$this->params['options']['recordset'],
+		$this->params['options']['foreign_field_name'],
+		$rid,
+		$hash,
+		$this->params['linkname'],
+		gs_dict::get('LOAD_RECORDS'));
 		$s.=sprintf('<input type="hidden" name="%s" value="%s">', $this->params['linkname'].'_hash',$hash);
 		return $s;
 	}
@@ -351,14 +358,13 @@ class gs_widget_iframe_gallery extends gs_widget {
 				}
 				$s.='<div class="clear"></div></div>';
 				
-
-
-				$s.=sprintf('<a href="/admin/news/iframe_gallery/%s/%s/%d/%s" target="gal_%s">%s</a>',
+				$s.=sprintf('<a href="/admin/news/iframe_gallery/%s/%s/%d/%s" target="gal_%s" id="lMany2One_%s">%s</a>',
 						$this->params['options']['recordset'],
 						$this->params['options']['foreign_field_name'],
 						$rid,
 						$hash,
 						$hash,
+						$this->params['linkname'],
 						$this->params['linkname'],
 						gs_dict::get('GALLERY_MANAGE_RECORDS'));
 				$s.='<iframe name="gal_'.$hash.'" class="gallery_ifr" id="gal_'.$hash.'" frameBorder="0"></iframe>';

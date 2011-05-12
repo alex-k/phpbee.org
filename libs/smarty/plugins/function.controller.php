@@ -77,8 +77,17 @@ function smarty_function_controller($params, &$smarty)
 	if (isset($_offset) && $limit) $options[]=array('type'=>'offset','value'=>$_offset);
 	if (isset($params['_orderby']) && trim($params['_orderby'])) $options['orderby']=array('type'=>'orderby','value'=>$params['_orderby']);
 
-	$fields=(isset($params['_fields'])) ? $params['_fields'] : NULL;
-	$ret=$obj->find_records($options,$fields);
+	$fields=(isset($params['_fields'])) ? (!is_array( $params['_fields'])) ? explode(",", $params['_fields']) :  $params['_fields'] : NULL;
+	
+	if (!isset($params['_count'])) {
+			if (!isset($params['_index_field_name'])) {
+				$ret=$obj->find_records($options,$fields);
+			} else {
+				$ret=$obj->find_records($options,$fields,$params['_index_field_name']);
+			}
+	} else {
+		$ret=$obj->count_records($options);
+	}
 	//$vars=$ret->get_values();
 	if (isset($params['_assign_type']) && $params['_assign_type']=='plain') {
 		$ret=$ret->current();
@@ -86,7 +95,7 @@ function smarty_function_controller($params, &$smarty)
 		if (!$ret) return;
 
 		$vars=$ret->get_values();
-		if ($params['_skip_filled'] && is_array($vars)) {
+		if (isset($params['_skip_filled']) && $params['_skip_filled'] && is_array($vars)) {
 			$tpl_vars=$smarty->getTemplateVars();
 			foreach ($vars as $k=>$v) {
 				if (isset($tpl_vars[$k])) unset($vars[$k]);
