@@ -55,7 +55,9 @@ var lwRTE = function (textarea, options) {
 	this.iframe		= null;
 	this.iframe_doc	= null;
 	this.textarea	= null;
-	this.images_link= $('#'+textarea.getAttribute('_images')).get(0).href.replace('many2one','images');
+	if($('#'+textarea.getAttribute('_images')).length) {
+		this.images_link= $('#'+textarea.getAttribute('_images')).get(0).href.replace('many2one','images');
+	}
 	this.event		= null;
 	this.range		= null;
 	this.toolbars	= {rte: '', html : ''};
