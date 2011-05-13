@@ -218,6 +218,7 @@ class gs_record implements arrayaccess {
 
 
 	public function __get($name) {
+		//var_dump($name.":".$this->gs_recordset->state);
 		if (array_key_exists($name,$this->values)) return $this->values[$name];
 		if (isset($this->gs_recordset->structure['recordsets'][$name])) return $this->lazy_load($name);
 

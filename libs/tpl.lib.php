@@ -1,6 +1,7 @@
 <?php
 
 final class gs_tpl {
+	private  $_tpl_arr;
 	
 	protected function init()
 	{

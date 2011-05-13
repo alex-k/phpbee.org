@@ -22,7 +22,8 @@ function smarty_function_handler($params, &$smarty) {
 	$tpl->assign('gspgid_root',$data['gspgid_root']);
 	$tpl->assign('handler_params',$params);
 
-	$o_p=new gs_parser($data);
+	$o_p=gs_parser::get_instance($data);
+	//$o_p=new gs_parser($data);
 	return $o_p->process();
 }
 ?>

@@ -6,13 +6,30 @@ class gs_parser {
 	private $data;
 	private $registered_handlers;
 	private $current_handler;
-	
-	function __construct($data)
+
+	static function &get_instance($data)
 	{
+		static $instance;
+		if (!isset($instance)) {
+			$instance = new gs_parser();
+		}
+		$instance->prepare($data);
+		return $instance;
+	}
+	
+	function __construct($data=null)
+	{
+		if($data) $this->data=$data;
+		$this->get_handlers_data=$this->get_handlers();
+		$this->registered_handlers=$this->parse_handlers_data($this->get_handlers_data);
+		if ($data) {
+			$this->prepare($data);
+		}
+	}
+	function prepare($data) {
 		$data['gspgid']=trim($data['gspgid'],'/');
 		$this->data=$data;
-		$this->registered_handlers=$this->get_handlers();
-		$result=$this->registered_handlers->xpath($data['gspgid']);
+		$result=$this->registered_handlers[$data['gspgtype']]->xpath($data['gspgid']);
 		$this->current_handler=$result->get_handler();
 		$data['handler_key']=$result->handler_key;
 		$data['gspgid_v']=ltrim(preg_replace("|$result->handler_key|",'',$data['gspgid'],1),'/');
@@ -72,16 +89,19 @@ class gs_parser {
 		}
 		krsort ($data['get']);
 		krsort ($data['post']);
-		return $this->parse_handlers_data($data);
+		return $data;
 	}
 	
 	
 	private function parse_handlers_data($data)
 	{
-		$root=new gs_node('root');
-		$this->parse_handler_for_type($root,'default',$data['default']);
-		$this->parse_handler_for_type($root,$this->data['gspgtype'],$data[$this->data['gspgtype']]);
-		return $root;
+		$ret=array();
+		foreach (array('default','get','post') as $type) {
+			$root=new gs_node('root');
+			$this->parse_handler_for_type($root,$type,$data[$type]);
+			$ret[$type]=$root;
+		}
+		return $ret;
 	}
 	
 	private function parse_handler_for_type(&$node,$type,$data)

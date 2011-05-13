@@ -62,10 +62,10 @@ class gs_base_handler {
 		$tpl->assign('_gsparams',$this->params);
 
 
-		if (!$tpl->templateExists($this->params['name'])) {
-			md($this->data,1);
-			md($this->params,1);
-			throw new gs_exception('gs_base_handler.show: can not find template file for '.$this->params['name']);
+		if (isset($this->data['handler_params'])) {
+			$html=$tpl->fetch($this->params['name']);
+			echo $html;
+			return;
 		}
 		$txt=ob_get_contents();
 		ob_end_clean();
