@@ -16,6 +16,9 @@ function smarty_function_handler($params, &$smarty) {
 
 	$tpl=gs_tpl::get_instance();
 
+	if (isset($params['_record'])) {
+		$tpl->assign('_record',$params['_record']);
+	}
 	$tpl->assign('gspgdata_form',$data);
 	$tpl->assign('gspgid_form',$data['gspgid']);
 	$tpl->assign('gspgid_handler',$data['gspgid_handler']);

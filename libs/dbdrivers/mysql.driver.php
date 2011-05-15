@@ -19,7 +19,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	
 	function __destruct() {
 		if (DEBUG) {
-			var_dump($this->stats);
+			//var_dump($this->stats);
 		}
 	}
 

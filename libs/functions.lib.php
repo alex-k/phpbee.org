@@ -155,4 +155,14 @@ function xml_print($xml) {
         return $dom->saveXML();
 }
 
+/**
+* Compatible functions 
+**/
+
+if (PHP_VERSION_ID>=50300) {
+	function mb_split($pattern, $string , $limit = -1) {
+		return preg_split(sprintf("/%s/",preg_quote($pattern)), $string , $limit);
+	}
+}
+
 ?>
