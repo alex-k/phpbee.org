@@ -63,9 +63,15 @@ class gs_base_handler {
 
 
 		if (isset($this->data['handler_params'])) {
-			$html=$tpl->fetch($this->params['name']);
-			echo $html;
-			return;
+			try {
+				$html=$tpl->fetch($this->params['name']);
+				echo $html;
+				return;
+			} catch (gs_exception $e) {
+				var_dump($this->params);
+				var_dump($this->data);
+				throw $e;
+			}
 		}
 		$txt=ob_get_contents();
 		ob_end_clean();

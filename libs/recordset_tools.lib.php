@@ -191,7 +191,7 @@ class field_interface {
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 	}
 	static function lOne2One($field,$opts,&$structure,$init_opts) {
-		$fname=$field.'_id';
+		$fname=isset($opts['local_field_name']) ? $opts['local_field_name'] : $field.'_id';
 		$structure['fields'][$fname]=array('type'=>'int');
 		if (isset($opts['mode']) && $opts['mode']=='link') {
 			$structure['fields'][$fname.'_hash']=array('type'=>'varchar','options'=>16);
@@ -228,7 +228,7 @@ class field_interface {
 		$obj_rs=$obj->structure['recordsets'][$linkname];
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$rname,
-			'local_field_name'=>'id',
+			'local_field_name'=>isset($opts['local_field_name']) ? $opts['local_field_name'] : 'id',
 			'foreign_field_name'=>$obj_rs['local_field_name'],
 			'type'=>'many',
 			'mode'=>isset($obj_rs['mode']) ? $obj_rs['mode'] : null,
@@ -435,8 +435,10 @@ class gs_recordset_short extends gs_recordset {
 		if (!$this->gs_connector_id) $this->gs_connector_id=key(cfg('gs_connectors'));
 		$this->structure['fields'][$this->id_field_name]=array('type'=>'serial');
 		$this->selfinit($s);
-		$this->structure['fields']['_ctime']=array('type'=>'date');
-		$this->structure['fields']['_mtime']=array('type'=>'date');
+		if(!isset($this->no_ctime) || !$this->no_ctime) {
+			$this->structure['fields']['_ctime']=array('type'=>'date');
+			$this->structure['fields']['_mtime']=array('type'=>'date');
+		}
 		parent::__construct($this->gs_connector_id,$this->table_name);
 	}
 

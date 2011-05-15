@@ -109,7 +109,12 @@ function smarty_function_controller($params, &$smarty)
 		return;
 
 	}
-	//$smarty->assign($params['_assign'],$vars);
+	if (isset($params['_assign_type']) && $params['_assign_type']=='first') {
+		$ret=$ret->current();
+		if (isset($params['_assign'])) $smarty->assign($params['_assign'],$ret);
+		return;
+	}
+
 	$smarty->assign($params['_assign'],$ret);
 }
 ?>
