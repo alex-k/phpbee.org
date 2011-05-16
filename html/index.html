@@ -1,10 +1,22 @@
 {*extends file="index_page.html"*}
 {block name="content"}
-{controller _class="tw_articles" _assign=arr _paging="pagenums:10"}
-{$arr_paging}
+{controller _class="tw_transactions" _assign=narr _limit=10 transactionAmount='>100' transactionDate='>2009-01-01,<2009-02-01'}
 <hr>
-{contr _recordset=$arr _assign=arr}
+{contr _recordset=$narr _assign=arr}
 {literal}
+<pre>
+
+		transactionMerchantID:{$arr.transactionMerchantID}
+		transactionDate:{$arr.transactionDate}
+		transactionType:{$arr.transactionType}
+		transactionStatus:{$arr.transactionStatus}
+		transactionAmount:{$arr.transactionAmount}
+		transactionProfit:{$arr.transactionProfit}
+		customerFullName:{$arr->Customer->first()->customerFullName}
+		customerCardNumber:{$arr->Customer->first()->customerCardNumber}
+
+</pre>
+{*
 id:{$arr.id}<br>
 name:{$arr.name}<br>
 ctime:{$arr._ctime}<br>
@@ -13,11 +25,15 @@ count_images:{$arr.Images->count()}<br>
 	{foreach from=$arr.Images item=i}
 	{$i.id}/{$i._ctime} : 
 	{/foreach}
+{handler gspgid="/a/`$arr.id`"}
+*}
 <hr>
+
 {/literal}
 {/contr}
+
 <hr>
-{$arr_paging}
+{$narr_paging}
 
 
 {/block}
