@@ -230,6 +230,19 @@ class gs_record implements arrayaccess {
 			$this->get_recordset()->load_records(array($name));
 			if (array_key_exists($name,$this->values)) return $this->values[$name];
 		}
+		/*
+		$cname=get_class($this->get_recordset()).'_'.$name;
+		if(class_exists($cname) && is_subclass_of($cname,'gs_recordset_base') && property_exists($cname,'parent_id_name')) {
+			$this->get_recordset()->structure['recordsets'][$name]=array(
+				'recordset' => $cname,
+				'local_field_name' => $this->get_recordset()->id_field_name,
+				'foreign_field_name' => $cname::$parent_id_name,
+				'type' => 'many',
+				'mode' => 'link',
+			);
+			return $this->__get($name);
+		}
+		*/
 		return new gs_null(GS_NULL_XML);
 	}
 
