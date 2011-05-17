@@ -1,8 +1,8 @@
 <?php
 
 abstract class gs_base_module {
-	static function add_subdir($data) {
-		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',clean_path(dirname(__file__)).'/'),'/');
+	static function add_subdir($data,$dir) {
+		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',clean_path($dir).'/'),'/');
 		$d=array();
 		foreach($data as $k=>$a) {
 			foreach($a as $t=>$v) {
@@ -18,7 +18,7 @@ abstract class gs_base_module {
 	
 }
 
-class module implements gs_module {
+class module extends gs_base_module implements gs_module {
 	function __construct() {}
 	
 	function install() {}
@@ -40,22 +40,7 @@ class module implements gs_module {
 				'b'=>'gs_base_handler.show',
 			),
 		);
-		return self::add_subdir($data);
-	}
-	
-	static function add_subdir($data) {
-		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',clean_path(dirname(__file__)).'/'),'/');
-		$d=array();
-		foreach($data as $k=>$a) {
-			foreach($a as $t=>$v) {
-				if (strpos($t,'/')===0) {
-					$d[$k][trim($t,'/')]=$v;
-				} else {
-					$d[$k][ltrim($subdir.'/'.$t,'/')]=$v;
-				}
-			}
-		}
-		return $d;
+		return self::add_subdir($data,dirname(__file__));
 	}
 }
 
