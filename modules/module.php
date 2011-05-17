@@ -1,5 +1,23 @@
 <?php
 
+abstract class gs_base_module {
+	static function add_subdir($data) {
+		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',clean_path(dirname(__file__)).'/'),'/');
+		$d=array();
+		foreach($data as $k=>$a) {
+			foreach($a as $t=>$v) {
+				if (strpos($t,'/')===0) {
+					$d[$k][trim($t,'/')]=$v;
+				} else {
+					$d[$k][rtrim($subdir.'/'.$t,'/')]=$v;
+				}
+			}
+		}
+		return $d;
+	}
+	
+}
+
 class module implements gs_module {
 	function __construct() {}
 	
@@ -15,8 +33,11 @@ class module implements gs_module {
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
 				'/admin/menu'=>'admin_handler.show_menu',
 				'img/show'=>'images_handler.show',
+				'img/s'=>'images_handler.s',
 				'/admin/many2one'=>'admin_handler.many2one:{name:many2one.html}',
 				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
+				'a'=>'gs_base_handler.show',
+				'b'=>'gs_base_handler.show',
 			),
 		);
 		return self::add_subdir($data);
@@ -44,22 +65,35 @@ class images_handler extends gs_base_handler {
 		$data=preg_replace("|\..+|is","",$data);
 		$data=explode("/",$data);
 		$method=array(
-			'w'=>'use_width',
-			'h'=>'use_height',
-			'b'=>'use_box',
-			'f'=>'use_fields',
-			'c'=>'use_crop',
-		);
+			    'w'=>'use_width',
+			    'h'=>'use_height',
+			    'b'=>'use_box',
+			    'f'=>'use_fields',
+			    'c'=>'use_crop',
+			);
 		$rec=new $data[0]();
 		$rec=$rec->get_by_id($data[4]);
 		$gd=new vpa_gd($rec->File_data,false);
-		if ($data[2]>0) {
+		if ($data[2]>0  && ($data[2]<$rec->File_width || $data[2]<$rec->File_height)) {
 			$gd->set_bg_color(255,255,255);
 			$gd->resize($data[2],$data[3],$method[$data[1]]);
 		}
 		$gd->show();
 		exit();
 	}
+	function s() {
+		$data=$this->data['gspgid_va'];
+		$rec=new $data[0]();
+		$rec=$rec->get_by_id($data[2]);
+		$gd=new vpa_gd($rec->File_data,false);
+		if ($data[1]>0 && $data[1]<max($rec->File_width,$rec->File_height)) {
+			$gd->set_bg_color(255,255,255);
+			$gd->resize($data[1],$data[1],'use_box');
+		}
+		$gd->show();
+		exit();
+	}
+
 }
 
 
@@ -70,7 +104,7 @@ class admin_handler extends gs_base_handler {
 		$menu=array();
 		if (is_array($modules)) foreach ($modules as $m) {
 			$mod=new $m;
-			if (method_exists($mod,'get_menu')) {
+			if (method_exists($mod,'get_menu') && $mod->get_menu()) {
 				$menu[]=$mod->get_menu();
 			}
 		}
