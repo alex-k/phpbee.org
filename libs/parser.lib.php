@@ -51,10 +51,17 @@ class gs_parser {
 			}
 			if (!class_exists($handler['class_name'],FALSE)) throw new gs_exception('gs_parser.process: Handler class not exists '.$handler['class_name']);
 			if (!method_exists($handler['class_name'],$handler['method_name'])) throw new gs_exception('gs_parser.process: Handler class method not exists '.$handler['class_name'].'.'.$handler['method_name']);
+			$module_name=$handler['params']['module_name'];
+			if (call_user_func(array($module_name, 'admin_auth'),$this->data,$handler['params'])===false) return false;
+			if (method_exists($handler['params']['module_name'],'auth')) {
+				
+				$ret=call_user_func(array($module_name, 'auth'),$this->data,$handler['params']);
+				if ($ret===false) return false;
+			}
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
 			//return $o_h->{$handler['method_name']}($this->data);
 			$ret=$o_h->{$handler['method_name']}();
-			if($ret===false) return $ret;
+			if($ret===false) return false;
 		}
 		return $ret;
 	}
@@ -239,10 +246,9 @@ class gs_node {
 				return $child;
 			}
 		}
-		
 		foreach ($this->childs as $i => $child)
 		{
-			if (!empty($name) && $child->name=='*') {
+			if (strlen($name) && $child->name=='*') {
 				return $child;
 			}
 		}
