@@ -16,6 +16,15 @@ abstract class gs_base_module {
 		return $d;
 	}
 	
+	static function admin_auth($data,$params) {
+		if (strpos($data['gspgid'],'admin')===0) {
+			if(in_array($_SERVER['REMOTE_ADDR'],array('127.0.0.1'))) return true;
+			$o=new admin_handler($data,array('name'=>'auth_error.html'));
+			$o->show();
+			return false;
+		}
+		return true;
+	}
 }
 
 class module extends gs_base_module implements gs_module {
@@ -96,6 +105,11 @@ class admin_handler extends gs_base_handler {
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('menu',$menu);
 		return $tpl->fetch('admin_menu.html');
+	}
+	
+	function show() {
+		parent::show();
+		return false;
 	}
 	
 	function deleteform() {
