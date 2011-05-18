@@ -220,7 +220,8 @@ abstract class gs_recordset_base extends gs_iterator {
 	
 	function first($create_record_if_null=false) {
 		$rec=parent::first();
-		return ($rec) ? $rec : $this->new_record($this->query_options['options']);
+		if ($rec) return $rec;
+		return $create_record_if_null ? $this->new_record($this->query_options['options']) : new gs_null(GS_NULL_XML);
 	}
 
 	function valid() {
