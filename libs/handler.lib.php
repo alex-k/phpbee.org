@@ -19,12 +19,14 @@ class gs_base_handler {
 		else 
 			$tpl->template_dir = cfg('lib_modules_dir')."/$subdir/templates";
 		$tpl->assign('tpl',$this);
+		$tpl->assign('_gssession',gs_session::load());
 		$tpl->assign('_module_subdir',$subdir);
 		$tpl->assign('subdir',$subdir);
 		$tpl->assign('www_subdir',$www_subdir);
 		$tpl->assign('root_dir',cfg('root_dir'));
 		$this->subdir=$subdir;
 		$this->www_subdir=$www_subdir;
+		
 
 		$this->register_blocks();
 	}

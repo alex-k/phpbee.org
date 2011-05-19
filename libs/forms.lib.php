@@ -155,6 +155,7 @@ abstract class g_forms implements g_forms_interface{
 			$wclass='gs_widget_'.$wclass;
 			$h['gs_form_params']=$this->params;
 			$w =new $wclass($k,$this->data,$h);
+			$value=null;
 			try {
 				$value=$w->clean();
 				if (is_array($value) && !is_numeric(key($value))) {
