@@ -38,7 +38,7 @@ var	rte_toolbar = {
 	<option value="<h6>">Header 6</options>\
 </select>\
 	', tag_cmp: lwrte_block_compare, tags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']},
-	font			: {command: 'fontname', select: '\
+	/*font			: {command: 'fontname', select: '\
 <select>\
 	<option value="">- font -</option>\
 	<option value="arial">Arial</option>\
@@ -63,7 +63,7 @@ var	rte_toolbar = {
 	<option value="6">6 (18pt)</option>\
 	<option value="7">7 (20pt)</options>\
 </select>\
-	', tags: ['font']},
+	', tags: ['font']},*/
 	style			: {exec: lwrte_style, init: lwrte_style_init},
 	color			: {exec: lwrte_color},
 	image			: {exec: lwrte_image, tags: ['img'] },
@@ -182,7 +182,9 @@ function lwrte_color(){
 				if(self.iframe_doc.selection) //IE fix for lost focus
 					self.range.select();
 
-				self.editor_cmd('foreColor', value);
+				//self.editor_cmd('foreColor', value);
+				var ht=self.get_selected_html();
+				self.selection_insert('<span style="color:'+value+'">'+ht+'</span>');
 			}
 					
 			panel.remove(); 
