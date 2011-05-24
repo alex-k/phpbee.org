@@ -165,7 +165,7 @@ class gs_iterator implements Iterator, arrayaccess {
     }
 
     function valid() {
-        return current($this->array);
+		return current($this->array);
     }
     public function offsetSet($offset, $value) {
         $this->array[$offset] = $value;

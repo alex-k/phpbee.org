@@ -154,11 +154,19 @@ TXT;
 				break;
 				case 'lMany2One':
 						if ($v['hidden']=='true') continue;
+						if (isset($v['widget'])) {
+							$dclass='gs_data_widget_'.$v['widget'];
+							if (class_exists($dclass)) {
+								$d=new $dclass();
+								$hh=$d->gd($rec,$k,$hh,$params,$data);
+							}
+						}
 						if (!empty($v['widget'])) {
 							break;
 						}
 						$nrs=$rec->$k;
 						$nrs->new_record();
+
 						foreach($nrs as $nobj) {
 							$f=self::get_form_for_record($nobj,$params,$data);
 							$forms=$f->htmlforms;
@@ -208,6 +216,7 @@ TXT;
 		//echo $tpl->fetch($this->params['name']);
 		return $tpl->fetch($this->params['name']);
 	}
+
 	function postform() {
 		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
 

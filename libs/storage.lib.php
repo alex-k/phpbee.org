@@ -108,6 +108,7 @@ abstract class gs_recordset_base extends gs_iterator {
 
 
 	public function new_record($values=NULL,$id=NULL) {
+		$this->preload();
 		$rec=new gs_record($this,'',RECORD_NEW);
 		$rec->fill_values($values);
 		//$this->add_element($rec,$id);

@@ -334,6 +334,30 @@ class gs_widget_gallery extends gs_widget {
 		}
 }
 
+class gs_data_widget_include_form {
+	
+	function gd($rec,$k,$hh,$params,$data) {
+		$nrs=$rec->$k;
+		$nrs->first(true);
+
+		foreach($nrs as $nobj) {
+			$f=gs_base_handler::get_form_for_record($nobj,$params,$data);
+			$forms=$f->htmlforms;
+			$i=intval($nobj->get_id());
+			foreach($forms as $fk=>$fv) {
+				$pfx_key="$k:$i:$fk";
+				$key="$k:$fk";
+				$hh[$pfx_key]=$fv;
+				if(isset($data['handler_params'][$key])) {
+					$data['handler_params'][$pfx_key]=$data['handler_params'][$key];
+				}
+			}
+		}
+		unset($hh[$k]);
+		return $hh;
+	}
+}
+
 class gs_widget_iframe_gallery extends gs_widget {
 		function clean() {
 				return array('fake'=>true);
