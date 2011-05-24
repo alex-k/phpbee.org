@@ -9,7 +9,7 @@ abstract class gs_base_module {
 				if (strpos($t,'/')===0) {
 					$d[$k][trim($t,'/')]=$v;
 				} else {
-					$d[$k][rtrim($subdir.'/'.$t,'/')]=$v;
+					$d[$k][trim($subdir.'/'.$t,'/')]=$v;
 				}
 			}
 		}
@@ -59,12 +59,12 @@ class images_handler extends gs_base_handler {
 		$data=preg_replace("|\..+|is","",$data);
 		$data=explode("/",$data);
 		$method=array(
-			    'w'=>'use_width',
-			    'h'=>'use_height',
-			    'b'=>'use_box',
-			    'f'=>'use_fields',
-			    'c'=>'use_crop',
-			);
+			'w'=>'use_width',
+			'h'=>'use_height',
+			'b'=>'use_box',
+			'f'=>'use_fields',
+			'c'=>'use_crop',
+		);
 		$rec=new $data[0]();
 		$rec=$rec->get_by_id($data[4]);
 		$gd=new vpa_gd($rec->File_data,false);
