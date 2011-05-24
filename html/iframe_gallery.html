@@ -9,7 +9,7 @@ var g=top.window.document.getElementById('gal_{$_gsdata.gspgid_va[3]}');
 var s='';
 {if count($list)}
 {foreach from=$list item="im"}
-s+='<div style="float:left; position:relative;">{$im}<a href="{$www_subdir}alex_gal/{$url}/delete/{$im.id}" class="del_img_ico" target="gal_{$_gsdata.gspgid_va[3]}"><img src="/i/dialog-close.png" alt="Удалить" title="Удалить"></a></div>';
+s+='<div style="float:left; position:relative;">{$im}<a href="/admin{$www_subdir}iframe_gallery/{$url}/delete/{$im.id}" class="del_img_ico" target="gal_{$_gsdata.gspgid_va[3]}"><img src="/i/dialog-close.png" alt="Удалить" title="Удалить"></a></div>';
 {/foreach}
 s+='<div class="clear"></div>';
 {/if}

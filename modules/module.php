@@ -18,7 +18,7 @@ abstract class gs_base_module {
 	
 	static function admin_auth($data,$params) {
 		if (strpos($data['gspgid'],'admin')===0) {
-			if(in_array($_SERVER['REMOTE_ADDR'],array('127.0.0.1'))) return true;
+			if(in_array($_SERVER['REMOTE_ADDR'],array('127.0.0.1','192.168.1.102'))) return true;
 			$o=new admin_handler($data,array('name'=>'auth_error.html'));
 			$o->show();
 			return false;
