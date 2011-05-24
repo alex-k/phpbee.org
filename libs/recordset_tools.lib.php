@@ -498,6 +498,11 @@ class gs_recordset_short extends gs_recordset {
 	function html_list() {
 		return trim($this);
 	}
+	function html_fields() {
+		$v=$this->structure['htmlforms'];
+		$v=array_keys(array_filter($v,create_function('$a','return $a["type"]!="hidden" && (!isset($a["hidden"]) || $a["hidden"]!="true");')));
+		return $v;
+	}
 }
 
 ?>
