@@ -216,6 +216,22 @@ TXT;
 		//echo $tpl->fetch($this->params['name']);
 		return $tpl->fetch($this->params['name']);
 	}
+	function post() {
+		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+
+		$tpl=gs_tpl::get_instance();
+		$f=$this->get_form();
+		$validate=$f->validate();
+		if ($validate['STATUS']===true) {
+			$f->rec->fill_values(self::explode_data($f->clean()));
+			$f->rec->get_recordset()->commit();
+			return $f->rec;
+			//return $tpl->fetch($this->params['name']);
+		}
+		$tpl->assign('formfields',$f->show($validate));
+		$tpl->assign('form',$f);
+		return $tpl->fetch($this->params['name']);
+	}
 
 	function postform() {
 		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
@@ -256,6 +272,9 @@ TXT;
 		$f->rec->commit();
 		if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
 		return html_redirect($this->data['gspgid_handler']);
+	}
+	function redirect() {
+		return html_redirect($this->params['href']);
 	}
 	function many2one() {
 		 if ($this->data['gspgid_va'][4]=='delete') {

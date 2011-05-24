@@ -45,6 +45,7 @@ class gs_parser {
 
 	function process() {
 		$config=gs_config::get_instance();
+		$ret= new gs_null(GS_NULL_XML);
 		foreach ($this->current_handler as $handler) {
 			if (!class_exists($handler['class_name'],FALSE)) {
 				load_file($config->lib_handlers_dir.$handler['class_name'].'.class.php');
@@ -61,9 +62,25 @@ class gs_parser {
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
 			//return $o_h->{$handler['method_name']}($this->data);
 			$ret=$o_h->{$handler['method_name']}();
-			if($ret===false) return false;
+			if(!$this->continue_if(isset($handler['params']['return']) ? $handler['params']['return'] : 'not_false',$ret)) return $ret;
 		}
 		return $ret;
+	}
+	function continue_if($type,$result) {
+		switch (strtolower($type)) {
+			case 'true': 
+				return $result===TRUE;
+			case 'false': 
+				return $result===FALSE;
+			case 'not_false': 
+				return $result!==FALSE;
+			case 'gs_record':
+				return is_object($result) && is_a($result,'gs_record');
+			case 'gs_recordset':
+				return is_object($result) && is_a($result,'gs_recordset');
+
+		}
+		return false;
 	}
 	
 	private function get_handlers()
