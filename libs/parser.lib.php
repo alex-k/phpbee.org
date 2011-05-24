@@ -67,6 +67,7 @@ class gs_parser {
 		return $ret;
 	}
 	function continue_if($type,$result) {
+		//var_dump($type); var_dump($result);
 		switch (strtolower($type)) {
 			case 'true': 
 				return $result===TRUE;

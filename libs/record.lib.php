@@ -148,6 +148,11 @@ class gs_record implements arrayaccess {
 		//return $this->unescape($this->values);
 		$ret=array();
 		$values=$this->values;
+		if ($fields==null) {
+			$fields=array_keys($this->get_recordset()->structure['fields']);
+			$this->get_recordset()->query_options['late_load_fields']=$fields;
+			$this->get_recordset()->late_load_records();
+		}
 		if ($fields !==null) {
 			$values=array();
 			if(!is_array($fields)) $fields=explode(',',$fields);
