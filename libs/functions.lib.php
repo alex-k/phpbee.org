@@ -1,17 +1,4 @@
 <?php
-function load_submodules($parent_name,$dirname) {
-	$files = glob($dirname.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'*.phps');
-	foreach ($files as $f) {
-		$pf=str_replace(basename($f),'___'.basename($f),$f);
-		$pf=preg_replace('/.phps$/','.xphp',$pf);
-		if (!file_exists($pf) || filemtime($pf) < filemtime($f)) {
-			$s=file_get_contents($f);
-			$s=str_replace('{PARENT_MODULE}',$parent_name.'_',$s);
-			file_put_contents($pf,$s);
-		}
-		load_file($pf);
-	}
-}
 function html_redirect($gspgid=null,$data=null,$type='302') {
 	$config=gs_config::get_instance();
 	if($gspgid===null) $gspgid=$config->referer_path;
@@ -177,5 +164,12 @@ if (PHP_VERSION_ID>=50300 && !function_exists('mb_split')) {
 		return preg_split(sprintf("/%s/",preg_quote($pattern)), $string , $limit);
 	}
 }
+
+if (PHP_VERSION_ID>=50300 && !function_exists('mb_strlen')) {
+	function mb_strlen($string) {
+		return strlen($string);
+	}
+}
+
 
 ?>
