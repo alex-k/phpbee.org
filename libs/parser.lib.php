@@ -60,7 +60,6 @@ class gs_parser {
 				if ($ret===false) return false;
 			}
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
-			//return $o_h->{$handler['method_name']}($this->data);
 			$ret=$o_h->{$handler['method_name']}();
 			if(!$this->continue_if(isset($handler['params']['return']) ? $handler['params']['return'] : 'not_false',$ret)) return $ret;
 		}
@@ -296,7 +295,6 @@ class gs_node {
 		$parts=explode('/',$path);
 		$current=array_shift ($parts);
 		$ret=$this->get_node_by_name($current);
-		//md($ret,1);
 		if (!is_null($ret)) {
 			return $ret->xpath(implode('/',$parts),$mypath.'/'.$current);
 		}

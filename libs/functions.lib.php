@@ -124,6 +124,7 @@ function record_by_id($id=0,$classname='gs_null') {
 }
 
 function string_to_params($inp) {
+	//md($inp);
 	$arr=is_array($inp) ? $inp : array($inp);
 	$ret=array();
 	$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
@@ -170,6 +171,21 @@ if (PHP_VERSION_ID>=50300 && !function_exists('mb_strlen')) {
 		return strlen($string);
 	}
 }
+
+function load_submodules($parent_name,$dirname) {
+	$files = glob($dirname.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'*.phps');
+	foreach ($files as $f) {
+		$pf=str_replace(basename($f),'___'.basename($f),$f);
+		$pf=preg_replace('/.phps$/','.xphp',$pf);
+		if (!file_exists($pf) || filemtime($pf) < filemtime($f)) {
+			$s=file_get_contents($f);
+			$s=str_replace('{PARENT_MODULE}',$parent_name.'_',$s);
+			file_put_contents($pf,$s);
+		}
+		load_file($pf);
+	}
+}
+
 
 
 ?>

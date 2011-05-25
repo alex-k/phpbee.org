@@ -238,7 +238,7 @@ class gs_logger {
 	}
 	function log($data) {
 		$this->messages[]=$data;
-		$this->log_to_file($data);
+		//$this->log_to_file($data);
 	}
 	private function log_to_file($data) {
 		if (cfg('log_file')) {
@@ -355,6 +355,31 @@ function stripslashes_deep($value)
 
 class gs_exception extends Exception {
 
+}
+
+class gs_var_storage {
+	private $arr=array();
+	static function &get_instance()
+	{
+		static $instance;
+		if (!isset($instance)) $instance = new gs_var_storage();
+		return $instance;
+	}
+	static function genid($id) {
+		return md5($id);
+	}
+	static function save($id,$value) {
+		//var_dump($this);
+		$id=self::genid($id);
+		$t=gs_var_storage::get_instance();
+		$t->arr[$id]=$value;
+	}
+	static function load($id) {
+		$id=self::genid($id);
+		$t=gs_var_storage::get_instance();
+		$ret=isset($t->arr[$id]) ? $t->arr[$id] : NULL;
+		return $ret;
+	}
 }
 
 

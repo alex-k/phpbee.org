@@ -443,7 +443,12 @@ class gs_recordset_short extends gs_recordset {
 	}
 
 	function selfinit($arr) {
-		$struct=field_interface::init($arr,$this->init_opts);
+		$id=get_class($this);
+		$struct=gs_var_storage::load($id);
+		if (!$struct) {
+			$struct=field_interface::init($arr,$this->init_opts);
+			gs_var_storage::save($id,$struct);
+		}
 		foreach ($struct as $k=>$s)
 			$this->structure[$k]=isset($this->structure[$k]) ? array_merge($this->structure[$k],$struct[$k]) : $struct[$k];
 	}
