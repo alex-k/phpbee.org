@@ -1,0 +1,269 @@
+<?php 
+class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
+	private $cinfo;
+	private $db_connection;
+	private $_res;
+	private $_id;
+	private $stats;
+	function __construct($cinfo) {
+		parent::__construct();
+		$this->cinfo=$cinfo;
+		$this->_id=rand();
+		$this->_cache=array();
+		$this->_que=null;
+		$this->stats['total_time']=0;
+		$this->stats['total_queries']=0;
+		$this->stats['total_rows']=0;
+		$this->connect();
+	}
+	
+	function __destruct() {
+		if (DEBUG) {
+			//var_dump($this->stats);
+		}
+	}
+
+	function escape_value($v,$c=null) {
+		if (is_float($v)) {
+			return sprintf('truncate(%s,5)',$v);
+		}else if (is_numeric($v)) {
+			return $v;
+		} else if (is_null($v)) {
+			return 'NULL';
+		} else if (is_array($v)) {
+			$arr=array();
+			foreach($v as $k=>$l) {
+				$arr[]=$this->escape_value($l);
+			}
+			return sprintf('(%s)',implode(',',$arr));
+		} else if ($c=='LIKE') {
+			return sprintf('%s',mysql_real_escape_string($v));
+		} else {
+			return sprintf("'%s'",mysql_real_escape_string($v));
+		}
+	}
+
+	function escape($f,$c,$v) {
+		$v_type='STRING';
+		if (is_float($v)) {$v_type='FLOAT';}
+		else if (is_numeric($v)) {$v_type='NUMERIC';}
+		else if (is_array($v)) {$v_type=!empty($v) ? 'ARRAY' : 'NULL';}
+		else if (is_null($v)) {$v_type='NULL';}
+
+
+		$escape_pattern=$this->_escape_case[$c][$v_type];
+		$ret=$this->replace_pattern($escape_pattern,$v,$f,$c);
+		return $ret;
+
+	}
+
+	function replace_pattern($escape_pattern,$v,$f=null,$c=null) {
+		preg_match_all('/{v/',$escape_pattern,$value_replaces);
+		if (sizeof($value_replaces[0])>1) {
+			$ret=str_replace('{f}',$f,$escape_pattern);
+			for ($i=0; $i<sizeof($value_replaces[0]); $i++) {
+				$ret=str_replace("{v$i}",$this->escape_value($v[$i]),$ret);
+			}
+		} else {
+			$v=$this->escape_value($v,$c);
+			$ret=str_replace(array('{f}','{v}'),array($f,$v),$escape_pattern);
+		}
+		return $ret;
+	}
+
+
+	function connect() {
+		$cinfo=$this->cinfo;
+		var_dump($cinfo);
+		check_and_create_dir($cinfo['db_root']);
+		$this->root=$cinfo['db_root'];
+	}
+
+
+	function query($que='') {
+		$t=microtime(true);
+		if (DEBUG) {
+			md($que);
+		}
+		$this->_res=mysql_query($que,$this->db_connection);
+		
+		if ($this->_res===FALSE) {
+			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error().' in query '.$que);
+		}
+		$t=microtime(true)-$t;
+		$rows=mysql_affected_rows($this->db_connection);
+		if (DEBUG) {
+			md(sprintf("%.03f secounds, %d rows",$t, $rows));
+		}
+		$this->stats['total_time']+=$t;
+		$this->stats['total_queries']+=1;
+		$this->stats['total_rows']+=$rows;
+		return $this->_res;
+
+	}
+	function get_insert_id() {
+		return mysql_insert_id($this->db_connection);
+	}
+	public function table_exists($tablename) {
+		$fname=$this->root.DIRECTORY_SEPARATOR.$tablename;
+		return is_dir($fname);
+	}
+
+	public function get_table_fields($tablename) {
+		$r=array();
+		$fname=$this->root.DIRECTORY_SEPARATOR.$tablename.DIRECTORY_SEPARATOR.'fields';
+		if (file_exists($fname)) $r=unserialize(file_get_contents($fname));
+		return $r;
+	}
+
+	public function get_table_keys($tablename) {
+		$r=array();
+		return $r;
+	}
+
+	function construct_createtable_fields($options) {
+		$table_fields=$this->construct_table_fields($options);
+		return sprintf ('(%s)',implode(",",$table_fields));
+	}
+	function construct_altertable_fields($tablename,$options) {
+		$fname=$this->root.DIRECTORY_SEPARATOR.$tablename;
+		$tf=array();
+		$table_fields=$this->construct_table_fields($options);
+		$old_fields=$this->get_table_fields($tablename);
+
+		$add_fields=array_diff(array_keys($table_fields),array_keys($old_fields));
+		$mod_fields=array_intersect(array_keys($old_fields),array_keys($table_fields));
+		$drop_fields=array_diff(array_keys($old_fields),array_keys($table_fields));
+		foreach($drop_fields as $k=>$v) {
+			$files=glob($fname.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.$v);
+			foreach ($files as $del_fname) unlink ($del_fname);
+		}
+	}
+	function construct_indexes($tablename,$structure) {
+	}
+
+	public function construct_droptable($tablename) {
+		$fname=$this->root.DIRECTORY_SEPARATOR.$tablename;
+		return rmdir($fname);
+	}
+	public function construct_altertable($tablename,$structure) {
+		switch (isset($structure['type']) ? $structure['type'] : '') {
+		case 'view':
+			$this->construct_droptable($tablename);
+			return $this->construct_createtable($tablename,$structure);
+		break;
+		default:
+			$this->construct_altertable_fields($tablename,$structure);
+			$table_fields=$this->construct_table_fields($structure);
+			$fname=$this->root.DIRECTORY_SEPARATOR.$tablename;
+			file_put_contents($fname.DIRECTORY_SEPARATOR.'fields',serialize($table_fields));
+		}
+	}
+	public function construct_createtable($tablename,$structure) {
+		switch (isset($structure['type']) ? $structure['type'] : '') {
+		case 'view':
+			throw new gs_dbd_exception('gs_dbdriver_file.construct_createtable: view have not implemented for file dbdriver');
+		break;
+		default:
+			$fname=$this->root.DIRECTORY_SEPARATOR.$tablename;
+			check_and_create_dir($fname);
+			$table_fields=$this->construct_table_fields($structure);
+			file_put_contents($fname.DIRECTORY_SEPARATOR.'fields',serialize($table_fields));
+			break;
+		}
+	}
+	function get_id($tablename) {
+	}
+	public function insert($record) {
+		$this->_cache=array();
+		$rset=$record->get_recordset();
+		$fields=$values=array();
+		foreach ($rset->structure['fields'] as $fieldname=>$st) {
+			if ( $st['type']!='serial' && $record->is_modified($fieldname)) {
+				$fields[]=$fieldname;
+				$values[]=$this->escape_value($record->$fieldname);
+			}
+		}
+		$que=sprintf('INSERT INTO %s (%s) VALUES  (%s)',$rset->db_tablename,implode(',',$fields),implode(',',$values));
+		$this->query($que);
+		return $this->get_insert_id();
+
+	}
+	public function update($record) {
+		$this->_cache=array();
+		$rset=$record->get_recordset();
+		$fields=array();
+		foreach ($rset->structure['fields'] as $fieldname=>$st) {
+			if ($record->is_modified($fieldname)) {
+				$fields[]=sprintf('%s=%s',$fieldname,$this->escape_value($record->$fieldname));
+			}
+		}
+		if (sizeof($fields)==0) return;
+		$idname=$rset->id_field_name;
+		$que=sprintf('UPDATE %s SET %s WHERE %s=%s',$rset->db_tablename,implode(',',$fields),$idname,$this->escape_value($record->get_old_value($idname)));
+		return $this->query($que);
+
+	}
+	public function delete($record) {
+		$this->_cache=array();
+		$rset=$record->get_recordset();
+		$idname=$rset->id_field_name;
+		$que=sprintf('DELETE FROM %s  WHERE %s=%s',$rset->db_tablename,$idname,$this->escape_value($record->get_old_value($idname)));
+		return $this->query($que);
+
+	}
+	function fetchall() {
+		$ret=array();
+		if (!$this->_que) {
+			while ($r=mysql_fetch_assoc($this->_res)) $ret[]=$r;
+			return $ret;
+		}
+		if (!isset($this->_cache[$this->_que])) {
+			while ($r=mysql_fetch_assoc($this->_res)) $ret[]=$r;
+			$this->_cache[$this->_que]=$ret;
+		}
+		$ret=$this->_cache[$this->_que];
+		$this->_que=null;
+		return $ret;
+	}
+	function fetch() {
+		return mysql_fetch_assoc($this->_res);
+	}
+	function select($rset,$options,$fields=NULL) {
+		$where=$this->construct_where($options);
+		//md($rset->structure['fields'],1);
+		$fields = is_array($fields) ? $fields : array_keys($rset->structure['fields']);
+		$que=sprintf("SELECT %s FROM %s ", implode(',',$fields), $rset->db_tablename);
+		if (is_array($options)) foreach($options as $o) {
+			if (isset($o['type'])) switch($o['type']) {
+				case 'limit':
+					$str_limit=sprintf(' LIMIT %d ',$this->escape_value($o['value']));
+					break;
+				case 'offset':
+					$str_offset=sprintf(' OFFSET %d ',$this->escape_value($o['value']));
+					break;
+				case 'orderby':
+					$str_orderby=sprintf(' ORDER BY %s ',mysql_real_escape_string($o['value']));
+					break;
+				case 'groupby':
+					$str_groupby=sprintf(' GROUP BY %s ',mysql_real_escape_string($o['value']));
+					break;
+			}
+		}
+		if (!empty($where)) $que.=sprintf(" WHERE %s", $where);
+		if (!empty($str_groupby)) $que.=$str_groupby;
+		if (!empty($str_orderby)) $que.=$str_orderby;
+		if (!empty($str_limit)) $que.=$str_limit;
+		if (!empty($str_offset)) $que.=$str_offset;
+
+		$this->_que=md5($que);
+		if(isset($this->_cache[$this->_que])) {
+			return true;
+		}
+
+		return $this->query($que);
+	}
+
+
+}
+?>

@@ -135,6 +135,7 @@ class gs_config {
 		$this->root_dir=clean_path(dirname(dirname(__FILE__))).'/';
 		$this->root_dir=str_replace('\\','/',$this->root_dir);
 		$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
+		$this->document_root=$_document_root;
 
 		if ($this->root_dir>$_document_root) {
 			$this->www_dir='/'.trim(str_replace($_document_root,'',$this->root_dir),'/');
