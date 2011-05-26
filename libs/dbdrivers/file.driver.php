@@ -147,6 +147,8 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		return rmdir($fname);
 	}
 	public function construct_altertable($tablename,$structure) {
+		$this->get_id($tablename);
+		die();
 		switch (isset($structure['type']) ? $structure['type'] : '') {
 		case 'view':
 			$this->construct_droptable($tablename);
@@ -173,7 +175,24 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		}
 	}
 	function get_id($tablename) {
+		$cname=$this->root.DIRECTORY_SEPARATOR.$tablename.DIRECTORY_SEPARATOR.'counter';
+		$counter=file_exists($cname)==true ? file_get_contents($cname) : 0;
+		$r_id=$this->_get_id($tablename,$counter);
+		while (($r_id=$this->_get_id($tablename,$counter)) && file_exists($r_id)) $counter++;
+		file_put_contents($cname,$counter);
+		return $r_id;
 	}
+	
+	function _get_id($tablename,$id) {
+		$levels=3;
+		$d=array(
+			'0'=>'a','1'=>'b','2'=>'c','3'=>'d','4'=>'e','5'=>'f','6'=>'g','7'=>'h',
+			'8'=>'i','9'=>'j','a'=>'k','b'=>'l','c'=>'m','d'=>'n','e'=>'o','f'=>'p',
+			'g'=>'q','h'=>'r','i'=>'s','j'=>'t','k'=>'u','l'=>'v','m'=>'w','n'=>'x',
+			'o'=>'y','p'=>'z');
+		return $this->root.DIRECTORY_SEPARATOR.$tablename.DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR,str_split(str_pad(strtr(base_convert($id,10,26),$d),$levels,'a',STR_PAD_LEFT),1));
+	}
+	
 	public function insert($record) {
 		$this->_cache=array();
 		$rset=$record->get_recordset();
