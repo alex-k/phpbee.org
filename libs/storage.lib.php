@@ -566,7 +566,6 @@ interface gs_dbdriver_interface {
 	function delete($record);
 	function fetch();
 	function select($rset,$options,$fields=NULL);
-	function get_insert_id();
 	function table_exists($tablename);
 	function get_table_fields($tablename);
 }

@@ -102,7 +102,7 @@ TXT;
 		$id=isset($data['gspgid_va'][1]) ? $data['gspgid_va'][1] : null;
 		$classname=$params['classname'];
 		$obj=new $classname;
-		if (is_numeric($id)) {
+		if ($id || is_numeric($id)) {
 			$rec=$obj->get_by_id($id);
 		} else {
 			$rec=$obj->new_record();
