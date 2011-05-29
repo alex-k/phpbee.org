@@ -88,8 +88,26 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		}
 	}
 	function construct_indexes($tablename,$structure) {
+		$construct_indexes=isset($structure['indexes']) && is_array($structure['indexes']) ? $structure['indexes'] : array();
+		$old_keys=$this->get_table_keys($tablename);
+		foreach ($construct_indexes as $name=>$index) {
+			if (!is_array($index)) {
+			$name=$index;
+			$index=array();
+			}
+			if (!isset($index['type'])) $index['type']='key';
+			if (!isset($this->_index_types[$index['type']])) {
+				throw new gs_dbd_exception('gs_dbdriver_file.construct_altertable: can not find definition for _index_types_'.$index['type']);
+			}
+			if (isset($old_keys[$name])) {
+			} else {
+				$fname=$this->root.DIRECTORY_SEPARATOR.$tablename.DIRECTORY_SEPARATOR.'indx'.DIRECTORY_SEPARATOR.$name;
+				$bt=new b_tree($fname);
+				mlog(sprintf('File query: CREATE INDEX b_tree %s(%s)',$tablename,$name));
+			}
+		}
 	}
-
+	
 	public function construct_droptable($tablename) {
 		$fname=$this->root.DIRECTORY_SEPARATOR.$tablename;
 		return rmdir($fname);
@@ -103,6 +121,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		default:
 			$this->construct_altertable_fields($tablename,$structure);
 			$table_fields=$this->construct_table_fields($structure);
+			$this->construct_indexes($tablename,$structure);
 			$fname=$this->root.DIRECTORY_SEPARATOR.$tablename;
 			file_put_contents($fname.DIRECTORY_SEPARATOR.'fields',serialize($table_fields));
 		}
@@ -165,7 +184,16 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 				file_put_contents($id.DIRECTORY_SEPARATOR.escapeshellcmd($fieldname),$record->$fieldname);
 			}
 		}
-		return basename($id);
+		
+		$insert_id=basename($id);
+		
+		$construct_indexes=isset($rset->structure['indexes']) && is_array($rset->structure['indexes']) ? $rset->structure['indexes'] : array();
+		foreach ($construct_indexes as $index => $name) {
+			$fname=$this->root.DIRECTORY_SEPARATOR.($rset->db_tablename).DIRECTORY_SEPARATOR.'indx'.DIRECTORY_SEPARATOR.$index;
+			$bt=new b_tree($fname);
+			$bt->add($record->$index,$insert_id);
+		}
+		return $insert_id;
 
 	}
 	public function update($record) {
@@ -184,9 +212,20 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		$rset=$record->get_recordset();
 		$id=$this->root.DIRECTORY_SEPARATOR.$rset->db_tablename.DIRECTORY_SEPARATOR.$this->split_id($record->get_id());
 		$files=glob($id.DIRECTORY_SEPARATOR.'*');
+		
+		$construct_indexes=isset($rset->structure['indexes']) && is_array($rset->structure['indexes']) ? $rset->structure['indexes'] : array();
+		foreach ($construct_indexes as $index => $name) {
+			$fname=$this->root.DIRECTORY_SEPARATOR.($rset->db_tablename).DIRECTORY_SEPARATOR.'indx'.DIRECTORY_SEPARATOR.$index;
+			$bt=new b_tree($fname);
+			$bt->delete($record->$index,$record->get_id());
+		}
+		
 		foreach($files as $f) {
 			unlink($f);
 		}
+		
+		
+		
 		rmdir($id);
 	}
 	function fetchall() {
@@ -201,14 +240,50 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		$fields = is_array($fields) ? $fields : array_keys($rset->structure['fields']);
 		$fname=$this->root.DIRECTORY_SEPARATOR.$rset->db_tablename;
 		$where=$this->construct_where($options);
+		$use_id=false;
 		if (isset($options[$rset->id_field_name])) {
 			$mask=DIRECTORY_SEPARATOR.$this->split_id($options[$rset->id_field_name]);
+			$use_id=true;
 		} else {
-			$mask=str_repeat(DIRECTORY_SEPARATOR.'*',GS_DB_FILE_ID_LENGTH);
+			$mask=DIRECTORY_SEPARATOR.'?'.str_repeat(DIRECTORY_SEPARATOR.'*',GS_DB_FILE_ID_LENGTH-1);
+			foreach ($options as $o) {
+				if (isset($o['field']) && $o['field']==$rset->id_field_name) {
+					$mask=DIRECTORY_SEPARATOR.$this->split_id($o['value']);
+					$use_id=true;
+					continue;
+				}
+			}
 		}
-		$mask=$fname.$mask;
-
-		$files=glob($mask);
+		$files=array();
+		// If options not empty and index for this fileds created - use index
+		if (!empty($options) && !$use_id) {
+			$construct_indexes=isset($rset->structure['indexes']) && is_array($rset->structure['indexes']) ? $rset->structure['indexes'] : array();
+			$idxs=array();
+			foreach ($options as $index => $value) {
+				if (isset($construct_indexes[$index])) {
+					$idxs[]=$index;
+					$iname=$this->root.DIRECTORY_SEPARATOR.($rset->db_tablename).DIRECTORY_SEPARATOR.'indx'.DIRECTORY_SEPARATOR.$index;
+					$bt=new b_tree($iname);
+					if (!is_array($value)) $value=array($value);
+					$ids=array();
+					foreach ($value as $val) {
+						$ids=array_merge($ids,$bt->find($val));
+					}
+					foreach ($ids as $id) {
+						$r=glob($fname.DIRECTORY_SEPARATOR.$this->split_id(trim($id)));
+						if ($r) {
+							$files=array_merge($files,$r);
+						}
+					}
+				}
+			}
+			$mask='indexes('.implode(',',$idxs).')';
+		} else {
+			$mask=$fname.$mask;
+			$files=glob($mask);
+		}
+		
+		
 		foreach ($files as $f) {
 			$d=array(
 				$rset->id_field_name=>basename($f)
@@ -217,9 +292,9 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 				if (!isset($d[$field])) $d[$field]=file_exists($f.DIRECTORY_SEPARATOR.$field) ? file_get_contents($f.DIRECTORY_SEPARATOR.$field) : NULL;
 			}
 			$this->_res[basename($f)]=$d;
-
 		}
-		mlog(sprintf('File query: %s fields: %s (%.06f sec)',$mask,implode(',',$fields),(microtime(1)-$t)));
+		
+		mlog(sprintf('File query: %s fields: %s records: %s (%.06f sec)',$mask,implode(',',$fields),count($this->_res),(microtime(1)-$t)));
 		return $this->_res;
 	}
 
