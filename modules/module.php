@@ -54,10 +54,12 @@ class module extends gs_base_module implements gs_module {
 }
 
 class images_handler extends gs_base_handler {
-	function show() {
-		$data=base64_decode($this->data['gspgid_va'][0]);
-		$data=preg_replace("|\..+|is","",$data);
-		$data=explode("/",$data);
+	function show( $data=null) {
+		if (!$data) {
+			$data=base64_decode($this->data['gspgid_va'][0]);
+			$data=preg_replace("|\..+|is","",$data);
+			$data=explode("/",$data);
+		}
 		$method=array(
 			'w'=>'use_width',
 			'h'=>'use_height',
@@ -76,16 +78,7 @@ class images_handler extends gs_base_handler {
 		exit();
 	}
 	function s() {
-		$data=$this->data['gspgid_va'];
-		$rec=new $data[0]();
-		$rec=$rec->get_by_id($data[2]);
-		$gd=new vpa_gd($rec->File_data,false);
-		if ($data[1]>0 && $data[1]<max($rec->File_width,$rec->File_height)) {
-			$gd->set_bg_color(255,255,255);
-			$gd->resize($data[1],$data[1],'use_box');
-		}
-		$gd->show();
-		exit();
+		return ($this->show($this->data['gspgid_va']));
 	}
 
 }
