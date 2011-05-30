@@ -4,6 +4,7 @@
 			'file_public'=>array( 
 				'db_type'=>'file',
 				'db_root'=>$this->document_root.'files',
+				'www_root'=>'/files',
 				),
 			);
 
