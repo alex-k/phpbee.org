@@ -18,7 +18,7 @@ class b_tree {
 		$k=str_split($key,1);
 		$path=$this->dir;
 		$path.=DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR,$k);
-		$data=file($path.DIRECTORY_SEPARATOR.'idx');
+		$data=(file_exists($path.DIRECTORY_SEPARATOR.'idx')) ? file($path.DIRECTORY_SEPARATOR.'idx') : array();
 		$res=array();
 		if ($strong) {
 			foreach ($data as $v) {
@@ -35,6 +35,7 @@ class b_tree {
 	}
 	
 	public function add($key,$value) {
+		mlog("add index: $key $value");
 		$key=$this->parse_key($key);
 		$k=str_split($key,1);
 		$path=$this->dir;
@@ -49,6 +50,7 @@ class b_tree {
 	}
 	
 	public function delete($key,$value) {
+		mlog("delete index: $key $value");
 		$key=$this->parse_key($key);
 		$k=str_split($key,1);
 		$path=$this->dir;

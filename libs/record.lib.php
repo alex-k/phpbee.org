@@ -44,6 +44,9 @@ class gs_record implements arrayaccess {
 	public function __wakeup() {
 		if(method_exists($this->get_recordset(),'__record_wakeup')) $this->get_recordset()->__record_wakeup($this);
 	}
+	public function __call($func,$args) {
+		if (method_exists($this->get_recordset(),$func)) return $this->get_recordset()->$func($args,$this);
+	}
 
 	public function append_child(&$child) {
 		$child->parent_record=$this;

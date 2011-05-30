@@ -214,7 +214,9 @@ TXT;
 		$tpl->assign('formfields',$f->show());
 		$tpl->assign('form',$f);
 		//echo $tpl->fetch($this->params['name']);
-		return $tpl->fetch($this->params['name']);
+		$ret=$tpl->fetch($this->params['name']);
+		//var_dump($ret);
+		return $ret;
 	}
 	function post() {
 		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
@@ -277,7 +279,7 @@ TXT;
 		return html_redirect($this->params['href']);
 	}
 	function many2one() {
-		 if ($this->data['gspgid_va'][4]=='delete') {
+		 if (isset($this->data['gspgid_va'][4]) && $this->data['gspgid_va'][4]=='delete') {
 		      $rid=intval($this->data['gspgid_va'][5]);
 		      $rs_name=$this->data['gspgid_va'][0];
 		      $rs=new $rs_name;
