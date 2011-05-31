@@ -151,22 +151,3 @@ class form_admin extends  g_forms_html {
 	}
 }
 
-class tw_images extends gs_recordset_short {
-	const superadmin = 1;
-	var $fields=array(
-		'File'=> "fFile 'Картинка'",
-		'Name'=> "fString 'Название' required=false",
-	);
-	
-	function __construct($init_opts=false) {
-			parent::__construct($this->fields,$init_opts);
-	}
-
-	function get_values($fields=NULL,$recursive=true) {
-		if ($fields===NULL) {
-		   $fields=array_keys($this->structure['fields']);
-		   unset($fields[array_search('File_data',$fields)]);
-		}
-		return parent::get_values($fields,$recursive);
-	}
-}
