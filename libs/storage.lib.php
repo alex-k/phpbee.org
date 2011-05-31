@@ -258,7 +258,6 @@ abstract class gs_recordset_base extends gs_iterator {
 		$options=$this->query_options['options'];
 		$index_field_name=$this->query_options['index_field_name'];
 		$fields=$fields ? array_merge($fields,array($index_field_name)) : $this->query_options['fields'];
-
 		if(!$fields) $fields=array($index_field_name);
 		$this->get_connector()->select($this,$options,$fields);
 		$ret=NULL;

@@ -16,7 +16,7 @@ class gs_base_handler {
 		$tpl=gs_tpl::get_instance();
 		if (is_array($tpl->template_dir))
 			array_unshift($tpl->template_dir, cfg('lib_modules_dir')."/$subdir/templates");
-		else 
+		else
 			$tpl->template_dir = cfg('lib_modules_dir')."/$subdir/templates";
 		$tpl->assign('tpl',$this);
 		$tpl->assign('_gssession',gs_session::load());
@@ -26,7 +26,7 @@ class gs_base_handler {
 		$tpl->assign('root_dir',cfg('root_dir'));
 		$this->subdir=$subdir;
 		$this->www_subdir=$www_subdir;
-		
+
 
 		$this->register_blocks();
 	}
@@ -85,13 +85,13 @@ class gs_base_handler {
 			$txt2=$log->show();
 			if (trim($txt) || trim($txt2)) {
 				$txt=preg_replace("/\n/",'\\r\\n',addslashes($txt));
-				echo <<<TXT
-				<script>
-				if (typeof console == 'object') {
-					console.log('$txt');
-					$txt2;
-				}
-				</script>
+echo <<<TXT
+<script>
+if (typeof console == 'object') {
+console.log('$txt');
+$txt2;
+}
+</script>
 TXT;
 			}
 		}
@@ -115,74 +115,84 @@ TXT;
 		$hh=$h;
 		if (!isset($params['fields']) && isset($data['handler_params']['fields'])) $params['fields']=$data['handler_params']['fields'];
 		if(isset($params['fields'])) {
-		$fields=array_filter(explode(',',$params['fields']));
-		$fields_minus=array_filter($fields,create_function('$a','return substr($a,0,1)=="-";'));
-		$fields_plus=array_diff($fields,$fields_minus);
-		$fields_minus=array_map(create_function('$a','return substr($a,1);'),$fields_minus);
-		if (count($fields_plus)>0) {
-			$hh=array();
-			foreach ($fields_plus as $f) if(isset($h[$f])) $hh[$f]=$h[$f]; 
-		} else if (count($fields_minus)>0) {
-			$hh=array();
-			foreach ($h as $f=>$v)  if (!in_array($f,$fields_minus)) $hh[$f]=$h[$f];
-		}
+			$fields=array_filter(explode(',',$params['fields']));
+			$fields_minus=array_filter($fields,create_function('$a','return substr($a,0,1)=="-";'));
+			$fields_plus=array_diff($fields,$fields_minus);
+			$fields_minus=array_map(create_function('$a','return substr($a,1);'),$fields_minus);
+			if (count($fields_plus)>0) {
+				$hh=array();
+				foreach ($fields_plus as $f) if(isset($h[$f])) $hh[$f]=$h[$f];
+			} else if (count($fields_minus)>0) {
+				$hh=array();
+				foreach ($h as $f=>$v)  if (!in_array($f,$fields_minus)) $hh[$f]=$h[$f];
+			}
 		}
 		$fields=$hh ? array_combine(array_keys($hh),array_keys($hh)) : array();
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
-				case 'lMany2Many':
-					$rsl=$rec->init_linked_recordset($k);
-					$rsname=$rsl->structure['recordsets']['childs']['recordset'];
-					$rs=new $rsname();
-					$vrecs=$rs->find_records();
-					foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
-					$hh[$k]['variants']=$variants;
-					if (isset($data[$k])) {
-						unset($fields[$k]);
-						$data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
-						$rec->$k->flush($data[$k]);
+			case 'lMany2Many':
+				$rsl=$rec->init_linked_recordset($k);
+				$rsname=$rsl->structure['recordsets']['childs']['recordset'];
+				$rs=new $rsname();
+				$vrecs=$rs->find_records();
+				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
+				$hh[$k]['variants']=$variants;
+				if (isset($data[$k])) {
+					unset($fields[$k]);
+					$data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
+					$rec->$k->flush($data[$k]);
+				}
+				break;
+			case 'lOne2One':
+				if ($hh[$k]['hidden']) break;
+				if (isset($v['widget'])) {
+					$dclass='gs_data_widget_'.$v['widget'];
+					if (class_exists($dclass)) {
+						$d=new $dclass();
+						$hh=$d->gd($rec,$k,$hh,$params,$data);
 					}
+				}
+				if (!empty($v['widget'])) {
+					break;
+				}
+				$variants=array();
+				$rname=get_class($rec->init_linked_recordset($v['linkname']));
+				$vro=new $rname;
+				$vrecs=$vro->find_records();
+				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
+				$hh[$k]['variants']=$variants;
 				break;
-				case 'lOne2One':
-					if ($hh[$k]['hidden']) break;
-					$variants=array();
-					$rname=get_class($rec->init_linked_recordset($v['linkname']));
-					$vro=new $rname;
-					$vrecs=$vro->find_records();
-					foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
-					$hh[$k]['variants']=$variants;
-				break;
-				case 'lMany2One':
-						if ($v['hidden']=='true') continue;
-						if (isset($v['widget'])) {
-							$dclass='gs_data_widget_'.$v['widget'];
-							if (class_exists($dclass)) {
-								$d=new $dclass();
-								$hh=$d->gd($rec,$k,$hh,$params,$data);
-							}
-						}
-						if (!empty($v['widget'])) {
-							break;
-						}
-						$nrs=$rec->$k;
-						$nrs->new_record();
+			case 'lMany2One':
+				if ($v['hidden']=='true') break;
+				if (isset($v['widget'])) {
+					$dclass='gs_data_widget_'.$v['widget'];
+					if (class_exists($dclass)) {
+						$d=new $dclass();
+						$hh=$d->gd($rec,$k,$hh,$params,$data);
+					}
+				}
+				if (!empty($v['widget'])) {
+					break;
+				}
+				$nrs=$rec->$k;
+				$nrs->new_record();
 
-						foreach($nrs as $nobj) {
-							$f=self::get_form_for_record($nobj,$params,$data);
-							$forms=$f->htmlforms;
-							$i=intval($nobj->get_id());
-							foreach($forms as $fk=>$fv) {
-								$pfx_key="$k:$i:$fk";
-								$key="$k:$fk";
-								$hh[$pfx_key]=$fv;
-								if(isset($data['handler_params'][$key])) {
-									$data['handler_params'][$pfx_key]=$data['handler_params'][$key];
-								}
-							}
+				foreach($nrs as $nobj) {
+					$f=self::get_form_for_record($nobj,$params,$data);
+					$forms=$f->htmlforms;
+					$i=intval($nobj->get_id());
+					foreach($forms as $fk=>$fv) {
+						$pfx_key="$k:$i:$fk";
+						$key="$k:$fk";
+						$hh[$pfx_key]=$fv;
+						if(isset($data['handler_params'][$key])) {
+							$data['handler_params'][$pfx_key]=$data['handler_params'][$key];
 						}
-						unset($hh[$k]);
+					}
+				}
+				unset($hh[$k]);
 				break;
-				default: 
+			default:
 			}
 		}
 		$fields=$rec->get_recordset()->id_field_name.','.implode(',',$fields);
@@ -195,8 +205,8 @@ TXT;
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
 		if(isset($data['handler_params']['_default'])) {
-			$default=$data['handler_params']['_default'];
-			$default=string_to_params($default);
+		$default=$data['handler_params']['_default'];
+		$default=string_to_params($default);
 			$data=array_merge($default,$data);
 		}
 		/* if widget need all data of record */
@@ -250,9 +260,9 @@ TXT;
 					$href=$this->subdir.$href;
 				}
 				return html_redirect($href,array(
-					'id'=>$f->rec->get_id(),
-					'classname'=>get_class($f->rec->get_recordset()),
-				));
+				                         'id'=>$f->rec->get_id(),
+				                         'classname'=>get_class($f->rec->get_recordset()),
+				                     ));
 			}
 			return html_redirect($this->data['gspgid_handler']);
 			//return $tpl->fetch($this->params['name']);
@@ -279,29 +289,29 @@ TXT;
 		return html_redirect($this->params['href']);
 	}
 	function many2one() {
-		 if (isset($this->data['gspgid_va'][4]) && $this->data['gspgid_va'][4]=='delete') {
-		      $rid=intval($this->data['gspgid_va'][5]);
-		      $rs_name=$this->data['gspgid_va'][0];
-		      $rs=new $rs_name;
-		      $rec=$rs->get_by_id($rid);
-		      if ($rec) {
-			   $rec->delete();
-			   $rec->commit();
-		      }
-		      $res=preg_replace("|/delete/\d+|is","//",$this->data['gspgid']);
-		      return html_redirect($res);
-		 }
-		 $params=array(
-		      $this->data['gspgid_va'][1]=>$this->data['gspgid_va'][2],
-		 );
-		 $url=$this->data['gspgid_va'][0].'/'.$this->data['gspgid_va'][1].'/'.$this->data['gspgid_va'][2].'/'.$this->data['gspgid_va'][3];
-		 if ($this->data['gspgid_va'][2]==0) {
-			   $params[$this->data['gspgid_va'][1].'_hash']=$this->data['gspgid_va'][3];
-		      }
-		 $tpl=gs_tpl::get_instance();
-		 $tpl->assign('url',$url);
-		 $tpl->assign('params',$params);
-		 $this->show();
+		if (isset($this->data['gspgid_va'][4]) && $this->data['gspgid_va'][4]=='delete') {
+			$rid=intval($this->data['gspgid_va'][5]);
+			$rs_name=$this->data['gspgid_va'][0];
+			$rs=new $rs_name;
+			$rec=$rs->get_by_id($rid);
+			if ($rec) {
+				$rec->delete();
+				$rec->commit();
+			}
+			$res=preg_replace("|/delete/\d+|is","//",$this->data['gspgid']);
+			return html_redirect($res);
+		}
+		$params=array(
+		            $this->data['gspgid_va'][1]=>$this->data['gspgid_va'][2],
+		        );
+		$url=$this->data['gspgid_va'][0].'/'.$this->data['gspgid_va'][1].'/'.$this->data['gspgid_va'][2].'/'.$this->data['gspgid_va'][3];
+		if ($this->data['gspgid_va'][2]==0) {
+			$params[$this->data['gspgid_va'][1].'_hash']=$this->data['gspgid_va'][3];
+		}
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('url',$url);
+		$tpl->assign('params',$params);
+		$this->show();
 	}
 
 	static function implode_data($data,$prefix='') {
@@ -316,17 +326,17 @@ TXT;
 		return $newdata;
 	}
 	static function explode_data($data) {
-			$newdata=array();
-			foreach ($data as $k=>$v) {
-					$s=explode(':',$k);
-					while (($i=array_pop($s))!==NULL) {
-							$dd=array();
-							$dd[$i]=$v;
-							$v=$dd;
-					}       
-					$newdata=array_merge_recursive_distinct($newdata,$v);
-			}       
-			return array_merge($data,$newdata);
+		$newdata=array();
+		foreach ($data as $k=>$v) {
+			$s=explode(':',$k);
+			while (($i=array_pop($s))!==NULL) {
+				$dd=array();
+				$dd[$i]=$v;
+				$v=$dd;
+			}
+			$newdata=array_merge_recursive_distinct($newdata,$v);
+		}
+		return array_merge($data,$newdata);
 	}
 }
 

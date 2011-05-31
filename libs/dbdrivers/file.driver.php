@@ -6,6 +6,10 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 	private $_res;
 	private $_id;
 	private $stats;
+	private $d=array( '0'=>'a','1'=>'b','2'=>'c','3'=>'d','4'=>'e','5'=>'f','6'=>'g','7'=>'h',
+			'8'=>'i','9'=>'j','a'=>'k','b'=>'l','c'=>'m','d'=>'n','e'=>'o','f'=>'p',
+			'g'=>'q','h'=>'r','i'=>'s','j'=>'t','k'=>'u','l'=>'v','m'=>'w','n'=>'x',
+			'o'=>'y','p'=>'z');
 	function __construct($cinfo) {
 		parent::__construct();
 		$this->cinfo=$cinfo;
@@ -152,19 +156,29 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		file_put_contents($cname,$counter);
 		return $r_id;
 	}
+
+	function id2int($id) {
+		$d=array_flip($this->d);
+		$id=intval(strtr($id,$d),26);
+		return($id);
+	}
+
+	function int2id($id) {
+		if(is_numeric($id)) {
+			$id=str_pad(strtr(base_convert($id,10,26),$this->d),GS_DB_FILE_ID_LENGTH,'a',STR_PAD_LEFT);
+		}
+		return $id;
+	}
 	
 	function _get_id($tablename,$id) {
-		$d=array(
-			'0'=>'a','1'=>'b','2'=>'c','3'=>'d','4'=>'e','5'=>'f','6'=>'g','7'=>'h',
-			'8'=>'i','9'=>'j','a'=>'k','b'=>'l','c'=>'m','d'=>'n','e'=>'o','f'=>'p',
-			'g'=>'q','h'=>'r','i'=>'s','j'=>'t','k'=>'u','l'=>'v','m'=>'w','n'=>'x',
-			'o'=>'y','p'=>'z');
-		$id=str_pad(strtr(base_convert($id,10,26),$d),GS_DB_FILE_ID_LENGTH,'a',STR_PAD_LEFT);
+		$id=trim($id);
+		$id=$this->int2id($id);
 		$id=$this->split_id($id);
 		$ret=$this->root.DIRECTORY_SEPARATOR.$tablename.DIRECTORY_SEPARATOR.$id;
 		return $ret;
 	}
 	function split_id($id) {
+		$id=$this->int2id($id);
 		$id=str_split($id,1);
 		for($i=1;$i<GS_DB_FILE_ID_LENGTH;$i++) {
 			$id[$i]=$id[$i-1].$id[$i];
@@ -195,7 +209,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			$bt=new b_tree($fname);
 			$bt->add($record->$index,$insert_id);
 		}
-		return $insert_id;
+		return $this->id2int($insert_id);
 
 	}
 	public function update($record) {
@@ -261,9 +275,12 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		$fname=$this->root.DIRECTORY_SEPARATOR.$rset->db_tablename;
 		$where=$this->construct_where($options);
 		$use_id=false;
-		if (isset($options[$rset->id_field_name])) {
-			$mask=DIRECTORY_SEPARATOR.$this->split_id($options[$rset->id_field_name]);
+		$mask=null;
+		if (isset($options[$rset->id_field_name]) ) {
 			$use_id=true;
+			if (trim($options[$rset->id_field_name])!=='') {
+				$mask=DIRECTORY_SEPARATOR.$this->split_id($options[$rset->id_field_name]);
+			}
 		} else {
 			$mask=DIRECTORY_SEPARATOR.'?'.str_repeat(DIRECTORY_SEPARATOR.'*',GS_DB_FILE_ID_LENGTH-1);
 			foreach ($options as $o) {
@@ -299,8 +316,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			}
 			$mask='indexes('.implode(',',$idxs).')';
 		} else {
-			$mask=$fname.$mask;
-			$files=glob($mask);
+			$files=$mask ? glob($fname.$mask): array();
 		}
 		
 		

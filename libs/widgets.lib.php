@@ -335,9 +335,15 @@ class gs_widget_gallery extends gs_widget {
 }
 
 class gs_data_widget_include_form {
-	
 	function gd($rec,$k,$hh,$params,$data) {
-		$nrs=$rec->$k;
+		if ($hh[$k]['type']=='lOne2One') {
+			$l_k=$hh[$k]['linkname'];
+			$nrs=$rec->$l_k;
+		} else {
+			$l_k=$k;
+			$nrs=$rec->$k;
+		}
+
 		$nrs->first(true);
 
 		foreach($nrs as $nobj) {
@@ -345,12 +351,14 @@ class gs_data_widget_include_form {
 			$forms=$f->htmlforms;
 			$i=intval($nobj->get_id());
 			foreach($forms as $fk=>$fv) {
-				$pfx_key="$k:$i:$fk";
-				$key="$k:$fk";
+				$key="$l_k:$fk";
+				$pfx_key=$hh[$k]['type']=='lOne2One' ? $key : "$l_k:$i:$fk";
+
 				$hh[$pfx_key]=$fv;
 				if(isset($data['handler_params'][$key])) {
 					$data['handler_params'][$pfx_key]=$data['handler_params'][$key];
 				}
+				
 			}
 		}
 		unset($hh[$k]);
@@ -371,7 +379,7 @@ class gs_widget_iframe_gallery extends gs_widget {
 						$r=new $this->params['options']['recordset'];
 						$find=array();
 						$find[$this->params['options']['foreign_field_name']]=$rid;
-						$images=$r->find_records($find,array('id,file_filename,file_mimetype'));
+						$images=$r->find_records($find);
 						$s.=(string)$images;
 					   /* 
 				$images=$images->get_values();

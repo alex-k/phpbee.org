@@ -40,14 +40,17 @@ class gs_fkey {
 		$classes=get_declared_classes();
 		foreach($classes as $c) {
 			if(is_subclass_of($c,'gs_recordset') &&(is_subclass_of($c,'gs_recordset_short') || property_exists($c,'table_name')) ) {
-				$obj=new $c;
-				if (isset($obj->structure['fkeys']) && is_array($obj->structure['fkeys'])) {
-					$this->update_hash($obj);
-				}
-				if (isset($obj->structure['recordsets'])) foreach($obj->structure['recordsets'] as $structure) {
-					if (isset($structure['rs1_name']) && isset($structure['rs2_name']))  {
-						$rs=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset']);
-						if (isset($rs->structure['fkeys'])) $this->update_hash($rs);
+				$testClass     = new ReflectionClass($c);
+				if (!$testClass->isAbstract()) {
+					$obj=new $c;
+					if (isset($obj->structure['fkeys']) && is_array($obj->structure['fkeys'])) {
+						$this->update_hash($obj);
+					}
+					if (isset($obj->structure['recordsets'])) foreach($obj->structure['recordsets'] as $structure) {
+						if (isset($structure['rs1_name']) && isset($structure['rs2_name']))  {
+							$rs=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset']);
+							if (isset($rs->structure['fkeys'])) $this->update_hash($rs);
+						}
 					}
 				}
 			}

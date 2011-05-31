@@ -429,7 +429,7 @@ class gs_recordset_short extends gs_recordset {
 	function __construct($s=false,$init_opts=false) {
 		$this->init_opts=$init_opts;
 		$this->init_opts['recordset']=get_class($this);
-		if (!$s || !is_array($s)) throw new gs_exception('gs_recordset_short :: empty init values');
+		if (!$s || !is_array($s)) throw new gs_exception('gs_recordset_short :: empty init values on '.get_class($this));
 		if (!$this->table_name) $this->table_name=get_class($this);
 		if (!$this->id_field_name) $this->id_field_name='id';
 		if (!$this->gs_connector_id) $this->gs_connector_id=key(cfg('gs_connectors'));
