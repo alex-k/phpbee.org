@@ -536,7 +536,8 @@ class vpa_gd {
 	
 	function save($filename,$quality=0)
 	{
-		imagejpeg($this->new_img,$filename,$quality);
+		$img=($this->new_img) ? $this->new_img : $this->old_img;
+		imagejpeg($img,$filename,$quality);
 	}
 
 }

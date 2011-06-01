@@ -348,9 +348,9 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			}
 			return sprintf('(%s)',implode(',',$arr));
 		} else if ($c=='LIKE') {
-			return sprintf('%s',mysql_real_escape_string($v));
+			return sprintf('%s',mysql_escape_string($v));
 		} else {
-			return sprintf("'%s'",mysql_real_escape_string($v));
+			return sprintf("'%s'",mysql_escape_string($v));
 		}
 	}
 
