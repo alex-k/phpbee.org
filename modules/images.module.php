@@ -16,6 +16,12 @@ abstract class tw_images extends gs_recordset_short {
 		}
 		return $ret;
 	}
+        function record_as_string($rec) {
+		return implode($this->img('small',$rec));
+	}
+        public function __toString() {
+                return implode(' ',$this->recordset_as_string_array());
+        }
 }
 abstract class tw_file_images extends gs_recordset_short{
 	var $gs_connector_id='file_public';
@@ -31,17 +37,6 @@ abstract class tw_file_images extends gs_recordset_short{
 		$this->structure['triggers']['after_insert']='resize';
 		$this->structure['triggers']['after_update']='resize';
 	}
-	/*
-        function record_as_string($rec) {
-                if (strpos($rec->File_mimetype,'image')===0) {
-                        return sprintf('<img src="/img/s/%s" alt="%s" title="%s">',(sprintf('%s/b/100/100/%s',get_class($this),$rec->get_id())),$rec->File_filename,$rec->File_filename);
-                }
-                return parent::record_as_string($rec);
-        }
-        public function __toString() {
-                return implode(' ',$this->recordset_as_string_array());
-        }
-	*/
 
 	function img($params,$record=null) {
 		$ret=$this->src($params,$record);
