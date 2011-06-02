@@ -58,7 +58,7 @@ class gs_init {
 		return false;
 	}
 
-	private function compile_modules($path='') {
+	function compile_modules($path='') {
 		$tpl=null;
 		$data=array();
 		$ret=array();
