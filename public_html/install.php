@@ -5,6 +5,7 @@ $init=new gs_init('user');
 $init->init(LOAD_CORE | LOAD_STORAGE | LOAD_TEMPLATES);
 
 
+$init->compile_modules();
 $init->load_modules();
 $init->install_modules();
 gs_fkey::update_fkeys();
