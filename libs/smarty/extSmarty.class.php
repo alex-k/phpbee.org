@@ -14,6 +14,11 @@ class gs_Smarty extends Smarty {
 		$t->assign($this->getTemplateVars());
 		return $t->fetch();
 	}
+	function get_var($name) {
+		$t=reset($this->_tpl_arr);
+		return  ($t && isset($t->tpl_vars[$name])) ? $t->tpl_vars[$name]->value : NULL;
+	}
+
 }
 class extSmarty extends gs_Smarty {}
 class ___extSmarty extends gs_Smarty

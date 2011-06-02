@@ -42,14 +42,78 @@ class gs_init {
 		}
 	}
 
-	public function load_modules($mask='*module.php') {
-		$files = array_merge(glob($this->config->lib_modules_dir.$mask),glob($this->config->lib_modules_dir.'*/'.$mask));
-		$classes=get_declared_classes();
+	function check_compile_modules($path='') {
+		$modified=false;
+		$dir=$this->config->lib_modules_dir;
+		$subdirs=glob($dir.$path.'*',GLOB_ONLYDIR);
+		foreach ($subdirs as $s) {
+			if ($this->check_compile_modules($path.basename($s).DIRECTORY_SEPARATOR)) return true;
+		}
+		$files=glob($dir.$path.'*.phps');
 		foreach ($files as $f) {
-			load_file($f);
-			$nc=array_diff(get_declared_classes(),$classes);
-			foreach($nc as $c) $this->config->class_files[$c]=$f;
+			$pf=str_replace(basename($f),'___'.basename($f),$f);
+			$pf=preg_replace('/.phps$/','.xphp',$pf);
+			if (!file_exists($pf) || filemtime($pf) < filemtime($f)) return true;
+		}
+		return false;
+	}
+
+	private function compile_modules($path='') {
+		$tpl=null;
+		$data=array();
+		$ret=array();
+		$dir=$this->config->lib_modules_dir;
+		$subdirs=glob($dir.$path.'*',GLOB_ONLYDIR);
+		foreach ($subdirs as $s) {
+			$d=$this->compile_modules($path.basename($s).DIRECTORY_SEPARATOR);
+			$data=array_merge_recursive($data,$d);
+		}
+		$files=glob($dir.$path.'*.phps');
+		$module_name=str_replace(DIRECTORY_SEPARATOR,'_',trim($path,DIRECTORY_SEPARATOR));
+		foreach ($files as $f) {
+			$pf=str_replace(basename($f),'___'.basename($f),$f);
+			$pf=preg_replace('/.phps$/','.xphp',$pf);
+			if (!$tpl) {
+				$tpl=new gs_tpl();
+				$tpl=$tpl->init();
+				$tpl->left_delimiter='{%';
+				$tpl->right_delimiter='%}';
+			}
+			$s=file_get_contents($f);
+			$tpl->assign('MODULE_NAME','_'.$module_name);
+			$tpl->assign('SUBMODULE_NAME',basename($path));
+			$tpl->assign('SUBMODULES_DATA',$data);
+			$s=$tpl->fetch('string:'.$s);
+			if ($tpl->get_var('DATA')) {
+				$r=$tpl->get_var('DATA');
+				//$r=array_filter(array_map('trim',explode(PHP_EOL,$r)));
+				preg_match_all('|(\w+)::(.+?)::(.*)|i',$r,$r);
+				foreach ($r[0] as $k=>$v) {
+					$ret[$r[1][$k]][$r[2][$k]]=trim($r[3][$k]);
+					$ret['MODULE'][$module_name][$r[1][$k]][$r[2][$k]]=trim($r[3][$k]);
+				}
+			}
+			file_put_contents($pf,$s);
+			var_dump($pf);
+		}
+		return $ret;
+	}
+
+
+	public function load_modules($mask='*module.{php,xphp}') {
+		if ($this->check_compile_modules()) $this->compile_modules();
+
+		$path=$this->config->lib_modules_dir;
+		while (($files = glob($path.$mask,GLOB_BRACE)) && !empty($files)) {
+			var_dump($files);
 			$classes=get_declared_classes();
+			foreach ($files as $f) {
+				load_file($f);
+				$nc=array_diff(get_declared_classes(),$classes);
+				foreach($nc as $c) $this->config->class_files[$c]=$f;
+				$classes=get_declared_classes();
+			}
+			$path.='*'.DIRECTORY_SEPARATOR;
 		}
 		$cfg=gs_config::get_instance();
 		$loaded_classes=get_declared_classes();

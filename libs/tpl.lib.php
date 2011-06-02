@@ -3,7 +3,7 @@
 final class gs_tpl {
 	private  $_tpl_arr;
 	
-	protected function init()
+	function init()
 	{
 		$config=gs_config::get_instance();
 		load_file($config->lib_tpl_dir.'Smarty.class.php');
