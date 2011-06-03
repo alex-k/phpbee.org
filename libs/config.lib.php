@@ -50,10 +50,13 @@ class gs_init {
 			if ($this->check_compile_modules($path.basename($s).DIRECTORY_SEPARATOR)) return true;
 		}
 		$files=glob($dir.$path.'*.phps');
+		$tpldir=$dir.$path.DIRECTORY_SEPARATOR.'templates';
+		$tplcdir=$dir.$path.DIRECTORY_SEPARATOR.'___templates';
 		foreach ($files as $f) {
 			$pf=str_replace(basename($f),'___'.basename($f),$f);
 			$pf=preg_replace('/.phps$/','.xphp',$pf);
 			if (!file_exists($pf) || filemtime($pf) < filemtime($f)) return true;
+			if (file_exists($tpldir) && (!file_exists($tplcdir) || filemtime($tplcdir) < filemtime($tpldir))) return true;
 		}
 		return false;
 	}
@@ -70,19 +73,20 @@ class gs_init {
 		}
 		$files=glob($dir.$path.'*.phps');
 		$module_name=str_replace(DIRECTORY_SEPARATOR,'_',trim($path,DIRECTORY_SEPARATOR));
+		if (empty($files)) return $ret;
+		$tpl=new gs_tpl();
+		$tpl=$tpl->init();
+		$tpl->left_delimiter='{%';
+		$tpl->right_delimiter='%}';
+		$tpl->assign('MODULE_NAME','_'.$module_name);
+		var_dump('MODULE_NAME:'.$module_name);
+		$tpl->assign('MODULE',$module_name);
+		$tpl->assign('SUBMODULE_NAME',basename($path));
+		$tpl->assign('SUBMODULES_DATA',$data);
 		foreach ($files as $f) {
 			$pf=str_replace(basename($f),'___'.basename($f),$f);
 			$pf=preg_replace('/.phps$/','.xphp',$pf);
-			if (!$tpl) {
-				$tpl=new gs_tpl();
-				$tpl=$tpl->init();
-				$tpl->left_delimiter='{%';
-				$tpl->right_delimiter='%}';
-			}
 			$s=file_get_contents($f);
-			$tpl->assign('MODULE_NAME','_'.$module_name);
-			$tpl->assign('SUBMODULE_NAME',basename($path));
-			$tpl->assign('SUBMODULES_DATA',$data);
 			$s=$tpl->fetch('string:'.$s);
 			if ($tpl->get_var('DATA')) {
 				$r=$tpl->get_var('DATA');
@@ -95,6 +99,19 @@ class gs_init {
 			}
 			file_put_contents($pf,$s);
 			var_dump($pf);
+		}
+		$tpldir=$dir.$path.'templates';
+		$tplcdir=$dir.$path.'___templates';
+		if (file_exists($tpldir)) {
+			check_and_create_dir($tplcdir);
+			$files=glob($tpldir.DIRECTORY_SEPARATOR.'*');
+			foreach ($files as $f) {
+				$s=file_get_contents($f);
+				$s=$tpl->fetch('string:'.$s);
+				$pf=$tplcdir.DIRECTORY_SEPARATOR.basename($f);
+				file_put_contents($pf,$s);
+				var_dump($pf);
+			}
 		}
 		return $ret;
 	}

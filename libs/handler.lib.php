@@ -14,10 +14,15 @@ class gs_base_handler {
 		$www_subdir=$www_subdir ? "/$www_subdir/" : '/';
 		$subdir=$subdir ? "/$subdir/" : '';
 		$tpl=gs_tpl::get_instance();
+
+		$tpl_dir= dirname($filename).DIRECTORY_SEPARATOR.'___templates';
+		if (!file_exists($tpl_dir)) $tpl_dir= dirname($filename).DIRECTORY_SEPARATOR.'templates';
 		if (is_array($tpl->template_dir))
-			array_unshift($tpl->template_dir, cfg('lib_modules_dir')."/$subdir/templates");
+			array_unshift($tpl->template_dir, $tpl_dir);
 		else
-			$tpl->template_dir = cfg('lib_modules_dir')."/$subdir/templates";
+			$tpl->template_dir = $tpl_dir;
+
+
 		$tpl->assign('tpl',$this);
 		$tpl->assign('_gssession',gs_session::load());
 		$tpl->assign('_module_subdir',$subdir);
