@@ -38,6 +38,10 @@ class gs_parser {
 		$this->data=$data;
 	}
 	
+	function get_current_handler() {
+		return $this->current_handler;
+	}
+	
 	public function _get_handler()
 	{
 		return $this->current_handler;
@@ -95,7 +99,6 @@ class gs_parser {
 					$handlers['get']=isset($handlers['get']) ? array_merge($handlers['get_post'],$handlers['get']) : $handlers['get_post'];
 					$handlers['post']=isset($handlers['post']) ? array_merge($handlers['get_post'],$handlers['post']) : $handlers['get_post'];
 				}
-
 
 				foreach ($handlers as $k=>$h) {
 					foreach ($h as $kk=>$hv) {

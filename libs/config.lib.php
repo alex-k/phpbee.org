@@ -73,14 +73,15 @@ class gs_init {
 		}
 		$files=glob($dir.$path.'*.phps');
 		$module_name=str_replace(DIRECTORY_SEPARATOR,'_',trim($path,DIRECTORY_SEPARATOR));
+		$module_dir_name=str_replace(DIRECTORY_SEPARATOR,'_',basename($path,DIRECTORY_SEPARATOR));
 		if (empty($files)) return $ret;
 		$tpl=new gs_tpl();
 		$tpl=$tpl->init();
 		$tpl->left_delimiter='{%';
 		$tpl->right_delimiter='%}';
 		$tpl->assign('MODULE_NAME','_'.$module_name);
-		var_dump('MODULE_NAME:'.$module_name);
-		$tpl->assign('MODULE',$module_name);
+		//$tpl->assign('MODULE',$module_name);
+		$tpl->assign('MODULE',$module_dir_name);
 		$tpl->assign('SUBMODULE_NAME',basename($path));
 		$tpl->assign('SUBMODULES_DATA',$data);
 		foreach ($files as $f) {
@@ -94,11 +95,10 @@ class gs_init {
 				preg_match_all('|(\w+)::(.+?)::(.*)|i',$r,$r);
 				foreach ($r[0] as $k=>$v) {
 					$ret[$r[1][$k]][$r[2][$k]]=trim($r[3][$k]);
-					$ret['MODULE'][$module_name][$r[1][$k]][$r[2][$k]]=trim($r[3][$k]);
+					$ret['MODULE'][$module_dir_name][$r[1][$k]][$r[2][$k]]=trim($r[3][$k]);
 				}
 			}
 			file_put_contents($pf,$s);
-			var_dump($pf);
 		}
 		$tpldir=$dir.$path.'templates';
 		$tplcdir=$dir.$path.'___templates';
@@ -122,7 +122,7 @@ class gs_init {
 
 		$path=$this->config->lib_modules_dir;
 		while (($files = glob($path.$mask,GLOB_BRACE)) && !empty($files)) {
-			var_dump($files);
+			//var_dump($files);
 			$classes=get_declared_classes();
 			foreach ($files as $f) {
 				load_file($f);

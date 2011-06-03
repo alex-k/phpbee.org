@@ -29,7 +29,10 @@ function smarty_function_handler($params, &$smarty) {
 	$tpl->assign($assign);
 
 	$o_p=gs_parser::get_instance($data);
-	//$o_p=new gs_parser($data);
+	if (isset($params['scope'])) {
+		$hndl=$o_p->get_current_handler();
+		if ($hndl[0]['params']['module_name']!=$params['scope']) return '';
+	}
 	return $o_p->process();
 }
 ?>
