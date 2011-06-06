@@ -61,7 +61,8 @@ class gs_base_handler {
 	function show($nodebug=FALSE) {
 		//if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
 		if (empty($this->params['name'])) {
-			$this->params['name']=str_replace('/','_',$this->data['handler_key']).'.html';
+			//$this->params['name']=str_replace('/','_',$this->data['handler_key']).'.html';
+			$this->params['name']=basename($this->data['handler_key']).'.html';
 		}
 
 		$tpl=gs_tpl::get_instance();
