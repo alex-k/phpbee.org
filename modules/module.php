@@ -43,6 +43,7 @@ class module extends gs_base_module implements gs_module {
 				'/admin/menu'=>'admin_handler.show_menu',
 				'img/show'=>'images_handler.show',
 				'img/s'=>'images_handler.s',
+				'/admin/window_form'=>'admin_handler.many2one:{name:window_form.html}',
 				'/admin/many2one'=>'admin_handler.many2one:{name:many2one.html}',
 				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
 				'a'=>'gs_base_handler.show',
@@ -147,6 +148,13 @@ class form_admin extends  g_forms_html {
 	function __construct($h,$data=array(),$rec=null)  {
 		parent::__construct($h,$data,$rec);
 		$this->view = new gs_glyph('helper',array('class'=>'table_admin'));
+		$this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
+	}
+}
+class form_table extends  g_forms_html {
+	function __construct($h,$data=array(),$rec=null)  {
+		parent::__construct($h,$data,$rec);
+		$this->view = new gs_glyph('helper',array('class'=>'table_submit'));
 		$this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
 	}
 }
