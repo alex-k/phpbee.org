@@ -317,7 +317,7 @@ class gs_widget_gallery extends gs_widget {
 				$find=array();
 				$find[$this->params['options']['foreign_field_name']]=$rid;
 				$hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
-				$images=$r->find_records($find,array('id,name'));
+				$images=$r->find_records($find);
 				$images=$images->get_values();
 
 				$s='<div class="many2one_gallery" id="gallery_'.$hash.'">';
@@ -364,6 +364,28 @@ class gs_data_widget_include_form {
 		unset($hh[$k]);
 		return $hh;
 	}
+}
+
+class gs_widget_window_form extends gs_widget {
+		function clean() {
+				return array('fake'=>true);
+		}
+		function html() {
+				$rid_name=$this->params['options']['local_field_name'];
+				$rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
+				$r=new $this->params['options']['recordset'];
+				$find=array();
+				$find[$this->params['options']['foreign_field_name']]=$rid;
+				$hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
+				$images=$r->find_records($find);
+				$images=$images->get_values();
+
+
+				$s='';
+				$s.=sprintf('<a href="/admin/window_form/%s/%s/%d/%s" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;" id="lMany2One_%s">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,$hash,$this->params['linkname'],gs_dict::get('LOAD_RECORDS'));
+				$s.=sprintf('<input type="hidden" name="%s" value="%s">', $this->params['linkname'].'_hash',$hash);
+				return $s;
+		}
 }
 
 class gs_widget_iframe_gallery extends gs_widget {

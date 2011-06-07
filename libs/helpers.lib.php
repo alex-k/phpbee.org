@@ -42,18 +42,6 @@ class helper_table {
 		return sprintf('<table class="helper_table">%s</table>',$txt);
 	}
 }
-class helper_table_submit{
-    function show($label,$txt,$errors=array()) {
-         return sprintf('<table class="helper_table"><tr><td class="helper_table_submit_l"><input type="submit" value="%s">
-         </td><td class="helper_table_submit_r"><input type="submit" value="%s"></td></tr>%s<tr><td class="helper_table_submit_l">
-         <input type="submit" value="%s"></td><td class="helper_table_submit_r"><input type="submit" value="%s"></td></tr></table>',
-         gs_dict::get('SUBMIT_FORM'),
-         gs_dict::get('SUBMIT_FORM'),
-         $txt,
-         gs_dict::get('SUBMIT_FORM'),
-         gs_dict::get('SUBMIT_FORM'));
-    }
-}
 
 
 class helper_empty {
@@ -79,6 +67,12 @@ class helper_table_admin {
 		gs_dict::get('SUBMIT_FORM'),
 		gs_dict::get('SUBMIT_FORM'));
 	}
+}
+class helper_table_submit{
+    function show($label,$txt,$errors=array()) {
+         return sprintf('<table class="helper_table"> %s <tr> <td class="helper_table_submit_r"><input type="submit" value="%s"></td></tr> </table>',
+			 $txt, gs_dict::get('SUBMIT_FORM'));
+    }
 }
 
 class helper_tr {

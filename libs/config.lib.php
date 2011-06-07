@@ -63,7 +63,7 @@ class gs_init {
 
 	function compile_modules($path='') {
 		$tpl=null;
-		$data=array();
+		$data=array('LINKS'=>array());
 		$ret=array();
 		$dir=$this->config->lib_modules_dir;
 		$subdirs=glob($dir.$path.'*',GLOB_ONLYDIR);
@@ -74,6 +74,7 @@ class gs_init {
 		$files=glob($dir.$path.'*.phps');
 		$module_name=str_replace(DIRECTORY_SEPARATOR,'_',trim($path,DIRECTORY_SEPARATOR));
 		$module_dir_name=str_replace(DIRECTORY_SEPARATOR,'_',basename($path,DIRECTORY_SEPARATOR));
+		$parent_module=str_replace(DIRECTORY_SEPARATOR,'_',dirname($path));
 		if (empty($files)) return $ret;
 		$tpl=new gs_tpl();
 		$tpl=$tpl->init();
@@ -82,6 +83,7 @@ class gs_init {
 		$tpl->assign('MODULE_NAME','_'.$module_name);
 		//$tpl->assign('MODULE',$module_name);
 		$tpl->assign('MODULE',$module_dir_name);
+		$tpl->assign('PARENT_MODULE',$parent_module);
 		$tpl->assign('SUBMODULE_NAME',basename($path));
 		$tpl->assign('SUBMODULES_DATA',$data);
 		foreach ($files as $f) {
@@ -110,7 +112,7 @@ class gs_init {
 				$s=$tpl->fetch('string:'.$s);
 				$pf=$tplcdir.DIRECTORY_SEPARATOR.basename($f);
 				file_put_contents($pf,$s);
-				var_dump($pf);
+				md($pf);
 			}
 		}
 		return $ret;
@@ -122,7 +124,6 @@ class gs_init {
 
 		$path=$this->config->lib_modules_dir;
 		while (($files = glob($path.$mask,GLOB_BRACE)) && !empty($files)) {
-			//var_dump($files);
 			$classes=get_declared_classes();
 			foreach ($files as $f) {
 				load_file($f);
@@ -452,7 +453,6 @@ class gs_var_storage {
 		return md5($id);
 	}
 	static function save($id,$value) {
-		//var_dump($this);
 		$id=self::genid($id);
 		$t=gs_var_storage::get_instance();
 		$t->arr[$id]=$value;

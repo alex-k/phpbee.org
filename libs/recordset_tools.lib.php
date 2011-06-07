@@ -28,6 +28,7 @@ class field_interface {
 		foreach ($ret as $k => $r) {
 			if (!method_exists('field_interface',$r['func_name']))
 				throw new gs_exception("field_interface: no method '".$r['func_name']."'");
+
 			self::$r['func_name']($k,$r,$structure,$init_opts);
 			if (isset($r['default']) && !isset($structure['fields'][$k]['default'])) $structure['fields'][$k]['default']=$r['default'];
 		}
@@ -222,9 +223,10 @@ class field_interface {
 	}
 	
 	static function lMany2One($field,$opts,&$structure,$init_opts) {
-		if(isset($init_opts['skip_many2many'])) return;
 		list($rname,$linkname)=explode(':',$opts['linked_recordset']);
-		$obj=new $rname(array('skip_many2many'=>true));
+		$obj=new $rname();
+		//if(isset($init_opts['skip_many2many'])) return;
+		//$obj=new $rname(array('skip_many2many'=>true));
 		$obj_rs=$obj->structure['recordsets'][$linkname];
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$rname,

@@ -15,13 +15,12 @@ class gs_base_handler {
 		$subdir=$subdir ? "/$subdir/" : '';
 		$tpl=gs_tpl::get_instance();
 
-		$tpl_dir= dirname($filename).DIRECTORY_SEPARATOR.'___templates';
-		if (!file_exists($tpl_dir)) $tpl_dir= dirname($filename).DIRECTORY_SEPARATOR.'templates';
+		$this->tpl_dir= dirname($filename).DIRECTORY_SEPARATOR.'___templates';
+		if (!file_exists($this->tpl_dir)) $this->tpl_dir=dirname($filename).DIRECTORY_SEPARATOR.'templates';
 		if (is_array($tpl->template_dir))
-			array_unshift($tpl->template_dir, $tpl_dir);
+			array_push($tpl->template_dir, $this->tpl_dir);
 		else
-			$tpl->template_dir = $tpl_dir;
-
+			$tpl->template_dir = $this->tpl_dir;
 
 		$tpl->assign('tpl',$this);
 		$tpl->assign('_gssession',gs_session::load());
@@ -47,11 +46,12 @@ class gs_base_handler {
 	}
 	function fetch() {
 		if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
+		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
-		if (!$tpl->templateExists($this->params['name'])) throw new gs_exception('gs_base_handler.show: can not find template file for '.$this->params['name']);
-		return $tpl->fetch($this->params['name']);
+		if (!$tpl->templateExists($tplname)) throw new gs_exception('gs_base_handler.show: can not find template file for '.$tplname);
+		return $tpl->fetch($tplname);
 	}
 	function show404() {
 		header("HTTP/1.0 404 Not Found");
@@ -59,11 +59,10 @@ class gs_base_handler {
 		return false;
 	}
 	function show($nodebug=FALSE) {
-		//if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
 		if (empty($this->params['name'])) {
-			//$this->params['name']=str_replace('/','_',$this->data['handler_key']).'.html';
 			$this->params['name']=basename($this->data['handler_key']).'.html';
 		}
+		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
 
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('_gsdata',$this->data);
@@ -72,7 +71,7 @@ class gs_base_handler {
 
 		if (isset($this->data['handler_params'])) {
 			try {
-				$html=$tpl->fetch($this->params['name']);
+				$html=$tpl->fetch($tplname);
 				echo $html;
 				return;
 			} catch (gs_exception $e) {
@@ -83,7 +82,7 @@ class gs_base_handler {
 		}
 		$txt=ob_get_contents();
 		ob_end_clean();
-		$html=$tpl->fetch($this->params['name']);
+		$html=$tpl->fetch($tplname);
 		echo $html;
 		if (DEBUG && !$nodebug) {
 			mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
@@ -229,9 +228,8 @@ TXT;
 		$f=$this->get_form();
 		$tpl->assign('formfields',$f->show());
 		$tpl->assign('form',$f);
-		//echo $tpl->fetch($this->params['name']);
-		$ret=$tpl->fetch($this->params['name']);
-		//var_dump($ret);
+		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
+		$ret=$tpl->fetch($tplname);
 		return $ret;
 	}
 	function post() {
@@ -244,11 +242,11 @@ TXT;
 			$f->rec->fill_values(self::explode_data($f->clean()));
 			$f->rec->get_recordset()->commit();
 			return $f->rec;
-			//return $tpl->fetch($this->params['name']);
 		}
 		$tpl->assign('formfields',$f->show($validate));
 		$tpl->assign('form',$f);
-		return $tpl->fetch($this->params['name']);
+		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
+		return $tpl->fetch($tplname);
 	}
 
 	function postform() {
@@ -271,11 +269,11 @@ TXT;
 				                     ));
 			}
 			return html_redirect($this->data['gspgid_handler']);
-			//return $tpl->fetch($this->params['name']);
 		}
 		$tpl->assign('formfields',$f->show($validate));
 		$tpl->assign('form',$f);
-		return $tpl->fetch($this->params['name']);
+		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
+		return $tpl->fetch($tplname);
 	}
 	function displayform() {
 		$tpl=gs_tpl::get_instance();

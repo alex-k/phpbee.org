@@ -248,6 +248,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		//$this->query_options['loaded_fields']=is_array($this->query_options['loaded_fields']) ? array_merge($fields,$this->query_options['loaded_fields']) : $fields;
 		$this->reset();
 		$this->state=RS_STATE_UNLOADED;
+		mlog('RS_STATE_UNLOADED on '.get_class($this));//.' options:'.print_r($options,TRUE));
 		return $this;
 	}
 	public function late_load_records() {
