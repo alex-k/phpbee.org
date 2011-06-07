@@ -11,8 +11,6 @@ final class gs_tpl {
 		$tpl=new extSmarty;
 		$tpl->template_dir=$config->tpl_data_dir;
 		$tpl->compile_dir=$config->tpl_var_dir;
-		//$tpl->use_sub_dirs=true;
-		$tpl->force_compile=true;
 		//$tpl->plugins_dir[]=$config->lib_tpl_dir.'plugins';
 		$tpl->assign('base_dir',$config->www_dir);
 		$tpl->assign('http_host',$config->host);
