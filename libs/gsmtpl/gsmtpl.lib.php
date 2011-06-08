@@ -223,6 +223,7 @@ class gstpl_compiler {
 	
 	function get() {
 		$this->code=$this->source;
+		$this->compile_comments();
 		$this->compile_extends();
 		$this->compile_strings();
 		$this->compile_vars();
@@ -234,6 +235,11 @@ class gstpl_compiler {
 		//md($this->code);
 		$this->make_class();
 		return $this->code;
+	}
+	
+	function compile_comments() {
+		$regexp=sprintf("|%s\*(.*?)\*%s|is",$this->ld,$this->rd);
+		$this->code=preg_replace($regexp,'',$this->code);
 	}
 	
 	function compile_extends() {
