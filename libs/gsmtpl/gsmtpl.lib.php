@@ -7,6 +7,7 @@ class gsmtpl {
 	public $left_delimiter='{';
 	public $right_delimiter='}';
 	private $assign=array();
+	private $page=NULL;
 	
 	function __construct() {
 		$this->compile_dir=dirname(__FILE__).DIRECTORY_SEPARATOR.$this->compile_dir;
@@ -23,6 +24,9 @@ class gsmtpl {
 			}
 		}
 	}
+	public function get_var($name) {
+		return $this->page ? $this->page->get_var($name) : NULL;
+	}
 	
 	public function display($name) {
 		echo $this->fetch($name);
@@ -31,8 +35,8 @@ class gsmtpl {
 	public function fetch($name) {
 		$info=$this->load_template($name);
 		$class_name='__gs_page_'.$info['id'];
-		$o=new $class_name($this->plugins_dir);
-		$res=$o->main($this->assign);
+		$this->page=new $class_name($this->plugins_dir);
+		$res=$this->page->main($this->assign);
 		return $res;
 	}
 	
@@ -126,6 +130,7 @@ class gsmtpl {
 		
 		return $info;
 	}
+
 }
 
 class gstpl_compiler {
@@ -433,6 +438,9 @@ class gs_page_blank {
 			$this->{$key}=$value;
 		}
 	}
+	function get_var($name) {
+		return isset($this->$name) ? $this->$name : NULL;
+	}
 }
 
 abstract class gstpl_source {}
@@ -463,7 +471,7 @@ class gstpl_source_string extends gstpl_source {
 /**
 * Functions from our engine
 **/
-
+/*
 function md($output)
 {
 	$txt=htmlentities(print_r($output,true));
@@ -519,5 +527,5 @@ class gs_exception extends Exception {
 }
 
 set_exception_handler('gs_exception_handler');
-
+*/
 ?>

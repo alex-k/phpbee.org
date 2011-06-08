@@ -6,7 +6,6 @@ final class gs_tpl {
 	function init()
 	{
 		$config=gs_config::get_instance();
-		load_file($config->lib_tpl_dir.'Smarty.class.php');
 		load_file($config->lib_tpl_dir.'extSmarty.class.php');
 		$tpl=new extSmarty;
 		$tpl->template_dir=$config->tpl_data_dir;
