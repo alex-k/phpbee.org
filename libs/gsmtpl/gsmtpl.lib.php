@@ -108,7 +108,7 @@ class gsmtpl {
 	}
 	
 	public function get_source_info($url) {
-		preg_match_all("|^(([\w_]{2,})?:)?(.+)$|i",$url,$d);
+		preg_match_all("|^(([\w_]{2,})?:)?(.+)$|is",$url,$d);
 		$info=array();
 		$type=(!empty($d[2][0])) ? $d[2][0] : 'file';
 		switch ($type) {
@@ -129,6 +129,12 @@ class gsmtpl {
 			);
 		
 		return $info;
+	}
+
+	function getTemplateVars($name=NULL) {
+		$ret=$this->page ? $this->page->assign : $this->assign ;
+		if ($name===NULL) return $ret;
+		return isset($ret[$name]) ? $ret[$name] : NULL;
 	}
 
 }
@@ -411,7 +417,7 @@ class gstpl_compiler {
 }
 
 class gs_page_blank {
-	protected $assign=array();
+	public $assign=array();
 	public $plugins_dir;
 	
 	function __construct($plugins_dir) {
@@ -424,11 +430,13 @@ class gs_page_blank {
 		}
 		$func_file=$this->plugins_dir.DIRECTORY_SEPARATOR.'function.'.$func.'.php';
 		$func_name=sprintf('smarty_function_%s',$func);
-		if (!file_exists ($func_file)) {
-			throw new gs_exception('gstpl: function '.$func_name.' not found');
+		if (!function_exists($func_name)) {
+			if (!file_exists ($func_file)) {
+				throw new gs_exception('gstpl: function '.$func_name.' not found');
+			}
+			include_once($func_file);
 		}
-		include($func_file);
-		return $func_name($params,$this);
+		return $func_name(reset($params),$this);
 	}
 	
 	public function main($params) {
@@ -436,16 +444,22 @@ class gs_page_blank {
 	}
 	
 	public function assign($params) {
+		$this->assign[$params['var']]=$params['value'];
 		$this->{$params['var']}=$params['value'];
 	}
 	
 	protected function assign_vars($params) {
 		foreach ($params as $key => $value) {
+			$this->assign[$key]=$value;
 			$this->{$key}=$value;
 		}
 	}
 	function get_var($name) {
 		return isset($this->$name) ? $this->$name : NULL;
+	}
+	function getTemplateVars($name=NULL) {
+		if ($name===NULL) return $this->assign;
+		return isset($this->assign[$name]) ? $this->assign[$name] : NULL;
 	}
 }
 
