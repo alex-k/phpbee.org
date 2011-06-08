@@ -37,7 +37,7 @@ class gsmtpl {
 		$class_name='__gs_page_'.$info['id'];
 		$this->page=new $class_name($this->plugins_dir);
 		$res=$this->page->main($this->assign);
-		return $res;
+		return stripslashes($res);
 	}
 	
 	public function load_template($name) {
@@ -74,7 +74,7 @@ class gsmtpl {
 	private function is_compiled($info) {
 		$dir=$this->compile_dir.DIRECTORY_SEPARATOR.$info['type'];
 		check_and_create_dir($dir);
-		if (file_exists($dir.DIRECTORY_SEPARATOR.$info['compile_id']) && $this->mtime_source($info)<=filemtime($dir.DIRECTORY_SEPARATOR.$info['compile_id'])) {
+		if (false && file_exists($dir.DIRECTORY_SEPARATOR.$info['compile_id']) && $this->mtime_source($info)<=filemtime($dir.DIRECTORY_SEPARATOR.$info['compile_id'])) {
 			//md('old version');
 			include_once($dir.DIRECTORY_SEPARATOR.$info['compile_id']);
 			return true;
@@ -114,20 +114,20 @@ class gsmtpl {
 		switch ($type) {
 			case 'file':
 				$url=$this->find_file($d[3][0]);
-				$id=basename($url,'.html');
+				$id=preg_replace("|(.*)\.\w+$|i","\\1",basename($url));
 			break;
 			default:
 				$url=$d[3][0];
 				$id=md5($url);
 			break;
 		}
+		
 		$info=array(
 			'type'=>$type,
 			'url'=>$url,
 			'id'=>$id,
 			'compile_id'=>md5($url).'.'.$id,
 			);
-		
 		return $info;
 	}
 
@@ -149,7 +149,7 @@ class gstpl_compiler {
 	private $extend='gs_page_blank';
 	private $methods=array();
 	private $tpl=null;
-	private $reserved=array('block','foreach','for','section','if','else');
+	private $reserved=array('block','capture','foreach','for','section','if','else');
 	
 	function __construct($source,$id,$gstpl) {
 		$this->id=$id;
@@ -160,49 +160,65 @@ class gstpl_compiler {
 	}
 	
 	// we need learn parse nested blocks
-	private function parse_blocks () {
+	private function parse_blocks ($blockname) {
 		$blocks=array();
 		$result=$this->code;
 		$counter=0;
 		$parts=array();
-		$spos=strpos($result,$this->ld.'block',0);
+		$spos=strpos($result,$this->ld.$blockname,0);
 		while($spos!==false) {
 			$counter++;
-			$len=strlen($this->ld.'block');
-			$result=substr_replace($result,$this->ld.'block:'.$counter,$spos,$len);
+			$len=strlen($this->ld.$blockname);
+			$result=substr_replace($result,$this->ld.$blockname.':'.$counter,$spos,$len);
 			//$blocks[$counter]['start']=$spos;
-			$spos=strpos($result,$this->ld.'block',$spos+$len);
+			$spos=strpos($result,$this->ld.$blockname,$spos+$len);
 		}
 		while ($counter>0) {
-			$spos=strpos($result,$this->ld.'block:'.$counter,0);
-			$epos=strpos($result,$this->ld.'/block'.$this->rd,$spos);
+			$spos=strpos($result,$this->ld.$blockname.':'.$counter,0);
+			$epos=strpos($result,$this->ld.'/'.$blockname.$this->rd,$spos);
 			if ($epos===false) throw new gs_exception('gstpl: closed tag of section not found');
-			$len=strlen($this->ld.'/block'.$this->rd);
-			$result=substr_replace($result,$this->ld.'/block:'.$counter.$this->rd,$epos,$len);
+			$len=strlen($this->ld.'/'.$blockname.$this->rd);
+			$result=substr_replace($result,$this->ld.'/'.$blockname.':'.$counter.$this->rd,$epos,$len);
 			$blocks[$counter]['start']=$spos;
-			$blocks[$counter]['end']=$epos+strlen($this->ld.'/block:'.$counter.$this->rd);
+			$blocks[$counter]['end']=$epos+strlen($this->ld.'/'.$blockname.':'.$counter.$this->rd);
 			$counter--;
 		}
 		$res=$result;
 		foreach ($blocks as $i => $block) {
-			$regexp=sprintf("|%s(block:%d)(.*?)%s(.*?)%s/\\1%s|is",$this->ld,$i,$this->rd,$this->ld,$this->rd);
+			$regexp=sprintf("|%s(%s:%d)(.*?)%s(.*?)%s/\\1%s|is",$this->ld,$blockname,$i,$this->rd,$this->ld,$this->rd);
 			preg_match_all($regexp,$result,$out);
 			$blocks[$i]['params']=string_to_params($out[2][0]);
+			if (!isset($blocks[$i]['params']['name'])) $blocks[$i]['params']['name']='default_'.$i;
 			$blocks[$i]['code']=$out[3][0];
 			$blocks[$i]['mode']=isset($blocks[$i]['params']['mode']) ? $blocks[$i]['params']['mode'] : 'replace';
 			
-			$params=preg_replace("|\s|is",'',var_export($blocks[$i]['params'],true));
-			$res=preg_replace($regexp,PHP_EOL."\$res.=\$this->block_".$blocks[$i]['params']['name'].'('.$params.');'.PHP_EOL,$res);
+			$fname='compile_'.$blockname;
+			$res=$this->$fname($blockname,$blocks[$i],$i,$res);
+			
 		}
 		$this->add_method('main',$res,'main');
 		foreach ($blocks as $i => $block) {
 			foreach ($blocks as $j => $subblock) {
-				$regexp=sprintf("|%s(block:%d)(.*?)%s(.*?)%s/\\1%s|is",$this->ld,$j,$this->rd,$this->ld,$this->rd);
+				$regexp=sprintf("|%s(%s:%d)(.*?)%s(.*?)%s/\\1%s|is",$this->ld,$blockname,$j,$this->rd,$this->ld,$this->rd);
 				$params=preg_replace("|\s|is",'',var_export($subblock['params'],true));
-				$blocks[$i]['code']=preg_replace($regexp,PHP_EOL."\$res.=\$this->block_".$subblock['params']['name'].'('.$params.');'.PHP_EOL,$blocks[$i]['code']);
+				$fname='compile_'.$blockname;
+				$blocks[$i]['code']=$this->$fname($blockname,$subblock,$j,$blocks[$i]['code']);
 			}
-			$this->add_method("block_".$block['params']['name'],$blocks[$i]['code'],$block['mode']);
+			$this->add_method($blockname."_".$block['params']['name'],$blocks[$i]['code'],$block['mode']);
 		}
+		$this->code=$res;
+	}
+	
+	private function compile_block($blockname,$block,$counter,$code) {
+		$regexp=sprintf("|%s(%s:%d)(.*?)%s(.*?)%s/\\1%s|is",$this->ld,$blockname,$counter,$this->rd,$this->ld,$this->rd);
+		$params=preg_replace("|\s|is",'',var_export($block['params'],true));
+		return preg_replace($regexp,PHP_EOL."\$res.=\$this->".$blockname."_".$block['params']['name'].'('.$params.');'.PHP_EOL,$code);
+	}
+	
+	private function compile_capture($blockname,$block,$counter,$code) {
+		$regexp=sprintf("|%s(%s:%d)(.*?)%s(.*?)%s/\\1%s|is",$this->ld,$blockname,$counter,$this->rd,$this->ld,$this->rd);
+		$params=preg_replace("|\s|is",'',var_export($block['params'],true));
+		return preg_replace($regexp,PHP_EOL."\$this->assign(array('var'=>'".$block['params']['assign']."','value'=>\$this->".$blockname."_".$block['params']['name'].'('.$params.')));'.PHP_EOL,$code);
 	}
 	
 	private function add_method($name,$code,$mode) {
@@ -237,7 +253,8 @@ class gstpl_compiler {
 		$this->compile_html();
 		$this->compile_foreach();
 		$this->compile_if();
-		$this->parse_blocks();
+		$this->parse_blocks('block');
+		$this->parse_blocks('capture');
 		//md($this->code);
 		$this->make_class();
 		return $this->code;
@@ -282,7 +299,7 @@ class gstpl_compiler {
 			$value=str_replace("\$this->","\$",$value);
 			$matches[$key]=str_replace("\$","\$this->",$value);
 		}
-		$res=preg_replace("|(^[\w_]+)(.*)|is","\$this->\\1(".$matches[1]."\\2)",$matches[2]);
+		$res=preg_replace("|(^[\w_]+)(.*)|is","\$this->_\\1(".$matches[1]."\\2)",$matches[2]);
 		$res=preg_replace_callback("|[\"\'].*?[\"\']|i",array($this,'escaper'),$res);
 		$res=preg_replace("|([^:]):([^:])|i","\\1,\\2",$res);
 		$res=preg_replace_callback("|[\"\'].*?[\"\']|i",array($this,'unescaper'),$res);
@@ -309,8 +326,8 @@ class gstpl_compiler {
 	}
 	
 	function parse_if($matches) {
-		$res=preg_replace("|\.([^\.><=]*)|i","[\\1]",$matches[1]);
-		$res=preg_replace("|\[([a-z_].*)\]|i","['\\1']",$res);
+		$res=preg_replace("|\.([^\.><=\[]*)|i","[\\1]",$matches[1]);
+		$res=preg_replace("|\[([a-z_][a-z0-9_]*)\]|i","['\\1']",$res);
 		return sprintf("\nif (%s) {\n",str_replace("\$","\$this->",$res));
 	}
 	
@@ -318,7 +335,7 @@ class gstpl_compiler {
 		$res=$this->code;
 		$regexp=sprintf("|%sforeach(.*?)%s|is",$this->ld,$this->rd);
 		$res=preg_replace_callback($regexp,array($this,'parse_foreach'),$res);
-		$res=str_replace(sprintf("%s/foreach%s",$this->ld,$this->rd),"}",$res);
+		$res=str_replace(sprintf("%s/foreach%s",$this->ld,$this->rd),"}\n",$res);
 		$this->code=$res;
 	}
 	
@@ -327,7 +344,7 @@ class gstpl_compiler {
 		if (isset($params['key'])) {
 			return sprintf("\nforeach (%s as \$this->%s => \$this->%s) {\n",str_replace("\$","\$this->",$params['from']),$params['key'],$params['item']);
 		}
-		return sprintf("\nforeach (%s as \$%s) {\n",$params['from'],$params['item']);
+		return sprintf("\nforeach (%s as \$this->%s) {\n",str_replace("\$","\$this->",$params['from']),$params['item']);
 	}
 	
 	function compile_strings() {
@@ -366,12 +383,21 @@ class gstpl_compiler {
 	}
 	
 	function parse_func($matches) {
-		$params=string_to_params($matches[1]);
+		md($matches[1],1);
+		$res=preg_replace("|\.([^\.><=\[]*)|i","[\\1]",$matches[1]);
+		md($res,1);
+		$res=preg_replace("|\[([a-z_][a-z0-9_]*)\]|i","['\\1']",$res);
+		md($res,1);
+		md('========',1);
+		//$params=string_to_params($matches[1]);
+		$params=string_to_params($res);
+		md($params,1);
 		$params[0]=ltrim($params[0],'/');
 		if (in_array($params[0],$this->reserved)) {
 			return $matches[0];
 		}
 		$func_name=$params[0];
+		md($func_name);
 		unset($params[0]);
 		foreach ($params as $key => $value) {
 			$d=$this->compile_modifiers(array($this->ld.$value.$this->rd));
@@ -404,7 +430,14 @@ class gstpl_compiler {
 		foreach ($lines as $line) {
 			$line=trim($line);
 			if (!empty($line)) {
-				$ret.=preg_replace_callback("|^([^\$\{].*)|i",array($this,'parse_html'),$line).PHP_EOL;
+				//md($line,1);
+				if(strpos($line,'$this')===false && strpos($line,'$res')===false && strpos($line,$this->ld)===false) {
+					//$ret.=preg_replace_callback("|^([^\$\{].*)|i",array($this,'parse_html'),$line).PHP_EOL;
+					//$ret.=preg_replace_callback("|^(.+)|i",array($this,'parse_html'),$line).PHP_EOL;
+					$ret.=sprintf("\$res.='%s';\n",addslashes($line));
+				} else {
+					$ret.=$line;
+				}
 			}
 		}
 		$this->code=$ret;
@@ -425,6 +458,11 @@ class gs_page_blank {
 	}
 	
 	function __call($func,$params) {
+		if (substr($func,0,1)!='_') {
+			$params=reset($params);
+		} else {
+			$func=substr($func,1);
+		}
 		if (function_exists($func)) {
 			return call_user_func_array($func,$params);
 		}
@@ -436,7 +474,11 @@ class gs_page_blank {
 			}
 			include_once($func_file);
 		}
-		return $func_name(reset($params),$this);
+		return $func_name($params,$this);
+	}
+	
+	function __get($name) {
+		return null;
 	}
 	
 	public function main($params) {
@@ -454,13 +496,17 @@ class gs_page_blank {
 			$this->{$key}=$value;
 		}
 	}
+	
 	function get_var($name) {
 		return isset($this->$name) ? $this->$name : NULL;
 	}
+	
 	function getTemplateVars($name=NULL) {
 		if ($name===NULL) return $this->assign;
 		return isset($this->assign[$name]) ? $this->assign[$name] : NULL;
 	}
+	
+
 }
 
 abstract class gstpl_source {}
