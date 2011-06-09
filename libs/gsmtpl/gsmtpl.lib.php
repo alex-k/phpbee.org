@@ -228,7 +228,7 @@ class gstpl_compiler {
 	
 	
 	private function make_class() {
-		$str=sprintf("<?php\n%s\n\nclass __gs_page_%s extends %s {\n",(!empty($this->extend_file)) ? 'require_once("'.$this->extend_file.'");' : '',$this->id,$this->extend);
+		$str=sprintf("<?php\n\n%s\n\nclass __gs_page_%s extends %s {\n",(!empty($this->extend_file)) ? 'require_once("'.$this->extend_file.'");' : '',$this->id,$this->extend);
 		foreach ($this->methods as $func => $info) {
 			$str.=sprintf("\t%s function %s(\$params) {\n\t\t\$this->assign_vars(\$params);\n\t\t\$res='';%s\n\t\t%s\n%s\n\t\treturn \$res;\n\t}\n\n",
 					$func=='main' ? 'public' : 'protected',
@@ -246,16 +246,18 @@ class gstpl_compiler {
 	function get() {
 		$this->code=$this->source;
 		$this->compile_comments();
+		$this->compile_html();
 		$this->compile_extends();
 		$this->compile_strings();
 		$this->compile_vars();
 		$this->compile_functions();
-		$this->compile_html();
 		$this->compile_foreach();
 		$this->compile_if();
+		
 		$this->parse_blocks('block');
 		$this->parse_blocks('capture');
 		//md($this->code);
+		//$this->
 		$this->make_class();
 		return $this->code;
 	}
@@ -291,6 +293,8 @@ class gstpl_compiler {
 			if ($res[0]==$r) break;
 			$r=$res[0];
 		}
+		$value=preg_replace("|\.([^\.><=\[\s\,\)\(\}]*)|i","[\\1]",$res[0]);
+		$res[0]=preg_replace("|\[([a-z_][a-z0-9\_]*)\]|i","['\\1']",$value);
 		return $res[0];
 	}
 	
@@ -342,7 +346,9 @@ class gstpl_compiler {
 	function parse_foreach($matches) {
 		$params=string_to_params($matches[1]);
 		if (isset($params['key'])) {
-			return sprintf("\nforeach (%s as \$this->%s => \$this->%s) {\n",str_replace("\$","\$this->",$params['from']),$params['key'],$params['item']);
+			$res=preg_replace("|\.([^\.]*)|i","[\\1]",$params['from']);
+			$res=preg_replace("|\[([a-z_].*)\]|i","['\\1']",$res);
+			return sprintf("\nforeach (%s as \$this->%s => \$this->%s) {\n",str_replace("\$","\$this->",$res),$params['key'],$params['item']);
 		}
 		return sprintf("\nforeach (%s as \$this->%s) {\n",str_replace("\$","\$this->",$params['from']),$params['item']);
 	}
@@ -383,21 +389,16 @@ class gstpl_compiler {
 	}
 	
 	function parse_func($matches) {
-		md($matches[1],1);
-		$res=preg_replace("|\.([^\.><=\[]*)|i","[\\1]",$matches[1]);
-		md($res,1);
-		$res=preg_replace("|\[([a-z_][a-z0-9_]*)\]|i","['\\1']",$res);
-		md($res,1);
-		md('========',1);
+		$res=preg_replace("|\.([^\.><=\[\s]*)|i","[\\1]",$matches[1]);
+		$res=preg_replace("|\[([a-z_][a-z0-9\_]*)\]|i","['\\1']",$res);
+		$res=str_replace("\$","\$this->",$res);
 		//$params=string_to_params($matches[1]);
 		$params=string_to_params($res);
-		md($params,1);
 		$params[0]=ltrim($params[0],'/');
 		if (in_array($params[0],$this->reserved)) {
 			return $matches[0];
 		}
 		$func_name=$params[0];
-		md($func_name);
 		unset($params[0]);
 		foreach ($params as $key => $value) {
 			$d=$this->compile_modifiers(array($this->ld.$value.$this->rd));
@@ -423,29 +424,36 @@ class gstpl_compiler {
 	
 	function compile_html() {
 		$res=$this->code;
-		$res=str_replace($this->ld,PHP_EOL.$this->ld,$res);
-		$res=str_replace($this->rd,$this->rd.PHP_EOL,$res);
-		$lines=explode("\n",$res);
-		$ret='';
-		foreach ($lines as $line) {
-			$line=trim($line);
-			if (!empty($line)) {
-				//md($line,1);
-				if(strpos($line,'$this')===false && strpos($line,'$res')===false && strpos($line,$this->ld)===false) {
-					//$ret.=preg_replace_callback("|^([^\$\{].*)|i",array($this,'parse_html'),$line).PHP_EOL;
-					//$ret.=preg_replace_callback("|^(.+)|i",array($this,'parse_html'),$line).PHP_EOL;
-					$ret.=sprintf("\$res.='%s';\n",addslashes($line));
-				} else {
-					$ret.=$line;
-				}
+		$spos=0;
+		$epos=strpos($res,$this->ld,$spos);
+		$s='';
+		$len=strlen($res);
+		do {
+			if ($epos!==false) {
+				$s.=sprintf("\$res.='%s';%s",addslashes(substr($res,$spos,$epos-$spos)),PHP_EOL);
+				$spos=strpos($res,$this->rd,$epos)+strlen($this->rd);
+				$s.=substr($res,$epos,$spos-$epos);
+			} else {
+				$epos=$len;
+				$s.=sprintf("\$res.='%s';%s",addslashes(substr($res,$spos,$epos-$spos)),PHP_EOL);
+				break;
 			}
-		}
-		$this->code=$ret;
+			$epos=strpos($res,$this->ld,$spos);
+			
+		} while($epos<$len-1);
+		$this->code=$s;
 	}
 	
-	function parse_html($matches) {
-		$res=addslashes($matches[1]);
-		return sprintf("\$res.='%s';",$res);
+	function parse_html_left($matches) {
+		return sprintf("\$res.='%s';%s",addslashes($matches[1]),$this->ld);
+	}
+	
+	function parse_html_center($matches) {
+		return sprintf("%s\$res.='%s';%s",$this->rd,addslashes($matches[1]),$this->ld);
+	}
+	
+	function parse_html_right($matches) {
+		return sprintf("%s\$res.='%s%s';%s",$this->rd,addslashes($matches[1]),PHP_EOL,PHP_EOL);
 	}
 }
 
@@ -460,6 +468,7 @@ class gs_page_blank {
 	function __call($func,$params) {
 		if (substr($func,0,1)!='_') {
 			$params=reset($params);
+			md($params,1);
 		} else {
 			$func=substr($func,1);
 		}
@@ -486,6 +495,13 @@ class gs_page_blank {
 	}
 	
 	public function assign($params) {
+		$args=func_get_args();
+		if (count($args)==2) {
+			$this->assign[$args[0]]=$args[1];
+			$this->{$args[0]}=$args[1];
+			return;
+		}
+		//md($args,1);
 		$this->assign[$params['var']]=$params['value'];
 		$this->{$params['var']}=$params['value'];
 	}

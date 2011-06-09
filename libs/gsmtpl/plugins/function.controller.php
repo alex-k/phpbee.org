@@ -114,7 +114,6 @@ function smarty_function_controller($params, &$smarty)
 		if (isset($params['_assign'])) $smarty->assign($params['_assign'],$ret);
 		return;
 	}
-
 	$smarty->assign($params['_assign'],$ret);
 }
 ?>

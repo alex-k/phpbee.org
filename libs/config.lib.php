@@ -1,6 +1,6 @@
 <?php
 /*test22*/
-
+set_time_limit(2);
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
 DEFINE ('LOAD_TEMPLATES',4);
@@ -89,6 +89,9 @@ class gs_init {
 		foreach ($files as $f) {
 			$pf=str_replace(basename($f),'___'.basename($f),$f);
 			$pf=preg_replace('/.phps$/','.xphp',$pf);
+			
+			md('------------',1);
+			md(realpath($f),1);
 			$s=file_get_contents($f);
 			$s=$tpl->fetch('string:'.$s);
 			if ($tpl->get_var('DATA')) {
@@ -100,6 +103,7 @@ class gs_init {
 					$ret['MODULE'][$module_dir_name][$r[1][$k]][$r[2][$k]]=trim($r[3][$k]);
 				}
 			}
+			md($s,1);
 			file_put_contents($pf,$s);
 		}
 		$tpldir=$dir.$path.'templates';

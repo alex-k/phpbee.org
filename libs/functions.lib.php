@@ -124,12 +124,12 @@ function record_by_id($id=0,$classname='gs_null') {
 }
 
 function string_to_params($inp) {
-	//md($inp);
 	$arr=is_array($inp) ? $inp : array($inp);
 	$ret=array();
 	$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
 	foreach ($arr as $k=>$s) {
-		preg_match_all(':(\s*(([a-z_]+)=)?[\'\"](.+?)[\'\"]|([^\s]+)):i',$s,$out);
+		$s.=' ';
+		preg_match_all(':(\s*(([a-z_]+)=)?[\'\"](.+?)[\'\"]\s|([^\s]+)):i',$s,$out);
 		$r=array();
 		$j=0;
 		foreach ($out[3] as $i => $v) {
