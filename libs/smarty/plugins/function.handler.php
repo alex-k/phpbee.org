@@ -17,7 +17,6 @@ function smarty_function_handler($params, &$smarty) {
 	//var_dump($data);
 
 	$tpl=gs_tpl::get_instance();
-
 	if (isset($params['_record'])) {
 		$tpl->assign('_record',$params['_record']);
 	}

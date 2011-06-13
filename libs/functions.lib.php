@@ -169,9 +169,17 @@ if (PHP_VERSION_ID>=50300 && !function_exists('mb_split')) {
 }
 
 if (PHP_VERSION_ID>=50300 && !function_exists('mb_strlen')) {
-	function mb_strlen($string) {
+	/*function mb_strlen($string) {
 		return strlen($string);
 	}
+	
+	function mb_detect_encoding($string,$encoding_list = null ,$strict = false) {
+		return 'UTF-8';
+	}
+	
+	function mb_substr($string,$start,$length, $encoding='UTF-8') {
+		return substr($string,$start,$length);
+	}*/
 }
 
 
