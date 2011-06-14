@@ -4,6 +4,7 @@ function smarty_function_controller($params, &$smarty)
 	if (isset($params['_params'])) {
 		$params=array_merge($params,$params['_params']);
 	}
+	
 	$obj=new $params['_class'];
 	if (isset($params['_id'])) $params[$obj->id_field_name]=$params['_id'];
 	if (isset($params['_assign_type']) && $params['_assign_type']=='class') {
@@ -109,12 +110,13 @@ function smarty_function_controller($params, &$smarty)
 		return;
 
 	}
+
 	if (isset($params['_assign_type']) && $params['_assign_type']=='first') {
 		$ret=$ret->current();
 		if (isset($params['_assign'])) $smarty->assign($params['_assign'],$ret);
 		return;
 	}
-
 	$smarty->assign($params['_assign'],$ret);
+	return;
 }
 ?>

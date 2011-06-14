@@ -90,8 +90,6 @@ class gs_init {
 			$pf=str_replace(basename($f),'___'.basename($f),$f);
 			$pf=preg_replace('/.phps$/','.xphp',$pf);
 			
-			md('------------',1);
-			md(realpath($f),1);
 			$s=file_get_contents($f);
 			$s=$tpl->fetch('string:'.$s);
 			if ($tpl->get_var('DATA')) {
@@ -103,7 +101,6 @@ class gs_init {
 					$ret['MODULE'][$module_dir_name][$r[1][$k]][$r[2][$k]]=trim($r[3][$k]);
 				}
 			}
-			md($s,1);
 			file_put_contents($pf,$s);
 		}
 		$tpldir=$dir.$path.'templates';
@@ -116,7 +113,6 @@ class gs_init {
 				$s=$tpl->fetch('string:'.$s);
 				$pf=$tplcdir.DIRECTORY_SEPARATOR.basename($f);
 				file_put_contents($pf,$s);
-				md($pf);
 			}
 		}
 		return $ret;
@@ -425,7 +421,7 @@ function load_file($file,$return_contents=FALSE,$return_file=FALSE)
 
 function mlog($data) {
 	$log=gs_logger::get_instance();
-	$log->log($data);
+	$log->log('> '.$data);
 }
 
 function clean_path($path) {
