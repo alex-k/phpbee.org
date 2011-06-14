@@ -436,4 +436,27 @@ class gs_widget_private extends gs_widget {
 }
 
 
+class gs_widget_lMany2Many_checkboxes extends gs_widget {
+	function html() {
+		$e_data=gs_base_handler::explode_data($this->data);
+		if (isset($e_data[$this->fieldname]) && is_array($e_data[$this->fieldname]) && !empty($e_data[$this->fieldname])) {
+			$this->value=array_combine(array_keys($e_data[$this->fieldname]),array_keys($e_data[$this->fieldname]));
+		}
+		$ret="<input type=\"hidden\" name=\"".$this->fieldname."\" value=\"0\">";
+		$ret.="<span>";
+		foreach ($this->params['variants'] as $k=>$v) {
+			$ret.=sprintf("<label class=\"lMany2Many_checkbox\"><input type=\"checkbox\" name=\"%s[]\" value=\"%d\" %s>%s</label>\n",$this->fieldname,$k, (is_array($this->value) && (in_array($k,$this->value) || array_key_exists($k,$this->value))) ? 'checked="checked"' : '',$v);
+		}
+		$ret.="<br><label><input type=\"checkbox\" onChange=\"$('.lMany2Many_checkbox :checkbox').attr('checked',this.checked);\">all</label>\n";
+		$ret.="</span>";
+		return $ret;
+	}
+	function clean() {
+		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
+		$ret=is_array($this->value) && count($this->value)>0 ? array_combine(array_values($this->value),array_values($this->value)) : array();
+		return $ret;
+	}
+}
+
+
 ?>

@@ -340,6 +340,7 @@ class gs_rs_links extends gs_recordset{
 	}
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		parent::find_records($options,$fields,$index_field_name);
+		parent::load_records();
 		if ($this->rs_link) {
 			$this->links=$this->array;
 			return $this;
@@ -350,7 +351,7 @@ class gs_rs_links extends gs_recordset{
 			foreach ($this as $t) $ids[]=$t->$idname;
 			$rsname=$this->structure['recordsets']['childs']['recordset'];
 			$rs=new $rsname();
-			$rs=$rs->find_records(array('id'=>$ids));
+			$rs=$rs->find_records(array('id'=>$ids))->load_records();
 			$rs->parent_recordset=$this;
 			$links=array();
 			foreach ($this->array as $l) {

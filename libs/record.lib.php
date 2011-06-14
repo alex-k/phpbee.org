@@ -339,7 +339,7 @@ class gs_record implements arrayaccess {
 	}
 
 	public function delete() {
-		$this->recordstate=($this->recordstate & RECORD_NEW) ? RECORD_ROLLBACK:RECORD_DELETED;
+		$this->recordstate=($this->recordstate & RECORD_NEW) ? RECORD_ROLLBACK : RECORD_DELETED;
 		if (($parent=$this->get_recordset()->parent_record)!==NULL) $parent->child_modified();
 	}
 

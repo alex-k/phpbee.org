@@ -140,6 +140,7 @@ TXT;
 				$rsname=$rsl->structure['recordsets']['childs']['recordset'];
 				$rs=new $rsname();
 				$vrecs=$rs->find_records();
+				$variants=array();
 				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
 				$hh[$k]['variants']=$variants;
 				if (isset($data[$k])) {
@@ -220,7 +221,6 @@ TXT;
 		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
 		//$f=new $form_class_name($hh,$params,self::implode_data(array_merge($rec->get_values($fields)),$data));
 		$f->rec=$rec;
-
 		return $f;
 	}
 	function showform() {

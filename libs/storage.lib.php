@@ -145,7 +145,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		$ret=array();
 		foreach ($this as $rec) {
 			//var_dump($rec->get_id());
-			//if($rec->get_id()) $ret[$rec->get_id()]=trim($rec);
+			if($rec->get_id()) $ret[$rec->get_id()]=trim($rec);
 		}
 		return $ret;
 	}
