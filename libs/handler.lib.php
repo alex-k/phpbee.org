@@ -32,7 +32,7 @@ class gs_base_handler {
 		$this->www_subdir=$www_subdir;
 
 
-		$this->register_blocks();
+		//$this->register_blocks();
 	}
 	function register_blocks() {
 		$this->assign('_blocks',$this->blocks);

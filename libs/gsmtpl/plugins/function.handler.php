@@ -4,7 +4,7 @@ function smarty_function_handler($params, &$smarty) {
 	//$gsparams=$smarty->getTemplateVars('_gsparams');
 	if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
 	$params['gspgid']=trim($params['gspgid'],'/');
-	mlog($params['gspgid']);
+	//mlog($params['gspgid']);
 	//mlog($params);
 	if (!isset($data['gspgid_root'])) {
 		$data['gspgid_root']=$data['gspgid'];
@@ -35,6 +35,7 @@ function smarty_function_handler($params, &$smarty) {
 		$hndl=$o_p->get_current_handler();
 		if ($hndl[0]['params']['module_name']!=$params['scope']) return '';
 	}
-	return $o_p->process();
+	$ret=$o_p->process();
+	return $ret;
 }
 ?>

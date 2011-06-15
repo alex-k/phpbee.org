@@ -1,6 +1,6 @@
 <?php
 /*test22*/
-set_time_limit(2);
+set_time_limit(20);
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
 DEFINE ('LOAD_TEMPLATES',4);
@@ -62,6 +62,7 @@ class gs_init {
 	}
 
 	function compile_modules($path='') {
+		mlog('COMPILE_MODULES');
 		$tpl=null;
 		$data=array('LINKS'=>array());
 		$ret=array();
@@ -107,6 +108,7 @@ class gs_init {
 		$tplcdir=$dir.$path.'___templates';
 		if (file_exists($tpldir)) {
 			check_and_create_dir($tplcdir);
+			touch($tplcdir);
 			$files=glob($tpldir.DIRECTORY_SEPARATOR.'*');
 			foreach ($files as $f) {
 				$s=file_get_contents($f);
@@ -298,8 +300,8 @@ function cfg($name) {
 function md($output,$type=false)
 {
 	if ($type) {
-	$txt=htmlentities(print_r($output,true));
-	echo "<pre>\n".$txt."</pre>\n";
+		$txt=htmlentities(print_r($output,true));
+		echo "<pre>\n".$txt."</pre>\n";
 	} else {
 		$log=gs_logger::get_instance();
 		$log->log($output);

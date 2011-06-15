@@ -19,16 +19,13 @@ class gsmtpl {
 		if (!defined('SMARTY_PLUGINS_DIR')) define('SMARTY_PLUGINS_DIR',$this->plugins_dir.DS);
 	}
 	
-	public function assign () {
-		$params=func_get_args();
-		
-		if (count($params)==2) {
-			$this->assign[$params[0]]=$params[1];
-			
-		} else {
-			foreach ($params[0] as $key => $value) {
+	public function assign ($name,$values='GSMTPL_NO_ARG') {
+		if ($values=='GSMTPL_NO_ARG') {
+			foreach ($name as $key => $value) {
 				$this->assign[$key]=$value;
 			}
+		} else {
+			$this->assign[$name]=$values;
 		}
 	}
 	public function get_var($name) {
@@ -40,11 +37,17 @@ class gsmtpl {
 	}
 	
 	public function fetch($name) {
+		$res='';
 		$info=$this->load_template($name);
 		$class_name='__gs_page_'.$info['id'];
-		$this->page=new $class_name($this->plugins_dir);
+		if (!isset($this->pages[$class_name])) {
+			$this->pages[$class_name]=new $class_name($this->plugins_dir);
+		}
+		$this->page=$this->pages[$class_name];
 		// @ - ahtung!!!
 		$res=@$this->page->main($this->assign);
+		/*
+		*/
 		return stripslashes($res);
 	}
 	
@@ -87,7 +90,7 @@ class gsmtpl {
 			include_once($dir.DS.$info['compile_id']);
 			return true;
 		}
-		//md('compile');
+		md('compile');
 		return false;
 	}
 	
@@ -257,7 +260,12 @@ class gstpl_compiler {
 	private function make_class() {
 		$str=sprintf("<?php\n\n%s\n\nclass __gs_page_%s extends %s {\n",(!empty($this->extend_file)) ? 'require_once("'.$this->extend_file.'");' : '',$this->id,$this->extend);
 		foreach ($this->methods as $func => $info) {
-			$str.=sprintf("\t%s function %s(\$params) {\n\t\t\$this->assign_vars(\$params);\n\t\t\$res='';%s\n\t\t%s\n%s\n\t\treturn \$res;\n\t}\n\n",
+			$str.=sprintf("\t%s function %s(\$params) {\n\t\t\$this->assign_vars(\$params);\n\t\t\$res='';%s\n\t\t%s\n%s\n\t\t
+			
+			\$res.=(sprintf('memory usage: %%.4f / %%.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
+			return \$res;\n\t
+			
+			}\n\n",
 					$func=='main' ? 'public' : 'protected',
 					$func,
 					$info['mode']=='prepend' ? "\n\t\t\$res.=parent::".$func."(\$params);" : "",
@@ -622,6 +630,7 @@ class gs_page_blank {
 		$mode='function';
 		if (substr($func,0,1)!='_') {
 			$params=reset($params);
+			//md($params,1);
 		} else {
 			$func=substr($func,1);
 			$mode='modifier';
@@ -679,10 +688,7 @@ class gs_page_blank {
 	}
 	
 	protected function assign_vars($params) {
-		foreach ($params as $key => $value) {
-			$this->assign[$key]=$value;
-			//$this->{$key}=$value;
-		}
+		$this->assign=array_merge($this->assign,$params);
 	}
 	
 	function get_var($name) {
@@ -699,6 +705,46 @@ class gs_page_blank {
 		$params=func_get_args();
 		return (empty($params[0])) ? $params[1] : $params[0];
 	}
+	function handler() {
+		$params=reset(func_get_args());
+		$data=$this->getTemplateVars('_gsdata');
+		//$gsparams=$smarty->getTemplateVars('_gsparams');
+		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
+		$params['gspgid']=trim($params['gspgid'],'/');
+		//mlog($params['gspgid']);
+		//mlog($params);
+		if (!isset($data['gspgid_root'])) {
+			$data['gspgid_root']=$data['gspgid'];
+		}
+		$data['gspgid_handler']=$data['gspgid'];
+		$data['gspgid']=$params['gspgid'];
+		$data['handler_params']=$params;
+		$data['foo']='bar';
+
+		//var_dump($data);
+
+		$tpl=gs_tpl::get_instance();
+
+		if (isset($params['_record'])) {
+			$tpl->assign('_record',$params['_record']);
+		}
+		$assign=array();
+		$assign['gspgdata_form']=$data;
+		$assign['gspgid_form']=$data['gspgid'];
+		$assign['gspgid_handler']=$data['gspgid_handler'];
+		$assign['gspgid_root']=$data['gspgid_root'];
+		$assign['handler_params']=$params;
+
+		$tpl->assign($assign);
+
+		$o_p=gs_parser::get_instance($data);
+		if (isset($params['scope'])) {
+			$hndl=$o_p->get_current_handler();
+			if ($hndl[0]['params']['module_name']!=$params['scope']) return '';
+		}
+		$ret=$o_p->process();
+		return $ret;
+	}
 	
 
 }
@@ -712,7 +758,7 @@ class gstpl_source_file extends gstpl_source {
 	}
 	
 	static function get_source_mtime($url) {
-		return time();
+		return filemtime($url);
 	}
 }
 
@@ -726,66 +772,4 @@ class gstpl_source_string extends gstpl_source {
 		return 0;
 	}
 }
-
-
-/**
-* Functions from our engine
-**/
-/*
-function md($output)
-{
-	$txt=htmlentities(print_r($output,true));
-	echo "<pre>\n".$txt."</pre>\n";
-}
-
-function check_and_create_dir($dir) {
-		if (!file_exists($dir)) {
-			if (!mkdir($dir,0777,TRUE)) {
-				throw new gs_exception('check_and_create_dir: '.$dir.'  can not create directory');
-			}
-		} else if (!is_writable($dir)) {
-			if (!is_dir($dir)) {
-				throw new gs_exception('check_and_create_dir: '.$dir.'  is not a directory');
-			}
-			throw new gs_exception('check_and_create_dir: '.$dir.'   not writeble');
-		}
-		return $dir;
-}
-
-function string_to_params($inp) {
-	$arr=is_array($inp) ? $inp : array($inp);
-	$ret=array();
-	$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
-	foreach ($arr as $k=>$s) {
-		preg_match_all(':(\s*(([a-z_]+)=)?[\'\"](.+?)[\'\"]|([^\s]+)):i',$s,$out);
-		$r=array();
-		$j=0;
-		foreach ($out[3] as $i => $v) {
-			$key= $v ? $v : $j++;
-			$value = $out[4][$i] ? $out[4][$i] : $out[1][$i];
-			if (strtolower($value)=='false') $value=false;
-			if (strtolower($value)=='true') $value=true;
-			$prefix=explode(':',$value,2);
-			if(strtoupper($prefix[0])=='ARRAY') $value=explode(':',$prefix[1]);
-			$r[$key]=$value;
-		}
-		$ret[$k]=$r;
-	}
-	return is_array($inp) ? $ret : reset($ret);
-}
-
-function gs_exception_handler($ex)
-{
-	md('');
-	md("EXCEPTION ".get_class($ex));
-	md($ex->getMessage());
-	md($ex->getTrace());
-}
-
-class gs_exception extends Exception {
-
-}
-
-set_exception_handler('gs_exception_handler');
-*/
 ?>
