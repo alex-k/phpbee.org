@@ -51,11 +51,21 @@
 		</div>
 		<div class="main_news">
 			<h2>Новости</h2>
-			<ul>
+				{*
 				{contr _class="tw_news" _assign=n _orderby="date desc" _limit=2}
 				{literal}<li><i>{$n.date|date:"%d %F %Y"}</i><br><a href="/news/show/{$n.date|date:"%Y"}/{$n.date|date:"%m"}/{$n.id}.html">{$n.subject}</a>
 				<p>{$n.text|strip_tags|truncate:300}</p></li>{/literal}{/contr}
-			</ul>
+				*}
+				{*
+
+				{controller _class="tw_news" _assign=news _orderby="date desc" _limit=2}
+				{foreach from=$news item=n}
+				<li><i>{$n.date|date:"%d %F %Y"}</i><br><a href="/news/show/{$n.date|date:"%Y"}/{$n.date|date:"%m"}/{$n.id}.html">{$n.subject}</a>
+				<p>{$n.text|strip_tags}</p></li>
+				{/foreach}
+
+				*}
+				{handler gspgid="news/last/2"}
 		</div>
 		<div class="visa">
 			<h3>Заявление на получение болгарской визы</h3>

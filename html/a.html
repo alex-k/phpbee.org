@@ -1,0 +1,15 @@
+---------------------
+{$_gsdata|md:1}
+{*
+{controller _class=tw_articles id=$_gsdata.gspgid_va.0 _assign=arr _assign_type=plain}
+id:{$arr.id}<br>
+name:{$arr.name}<br>
+ctime:{$arr._ctime}<br>
+mtime:{$arr._mtime}<br>
+count_images:{$arr.Images->count()}<br>
+	{foreach from=$arr.Images item=i}
+	{$i.id}/{$i._ctime} : 
+	{/foreach}
+
+*}
+---------------------
