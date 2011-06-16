@@ -50,7 +50,7 @@ abstract class tw_file_images extends gs_recordset_short{
 		$ret=array();
 		$fname=$this->get_connector()->www_root.'/'.$this->db_tablename;
 		foreach ($records as $rec) {
-			$ret[]=$fname.'/'.$this->get_connector()->split_id($rec->get_id()).'/'.'File_data';	
+			$ret[]=$fname.'/'.$this->get_connector()->split_id($rec->get_id(),true).'/'.(($params=='') ? 'File_data' : $params.'.jpg');
 		}
 		return $ret;
 	}
