@@ -177,13 +177,13 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		$ret=$this->root.DIRECTORY_SEPARATOR.$tablename.DIRECTORY_SEPARATOR.$id;
 		return $ret;
 	}
-	function split_id($id) {
+	function split_id($id,$no_fs=false) {
 		$id=$this->int2id($id);
 		$id=str_split($id,1);
 		for($i=1;$i<GS_DB_FILE_ID_LENGTH;$i++) {
 			$id[$i]=$id[$i-1].$id[$i];
 		}
-		return implode(DIRECTORY_SEPARATOR,$id);
+		return implode(($no_fs==true) ? '/' : DIRECTORY_SEPARATOR,$id);
 	}
 	
 	public function insert($record) {

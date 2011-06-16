@@ -91,8 +91,9 @@ class gs_init {
 			$pf=str_replace(basename($f),'___'.basename($f),$f);
 			$pf=preg_replace('/.phps$/','.xphp',$pf);
 			
-			$s=file_get_contents($f);
-			$s=$tpl->fetch('string:'.$s);
+			/*$s=file_get_contents($f);
+			$s=$tpl->fetch('string:'.$s);*/
+			$s=$tpl->fetch('file:'.$f);
 			if ($tpl->get_var('DATA')) {
 				$r=$tpl->get_var('DATA');
 				//$r=array_filter(array_map('trim',explode(PHP_EOL,$r)));
@@ -108,11 +109,13 @@ class gs_init {
 		$tplcdir=$dir.$path.'___templates';
 		if (file_exists($tpldir)) {
 			check_and_create_dir($tplcdir);
-			touch($tplcdir);
+			// Ahtung ! touch on dir doesn`t work for Windows and PHP <5.3.0
+			@touch($tplcdir);
 			$files=glob($tpldir.DIRECTORY_SEPARATOR.'*');
 			foreach ($files as $f) {
-				$s=file_get_contents($f);
-				$s=$tpl->fetch('string:'.$s);
+				/*$s=file_get_contents($f);
+				$s=$tpl->fetch('string:'.$s);*/
+				$s=$tpl->fetch($f);
 				$pf=$tplcdir.DIRECTORY_SEPARATOR.basename($f);
 				file_put_contents($pf,$s);
 			}

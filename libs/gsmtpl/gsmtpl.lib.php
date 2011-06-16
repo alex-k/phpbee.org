@@ -129,7 +129,8 @@ class gsmtpl {
 		switch ($type) {
 			case 'file':
 				$url=$this->find_file($d[3][0]);
-				$id=preg_replace("|(.*)\.\w+$|i","\\1",basename($url));
+				$md5=md5($url);
+				$id=preg_replace("|(.*)\.\w+$|i","\\1",basename($url)).'_'.$md5;
 			break;
 			default:
 				$url=$d[3][0];
@@ -141,7 +142,7 @@ class gsmtpl {
 			'type'=>$type,
 			'url'=>$url,
 			'id'=>$id,
-			'compile_id'=>md5($url).'.'.$id,
+			'compile_id'=>$id.'.php',
 			);
 		return $info;
 	}
@@ -589,7 +590,6 @@ class gs_smarty_parser {
 	
 	function call($func) {
 		$func_file='modifier.'.$func.'.php';
-		$real_func=substr($func,1);
 		$plugins_dir=gsmtpl::get_plugins_dir();
 		$func_full_file=$plugins_dir.DS.$func_file;
 		$func_name=sprintf('smarty_modifier_%s',$func);
@@ -604,7 +604,7 @@ class gs_smarty_parser {
 		if (function_exists($func_name)) {
 			return $func_name;
 		}
-		if (function_exists($real_func)) {
+		if (function_exists($func)) {
 			return $func;
 		}
 	}
@@ -725,7 +725,7 @@ class gs_page_blank {
 	}
 	
 	function get_var($name) {
-		return isset($this->$name) ? $this->$name : NULL;
+		return isset($this->assign[$name]) ? $this->assign[$name] : NULL;
 	}
 	
 	function getTemplateVars($name=NULL) {
