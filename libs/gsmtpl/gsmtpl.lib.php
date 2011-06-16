@@ -19,6 +19,11 @@ class gsmtpl {
 		if (!defined('SMARTY_PLUGINS_DIR')) define('SMARTY_PLUGINS_DIR',$this->plugins_dir.DS);
 	}
 	
+	static function get_plugins_dir() {
+		$o=new gsmtpl;
+		return $o->plugins_dir;
+	}
+	
 	public function assign ($name,$values='GSMTPL_NO_ARG') {
 		if ($values=='GSMTPL_NO_ARG') {
 			foreach ($name as $key => $value) {
@@ -44,10 +49,9 @@ class gsmtpl {
 			$this->pages[$class_name]=new $class_name($this->plugins_dir);
 		}
 		$this->page=$this->pages[$class_name];
+		//$this->page=new $class_name($this->plugins_dir);
 		// @ - ahtung!!!
 		$res=@$this->page->main($this->assign);
-		/*
-		*/
 		return stripslashes($res);
 	}
 	
@@ -159,7 +163,11 @@ class gstpl_compiler {
 	private $extend_file=null;
 	private $extend='gs_page_blank';
 	private $methods=array();
-	private $tpl=null;
+	public $tpl=null;
+	private $func_num=0;
+	public $includes=array();
+	private $o=null;
+	
 	private $reserved=array('block','capture','foreach','for','section','if','else','literal');
 	
 	function __construct($source,$id,$gstpl) {
@@ -168,6 +176,7 @@ class gstpl_compiler {
 		$this->ld=$gstpl->left_delimiter;
 		$this->rd=$gstpl->right_delimiter;
 		$this->tpl=$gstpl;
+		$this->o=new gs_page_blank($this->tpl->plugins_dir);
 	}
 	
 	// we need learn parse nested blocks
@@ -258,11 +267,14 @@ class gstpl_compiler {
 	
 	
 	private function make_class() {
-		$str=sprintf("<?php\n\n%s\n\nclass __gs_page_%s extends %s {\n",(!empty($this->extend_file)) ? 'require_once("'.$this->extend_file.'");' : '',$this->id,$this->extend);
+		$includes='';
+		foreach ($this->includes as $include => $key) {
+			$includes.=sprintf("include_once('%s');\n",$key);
+		}
+		$str=sprintf("<?php\n\n%s\n\n%s\n\nclass __gs_page_%s extends %s {\n",$includes,(!empty($this->extend_file)) ? 'require_once("'.$this->extend_file.'");' : '',$this->id,$this->extend);
 		foreach ($this->methods as $func => $info) {
 			$str.=sprintf("\t%s function %s(\$params) {\n\t\t\$this->assign_vars(\$params);\n\t\t\$res='';%s\n\t\t%s\n%s\n\t\t
 			
-			\$res.=(sprintf('memory usage: %%.4f / %%.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
 			return \$res;\n\t
 			
 			}\n\n",
@@ -323,41 +335,6 @@ class gstpl_compiler {
 		return '';
 	}
 	
-	function compile_modifiers($res) {
-		$regexp=sprintf("|%s(.*?)\|(.*?)[\|\%s]|i",$this->ld,$this->rd);
-		$r=$res[0];
-		while(1){
-			$res[0]=preg_replace_callback($regexp,array($this,'parse_modifiers'),$r);
-			if ($res[0]==$r) break;
-			$r=$res[0];
-		}
-		$value=preg_replace("|\.([^\.><=\[\s\,\)\(\}]*)|i","[\\1]",$res[0]);
-		$res[0]=preg_replace("|\[([a-z_][a-z0-9\_]*)\]|i","['\\1']",$value);
-		return $res[0];
-	}
-	
-	function parse_modifiers($matches) {
-		foreach ($matches as $key => $value) {
-			$value=str_replace("\$this->","\$",$value);
-			$matches[$key]=str_replace("\$","\$this->",$value);
-		}
-		$res=preg_replace("|(^[\w_]+)(.*)|is","\$this->_\\1(".$matches[1]."\\2)",$matches[2]);
-		$res=preg_replace_callback("|[\"\'].*?[\"\']|i",array($this,'escaper'),$res);
-		$res=preg_replace("|([^:]):([^:])|i","\\1,\\2",$res);
-		$res=preg_replace_callback("|[\"\'].*?[\"\']|i",array($this,'unescaper'),$res);
-		$matches[0]=str_replace($matches[1].'|'.$matches[2],$res,$matches[0]);
-		
-		return $matches[0];
-	}
-	
-	function escaper ($matches) {
-		return str_replace(":","::",$matches[0]);
-	}
-	
-	function unescaper ($matches) {
-		return str_replace("::",":",$matches[0]);
-	}
-	
 	function compile_if() {
 		$res=$this->code;
 		$regexp=sprintf("|%sif(.*?)%s|is",$this->ld,$this->rd);
@@ -369,7 +346,7 @@ class gstpl_compiler {
 	
 	function parse_if($matches) {
 		$res=$matches[1];
-		//$o=new gs_smarty_parser;
+		//$o=new gs_smarty_parser($this);
 		//return $o->smarty_parser($matches[1]);
 		$res=preg_replace("|\.([^\.><=\[]*)|i","[\\1]",$matches[1]);
 		$res=preg_replace("|\[([a-z_][a-z0-9_]*)\]|i","['\\1']",$res);
@@ -386,7 +363,7 @@ class gstpl_compiler {
 	
 	function parse_foreach($matches) {
 		$params=$this->string_to_params($matches[1]);
-		$o=new gs_smarty_parser;
+		$o=new gs_smarty_parser($this);
 		$res=$o->smarty_parser($params['from']);
 		if (isset($params['key'])) {
 			return sprintf("\nforeach (%s as \$this->assign['%s'] => \$this->assign['%s']) {\n",$res,trim($params['key'],'"\''),trim($params['item'],'"\''));
@@ -403,7 +380,7 @@ class gstpl_compiler {
 	}
 	
 	function parse_for($matches) {
-		$o=new gs_smarty_parser;
+		$o=new gs_smarty_parser($this);
 		$params=$this->string_to_params($matches[1]);
 		reset($params);
 		$key=key($params);
@@ -426,7 +403,7 @@ class gstpl_compiler {
 	}
 	
 	function parse_string($matches) {
-		$o=new gs_smarty_parser;
+		$o=new gs_smarty_parser($this);
 		return sprintf("\n\$res.=%s;\n",$o->smarty_parser($matches[1]));
 	}
 	
@@ -438,7 +415,7 @@ class gstpl_compiler {
 	}
 	
 	function parse_var($matches) {
-		$o=new gs_smarty_parser;
+		$o=new gs_smarty_parser($this);
 		return sprintf("\n\$res.=%s;\n",$o->smarty_parser($matches[1]));
 	}
 	
@@ -490,13 +467,39 @@ class gstpl_compiler {
 		}
 		$func_name=$params[0];
 		unset($params[0]);
-		$o=new gs_smarty_parser;
+		$o=new gs_smarty_parser($this);
 		foreach ($params as $key => $value) {
 			$value=$o->smarty_parser($value);
 			$params[$key]=$value;
 		}
+		$params['_gsmtpl_id']=$this->func_num;
+		$this->func_num++;
 		$params=$this->make_params_string($params);
-		return sprintf("\n\$res.=\$this->%s(%s);\n",$func_name,$params);
+		$real_func_name=$this->call($func_name,$params);
+		//return sprintf("\n\$res.=\$this->%s(%s);\n",$func_name,$params);
+		return sprintf("\n\$res.=%s;\n",$real_func_name);
+	}
+	
+	function call($func,$params) {
+		if (method_exists($this->o,$func)) {
+			return sprintf('$this->%s(%s)',$func,$params);
+		}
+		
+		$func_file='function.'.$func.'.php';
+		$func_full_file=$this->tpl->plugins_dir.DS.$func_file;
+		$func_name=sprintf('smarty_function_%s',$func);
+		if (!function_exists($func_name)) {
+			if (file_exists ($func_full_file)) {
+				$this->includes[$func_file]=$func_full_file;
+				include_once($func_full_file);
+			}
+		}
+		if (function_exists($func_name)) {
+			return sprintf('%s(%s,$this)',$func_name,$params);
+		}
+		if (function_exists($func)) {
+			return sprintf('%s(%s)',$func,$params);
+		}
 	}
 	
 	private function make_params_string($params) {
@@ -532,7 +535,14 @@ class gstpl_compiler {
 
 
 class gs_smarty_parser {
+	var $tpl;
 	var $parts=array();
+	var $o=null;
+	function __construct ($tpl) {
+		$this->tpl=$tpl;
+		$this->o=new gs_page_blank($tpl->tpl->plugins_dir);
+	}
+	
 	function smarty_parser($string) {
 		$this->parts=array('pattern'=>'','childs'=>array());
 		$string=preg_replace_callback('/`(\$|"|\')(.*?)`/is',array($this,'escape'),$string);
@@ -556,13 +566,15 @@ class gs_smarty_parser {
 		$mods=explode('|',$res['pattern']);
 		for ($i=0;$i<count($mods)-1;$i++) {
 			$params=explode(":",$mods[$i+1]);
-			$func='$this->_'.ltrim(array_shift($params),'@');
+			//$func='$this->_'.ltrim(array_shift($params),'@');
+			$func=$this->call(ltrim(array_shift($params),'@'));
 			array_unshift($params,$mods[$i]);
 			if (!isset($res['parsed'])) {
 				$params=array_map(array($this,'parse_array'),$params);
 				$res['parsed']=true;
 			}
 			$mods[$i+1]=sprintf("%s(%s)",$func,implode(',',$params));
+			md($func,1);
 		}
 		
 		$tpl=end($mods);
@@ -574,6 +586,28 @@ class gs_smarty_parser {
 		}
 		$res['pattern']=(empty($res['childs'])&& !isset($res['parsed'])) ? $this->parse_array($tpl) : $tpl;
 		$res['parsed']=true;
+	}
+	
+	function call($func) {
+		$func_file='modifier.'.$func.'.php';
+		$real_func=substr($func,1);
+		$plugins_dir=gsmtpl::get_plugins_dir();
+		$func_full_file=$plugins_dir.DS.$func_file;
+		$func_name=sprintf('smarty_modifier_%s',$func);
+		if (method_exists($this->o,'_'.$func)) {
+			return sprintf('$this->_%s',$func);
+		}
+		
+		if (!function_exists($func_name) && file_exists ($func_full_file)) {
+			$this->tpl->includes[$func_file]=$func_full_file;
+			include_once($func_full_file);
+		}
+		if (function_exists($func_name)) {
+			return $func_name;
+		}
+		if (function_exists($real_func)) {
+			return $func;
+		}
 	}
 	
 	function parse_array($v) {
@@ -619,6 +653,7 @@ class gs_smarty_parser {
 class gs_page_blank {
 	public $assign=array();
 	public $plugins_dir;
+	protected $cycle;
 	
 	function __construct($plugins_dir) {
 		$this->plugins_dir=$plugins_dir;
@@ -627,11 +662,14 @@ class gs_page_blank {
 	}
 	
 	function __call($func,$params) {
+		md('__call'.$func,1);
+		die();
 		$mode='function';
 		if (substr($func,0,1)!='_') {
 			$params=reset($params);
 			//md($params,1);
 		} else {
+			$real_func=$func;
 			$func=substr($func,1);
 			$mode='modifier';
 		}
@@ -657,6 +695,9 @@ class gs_page_blank {
 			return $ret.$ret_ob;
 		}
 		if (function_exists($func)) {
+			md($real_func,1);
+			//$this->$real_func=create_function(sprintf('$params,$smarty','return %s($params,$smarty);',$func));
+			//$ret=$this->$func_name($params,$this);
 			return call_user_func_array($func,$params);
 		}
 		//throw new gs_exception('gsmtpl: function '.$func_name.' not found');
@@ -705,14 +746,24 @@ class gs_page_blank {
 		$params=func_get_args();
 		return (empty($params[0])) ? $params[1] : $params[0];
 	}
-	function handler() {
-		$params=reset(func_get_args());
+	
+	function cycle($params) {
+		$cn='func'.$params['_gsmtpl_id'];
+		if(!isset($this->cycle[$cn])) {
+			$this->cycle[$cn]['idx']=1;
+			$this->cycle[$cn]['values']=is_array($params['values']) ? $params['values'] : explode(',',$params['values']);
+			$this->cycle[$cn]['cnt']=count($this->cycle[$cn]['values']);
+		}
+		$this->cycle[$cn]['idx']++;
+		return $this->cycle[$cn]['values'][$this->cycle[$cn]['idx']%$this->cycle[$cn]['cnt']];
+	}
+	
+	function handler($params) {
+		ob_start();
 		$data=$this->getTemplateVars('_gsdata');
 		//$gsparams=$smarty->getTemplateVars('_gsparams');
 		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
 		$params['gspgid']=trim($params['gspgid'],'/');
-		//mlog($params['gspgid']);
-		//mlog($params);
 		if (!isset($data['gspgid_root'])) {
 			$data['gspgid_root']=$data['gspgid'];
 		}
@@ -720,8 +771,6 @@ class gs_page_blank {
 		$data['gspgid']=$params['gspgid'];
 		$data['handler_params']=$params;
 		$data['foo']='bar';
-
-		//var_dump($data);
 
 		$tpl=gs_tpl::get_instance();
 
@@ -743,7 +792,9 @@ class gs_page_blank {
 			if ($hndl[0]['params']['module_name']!=$params['scope']) return '';
 		}
 		$ret=$o_p->process();
-		return $ret;
+		$ret_ob=ob_get_contents();
+		ob_end_clean();
+		return $ret_ob.$ret;
 	}
 	
 
