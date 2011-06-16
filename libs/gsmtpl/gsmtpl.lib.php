@@ -574,7 +574,6 @@ class gs_smarty_parser {
 				$res['parsed']=true;
 			}
 			$mods[$i+1]=sprintf("%s(%s)",$func,implode(',',$params));
-			md($func,1);
 		}
 		
 		$tpl=end($mods);
@@ -662,12 +661,9 @@ class gs_page_blank {
 	}
 	
 	function __call($func,$params) {
-		md('__call'.$func,1);
-		die();
 		$mode='function';
 		if (substr($func,0,1)!='_') {
 			$params=reset($params);
-			//md($params,1);
 		} else {
 			$real_func=$func;
 			$func=substr($func,1);
@@ -695,12 +691,8 @@ class gs_page_blank {
 			return $ret.$ret_ob;
 		}
 		if (function_exists($func)) {
-			md($real_func,1);
-			//$this->$real_func=create_function(sprintf('$params,$smarty','return %s($params,$smarty);',$func));
-			//$ret=$this->$func_name($params,$this);
 			return call_user_func_array($func,$params);
 		}
-		//throw new gs_exception('gsmtpl: function '.$func_name.' not found');
 	}
 	
 	function __get($name) {
