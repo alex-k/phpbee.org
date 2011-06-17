@@ -12,7 +12,7 @@ class gsmtpl {
 	public $right_delimiter='}';
 	private $assign=array();
 	private $page=NULL;
-	
+
 	function __construct() {
 		$this->compile_dir=dirname(__FILE__).DS.$this->compile_dir;
 		$this->plugins_dir=dirname(__FILE__).DS.$this->plugins_dir;
@@ -65,9 +65,10 @@ class gsmtpl {
 	
 	private function compile($info) {
 		$result=$this->load_source($info);
+		$file=$this->compile_dir.DS.$info['type'].DS.$info['compile_id'];
+		touch($file);
 		$cpl=new gstpl_compiler($result,$info['id'],$this);
 		$code=$cpl->get();
-		$file=$this->compile_dir.DS.$info['type'].DS.$info['compile_id'];
 		file_put_contents($file,$code);
 		include_once($file);
 	}
@@ -143,6 +144,7 @@ class gsmtpl {
 			'url'=>$url,
 			'id'=>$id,
 			'compile_id'=>$id.'.php',
+			'compile_url'=>realpath($this->compile_dir.DS.$type).DS.$id.'.php',
 			);
 		return $info;
 	}
@@ -300,6 +302,7 @@ class gstpl_compiler {
 		$this->code=$this->compile_strings($this->code);
 		$this->compile_vars();
 		$this->compile_functions();
+		$this->compile_include();
 		$this->compile_if();
 		$this->compile_foreach();
 		$this->compile_for();
@@ -477,13 +480,13 @@ class gstpl_compiler {
 		$this->func_num++;
 		$params=$this->make_params_string($params);
 		$real_func_name=$this->call($func_name,$params);
-		//return sprintf("\n\$res.=\$this->%s(%s);\n",$func_name,$params);
+		
 		return sprintf("\n\$res.=%s;\n",$real_func_name);
 	}
 	
 	function call($func,$params) {
-		if (method_exists($this->o,$func)) {
-			return sprintf('$this->%s(%s)',$func,$params);
+		if (method_exists($this->o,'__'.$func)) {
+			return sprintf('$this->__%s(%s)',$func,$params);
 		}
 		
 		$func_file='function.'.$func.'.php';
@@ -501,6 +504,8 @@ class gstpl_compiler {
 		if (function_exists($func)) {
 			return sprintf('%s(%s)',$func,$params);
 		}
+		
+		return sprintf('$this->__%s(%s)',$func,$params);
 	}
 	
 	private function make_params_string($params) {
@@ -509,6 +514,13 @@ class gstpl_compiler {
 			$d[]='"'.$key.'" => '.$value;
 		}
 		return sprintf('array(%s)',implode(',',$d));
+	}
+	
+	function compile_include() {
+		$res=$this->code;
+		$regexp=sprintf("|%s(.*?)%s|is",$this->ld,$this->rd);
+		$res=preg_replace_callback($regexp,array($this,'parse_func'),$res);
+		$this->code=$res;
 	}
 	
 	function compile_html() {
@@ -739,7 +751,7 @@ class gs_page_blank {
 		return (empty($params[0])) ? $params[1] : $params[0];
 	}
 	
-	function cycle($params) {
+	function __cycle($params) {
 		$cn='func'.$params['_gsmtpl_id'];
 		if(!isset($this->cycle[$cn])) {
 			$this->cycle[$cn]['idx']=1;
@@ -750,10 +762,15 @@ class gs_page_blank {
 		return $this->cycle[$cn]['values'][$this->cycle[$cn]['idx']%$this->cycle[$cn]['cnt']];
 	}
 	
-	function handler($params) {
+	function __include($params) {
+		$tpl=gs_tpl::get_instance();
+		$file=trim($params['file'],'"\'');
+		return $info=$tpl->fetch($file);
+	}
+	
+	function __handler($params) {
 		ob_start();
 		$data=$this->getTemplateVars('_gsdata');
-		//$gsparams=$smarty->getTemplateVars('_gsparams');
 		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
 		$params['gspgid']=trim($params['gspgid'],'/');
 		if (!isset($data['gspgid_root'])) {
