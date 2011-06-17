@@ -165,10 +165,14 @@ TXT;
 				if (!empty($v['widget'])) {
 					break;
 				}
+				if (method_exists($rec->get_recordset(),'form_variants_'.$v['linkname'])) {
+					$vrecs=call_user_func(array($rec->get_recordset(),'form_variants_'.$v['linkname']),$rec,$data);
+				} else {
+					$rname=get_class($rec->init_linked_recordset($v['linkname']));
+					$vro=new $rname;
+					$vrecs=$vro->find_records();
+				}
 				$variants=array();
-				$rname=get_class($rec->init_linked_recordset($v['linkname']));
-				$vro=new $rname;
-				$vrecs=$vro->find_records();
 				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
 				$hh[$k]['variants']=$variants;
 				break;

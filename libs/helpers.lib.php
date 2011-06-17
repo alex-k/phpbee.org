@@ -24,6 +24,11 @@ class helper_fieldset {
 		return sprintf('<fieldset><legend>%s</legend>%s</fieldset>',$label,$txt);
 	}
 }
+class helper_label{
+	function show($label,$txt,$errors=array()) {
+		return sprintf('<label>%s&nbsp;%s</label>',$label,$txt);
+	}
+}
 class helper_dl {
 	function show($label,$txt,$errors=array()) {
 		return sprintf('<dl>%s</dl>',$txt);
@@ -74,6 +79,13 @@ class helper_table_submit{
 			 $txt, gs_dict::get('SUBMIT_FORM'));
     }
 }
+class helper_submit{
+    function show($label,$txt,$errors=array()) {
+         return sprintf('%s <input type="submit" value="%s">',
+			 $txt, gs_dict::get('SUBMIT_FORM'));
+    }
+}
+
 
 class helper_tr {
 	function show($label,$txt,$errors=array()) {

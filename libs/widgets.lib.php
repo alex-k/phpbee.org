@@ -461,7 +461,6 @@ class gs_widget_lMany2Many_checkboxes extends gs_widget {
 		foreach ($this->params['variants'] as $k=>$v) {
 			$ret.=sprintf("<label class=\"lMany2Many_checkbox\"><input type=\"checkbox\" name=\"%s[]\" value=\"%d\" %s>%s</label>\n",$this->fieldname,$k, (is_array($this->value) && (in_array($k,$this->value) || array_key_exists($k,$this->value))) ? 'checked="checked"' : '',$v);
 		}
-		$ret.="<br><label><input type=\"checkbox\" onChange=\"$('.lMany2Many_checkbox :checkbox').attr('checked',this.checked);\">all</label>\n";
 		$ret.="</span>";
 		return $ret;
 	}
@@ -470,6 +469,14 @@ class gs_widget_lMany2Many_checkboxes extends gs_widget {
 		$ret=is_array($this->value) && count($this->value)>0 ? array_combine(array_values($this->value),array_values($this->value)) : array();
 		return $ret;
 	}
+}
+class gs_widget_lMany2Many_checkboxes_all extends gs_widget_lMany2Many_checkboxes {
+	function html() { 
+		$ret=parent::html();
+		$ret.="<br><label><input type=\"checkbox\" onChange=\"$('.lMany2Many_checkbox :checkbox').attr('checked',this.checked);\">all</label>\n";
+		return $ret;
+	}
+
 }
 
 
