@@ -322,6 +322,7 @@ class gs_record implements arrayaccess {
 		}
 		$this->recordstate=RECORD_UNCHANGED;
 		$this->old_values=$this->modified_values=array();
+		$this->gs_recordset->process_trigger('after_commit',$this);
 		return $ret;
 	}
 	private function commit_childrens() {

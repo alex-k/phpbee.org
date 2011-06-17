@@ -11,6 +11,7 @@ class field_interface {
 		$arr=string_to_params($arr);
 		foreach ($arr as $k=>$r) {
 			if(!isset($r['required'])) $r['required']='true';
+			if (!isset($r['readonly'])) $r['readonly']=false;
 			$r['func_name']=$r[0];
 			if (in_array($r['func_name'],array('lMany2Many','lMany2One','lOne2One'))) {
 				$r['linked_recordset']=$r[1];
@@ -40,6 +41,7 @@ class field_interface {
 		$structure['htmlforms'][$field]=array(
 			'type'=>'input', 
 			'hidden'=>$opts['hidden'],
+			'readonly'=>$opts['readonly'],
 			'verbose_name'=>$opts['verbose_name'], 
 			);
 
@@ -54,7 +56,7 @@ class field_interface {
 				$structure['htmlforms'][$field]['validate_params']['validate_regexp']=$opts['validate_regexp'];
 			}
 		}
-		if (isset($opts['unique']) && strtolower($opts['unique'])=='true') {
+		if (isset($opts['unique']) && strtolower($opts['unique'])!='false' && $opts['unique']) {
 			$structure['htmlforms'][$field]['validate'][]='checkField';
 			$structure['htmlforms'][$field]['validate_params']['class']=$init_opts['recordset'];
 			$structure['htmlforms'][$field]['validate_params']['field']=$field;
@@ -95,19 +97,9 @@ class field_interface {
 	}
 	
 	static function fEmail($field,$opts,&$structure,$init_opts) {
+		self::fString($field,$opts,$structure,$init_opts);
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
-		$structure['htmlforms'][$field]=array(
-			'type'=>'email',
-			'hidden'=>$opts['hidden'],
-			'verbose_name'=>$opts['verbose_name'],
-		);
-		$structure['htmlforms'][$field]['validate'][]=strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty';
-		if (isset($opts['unique']) && strtolower($opts['unique'])=='true') {
-			$structure['htmlforms'][$field]['validate'][]='checkField';
-			$structure['htmlforms'][$field]['validate_params']['class']=$init_opts['recordset'];
-			$structure['htmlforms'][$field]['validate_params']['field']=$field;
-		}
-		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
+		$structure['htmlforms'][$field]['type']='email';
 	}
 	static function fDateTime($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'date');

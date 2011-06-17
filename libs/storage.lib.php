@@ -5,50 +5,6 @@ define ('DBD_UPD_RESTRICT',4);
 define ('DBD_DEL_RESTRICT',8);
 define ('DBD_TRIGGER_FUNC_NOT_EXISTS',16);
 
-
-abstract class gs_recordset extends gs_recordset_base {}
-abstract class _gs_recordset extends gs_recordset_base { // кеширование
-	public function find_records($options=null,$fields=null,$index_field_name=null) {
-		if (($ret=$this->load_cache($options))) return $ret;
-		$ret=parent::find_records($options,$fields,$index_field_name);
-		$this->save_cache($ret,$options);
-		return $ret;
-	}
-
-	public function count_records($options=null) {
-		if (($ret=$this->load_cache($options))) return $ret;
-		$ret=parent::count_records($options);
-		$this->save_cache($ret,$options);
-		return $ret;
-	}
-	private function save_cache($data,$options) {
-		return gs_cacher::save($data,'gs_recordset_'.get_class($this),$this->gen_rs_name($options));
-	}
-	private function load_cache($options) {
-		return gs_cacher::load($this->gen_rs_name($options),'gs_recordset_'.get_class($this));
-	}
-	public function clear_cache() {
-		return gs_cacher::cleardir('gs_recordset_'.get_class($this));
-	}
-
-
-	private function gen_rs_name($options) {
-		is_array($options) && asort($options);
-		return md5(serialize($options));
-	}
-
-	public function commit() {
-		if (parent::commit() ) {
-			$this->clear_cache();
-		}
-	}
-}
-
-function new_rs($classname) {
-        return new $classname;
-}
-
-
 define ('RS_STATE_NULL',0);
 define ('RS_STATE_UNLOADED',1);
 define ('RS_STATE_COUNTED',2);
@@ -210,6 +166,7 @@ abstract class gs_recordset_base extends gs_iterator {
               $options=array_merge($options,array($rs->id_field_name=>$ids));
          }
          $rs->find_records($options);
+	 $rs->preload();
          return $rs;
 	}
 	
@@ -246,7 +203,6 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->query_options['options']=$this->string2options($options);
 		$this->query_options['index_field_name'] = is_string($index_field_name) ? $index_field_name : $this->id_field_name;
 		$this->query_options['fields']=$fields;
-		//$this->query_options['loaded_fields']=is_array($this->query_options['loaded_fields']) ? array_merge($fields,$this->query_options['loaded_fields']) : $fields;
 		$this->reset();
 		$this->state=RS_STATE_UNLOADED;
 		mlog('RS_STATE_UNLOADED on '.get_class($this));//.' options:'.print_r($options,TRUE));
@@ -422,6 +378,51 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 	}
 }
+
+
+abstract class gs_recordset extends gs_recordset_base {}
+abstract class _gs_recordset extends gs_recordset_base { // кеширование
+	public function find_records($options=null,$fields=null,$index_field_name=null) {
+		if (($ret=$this->load_cache($options))) return $ret;
+		$ret=parent::find_records($options,$fields,$index_field_name);
+		$this->save_cache($ret,$options);
+		return $ret;
+	}
+
+	public function count_records($options=null) {
+		if (($ret=$this->load_cache($options))) return $ret;
+		$ret=parent::count_records($options);
+		$this->save_cache($ret,$options);
+		return $ret;
+	}
+	private function save_cache($data,$options) {
+		return gs_cacher::save($data,'gs_recordset_'.get_class($this),$this->gen_rs_name($options));
+	}
+	private function load_cache($options) {
+		return gs_cacher::load($this->gen_rs_name($options),'gs_recordset_'.get_class($this));
+	}
+	public function clear_cache() {
+		return gs_cacher::cleardir('gs_recordset_'.get_class($this));
+	}
+
+
+	private function gen_rs_name($options) {
+		is_array($options) && asort($options);
+		return md5(serialize($options));
+	}
+
+	public function commit() {
+		if (parent::commit() ) {
+			$this->clear_cache();
+		}
+	}
+}
+
+function new_rs($classname) {
+        return new $classname;
+}
+
+
 
 class gs_connector_pool {
 	private $db_connectors_pool;

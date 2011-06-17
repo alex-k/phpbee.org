@@ -136,10 +136,14 @@ TXT;
 		foreach ($hh as $k=>$v) {
 			switch($v['type']) {
 			case 'lMany2Many':
-				$rsl=$rec->init_linked_recordset($k);
-				$rsname=$rsl->structure['recordsets']['childs']['recordset'];
-				$rs=new $rsname();
-				$vrecs=$rs->find_records();
+				if (method_exists($rec->get_recordset(),'form_variants_'.$k)) {
+					$vrecs=call_user_func(array($rec->get_recordset(),'form_variants_'.$k),$rec,$data);
+				} else {
+					$rsl=$rec->init_linked_recordset($k);
+					$rsname=$rsl->structure['recordsets']['childs']['recordset'];
+					$rs=new $rsname();
+					$vrecs=$rs->find_records();
+				}
 				$variants=array();
 				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
 				$hh[$k]['variants']=$variants;

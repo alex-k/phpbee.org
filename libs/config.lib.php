@@ -109,8 +109,7 @@ class gs_init {
 		$tplcdir=$dir.$path.'___templates';
 		if (file_exists($tpldir)) {
 			check_and_create_dir($tplcdir);
-			// Ahtung ! touch on dir doesn`t work for Windows and PHP <5.3.0
-			@touch($tplcdir);
+			touch($tplcdir);
 			$files=glob($tpldir.DIRECTORY_SEPARATOR.'*');
 			foreach ($files as $f) {
 				/*$s=file_get_contents($f);
@@ -327,7 +326,7 @@ class gs_logger {
 	}
 	function log($data) {
 		$this->messages[]=$data;
-		//$this->log_to_file($data);
+		$this->log_to_file($data);
 	}
 	private function log_to_file($data) {
 		if (cfg('log_file')) {

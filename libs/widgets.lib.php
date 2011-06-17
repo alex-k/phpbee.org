@@ -51,6 +51,20 @@ class gs_widget_int extends gs_widget{
 		}
 }
 
+class gs_widget_password2 extends gs_widget{
+	    function html() {
+		            $f2=$this->fieldname.'_repeat';
+			            $v2=isset($this->data[$f2]) ? $this->data[$f2] : '';
+				            return sprintf('<input class="fPassword" type="password" name="%s" value="%s"%s></td><td class="helper_tr_error"></td></tr><tr class="helper_tr"><td class="helper_tr_title">%s</td><td class="helper_tr_field"><input class="fPassword" type="password" name="%s_repeat" value="%s"%s>', $this->fieldname,trim($this->value),$this->params['readonly'] ? 'disabled="disabled"' : '',gs_dict::get('REPEAT_PASSWORD'),$this->fieldname,($this->value==$v2) ? $this->value : '',$this->params['readonly'] ? 'disabled="disabled"' : '');
+					        }
+						    
+						        function validate() {
+								        $f1=$this->fieldname;
+									        $f2=$this->fieldname.'_repeat';
+										        return (isset($this->data[$f2]) && $this->data[$f1]==$this->data[$f2]);
+											    }
+}
+
 
 class gs_widget_password extends gs_widget{
 		function html() {
