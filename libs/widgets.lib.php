@@ -193,6 +193,29 @@ class gs_widget_select extends gs_widget{
 				return $ret;
 		}
 }
+class gs_widget_select_enter extends gs_widget{
+		function html() {
+				$ret="<select onChange=\"$('input[selname=".$this->fieldname."]').val('');\" class=\"fSelect\"  name=\"".$this->fieldname."[select]\"><option></option>\n";
+				if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
+				foreach ($this->params['options'] as $v=>$l) {
+						$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n",
+									htmlspecialchars($v),
+									(empty($this->value['enter']) && trim($this->value['select'])==$v) ? 'selected="selected"' : '',
+									$l);
+				}
+				$ret.="</select>\n";
+				$ret.=sprintf("</label><label><input class=\"fSelect\"  name=\"%s[enter]\" selname=\"%s\" value=\"%s\">",
+								$this->fieldname,
+								$this->fieldname,
+								trim($this->value['enter'])
+								);
+				return $ret;
+		}
+		function clean() {
+			$ret=isset($this->value['enter']) && !empty($this->value['enter']) ? $this->value['enter'] : $this->value['select'];
+			return $ret;
+		}
+}
 class gs_widget_checkbox extends gs_widget{
 		function html() {
 				$s=sprintf('<input type="hidden" name="%s" value="0">', $this->fieldname);

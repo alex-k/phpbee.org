@@ -26,7 +26,9 @@ class helper_fieldset {
 }
 class helper_label{
 	function show($label,$txt,$errors=array()) {
-		return sprintf('<label>%s&nbsp;%s</label>',$label,$txt);
+		//$e = $errors ? '<span class="error">'.gs_dict::get('FORM_VALIDATE_ERROR').': '.implode(',',gs_dict::get($errors)).'</span>' : '';
+		$e = $errors ? '<span class="error">*</span>' : '';
+		return sprintf('<label>%s&nbsp;%s%s</label>',$label,$e,$txt);
 	}
 }
 class helper_dl {

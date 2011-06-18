@@ -43,6 +43,7 @@ class field_interface {
 			'hidden'=>$opts['hidden'],
 			'readonly'=>$opts['readonly'],
 			'verbose_name'=>$opts['verbose_name'], 
+			'options'=>isset($opts['options']) ? $opts['options'] : NULL,
 			);
 
 		if (strtolower($opts['required'])=='false') {
