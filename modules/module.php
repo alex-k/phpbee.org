@@ -108,12 +108,12 @@ class admin_handler extends gs_base_handler {
 	
 	function deleteform() {
 		$id=$this->data['gspgid_va'][0];
-		$res=preg_replace("|/delete/[\dA-Za-z]+|is","//",$this->data['gspgid']);
+		$res=preg_replace("|/delete/\d+|is","/",$this->data['gspgid']);
 		$rs=new $this->params['classname'];
 		$rec=$rs->get_by_id($id);
 		$rec->delete();
 		$rec->commit();
-		return html_redirect($res);
+		return html_redirect($res,$_GET);
 	}
 	
 	function many2one() {
