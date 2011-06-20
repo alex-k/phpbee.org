@@ -135,8 +135,8 @@ function string_to_params($inp) {
 		foreach ($out[3] as $i => $v) {
 			$key= $v ? $v : $j++;
 			$value = $out[4][$i] ? $out[4][$i] : $out[1][$i];
-			if (strtolower($value)=='false') $value=false;
-			if (strtolower($value)=='true') $value=true;
+			//if (strtolower($value)=='false') $value=false;
+			//if (strtolower($value)=='true') $value=true;
 			$prefix=explode(':',$value,2);
 			if(strtoupper($prefix[0])=='ARRAY') $value=explode(':',$prefix[1]);
 			$r[$key]=$value;

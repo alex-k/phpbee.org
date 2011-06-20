@@ -290,15 +290,17 @@ TXT;
 		echo $this->postform();
 	}
 	function deleteform() {
+		
 		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
 		$f=$this->get_form();
 		$f->rec->delete();
 		$f->rec->commit();
+		
 		if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
-		return html_redirect($this->data['gspgid_handler']);
+		return html_redirect($this->data['gspgid_handler'],$_GET);
 	}
 	function redirect() {
-		return html_redirect($this->params['href']);
+		return html_redirect($this->params['href'],$_GET);
 	}
 	function many2one() {
 		if (isset($this->data['gspgid_va'][4]) && $this->data['gspgid_va'][4]=='delete') {

@@ -45,7 +45,6 @@ class field_interface {
 			'verbose_name'=>$opts['verbose_name'], 
 			'options'=>isset($opts['options']) ? $opts['options'] : NULL,
 			);
-
 		if (strtolower($opts['required'])=='false') {
 			$structure['htmlforms'][$field]['validate']='dummyValid';
 		} else {

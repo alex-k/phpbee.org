@@ -352,8 +352,11 @@ class gstpl_compiler {
 		$res=$matches[1];
 		//$o=new gs_smarty_parser($this);
 		//return $o->smarty_parser($matches[1]);
-		$res=preg_replace("|\.([^\.><=\[]*)|i","[\\1]",$matches[1]);
-		$res=preg_replace("|\[([a-z_][a-z0-9_]*)\]|i","['\\1']",$res);
+		$res=str_replace('$','$this->assign.',$matches[1]);
+		$res=preg_replace("|\.([a-zA-Z0-9\_]*)|i","[\\1]",$res);
+		$res=preg_replace("|\[([a-zA-Z_][a-zA-Z0-9_]*)\]|i","['\\1']",$res);
+		
+		return sprintf("\nif (%s) {\n",$res);
 		return sprintf("\nif (%s) {\n",str_replace("\$","\$this->",$res));
 	}
 	
@@ -715,21 +718,24 @@ class gs_page_blank {
 		$this->assign_vars($params);
 	}
 	
-	public function assign($params) {
-		$args=func_get_args();
-		if (count($args)==2) {
-			$this->assign[$args[0]]=$args[1];
-			//$this->{$args[0]}=$args[1];
-			return;
+	public function __assign($name,$values='GSMTPL_NO_ARG') {
+		if ($values=='GSMTPL_NO_ARG') {
+			if (isset($name['var']) && isset($name['value'])) {
+				if ($name['value']=='null') $name['value']=null;
+				$this->assign[$name['var']]=$name['value'];
+				return;
+			}
+			foreach ($name as $key => $value) {
+				if ($value=='null') $value=null;
+				$this->assign[$key]=$value;
+			}
+		} else {
+			$this->assign[$name]=$values;
 		}
-		if (isset($params['var']) && isset($params['value'])) {
-			$this->assign[$params['var']]=$params['value'];
-			return;
-		}
-		foreach ($params as $name => $value) {
-			$this->assign[$name]=$value;
-		}
-		//$this->{$params['var']}=$params['value'];
+	}
+	
+	public function assign ($name,$values='GSMTPL_NO_ARG') {
+		return $this->__assign($name,$values);
 	}
 	
 	protected function assign_vars($params) {
@@ -765,6 +771,7 @@ class gs_page_blank {
 	function __include($params) {
 		$tpl=gs_tpl::get_instance();
 		$file=trim($params['file'],'"\'');
+		$tpl->assign($params);
 		return $info=$tpl->fetch($file);
 	}
 	
@@ -782,6 +789,7 @@ class gs_page_blank {
 		$data['foo']='bar';
 
 		$tpl=gs_tpl::get_instance();
+		$tpl->assign($params);
 
 		if (isset($params['_record'])) {
 			$tpl->assign('_record',$params['_record']);
@@ -794,6 +802,7 @@ class gs_page_blank {
 		$assign['handler_params']=$params;
 
 		$tpl->assign($assign);
+		
 
 		$o_p=gs_parser::get_instance($data);
 		if (isset($params['scope'])) {
