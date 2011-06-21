@@ -1,4 +1,5 @@
 $(document).ready (function (){
+	$(".lMany2Many").gs_multiselect();
 	$(".fDateTime").datepicker();
 	$('.fWysiwyg').rte({
 		//css: ['default.css'],

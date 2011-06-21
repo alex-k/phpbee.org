@@ -12,7 +12,7 @@ cfg_set('tpl_data_dir',array(
 ));
 $init->init(LOAD_CORE | LOAD_STORAGE | LOAD_TEMPLATES);
 $init->load_modules();
-
+mlog('1');
 session_start();
 
 $o_h=new gs_parser($init->data);
