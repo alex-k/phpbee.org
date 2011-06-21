@@ -42,12 +42,29 @@ class tw{%$MODULE_NAME%} extends gs_recordset_short {
 	const superadmin=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'subject'=>"fString 'Название'",
-		'Image'=>"fFile 'Баннер'",
+		'File'=>"lOne2One tw{%$MODULE_NAME%}_files 'Баннер' hidden=false widget=include_form",
 		'Pages'=> "lMany2Many tw_{%$PARENT_MODULE%}:link{%$MODULE_NAME%}",
 		{%foreach from=$SUBMODULES_DATA.LINKS key=K item=L%}
 			'{%$K%}'=>"{%$L%}",
 		{%/foreach%}
 		),$init_opts);
+	}
+}
+
+class tw{%$MODULE_NAME%}_files extends tw_file_images {
+	function __construct($init_opts=false) {
+		parent::__construct($init_opts);
+		$this->structure['fkeys']=array(
+			array('link'=>'tw{%$MODULE_NAME%}.File','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
+		);
+	}
+	
+	function config_previews() {
+		parent::config_previews();
+		$this->config=array_merge($this->config,array(
+			'small'=>array('width'=>50,'height'=>50,'method'=>'use_fields','bgcolor'=>array(255,255,255)),
+			'left'=>array('width'=>160,'height'=>160,'method'=>'use_width'),
+		));
 	}
 }
 

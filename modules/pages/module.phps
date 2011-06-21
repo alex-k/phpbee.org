@@ -22,6 +22,9 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 		'default'=>array(
 			'default'=>'gs_base_handler.show404:{name:404.html}',
 		),
+		'get'=>array(
+			'info'=>'handler_pages.get_info',
+		),
 		'get_post'=>array(
 			''=>'gs_base_handler.show:{name:pages.html}',
 			'/admin/pages'=>'gs_base_handler.show:{name:adm_pages.html:classname:tw{%$MODULE_NAME%}}',
@@ -37,6 +40,16 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 }
 
 class handler{%$MODULE_NAME%} extends gs_base_handler {
+	function get_info() {
+		$o=new tw_pages;
+		$url='/'.ltrim($this->data['gspgid_root'],'/');
+		$rec=$o->find_records(array('url'=>$url),array('id','subject','keywords','description'))->limit(1)->first();
+		$info['title']=$rec->subject;
+		$info['keywords']=$rec->keywords;
+		$info['description']=$rec->description;
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('page_info',$info);
+	}
 }
 
 class tw{%$MODULE_NAME%} extends gs_recordset_short {
