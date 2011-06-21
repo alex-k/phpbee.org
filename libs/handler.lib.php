@@ -300,7 +300,7 @@ TXT;
 		$f->rec->commit();
 		
 		if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
-		return html_redirect($this->data['gspgid_handler'],$_GET);
+		return html_redirect($this->data['gspgid_handler']);
 	}
 	function redirect() {
 		return html_redirect($this->params['href']);
