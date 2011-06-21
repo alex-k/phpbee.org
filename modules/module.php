@@ -113,7 +113,9 @@ class admin_handler extends gs_base_handler {
 		$rec=$rs->get_by_id($id);
 		$rec->delete();
 		$rec->commit();
-		return html_redirect($res,$_GET);
+		$query=array();
+		parse_str(parse_url(cfg('referer'),PHP_URL_QUERY),$query);
+		return html_redirect($res,$query);
 	}
 	
 	function many2one() {
