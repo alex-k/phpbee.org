@@ -1,10 +1,16 @@
 <?php
-function html_redirect($gspgid=null,$data=null,$type='302') {
+function html_redirect($gspgid=null,$data=array(),$type='302') {
 	$config=gs_config::get_instance();
-	if($gspgid===null) $gspgid=$config->referer_path;
-	$scheme=parse_url($gspgid,PHP_URL_SCHEME);
-	$url=$scheme ? $gspgid : $config->www_dir.$gspgid;
+	$query=array();
+	if($gspgid===null) {
+		$url=$config->referer_path;
+		parse_str(parse_url($config->referer,PHP_URL_QUERY),$query);
+	} else {
+		$scheme=parse_url($gspgid,PHP_URL_SCHEME);
+		$url=$scheme ? $gspgid : $config->www_dir.$gspgid;
+	}
 	$url='/'.ltrim($url,'/');
+	$data=array_merge($query,$data);
 	$datastr='';
 	if ($data) $datastr='?'.http_build_query($data);
 	switch ($type) {

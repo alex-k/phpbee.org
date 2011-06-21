@@ -234,6 +234,7 @@ class gs_config {
                 $this->www_image_dir=$this->www_dir.'img/';
 		$this->script_dir=rtrim(dirname($_SERVER['PHP_SELF']),'/').'/';
 		$this->index_filename=$_SERVER['SCRIPT_NAME'];
+		$this->referer= $_SERVER['HTTP_REFERER'];
 		$this->referer_path= isset($_SERVER['HTTP_REFERER']) ?  preg_replace("|^$this->www_dir|",'',parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH)) : '';
 		$this->lib_dir=$this->root_dir.'libs/';
 		$this->var_dir=$this->root_dir.'var/';

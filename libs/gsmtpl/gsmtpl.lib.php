@@ -776,43 +776,7 @@ class gs_page_blank {
 	}
 	
 	function __handler($params) {
-		ob_start();
-		$data=$this->getTemplateVars('_gsdata');
-		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
-		$params['gspgid']=trim($params['gspgid'],'/');
-		if (!isset($data['gspgid_root'])) {
-			$data['gspgid_root']=$data['gspgid'];
-		}
-		$data['gspgid_handler']=$data['gspgid'];
-		$data['gspgid']=$params['gspgid'];
-		$data['handler_params']=$params;
-		$data['foo']='bar';
-
-		$tpl=gs_tpl::get_instance();
-		$tpl->assign($params);
-
-		if (isset($params['_record'])) {
-			$tpl->assign('_record',$params['_record']);
-		}
-		$assign=array();
-		$assign['gspgdata_form']=$data;
-		$assign['gspgid_form']=$data['gspgid'];
-		$assign['gspgid_handler']=$data['gspgid_handler'];
-		$assign['gspgid_root']=$data['gspgid_root'];
-		$assign['handler_params']=$params;
-
-		$tpl->assign($assign);
-		
-
-		$o_p=gs_parser::get_instance($data);
-		if (isset($params['scope'])) {
-			$hndl=$o_p->get_current_handler();
-			if ($hndl[0]['params']['module_name']!=$params['scope']) return '';
-		}
-		$ret=$o_p->process();
-		$ret_ob=ob_get_contents();
-		ob_end_clean();
-		return $ret_ob.$ret;
+		return gs_base_handler::process_handler($params,$this);
 	}
 	
 

@@ -241,7 +241,8 @@ TXT;
 		return $ret;
 	}
 	function post() {
-		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+		//if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+		if ($this->data['gspgtype']==GS_DATA_GET) return $this->showform();
 
 		$tpl=gs_tpl::get_instance();
 		$f=$this->get_form();
@@ -258,7 +259,8 @@ TXT;
 	}
 
 	function postform() {
-		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+		//if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+		if ($this->data['gspgtype']==GS_DATA_GET) return $this->showform();
 
 		$tpl=gs_tpl::get_instance();
 		$f=$this->get_form();
@@ -291,7 +293,8 @@ TXT;
 	}
 	function deleteform() {
 		
-		if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+		//if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+		if ($this->data['gspgtype']==GS_DATA_GET) return $this->showform();
 		$f=$this->get_form();
 		$f->rec->delete();
 		$f->rec->commit();
@@ -300,7 +303,7 @@ TXT;
 		return html_redirect($this->data['gspgid_handler'],$_GET);
 	}
 	function redirect() {
-		return html_redirect($this->params['href'],$_GET);
+		return html_redirect($this->params['href']);
 	}
 	function many2one() {
 		if (isset($this->data['gspgid_va'][4]) && $this->data['gspgid_va'][4]=='delete') {
@@ -351,6 +354,53 @@ TXT;
 			$newdata=array_merge_recursive_distinct($newdata,$v);
 		}
 		return array_merge($data,$newdata);
+	}
+	static function process_handler($params,$smarty) {
+		ob_start();
+		$data=$smarty->getTemplateVars('_gsdata');
+		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
+		$params['gspgid']=trim($params['gspgid'],'/');
+		if (isset($data['gspgid_form']) && $data['gspgid_form']==$params['gspgid']) {
+			$gspgid_form=$data['gspgid_form'];
+			$c=new gs_data_driver_post;
+			$data=$c->import();
+			$data['gspgid_form']=$gspgid_form;
+			$data['gspgid']=$params['gspgid'];
+		}
+		if (!isset($data['gspgid_root'])) {
+			$data['gspgid_root']=$data['gspgid'];
+		}
+		$data['gspgid_handler']=$data['gspgid'];
+		$data['gspgid']=$params['gspgid'];
+		$data['handler_params']=$params;
+		
+
+
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign($params);
+
+		if (isset($params['_record'])) {
+			$tpl->assign('_record',$params['_record']);
+		}
+		$assign=array();
+		$assign['gspgdata_form']=$data;
+		$assign['gspgid_form']=$data['gspgid'];
+		$assign['gspgid_handler']=$data['gspgid_handler'];
+		$assign['gspgid_root']=$data['gspgid_root'];
+		$assign['handler_params']=$params;
+
+		$tpl->assign($assign);
+		
+		$o_p=gs_parser::get_instance($data);
+		if (isset($params['scope'])) {
+			$hndl=$o_p->get_current_handler();
+			if ($hndl[0]['params']['module_name']!=$params['scope']) return '';
+		}
+		$ret=$o_p->process();
+		$ret_ob=ob_get_contents();
+		ob_end_clean();
+		return $ret_ob.$ret;
+
 	}
 }
 

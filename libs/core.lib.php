@@ -71,7 +71,15 @@ class gs_data {
 				$this->data=array_merge($this->data,$c->import());
 			}
 		}
-		//md($this->data);
+		if($this->data['gspgtype']==GS_DATA_POST && isset($this->data['gspgid_form']) 
+					&& $this->data['gspgid_form']!=$this->data['gspgid']) {
+			$gspgid_form=$this->data['gspgid_form'];
+			$gspgid=$this->data['gspgid'];
+			$c=new gs_data_driver_get;
+			$this->data=$c->import();
+			$this->data['gspgid']=$gspgid;
+			$this->data['gspgid_form']=$gspgid_form;
+		}
 	}
 	
 
