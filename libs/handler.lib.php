@@ -154,7 +154,7 @@ TXT;
 				}
 				break;
 			case 'lOne2One':
-				if ($hh[$k]['hidden']) break;
+				if ($hh[$k]['hidden']!='false') break;
 				if (isset($v['widget'])) {
 					$dclass='gs_data_widget_'.$v['widget'];
 					if (class_exists($dclass)) {
