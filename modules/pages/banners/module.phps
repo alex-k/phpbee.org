@@ -44,7 +44,6 @@ class tw{%$MODULE_NAME%} extends gs_recordset_short {
 		'subject'=>"fString 'Название'",
 		'Image'=>"fFile 'Баннер'",
 		'Pages'=> "lMany2Many tw_{%$PARENT_MODULE%}:link{%$MODULE_NAME%}",
-		{%$SUBMODULES_DATA|md:1%}
 		{%foreach from=$SUBMODULES_DATA.LINKS key=K item=L%}
 			'{%$K%}'=>"{%$L%}",
 		{%/foreach%}
