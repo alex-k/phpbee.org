@@ -150,24 +150,23 @@ abstract class gs_recordset_base extends gs_iterator {
 
 	function find($options,$linkname=null) {
 		 $options=$this->string2options($options);
-         if (!$this->first()) return new gs_null(GS_NULL_XML);
-
-         $ids=array();
-         if ($linkname!==null) {
-              if (!isset($this->structure['recordsets'][$linkname])) return new gs_null(GS_NULL_XML);
-              $rs=$this->first()->init_linked_recordset($linkname);
-              $s=$this->structure['recordsets'][$linkname];
-              foreach ($this as $r) $ids[]=$r->$s['local_field_name'];
-              $options=array_merge($options,array($rs->foreign_field_name=>$ids));
-         } else {
-              foreach ($this as $r) $ids[]=$r->get_id();
-              $cur_class_name=get_class($this);
-              $rs=new $cur_class_name;
-              $options=array_merge($options,array($rs->id_field_name=>$ids));
-         }
-         $rs->find_records($options);
-	 $rs->preload();
-         return $rs;
+		if (!$this->first()) return new gs_null(GS_NULL_XML);
+		$ids=array();
+		if ($linkname!==null) {
+			if (!isset($this->structure['recordsets'][$linkname])) return new gs_null(GS_NULL_XML);
+			$rs=$this->first()->init_linked_recordset($linkname);
+			$s=$this->structure['recordsets'][$linkname];
+			foreach ($this as $r) $ids[]=$r->$s['local_field_name'];
+			$options=array_merge($options,array($rs->foreign_field_name=>$ids));
+		} else {
+			foreach ($this as $r) $ids[]=$r->get_id();
+			$cur_class_name=get_class($this);
+			$rs=new $cur_class_name;
+			$options=array_merge($options,array($rs->id_field_name=>$ids));
+		}
+		$rs->find_records($options);
+		$rs->preload();
+		return $rs;
 	}
 	
 	
@@ -196,7 +195,21 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 		return parent::count();
 	}
+	
+	function limit ($offset,$limit=null) {
+		if (is_null($limit)) {
+			$this->query_options['options'][]=array('type'=>'limit','value'=>$offset);
+		} else {
+			$this->query_options['options'][]=array('type'=>'offset','value'=>$offset);
+			$this->query_options['options'][]=array('type'=>'limit','value'=>$limit);
+		}
+		return $this;
+	}
 
+	function offset ($num) {
+		$this->query_options['options'][]=array('type'=>'offset','value'=>$num);
+		return $this;
+	}
 
 
 	public function find_records($options=null,$fields=null,$index_field_name=null) {

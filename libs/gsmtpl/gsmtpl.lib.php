@@ -12,6 +12,7 @@ class gsmtpl {
 	public $right_delimiter='}';
 	private $assign=array();
 	private $page=NULL;
+	private $pages=array();
 
 	function __construct() {
 		$this->compile_dir=dirname(__FILE__).DS.$this->compile_dir;
@@ -31,6 +32,9 @@ class gsmtpl {
 			}
 		} else {
 			$this->assign[$name]=$values;
+		}
+		foreach ($this->pages as $pg) {
+			$pg->assign($name,$values);
 		}
 	}
 	public function get_var($name) {
@@ -755,6 +759,22 @@ class gs_page_blank {
 	function _default() {
 		$params=func_get_args();
 		return (empty($params[0])) ? $params[1] : $params[0];
+	}
+	
+	function _cat($part1,$part2) {
+		return $part1.$part2;
+	}
+	
+	function _norma($text) {
+		$text=strip_tags($text);
+		$lib=cfg('lib_dir');
+		$norm=VPA_normalizator::getInstance($lib.'dicts/');
+		$words=$norm->parse_text(strtolower($text));
+		$w=$norm->freq_analyze_first($words);
+		$res=$norm->freq_analyze_second($w);
+		var_dump($words);
+		die();
+		return $res;
 	}
 	
 	function __cycle($params) {

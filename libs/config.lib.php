@@ -109,7 +109,7 @@ class gs_init {
 		$tplcdir=$dir.$path.'___templates';
 		if (file_exists($tpldir)) {
 			check_and_create_dir($tplcdir);
-			touch($tplcdir);
+			@touch($tplcdir);
 			$files=glob($tpldir.DIRECTORY_SEPARATOR.'*');
 			foreach ($files as $f) {
 				/*$s=file_get_contents($f);
@@ -176,6 +176,7 @@ class gs_init {
 		load_file($this->config->lib_dir.'newvalidator.lib.php');
 		load_file($this->config->lib_dir.'functions.lib.php');
 		load_file($this->config->lib_dir.'vpa_mail.lib.php');
+		load_file($this->config->lib_dir.'vpa_normalizator.lib.php');
 	}
 
 	public function load_storage() {
