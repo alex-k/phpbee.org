@@ -46,7 +46,7 @@ class gs_init {
 		$modified=false;
 		$dir=$this->config->lib_modules_dir;
 		$subdirs=glob($dir.$path.'*',GLOB_ONLYDIR);
-		$dir=rtrim($dir,DIRECTORY_SEPARATOR);
+		$dir=rtrim($dir,DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 		$path=trim($path,DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 		foreach ($subdirs as $s) {
 			if ($this->check_compile_modules($path.basename($s).DIRECTORY_SEPARATOR)) return true;
@@ -59,18 +59,20 @@ class gs_init {
 			$pf=str_replace(basename($f),'___'.basename($f),$f);
 			$pf=preg_replace('/.phps$/','.xphp',$pf);
 			if (!file_exists($pf) || filemtime($pf) < filemtime($f)) return true;
-			if (strpos(PHP_OS,'WIN')!==false && PHP_VERSION_ID<50300) {
+			//if (strpos(strtoupper(PHP_OS),'WIN')!==false && PHP_VERSION_ID<50300) {
 				$mtime=filemtime($tpldir);
 				$mctime=filemtime($tplcdir);
 				$tpls=glob($tpldir.DIRECTORY_SEPARATOR.'*');
 				foreach ($tpls as $t) {
 					$mt=filemtime($t);
 					$mct=filemtime($tplcdir.DIRECTORY_SEPARATOR.basename($t));
+					//md($t.') '.$mt.' - '.$mct.' = '.intval($mt - $mct),1);
 					if ($mt>$mct) return true;
 				}
-			} else {
+			/*} else {
+				md($tpldir.') '.filemtime($tplcdir).' - '.filemtime($tpldir).' = '.intval(filemtime($tplcdir) - filemtime($tpldir)),1);
 				if (file_exists($tpldir) && (!file_exists($tplcdir) || filemtime($tplcdir) < filemtime($tpldir))) return true;
-			}
+			}*/
 			
 		}
 		return false;
@@ -251,7 +253,7 @@ class gs_config {
                 $this->www_image_dir=$this->www_dir.'img/';
 		$this->script_dir=rtrim(dirname($_SERVER['PHP_SELF']),'/').'/';
 		$this->index_filename=$_SERVER['SCRIPT_NAME'];
-		$this->referer= $_SERVER['HTTP_REFERER'];
+		$this->referer= isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
 		$this->referer_path= isset($_SERVER['HTTP_REFERER']) ?  preg_replace("|^$this->www_dir|",'',parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH)) : '';
 		$this->lib_dir=$this->root_dir.'libs/';
 		$this->var_dir=$this->root_dir.'var/';

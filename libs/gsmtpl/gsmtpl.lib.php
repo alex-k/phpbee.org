@@ -765,6 +765,10 @@ class gs_page_blank {
 		return $part1.$part2;
 	}
 	
+	function _replace($subject,$search,$replace) {
+		return str_replace($search,$replace,$subject);
+	}
+	
 	function __cycle($params) {
 		$cn='func'.$params['_gsmtpl_id'];
 		if(!isset($this->cycle[$cn])) {
