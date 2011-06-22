@@ -765,18 +765,6 @@ class gs_page_blank {
 		return $part1.$part2;
 	}
 	
-	function _norma($text) {
-		$text=strip_tags($text);
-		$lib=cfg('lib_dir');
-		$norm=VPA_normalizator::getInstance($lib.'dicts/');
-		$words=$norm->parse_text(strtolower($text));
-		$w=$norm->freq_analyze_first($words);
-		$res=$norm->freq_analyze_second($w);
-		var_dump($words);
-		die();
-		return $res;
-	}
-	
 	function __cycle($params) {
 		$cn='func'.$params['_gsmtpl_id'];
 		if(!isset($this->cycle[$cn])) {

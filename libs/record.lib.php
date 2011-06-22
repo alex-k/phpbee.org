@@ -122,6 +122,7 @@ class gs_record implements arrayaccess {
 				}
 			} else {
 				$this->$field=$value;
+				//$this->values[$field]=$value;
 			}
 		}
 		$this->gs_recordset->fill_values($this,$values);
@@ -259,8 +260,7 @@ class gs_record implements arrayaccess {
 		$fields=$this->get_recordset()->structure['fields'];
 		if ($this->recordstate & RECORD_ROLLBACK) {
 			$this->recordstate=RECORD_NEW;
-		}
-		elseif((is_array($fields) && array_key_exists($name,$fields) && (!isset($this->values[$name]) || $value!=$this->values[$name]))
+		} elseif((is_array($fields) && array_key_exists($name,$fields) && (!isset($this->values[$name]) || $value!=$this->values[$name]))
 		       || ($this->recordstate & RECORD_NEW)) {
 			$this->recordstate=$this->recordstate|RECORD_CHANGED;
 			if (isset($this->values[$name])) $this->old_values[$name]=$this->values[$name];
@@ -269,9 +269,11 @@ class gs_record implements arrayaccess {
 		if (($parent=$this->get_recordset()->parent_record)!==NULL) $parent->child_modified();
 		return $this->values[$name]=$value;
 	}
+	
 	function get_old_value($name) {
 		return isset($this->old_values[$name]) ? $this->old_values[$name] : $this->__get($name);
 	}
+	
 	public function child_modified() {
 		$this->recordstate=$this->recordstate|RECORD_CHILDMOD;
 		if (($rs=$this->get_recordset()->parent_record)!==NULL) $rs->child_modified();

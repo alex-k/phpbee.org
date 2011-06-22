@@ -32,9 +32,14 @@ class field_interface {
 
 			self::$r['func_name']($k,$r,$structure,$init_opts);
 			if (isset($r['default']) && !isset($structure['fields'][$k]['default'])) $structure['fields'][$k]['default']=$r['default'];
+			if (isset($r['trigger'])) {
+				$structure['triggers']['before_insert'][$k]=$r['trigger'];
+				$structure['triggers']['before_update'][$k]=$r['trigger'];
+			}
 		}
 		return $structure;
 	}
+	
 
 	static function fString($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);

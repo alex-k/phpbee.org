@@ -13,11 +13,13 @@ class VPA_normalizator
 	var $dic_file;
 	var $error_words;
 	var $dic=array();
+	var $stop=array();
+	var $verb=array();
 	var $big_word;
 	var $lang;
 	var $log;
 	
-	function &getInstance($dir='dicts/',$dic='russian_utf')
+	function &getInstance($dir='dicts/',$dic='russian')
 	{
 	  static $instance;
 	  if (!isset($instance)) $instance = new VPA_normalizator($dir,$dic);
@@ -29,7 +31,8 @@ class VPA_normalizator
 		$this->aff_index=unserialize(file_get_contents($dir.$dic.'_aff.indx'));
 		$this->aff_data=unserialize(file_get_contents($dir.$dic.'_aff.data'));
 		$this->dic_file=$dir.$dic.'_dic.data';
-		
+		$stop_file=$dir.$dic.'_stop.data';
+		$verb_file=$dir.$dic.'_verb.data';
 		asort ($this->aff_index);
 		$v=array();
 		$l='';
@@ -40,11 +43,19 @@ class VPA_normalizator
 			$this->aff_letters[$key][$indx]=$end;
 		}
 		$this->dic=array_unique(file($this->dic_file));
-		foreach ($this->dic as $i => $dw)
-		{
+		$this->stop=array_unique(file($stop_file));
+		$this->verb=array_unique(file($verb_file));
+		foreach ($this->dic as $i => $dw) {
 			//$this->dic[$i]=iconv('Windows-1251','UTF-8',strtolower(trim($dw)));
 			$this->dic[$i]=trim($dw);
 		}
+		foreach ($this->stop as $i => $dw) {
+			$this->stop[$i]=trim($dw);
+		}
+		foreach ($this->verb as $i => $dw) {
+			$this->verb[$i]=trim($dw);
+		}
+		$this->stop=array_flip($this->stop);
 		$this->dic=array_flip($this->dic);
 		$this->lang=$dic;
 		mlog(get_class($this).": VPA_normalizator init successful",$start,$status);
@@ -146,8 +157,8 @@ class VPA_normalizator
 		$words=preg_split('/[\s\,\.\;\:\-]/',$text);
 		foreach ($words as $indx => $word)
 		{
-			$word=preg_replace("/[^а-яА-Я]*([а-яА-Я]*)[^а-яА-Я]*/is","$1",$word);
-			$words[$indx]=$word;
+			//$word=preg_replace("/[^а-яА-Я]*([а-яА-Я]*)[^а-яА-Я]*/is","$1",$word);
+			$words[$indx]=trim($word,'"\'');
 			if (strlen($word)<=3) unset($words[$indx]);
 		}
 		sort($words);
@@ -177,18 +188,38 @@ class VPA_normalizator
 	{
 		$words=array_keys($result);
 		$this->error_words=array();
+		
 		foreach ($words as $i => $word)
 		{
-			if (!$this->get($word,$nw,false))
-			{
-				$this->error_words[]=$word;
-			}
 			$freq=$result[$word];
 			unset($result[$word]);
+			if (!$this->get($word,$nw,false)) {
+				$this->error_words[]=$word;
+			}
 			$result[$nw]=(isset($result[$nw])) ? $result[$nw]+$freq : $freq;
 		}
-		mlog(get_class($this).": freq_analyze_second: вторичный частотный анализ проведен (".count($words)."=>".count($result).")",$start,true);
-		return $result;
+		$res=array();
+		foreach ($result as $word => $f) {
+			if (!array_key_exists($word,$this->stop)) {
+				$res[$word]=$f;
+			}
+		}
+		mlog(get_class($this).": freq_analyze_second: вторичный частотный анализ проведен (".count($words)."=>".count($res).")",$start,true);
+		return $res;
+	}
+	
+	function freq_analyze_third($result) {
+		$res=array();
+		foreach ($result as $word => $f) {
+			$s=0;
+			foreach ($this->verb as $verb) {
+				$regexp=sprintf("|%s$|is",$verb);
+				$s+=preg_match($regexp,$word);
+			}
+			if ($s==0) $res[$word]=$f;
+		}
+		mlog(get_class($this).": freq_analyze_third: отброшены глаголы (".count($result)."=>".count($res).")",$start,true);
+		return $res;
 	}
 
 }

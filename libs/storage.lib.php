@@ -107,17 +107,17 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 
 	// works only in PHP > 5.3
-	static function record_by_id($id) {
+	static function record_by_id($id,$fields=array()) {
 		if(function_exists('get_called_class')) {
 			$name=get_called_class();
 			$rs=new $name;
-			return $rs->get_by_id($id);
+			return $rs->get_by_id($id,$fields);
 		}
 		throw new gs_exception('static function record_by_id tot works prior php 5.3!');
 	}
 
-	public function get_by_id($id) {
-		return $this->find_records(array($this->id_field_name=>$id))->current();
+	public function get_by_id($id,$fields) {
+		return $this->find_records(array($this->id_field_name=>$id),$fields)->current();
 	}
 	public function set($values=array()) {
 		foreach ($this as $i) {
@@ -384,9 +384,12 @@ abstract class gs_recordset_base extends gs_iterator {
 		if (isset($this->structure['triggers']) && isset($this->structure['triggers'][$event])) {
 			$triggers=$this->structure['triggers'][$event];
 			if (!is_array($triggers)) $triggers=array($triggers);
-			foreach ($triggers as $t) {
-				if (!method_exists($this,$t)) throw new gs_dbd_exception("triggers: no method '$t' exists:".get_class($this).":$event:$t",DBD_TRIGGER_FUNC_NOT_EXISTS);
-				$this->$t($rec,$event);
+			foreach ($triggers as $k => $t) {
+				$args=explode(':',$t);
+				$fname=array_shift($args);
+				array_unshift($args,$k);
+				if (!method_exists($this,$fname)) throw new gs_dbd_exception("triggers: no method '$fname' exists:".get_class($this).":$event:$fname",DBD_TRIGGER_FUNC_NOT_EXISTS);
+				$this->$fname($rec,$event,$args);
 			}
 		}
 	}

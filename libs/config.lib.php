@@ -46,22 +46,38 @@ class gs_init {
 		$modified=false;
 		$dir=$this->config->lib_modules_dir;
 		$subdirs=glob($dir.$path.'*',GLOB_ONLYDIR);
+		$dir=rtrim($dir,DIRECTORY_SEPARATOR);
+		$path=trim($path,DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 		foreach ($subdirs as $s) {
 			if ($this->check_compile_modules($path.basename($s).DIRECTORY_SEPARATOR)) return true;
 		}
+		
 		$files=glob($dir.$path.'*.phps');
-		$tpldir=$dir.$path.DIRECTORY_SEPARATOR.'templates';
+		$tpldir=$dir.$path.'templates';
 		$tplcdir=$dir.$path.DIRECTORY_SEPARATOR.'___templates';
 		foreach ($files as $f) {
 			$pf=str_replace(basename($f),'___'.basename($f),$f);
 			$pf=preg_replace('/.phps$/','.xphp',$pf);
 			if (!file_exists($pf) || filemtime($pf) < filemtime($f)) return true;
-			if (file_exists($tpldir) && (!file_exists($tplcdir) || filemtime($tplcdir) < filemtime($tpldir))) return true;
+			if (strpos(PHP_OS,'WIN')!==false && PHP_VERSION_ID<50300) {
+				$mtime=filemtime($tpldir);
+				$mctime=filemtime($tplcdir);
+				$tpls=glob($tpldir.DIRECTORY_SEPARATOR.'*');
+				foreach ($tpls as $t) {
+					$mt=filemtime($t);
+					$mct=filemtime($tplcdir.DIRECTORY_SEPARATOR.basename($t));
+					if ($mt>$mct) return true;
+				}
+			} else {
+				if (file_exists($tpldir) && (!file_exists($tplcdir) || filemtime($tplcdir) < filemtime($tpldir))) return true;
+			}
+			
 		}
 		return false;
 	}
 
 	function compile_modules($path='') {
+		//throw new gs_exception('gs_base_handler.show: empty params[name]');
 		mlog('COMPILE_MODULES');
 		$tpl=null;
 		$data=array('LINKS'=>array());
