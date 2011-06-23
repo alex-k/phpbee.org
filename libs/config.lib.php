@@ -1,6 +1,6 @@
 <?php
 /*test22*/
-set_time_limit(20);
+set_time_limit(2);
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
 DEFINE ('LOAD_TEMPLATES',4);

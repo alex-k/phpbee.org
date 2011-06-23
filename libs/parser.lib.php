@@ -50,7 +50,10 @@ class gs_parser {
 	function process() {
 		$config=gs_config::get_instance();
 		$ret= new gs_null(GS_NULL_XML);
-		foreach ($this->current_handler as $handler) {
+		reset($this->current_handler);
+		while($handler=current($this->current_handler)) {
+			$h_key=key($this->current_handler);
+			if ($handler['name']=='end') return $ret;
 			if (!class_exists($handler['class_name'],FALSE)) {
 				load_file($config->lib_handlers_dir.$handler['class_name'].'.class.php');
 			}
@@ -65,7 +68,30 @@ class gs_parser {
 			}
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
 			$ret=$o_h->{$handler['method_name']}();
-			if(!$this->continue_if(isset($handler['params']['return']) ? $handler['params']['return'] : 'not_false',$ret)) return $ret;
+
+			$condition=isset($handler['params']['return']) ? $handler['params']['return'] : 'not_false';
+			preg_match_all('/([\&\^]?)([^\&\^]+)/',$condition,$cond);
+			$condition=$cond[0][0];
+			$cond_true=($i=array_search('&',$cond[1])) ? $cond[2][$i] : false;
+			$cond_false=($i=array_search('^',$cond[1])) ? $cond[2][$i] : false;
+
+
+
+			if($this->continue_if($condition,$ret)) {
+				if ($cond_true && array_key_exists($cond_true,$this->current_handler)) {
+					reset($this->current_handler);
+					while ((string)(key($this->current_handler))!=(string)$cond_true) next($this->current_handler);
+					continue;
+				}
+			} else  {
+				if ($cond_false && array_key_exists($cond_false,$this->current_handler)) {
+					reset($this->current_handler);
+					while ( (string)(key($this->current_handler))!=(string)$cond_false)  next($this->current_handler);
+					continue;
+				}
+				return $ret;
+			}
+			next($this->current_handler);
 		}
 		return $ret;
 	}
@@ -104,13 +130,12 @@ class gs_parser {
 					foreach ($h as $kk=>$hv) {
 						if (!is_array($hv)) $hv=array($hv);
 						$hv_arr=array();
-						foreach ($hv as $handler_value) {
-							$hv_arr[]=$handler_value.":module_name:$module_name";
+						foreach ($hv as $handler_key=>$handler_value) {
+							$hv_arr[$handler_key]=$handler_value.":module_name:$module_name";
 						}
 						$handlers[$k][$kk]=$hv_arr;
 					}
 				}
-
 				$data=array_merge_recursive($data,$handlers);
 			}
 		}
@@ -162,7 +187,7 @@ class gs_recurseparser {
 	function parse_val($vals)
 	{
 		$this->params=array();
-		foreach ($vals as $val) {
+		foreach ($vals as $key=>$val) {
 			$params=array();
 			$parts=explode(':',str_replace(array("{","}"),"",$val));
 			$len=count($parts);
@@ -171,7 +196,7 @@ class gs_recurseparser {
 			{
 				$params[$parts[$i]]=$parts[$i+1];
 			}
-		$this->params[]=array('val'=>$parts[0],'params'=>$params);
+		$this->params[$key]=array('val'=>$parts[0],'params'=>$params);
 		}
 	}
 	
@@ -221,14 +246,14 @@ class gs_node {
 	
 	function _set_attibutes($c_type='',$c_params=array())
 	{
-		foreach ($c_params as $par) {
+		foreach ($c_params as $params_key=>$par) {
 			$controller=array(
 				'name'=>$par['val'],
 				'type'=>$c_type,
 				'params'=>$par['params'],
 				);
 			@list($controller['class_name'],$controller['method_name'])=explode('.',$controller['name']);
-			$this->controller[]=$controller;
+			$this->controller[$params_key]=$controller;
 		}
 		/*
 		$this->controller['name']=$c_name;

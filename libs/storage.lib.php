@@ -116,7 +116,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		throw new gs_exception('static function record_by_id tot works prior php 5.3!');
 	}
 
-	public function get_by_id($id,$fields) {
+	public function get_by_id($id,$fields=null) {
 		return $this->find_records(array($this->id_field_name=>$id),$fields)->current();
 	}
 	public function set($values=array()) {

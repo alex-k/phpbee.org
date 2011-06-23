@@ -53,7 +53,14 @@ class gs_base_handler {
 		if (!$tpl->templateExists($tplname)) throw new gs_exception('gs_base_handler.show: can not find template file for '.$tplname);
 		return $tpl->fetch($tplname);
 	}
+
+	function validate_gl() {
+		$url=trim(call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v']),'/');
+		return ($url==$this->data['gspgid']);
+	}
 	function show404() {
+		var_dump('show404');
+		die('404');
 		header("HTTP/1.0 404 Not Found");
 		return $this->show();
 		return false;
