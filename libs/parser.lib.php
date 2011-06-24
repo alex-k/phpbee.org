@@ -7,13 +7,13 @@ class gs_parser {
 	private $registered_handlers;
 	private $current_handler;
 
-	static function &get_instance($data)
+	static function &get_instance($data,$gspgtype=null)
 	{
 		static $instance;
 		if (!isset($instance)) {
 			$instance = new gs_parser();
 		}
-		$instance->prepare($data);
+		$instance->prepare($data,$gspgtype);
 		return $instance;
 	}
 	
@@ -26,11 +26,11 @@ class gs_parser {
 			$this->prepare($data);
 		}
 	}
-	function prepare($data) {
+	function prepare($data,$gspgtype=null) {
 		$data['gspgid']=trim($data['gspgid'],'/');
 		$this->data=$data;
-		$result=$this->registered_handlers[$data['gspgtype']]->xpath($data['gspgid']);
-		$this->current_handler=$result->get_handler();
+		$result=$this->registered_handlers[$gspgtype ? $gspgtype : $data['gspgtype']]->xpath($data['gspgid']);
+		$this->current_handler=$result->get_handler($gspgtype.'.'.$data['gspgid']);
 		$data['handler_key']=$result->handler_key;
 		$data['gspgid_v']=ltrim(preg_replace("|$result->handler_key|",'',$data['gspgid'],1),'/');
 		$data['gspgid_va']=explode('/',$data['gspgid_v']);
@@ -70,10 +70,20 @@ class gs_parser {
 			$ret=$o_h->{$handler['method_name']}();
 
 			$condition=isset($handler['params']['return']) ? $handler['params']['return'] : 'not_false';
-			preg_match_all('/([\&\^]?)([^\&\^]+)/',$condition,$cond);
-			$condition=$cond[0][0];
-			$cond_true=($i=array_search('&',$cond[1])) ? $cond[2][$i] : false;
-			$cond_false=($i=array_search('^',$cond[1])) ? $cond[2][$i] : false;
+			preg_match('/([^\&\^]+)([\&]([^\&\^]+))?([\^]([^\&\^]+))?/',$condition,$cond);
+			$condition=$cond[1];
+			$cond_true= isset($cond[3]) ? $cond[3] : false;
+			$cond_false= isset($cond[5]) ? $cond[5] : false;
+
+			/*
+
+			var_dump('========'.$this->data['gspgid']);
+			var_dump($condition);
+			var_dump($cond_true);
+			var_dump($cond_false);
+			var_dump($this->continue_if($condition,$ret));
+			var_dump($handler['params']);
+			*/
 
 
 
@@ -148,7 +158,7 @@ class gs_parser {
 	private function parse_handlers_data($data)
 	{
 		$ret=array();
-		foreach (array('default','get','post') as $type) {
+		foreach (array('get','post','handler') as $type) {
 			$root=new gs_node('root');
 			$this->parse_handler_for_type($root,$type,$data[$type]);
 			$ret[$type]=$root;
@@ -264,13 +274,16 @@ class gs_node {
 		*/
 	}
 	
-	function get_handler()
+	function get_handler($gspgid='')
 	{
+		mlog('process handler for '.$gspgid);
 		if ($this->controller)
 		{
 			return $this->controller;
 		}
-		return isset($this->parent) ? $this->parent->get_handler() : $this->get_node_by_name('default')->controller;
+		//return isset($this->parent) ? $this->parent->get_handler() : $this->get_node_by_name('default')->controller;
+		if(!isset($this->parent)) throw new gs_exception('can not find handler for '.$gspgid);
+		return $this->parent->get_handler();
 	}
 	
 	function append_child($node)

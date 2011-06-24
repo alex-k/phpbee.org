@@ -34,6 +34,11 @@ class gs_base_handler {
 
 		//$this->register_blocks();
 	}
+
+	function is_post() {
+		return $this->data['gspgtype']==GS_DATA_POST;
+	}
+		
 	function register_blocks() {
 		$this->assign('_blocks',$this->blocks);
 	}
@@ -59,8 +64,6 @@ class gs_base_handler {
 		return ($url==$this->data['gspgid']);
 	}
 	function show404() {
-		var_dump('show404');
-		die('404');
 		header("HTTP/1.0 404 Not Found");
 		return $this->show();
 		return false;
@@ -399,7 +402,7 @@ TXT;
 
 		$tpl->assign($assign);
 		
-		$o_p=gs_parser::get_instance($data);
+		$o_p=gs_parser::get_instance($data,'handler');
 		if (isset($params['scope'])) {
 			$hndl=$o_p->get_current_handler();
 			if ($hndl[0]['params']['module_name']!=$params['scope']) return '';
