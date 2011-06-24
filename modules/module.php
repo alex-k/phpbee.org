@@ -34,9 +34,6 @@ class module extends gs_base_module implements gs_module {
 	
 	static function get_handlers() {
 		$data=array(
-			'default'=>array(
-				'default'=>'gs_base_handler.show404:{name:404.html}',
-			),
 			'get_post'=>array(
 				''=>'gs_base_handler.show:{name:index.html}',
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
@@ -48,6 +45,7 @@ class module extends gs_base_module implements gs_module {
 				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
 				'a'=>'gs_base_handler.show',
 				'b'=>'gs_base_handler.show',
+				'*'=>'gs_base_handler.show404:{name:404.html}',
 			),
 		);
 		return self::add_subdir($data,dirname(__file__));

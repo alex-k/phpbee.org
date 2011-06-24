@@ -22,16 +22,16 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 		'default'=>array(
 			'default'=>'gs_base_handler.show404:{name:404.html}',
 		),
-		'get'=>array(
+		'handler'=>array(
 			'info'=>'handler_pages.get_info',
-		),
-		'get_post'=>array(
-			''=>'gs_base_handler.show:{name:pages.html}',
-			'/admin/pages'=>'gs_base_handler.show:{name:adm_pages.html:classname:tw{%$MODULE_NAME%}}',
 			'/admin/form/tw_pages'=>array(
 					'gs_base_handler.post:return:gs_record:{name:form.html:form_class:g_forms_table:classname:tw{%$MODULE_NAME%}:href:/admin/pages:form_class:form_admin}',
 					'gs_base_handler.redirect:{href:/admin/pages}',
 			),
+		),
+		'get_post'=>array(
+			''=>'gs_base_handler.show:{name:pages.html}',
+			'/admin/pages'=>'gs_base_handler.show:{name:adm_pages.html:classname:tw{%$MODULE_NAME%}}',
 			'/admin/pages/delete'=>'admin_handler.deleteform:{classname:tw{%$MODULE_NAME%}}',
 		),
 	);
