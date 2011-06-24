@@ -49,11 +49,12 @@ class gs_parser {
 
 	function process() {
 		$config=gs_config::get_instance();
-		$ret= new gs_null(GS_NULL_XML);
+		$ret=array();
+		$ret['last']= new gs_null(GS_NULL_XML);
 		reset($this->current_handler);
 		while($handler=current($this->current_handler)) {
 			$h_key=key($this->current_handler);
-			if ($handler['name']=='end') return $ret;
+			if ($handler['name']=='end') return $ret['last'];
 			if (!class_exists($handler['class_name'],FALSE)) {
 				load_file($config->lib_handlers_dir.$handler['class_name'].'.class.php');
 			}
@@ -63,11 +64,11 @@ class gs_parser {
 			if (call_user_func(array($module_name, 'admin_auth'),$this->data,$handler['params'])===false) return false;
 			if (method_exists($handler['params']['module_name'],'auth')) {
 				
-				$ret=call_user_func(array($module_name, 'auth'),$this->data,$handler['params']);
-				if ($ret===false) return false;
+				$ret['last']=$ret[$h_key]=call_user_func(array($module_name, 'auth'),$this->data,$handler['params']);
+				if ($ret['last']===false) return false;
 			}
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
-			$ret=$o_h->{$handler['method_name']}();
+			$ret['last']=$ret[$h_key]=$o_h->{$handler['method_name']}($ret);
 
 			$condition=isset($handler['params']['return']) ? $handler['params']['return'] : 'not_false';
 			preg_match('/([^\&\^]+)([\&]([^\&\^]+))?([\^]([^\&\^]+))?/',$condition,$cond);
@@ -87,7 +88,7 @@ class gs_parser {
 
 
 
-			if($this->continue_if($condition,$ret)) {
+			if($this->continue_if($condition,$ret['last'])) {
 				if ($cond_true && array_key_exists($cond_true,$this->current_handler)) {
 					reset($this->current_handler);
 					while ((string)(key($this->current_handler))!=(string)$cond_true) next($this->current_handler);
@@ -99,11 +100,11 @@ class gs_parser {
 					while ( (string)(key($this->current_handler))!=(string)$cond_false)  next($this->current_handler);
 					continue;
 				}
-				return $ret;
+				return $ret['last'];
 			}
 			next($this->current_handler);
 		}
-		return $ret;
+		return $ret['last'];
 	}
 	function continue_if($type,$result) {
 		//var_dump($type); var_dump($result);

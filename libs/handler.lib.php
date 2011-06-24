@@ -49,12 +49,13 @@ class gs_base_handler {
 		}
 		return $tpl->assign($name,$value);
 	}
-	function fetch() {
+	function fetch($data) {
 		if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
 		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
+		if(isset($this->params['hkey'])) $tpl->assign('hdata',$data[$this->params['hkey']]);
 		if (!$tpl->templateExists($tplname)) throw new gs_exception('gs_base_handler.show: can not find template file for '.$tplname);
 		return $tpl->fetch($tplname);
 	}
@@ -411,6 +412,24 @@ TXT;
 		$ret_ob=ob_get_contents();
 		ob_end_clean();
 		return $ret_ob.$ret;
+
+	}
+
+	function hpar($data,$name='hkey',$default=null) {
+		return isset($this->params[$name]) ? $data[$this->params[$name]] : $default;
+	}
+
+	function send_email($data) {
+
+
+		$to=$this->hpar($data,'email',array());
+		$to=$this->hpar($data,'hkey',$to);
+
+		$txt=$this->hpar($data,'txt','');
+
+		$subj='lalala';
+
+		pmail($to,$subj,$txt);
 
 	}
 }
