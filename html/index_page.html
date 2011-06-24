@@ -3,9 +3,9 @@
 <head>
 {handler gspgid="/pages/info"}
 {block name="header"}
-<title>{$page_info.title}</title>
-<meta name="keywords" content="{$page_info.keywords}">
-<meta name="description" content="{$page_info.description}">
+<title>{$page_info.title|default:''}</title>
+<meta name="keywords" content="{$page_info.keywords|default:''}">
+<meta name="description" content="{$page_info.description|default:''}">
 {/block}
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <meta name="Powered_By" content="VPA(tm) Engine Copyright(C) 2010-2011">
@@ -41,6 +41,7 @@
 			<li><a href="#">Форум</a></li>
 		</ul>
 		<ul class="bans">
+			<li>{handler gspgid="auth/formlogin"}</li>
 			<li><a href="#"><img src="/i/ban_left.gif" alt=""></a></li>
 			<li><a href="#"><img src="/i/ban_left.gif" alt=""></a></li>
 		</ul>
@@ -52,7 +53,7 @@
 		{handler gspgid="/articles/main"}
 		</div>
 		<div class="main_news">
-			<h2>Новости</h2>
+			<a href="/news/"><h2>Новости</h2></a>
 				
 				{handler gspgid="/news/last/2"}
 		</div>
