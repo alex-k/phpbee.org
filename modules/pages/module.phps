@@ -28,6 +28,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 					'gs_base_handler.post:return:gs_record:{name:form.html:form_class:g_forms_table:classname:tw{%$MODULE_NAME%}:href:/admin/pages:form_class:form_admin}',
 					'gs_base_handler.redirect:{href:/admin/pages}',
 			),
+			'info'=>'handler{%$MODULE_NAME%}.get_info'
 		),
 		'get_post'=>array(
 			''=>'gs_base_handler.show:{name:pages.html}',
@@ -43,8 +44,8 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 	function get_info() {
 		$o=new tw_pages;
 		$url='/'.ltrim($this->data['gspgid_root'],'/');
-		$rec=$o->find_records(array('url'=>$url),array('id','subject','keywords','description'))->limit(1)->first();
-		$info['title']=$rec->subject;
+		$rec=$o->find_records(array('url'=>$url),array('id','title','keywords','description'))->limit(1)->first();
+		$info['title']=$rec->title;
 		$info['keywords']=$rec->keywords;
 		$info['description']=$rec->description;
 		$tpl=gs_tpl::get_instance();
@@ -56,9 +57,9 @@ class tw{%$MODULE_NAME%} extends gs_recordset_short {
 	const superadmin=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'url'=>"fString URL",
-		'subject'=>"fString Заголовок required=false",
-		'keywords'=>"fString Keywords required=false",
-		'description'=>"fString Description required=false",
+		{%foreach from=$SUBMODULES_DATA.FIELDS key=K item=L%}
+			'{%$K%}'=>"{%$L%}",
+		{%/foreach%}
 		{%foreach from=$SUBMODULES_DATA.LINKS key=K item=L%}
 			'{%$K%}'=>"{%$L%}",
 		{%/foreach%}
