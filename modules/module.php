@@ -37,7 +37,6 @@ class module extends gs_base_module implements gs_module {
 			'get_post'=>array(
 				''=>'gs_base_handler.show:{name:index.html}',
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
-				'/admin/menu'=>'admin_handler.show_menu',
 				'img/show'=>'images_handler.show',
 				'img/s'=>'images_handler.s',
 				'/admin/window_form'=>'admin_handler.many2one:{name:window_form.html}',
@@ -46,6 +45,9 @@ class module extends gs_base_module implements gs_module {
 				'a'=>'gs_base_handler.show',
 				'b'=>'gs_base_handler.show',
 				'*'=>'gs_base_handler.show404:{name:404.html}',
+			),
+			'handler'=>array(
+				'/admin/menu'=>'admin_handler.show_menu',
 			),
 		);
 		return self::add_subdir($data,dirname(__file__));
