@@ -283,7 +283,7 @@ class gs_node {
 			return $this->controller;
 		}
 		//return isset($this->parent) ? $this->parent->get_handler() : $this->get_node_by_name('default')->controller;
-		if(!isset($this->parent)) throw new gs_exception('can not find handler for '.$gspgid);
+		if(!isset($this->parent)) throw new gs_exception('can not find handler for =>'.$gspgid.'<=');
 		return $this->parent->get_handler();
 	}
 	

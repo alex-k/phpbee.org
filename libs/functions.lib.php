@@ -49,15 +49,15 @@ function array_merge_recursive_distinct ( array &$array1, array &$array2 )
 function html_fetch($url,$data=array(),$scheme='GET') {
 	mlog($url);
 	mlog($data);
-   if (!isset($url)) throw new gs_exception('html_fetch: empty url');
+	if (!isset($url)) throw new gs_exception('html_fetch: empty url');
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    if (strtoupper($scheme)=='POST') {
-	    curl_setopt($ch, CURLOPT_POST, 1);
-	    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    }
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	if (strtoupper($scheme)=='POST') {
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+	}
 
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);

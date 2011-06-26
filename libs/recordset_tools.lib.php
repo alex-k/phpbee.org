@@ -47,6 +47,8 @@ class field_interface {
 			'type'=>'input', 
 			'hidden'=>$opts['hidden'],
 			'readonly'=>$opts['readonly'],
+			'index'=>isset($opts['index']) ? $opts['index'] : 0,
+			'keywords'=>isset($opts['keywords']) ? $opts['keywords'] : 0,
 			'verbose_name'=>$opts['verbose_name'], 
 			'options'=>isset($opts['options']) ? $opts['options'] : NULL,
 			);
@@ -122,6 +124,8 @@ class field_interface {
 			'type'=>'text',
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
+			'index'=>isset($opts['index']) ? $opts['index'] : 0,
+			'keywords'=>isset($opts['keywords']) ? $opts['keywords'] : 0,
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];

@@ -82,7 +82,7 @@ class gs_init {
 		//throw new gs_exception('gs_base_handler.show: empty params[name]');
 		mlog('COMPILE_MODULES');
 		$tpl=null;
-		$data=array('LINKS'=>array());
+		$data=array('LINKS'=>array(),'FIELDS'=>array());
 		$ret=array();
 		$dir=$this->config->lib_modules_dir;
 		$subdirs=glob($dir.$path.'*',GLOB_ONLYDIR);
