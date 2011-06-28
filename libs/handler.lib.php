@@ -35,6 +35,10 @@ class gs_base_handler {
 		//$this->register_blocks();
 	}
 
+	function get_data($name=null) {
+		return $name ? $this->data[$name] : $this->data ;
+	}
+
 	function is_post() {
 		return $this->data['gspgtype']==GS_DATA_POST;
 	}
@@ -166,7 +170,7 @@ TXT;
 				}
 				break;
 			case 'lOne2One':
-				if ($hh[$k]['hidden']!='false') break;
+				if ($hh[$k]['hidden']!='false' && $hh[$k]['hidden']) break;
 				if (isset($v['widget'])) {
 					$dclass='gs_data_widget_'.$v['widget'];
 					if (class_exists($dclass)) {
@@ -174,21 +178,9 @@ TXT;
 						$hh=$d->gd($rec,$k,$hh,$params,$data);
 					}
 				}
-				if (!empty($v['widget'])) {
-					break;
-				}
-				if (method_exists($rec->get_recordset(),'form_variants_'.$v['linkname'])) {
-					$vrecs=call_user_func(array($rec->get_recordset(),'form_variants_'.$v['linkname']),$rec,$data);
-				} else {
-					$rname=get_class($rec->init_linked_recordset($v['linkname']));
-					$vro=new $rname;
-					$vrecs=$vro->find_records();
-				}
-				$variants=array();
-				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
-				$hh[$k]['variants']=$variants;
 				break;
 			case 'lMany2One':
+				break;
 				if ($v['hidden']=='true') break;
 				if (isset($v['widget'])) {
 					$dclass='gs_data_widget_'.$v['widget'];
@@ -369,7 +361,7 @@ TXT;
 	}
 	static function process_handler($params,$smarty) {
 		ob_start();
-		$data=$smarty->getTemplateVars('_gsdata');
+		$s_data=$data=$smarty->getTemplateVars('_gsdata');
 		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
 		$params['gspgid']=trim($params['gspgid'],'/');
 		if (isset($data['gspgid_form']) && $data['gspgid_form']==$params['gspgid']) {
@@ -402,6 +394,7 @@ TXT;
 		$assign['handler_params']=$params;
 
 		$tpl->assign($assign);
+
 		
 		$o_p=gs_parser::get_instance($data,'handler');
 		if (isset($params['scope'])) {
@@ -411,6 +404,8 @@ TXT;
 		$ret=$o_p->process();
 		$ret_ob=ob_get_contents();
 		ob_end_clean();
+
+		$smarty->assign('_gsdata',$s_data);
 		return $ret_ob.$ret;
 
 	}

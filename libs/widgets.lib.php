@@ -371,6 +371,24 @@ class gs_widget_gallery extends gs_widget {
 		}
 }
 
+class gs_widget_parent_list extends gs_widget_lOne2One{}
+
+class gs_data_widget_parent_list {
+	function gd($rec,$k,$hh,$params,$data) {
+		$v=$hh[$k];
+		if (method_exists($rec->get_recordset(),'form_variants_'.$v['linkname'])) {
+			$vrecs=call_user_func(array($rec->get_recordset(),'form_variants_'.$v['linkname']),$rec,$data);
+		} else {
+			$rname=get_class($rec->init_linked_recordset($v['linkname']));
+			$vro=new $rname;
+			$vrecs=$vro->find_records();
+		}
+		$variants=array();
+		foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
+		$hh[$k]['variants']=$variants;
+		return $hh;
+	}
+}
 class gs_data_widget_include_form {
 	function gd($rec,$k,$hh,$params,$data) {
 		if ($hh[$k]['type']=='lOne2One') {
