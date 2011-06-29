@@ -195,7 +195,7 @@ class gs_widget_select extends gs_widget{
 }
 class gs_widget_select_enter extends gs_widget{
 		function html() {
-				$ret="<select onChange=\"$('input[selname=".$this->fieldname."]').val('');\" class=\"fSelect\"  name=\"".$this->fieldname."[select]\"><option></option>\n";
+				$ret="<select onChange=\"$('input[selname=".$this->fieldname."]').val(this.value);\" class=\"fSelect\"  name=\"".$this->fieldname."[select]\"><option></option>\n";
 				if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 				foreach ($this->params['options'] as $v=>$l) {
 						$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n",

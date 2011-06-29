@@ -459,7 +459,7 @@ class gs_recordset_short extends gs_recordset {
 	function commit() {
 		foreach ($this->structure['recordsets'] as $l=>$st) {
 			// Block for commit preloaded linked "Many2One" records 
-			if (isset($st['type']) && $st['type']=='many' && $st['mode']=='link') {
+			if (isset($st['type']) && $st['type']=='many' && isset($st['mode']) && $st['mode']=='link') {
 				$id_name=$st['foreign_field_name'];
 				$root_name=$l.'_hash';
 				$hash_name=$st['foreign_field_name'].'_hash';
