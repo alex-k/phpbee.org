@@ -53,7 +53,7 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 	}
 }
 
-class tw{%$MODULE_NAME%} extends gs_recordset_short {
+class tw{%$MODULE_NAME%} extends gs_recordset_handler{
 	const superadmin=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'url'=>"fString URL",

@@ -17,6 +17,7 @@ session_start();
 
 $o_h=new gs_parser($init->data);
 $o_h->process();
+gs_logger::dump();
 
 
 ?>

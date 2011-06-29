@@ -30,7 +30,12 @@ abstract class gs_base_module {
 class module extends gs_base_module implements gs_module {
 	function __construct() {}
 	
-	function install() {}
+	function install() {
+		$n=new tw_handlers;
+		$n->install();
+		$n=new tw_handlers_cache;
+		$n->install();
+	}
 	
 	static function get_handlers() {
 		$data=array(

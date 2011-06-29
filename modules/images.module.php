@@ -1,5 +1,5 @@
 <?php
-abstract class tw_images extends gs_recordset_short {
+abstract class tw_images extends gs_recordset_handler {
 	function src($params,$record=null) {
 		$records=$record ? array($record) : $this;
 		$ret=array();
