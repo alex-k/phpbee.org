@@ -127,6 +127,9 @@ class gs_record implements arrayaccess {
 		}
 		$this->gs_recordset->fill_values($this,$values);
 	}
+	public function is_set($name) {
+		return array_key_exists($name,$this->values);
+	}
 
 	public function is_modified($name) {
 		return array_key_exists($name,$this->modified_values);
@@ -217,10 +220,10 @@ class gs_record implements arrayaccess {
 		//md('lazy_load:'.$name,1);
 		$rs=$this->init_linked_recordset($name);
 		$structure=$this->gs_recordset->structure['recordsets'][$name];
-		$id=$this->__get($rs->local_field_name);
+		$id=$this->is_set($rs->local_field_name) ? $this->__get($rs->local_field_name) : NULL;
 
 		$structure['options'][$rs->foreign_field_name]=$id;
-		$rs=$rs->find_records($structure['options'],null,$rs->index_field_name);
+		if($id!==NULL) $rs=$rs->find_records($structure['options'],null,$rs->index_field_name);
 		$this->values[$name]=$this->recordsets_array[$name]=$rs;
 		return $this->__get($name);
 	}

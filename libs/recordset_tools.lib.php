@@ -474,7 +474,7 @@ class gs_recordset_short extends gs_recordset {
 			if(isset($st['update_recordset'])) {
 				$prec=new $st['update_recordset'];
 				foreach ($prec->structure['recordsets'] as $pl=>$pst) {
-					if ($pst['counter_linkname']==$l) {
+					if (isset($pst['counter_linkname']) && $pst['counter_linkname']==$l) {
 						foreach ($this as $rlink) {
 							$old_id=$rlink->get_old_value($st['local_field_name']);
 							$new_id=$rlink->{$st['local_field_name']};

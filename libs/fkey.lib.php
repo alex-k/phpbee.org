@@ -39,7 +39,7 @@ class gs_fkey {
 		//md('update_fkeys',1);
 		$classes=get_declared_classes();
 		foreach($classes as $c) {
-			if(is_subclass_of($c,'gs_recordset') &&(is_subclass_of($c,'gs_recordset_short') || property_exists($c,'table_name')) ) {
+			if($c!=='gs_recordset_handler' && is_subclass_of($c,'gs_recordset') &&(is_subclass_of($c,'gs_recordset_short') || property_exists($c,'table_name')) ) {
 				$testClass     = new ReflectionClass($c);
 				if (!$testClass->isAbstract()) {
 					$obj=new $c;

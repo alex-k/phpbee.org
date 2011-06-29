@@ -28,6 +28,17 @@ function object_to_array($obj) {
         }
         return $arr;
 }
+function array_search_recursive($n,$a,$s=false) {
+	$r=array_search($n,$a,$s);
+	if ($r!==FALSE) return $r;
+	foreach ($a as $aa) {
+		if(is_array($aa)) {
+			$r=array_search_recursive($n,$aa,$s);
+			if ($r!==FALSE) return $r;
+		}
+	}
+	return FALSE;
+}
 function array_merge_recursive_distinct ( array &$array1, array &$array2 )
 {
   $merged = $array1;

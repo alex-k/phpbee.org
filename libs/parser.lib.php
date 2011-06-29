@@ -7,13 +7,13 @@ class gs_parser {
 	private $registered_handlers;
 	private $current_handler;
 
-	static function &get_instance($data,$gspgtype=null)
+	static function &get_instance($data=null,$gspgtype=null)
 	{
 		static $instance;
 		if (!isset($instance)) {
 			$instance = new gs_parser();
 		}
-		$instance->prepare($data,$gspgtype);
+		if ($data) $instance->prepare($data,$gspgtype);
 		return $instance;
 	}
 	
@@ -61,12 +61,16 @@ class gs_parser {
 			if (!class_exists($handler['class_name'],FALSE)) throw new gs_exception('gs_parser.process: Handler class not exists '.$handler['class_name']);
 			if (!method_exists($handler['class_name'],$handler['method_name'])) throw new gs_exception('gs_parser.process: Handler class method not exists '.$handler['class_name'].'.'.$handler['method_name']);
 			$module_name=$handler['params']['module_name'];
+
+			// --------------------- 
 			if (call_user_func(array($module_name, 'admin_auth'),$this->data,$handler['params'])===false) return false;
 			if (method_exists($handler['params']['module_name'],'auth')) {
 				
 				$ret['last']=$ret[$h_key]=call_user_func(array($module_name, 'auth'),$this->data,$handler['params']);
 				if ($ret['last']===false) return false;
 			}
+			// ----------------------
+
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
 			$ret['last']=$ret[$h_key]=$o_h->{$handler['method_name']}($ret);
 

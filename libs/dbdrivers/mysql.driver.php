@@ -180,6 +180,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 			}
 			*/
 			$old_keys=$this->get_table_keys($tablename);
+			md($construct_indexes);
 			foreach ($construct_indexes as $name=>$index) {
 					if (!is_array($index)) {
 					$name=$index;

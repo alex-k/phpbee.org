@@ -60,6 +60,9 @@ class gs_init {
 			$pf=preg_replace('/.phps$/','.xphp',$pf);
 			if (!file_exists($pf) || filemtime($pf) < filemtime($f)) return true;
 			//if (strpos(strtoupper(PHP_OS),'WIN')!==false && PHP_VERSION_ID<50300) {
+
+			if (file_exists($tpldir)) {
+				check_and_create_dir($tplcdir);
 				$mtime=filemtime($tpldir);
 				$mctime=filemtime($tplcdir);
 				$tpls=glob($tpldir.DIRECTORY_SEPARATOR.'*');
@@ -69,6 +72,7 @@ class gs_init {
 					//md($t.') '.$mt.' - '.$mct.' = '.intval($mt - $mct),1);
 					if ($mt>$mct) return true;
 				}
+			}
 			/*} else {
 				md($tpldir.') '.filemtime($tplcdir).' - '.filemtime($tpldir).' = '.intval(filemtime($tplcdir) - filemtime($tpldir)),1);
 				if (file_exists($tpldir) && (!file_exists($tplcdir) || filemtime($tplcdir) < filemtime($tpldir))) return true;
@@ -203,6 +207,7 @@ class gs_init {
 		load_file($this->config->lib_dir.'record.lib.php');
 		load_file($this->config->lib_dir.'storage.lib.php');
 		load_file($this->config->lib_dir.'recordset_tools.lib.php');
+		load_file($this->config->lib_dir.'recordset_handler.lib.php');
 	}
 	
 	
@@ -273,6 +278,8 @@ class gs_config {
 		$this->lib_handlers_dir=$this->root_dir.'handlers/';
 		$this->lib_modules_dir=$this->root_dir.'modules/';
 		$this->lib_dbdrivers_dir=$this->lib_dir.'dbdrivers/';
+
+		$this->use_handler_cache=TRUE;
 
 		foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {
 			if (file_exists($cfg_filename)) require_once($cfg_filename);

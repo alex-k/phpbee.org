@@ -161,7 +161,7 @@ class gs_widget_datetime extends gs_widget{
 				return sprintf('<input class="fDateTime" type="text" name="%s" value="%s">', $this->fieldname,htmlspecialchars(trim($this->value)));
 		}
 		function clean() {
-				return date('Y-m-d H:i:s',strtotime($this->value));
+				return date('Y-m-d H:i:s',strtotime(!empty($this->value) ? $this->value : 'now' ));
 		}
 }
 

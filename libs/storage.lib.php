@@ -23,6 +23,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	public $db_scheme=null;
 	public $structure=array();
 	public $parent_record=NULL;
+	protected $handler_cache_status=1;
 
 	public function __construct($gs_connector_id,$db_tablename,$db_scheme=null) {
 		$this->gs_connector=NULL;
@@ -211,13 +212,14 @@ abstract class gs_recordset_base extends gs_iterator {
 		return $this;
 	}
 
-
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		$this->query_options['options']=$this->string2options($options);
 		$this->query_options['index_field_name'] = is_string($index_field_name) ? $index_field_name : $this->id_field_name;
+		if ($fields && !is_array($fields)) $fields=explode(',',$fields);
 		$this->query_options['fields']=$fields;
 		$this->reset();
 		$this->state=RS_STATE_UNLOADED;
+		cfg_set('handler_cache_status',cfg('handler_cache_status') | $this->handler_cache_status);
 		mlog('RS_STATE_UNLOADED on '.get_class($this));//.' options:'.print_r($options,TRUE));
 		return $this;
 	}
@@ -247,7 +249,7 @@ abstract class gs_recordset_base extends gs_iterator {
 			$record=new gs_record($this,$fields);
 			$record->fill_values($r);
 			$record->recordstate = RECORD_UNCHANGED;
-			if (isset($records[$record->$index_field_name]))
+			if (!$record->$index_field_name || isset($records[$record->$index_field_name]))
 				$records[]=$record;
 			else $records[$record->$index_field_name]=$record;
 		}
@@ -492,6 +494,7 @@ abstract class gs_prepare_sql {
 		                        'unique'=>'UNIQUE',
 		                        'fulltext'=>'FULLTEXT',
 		                        //'serial'=>'PRIMARY AUTO_INCREMENT',
+		                        //'serial'=>'PRIMARY AUTO_INCREMENT',
 		                    );
 		$this->_field_types=array( 
 		                           'serial'=>'INT AUTO_INCREMENT PRIMARY KEY',
@@ -532,7 +535,7 @@ abstract class gs_prepare_sql {
 				$k=$this->replace_pattern($k,$field['options']);
 			}
 			$name=!isset($field['name'])?$key:$field['name'];
-			$table_fields[$name]=sprintf("%s %s %s",$name, $k, isset($field['default']) ? 'DEFAULT '.$this->escape_value($field['default']) : '');
+			$table_fields[$name]=sprintf("%s %s %s",$name, $k, isset($field['default']) ? 'NOT NULL DEFAULT '.$this->escape_value($field['default']) : '');
 
 		}
 		return $table_fields;

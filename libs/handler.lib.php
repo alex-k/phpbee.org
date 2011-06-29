@@ -360,10 +360,11 @@ TXT;
 		return array_merge($data,$newdata);
 	}
 	static function process_handler($params,$smarty) {
-		ob_start();
-		$s_data=$data=$smarty->getTemplateVars('_gsdata');
-		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
 		$params['gspgid']=trim($params['gspgid'],'/');
+		$s_data=$data=$smarty->getTemplateVars('_gsdata');
+		$s_gspgid=cfg('s_gspgid');
+		cfg_set('s_gspgid',$params['gspgid']);
+		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
 		if (isset($data['gspgid_form']) && $data['gspgid_form']==$params['gspgid']) {
 			$gspgid_form=$data['gspgid_form'];
 			$c=new gs_data_driver_post;
@@ -371,6 +372,19 @@ TXT;
 			$data['gspgid_form']=$gspgid_form;
 			$data['gspgid']=$params['gspgid'];
 		}
+
+		if (cfg('use_handler_cache') && $data['gspgtype']!==GS_DATA_POST) {
+			$hh=new tw_handlers_cache();
+			$h=$hh->find_records(array('md5'=>md5($params['gspgid']),'gspgid'=>$params['gspgid']),'text')->first();
+			if ($h) {
+				mlog('RETRUN '.$params['gspgid'].' data from cache');
+				return $h->text;
+			}
+		}
+
+		cfg_set('handler_cache_status',0);
+
+		ob_start();
 		if (!isset($data['gspgid_root'])) {
 			$data['gspgid_root']=$data['gspgid'];
 		}
@@ -406,7 +420,17 @@ TXT;
 		ob_end_clean();
 
 		$smarty->assign('_gsdata',$s_data);
-		return $ret_ob.$ret;
+		cfg_set('s_gspgid',$s_gspgid);
+		$ret=$ret_ob.$ret;
+
+		if (cfg('use_handler_cache') && cfg('handler_cache_status')==2 &&  $data['gspgtype']!==GS_DATA_POST) {
+			$h=$hh->find_records(array('md5'=>md5($params['gspgid'])))->first(true);
+			$h->gspgid=$params['gspgid'];
+			$h->text=$ret;
+			$hh->commit();
+		}
+
+		return $ret;
 
 	}
 
