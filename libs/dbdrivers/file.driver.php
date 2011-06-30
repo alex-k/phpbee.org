@@ -178,10 +178,14 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		return $ret;
 	}
 	function split_id($id,$no_fs=false) {
-		$id=$this->int2id($id);
-		$id=str_split($id,1);
-		for($i=1;$i<GS_DB_FILE_ID_LENGTH;$i++) {
-			$id[$i]=$id[$i-1].$id[$i];
+		if (is_numeric($id)) {
+			$id=$this->int2id($id);
+			$id=str_split($id,1);
+			for($i=1;$i<GS_DB_FILE_ID_LENGTH;$i++) {
+				$id[$i]=$id[$i-1].$id[$i];
+			}
+		} else {
+			$id=str_split($id,ceil(strlen($id) / GS_DB_FILE_ID_LENGTH));
 		}
 		return implode(($no_fs==true) ? '/' : DIRECTORY_SEPARATOR,$id);
 	}
@@ -190,7 +194,11 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		$this->_cache=array();
 		$rset=$record->get_recordset();
 		$fields=$values=array();
-		$id=$this->get_id($rset->db_tablename);
+		if ($record->get_id()) {
+			$id=$this->root.DIRECTORY_SEPARATOR.$rset->db_tablename.DIRECTORY_SEPARATOR.$this->split_id($record->get_id());
+		} else {
+			$id=$this->get_id($rset->db_tablename);
+		}
 		mlog(sprintf('File query: insert %s record  %s',$rset->db_tablename,$id));
 		check_and_create_dir($id);
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
