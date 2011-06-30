@@ -51,10 +51,10 @@ class gs_parser {
 		$config=gs_config::get_instance();
 		$ret=array();
 		$ret['last']= new gs_null(GS_NULL_XML);
-		reset($this->current_handler);
-		//var_dump($this->current_handler);
-		while($handler=current($this->current_handler)) {
-			$h_key=key($this->current_handler);
+		$handler_array=$this->current_handler;
+		reset($handler_array);
+		while($handler=current($handler_array)) {
+			$h_key=key($handler_array);
 			if ($handler['name']=='end') return $ret['last'];
 			if (!class_exists($handler['class_name'],FALSE)) {
 				load_file($config->lib_handlers_dir.$handler['class_name'].'.class.php');
@@ -73,9 +73,10 @@ class gs_parser {
 			// ----------------------
 
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
+
 			$ret['last']=$ret[$h_key]=$o_h->{$handler['method_name']}($ret);
 
-			$condition=isset($handler['params']['return']) ? $handler['params']['return'] : 'not_false';
+			$condition=isset($handler['params']['return']) ? $handler['params']['return'] : 'gs_record';
 			preg_match('/([^\&\^]+)([\&]([^\&\^]+))?([\^]([^\&\^]+))?/',$condition,$cond);
 			$condition=$cond[1];
 			$cond_true= isset($cond[3]) ? $cond[3] : false;
@@ -95,20 +96,20 @@ class gs_parser {
 
 
 			if($this->continue_if($condition,$ret['last'])) {
-				if ($cond_true && array_key_exists($cond_true,$this->current_handler)) {
-					reset($this->current_handler);
-					while ((string)(key($this->current_handler))!=(string)$cond_true) next($this->current_handler);
+				if ($cond_true && array_key_exists($cond_true,$handler_array)) {
+					reset($handler_array);
+					while ((string)(key($handler_array))!=(string)$cond_true) next($handler_array);
 					continue;
 				}
 			} else  {
-				if ($cond_false && array_key_exists($cond_false,$this->current_handler)) {
-					reset($this->current_handler);
-					while ( (string)(key($this->current_handler))!=(string)$cond_false)  next($this->current_handler);
+				if ($cond_false && array_key_exists($cond_false,$handler_array)) {
+					reset($handler_array);
+					while ( (string)(key($handler_array))!=(string)$cond_false)  next($handler_array);
 					continue;
 				}
 				return $ret['last'];
 			}
-			next($this->current_handler);
+			next($handler_array);
 		}
 		return $ret['last'];
 	}

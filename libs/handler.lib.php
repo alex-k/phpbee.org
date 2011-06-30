@@ -169,7 +169,6 @@ class gs_base_handler {
 				}
 				break;
 			case 'lMany2One':
-				break;
 				if ($v['hidden']=='true') break;
 				if (isset($v['widget'])) {
 					$dclass='gs_data_widget_'.$v['widget'];
@@ -200,6 +199,7 @@ class gs_base_handler {
 				unset($hh[$k]);
 				break;
 			default:
+				break;
 			}
 		}
 		$fields=$rec->get_recordset()->id_field_name.','.implode(',',$fields);
@@ -216,11 +216,8 @@ class gs_base_handler {
 		$default=string_to_params($default);
 			$data=array_merge($default,$data);
 		}
-		/* if widget need all data of record */
-		//$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values()),$data));
 		$params['rec_id']=$rec->get_id();
 		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
-		//$f=new $form_class_name($hh,$params,self::implode_data(array_merge($rec->get_values($fields)),$data));
 		$f->rec=$rec;
 		return $f;
 	}
@@ -353,6 +350,9 @@ class gs_base_handler {
 		$s_data=$data=$smarty->getTemplateVars('_gsdata');
 		$s_gspgid=cfg('s_gspgid');
 		cfg_set('s_gspgid',$params['gspgid']);
+			
+		$s_handler_cnt=cfg_set('s_handler_cnt',cfg('s_handler_cnt')+1);
+
 		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
 		if (isset($data['gspgid_form']) && $data['gspgid_form']==$params['gspgid']) {
 			$gspgid_form=$data['gspgid_form'];
@@ -412,7 +412,7 @@ class gs_base_handler {
 		cfg_set('s_gspgid',$s_gspgid);
 		$ret=$ret_ob.$ret;
 
-		if (cfg('use_handler_cache') && cfg('handler_cache_status')==2 &&  $data['gspgtype']!==GS_DATA_POST) {
+		if(cfg('use_handler_cache') &&  $s_handler_cnt==cfg('s_handler_cnt') && cfg('handler_cache_status')==2 &&  $data['gspgtype']!==GS_DATA_POST) {
 			$h=$hh->find_records(array('md5'=>md5($params['gspgid'])))->first(true);
 			$h->gspgid=$params['gspgid'];
 			$h->text=$ret;

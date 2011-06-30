@@ -90,7 +90,7 @@ class gs_recordset_handler extends gs_recordset_short {
 	}
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		$gspgid=cfg('s_gspgid');
-		if (!$gspgid) return parent::find_records($options,$fields,$index_field_name);
+		if (!cfg('use_handler_cache') || !$gspgid) return parent::find_records($options,$fields,$index_field_name);
 
 		$o=array(
 			'recordset'=>get_class($this),

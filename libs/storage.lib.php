@@ -180,7 +180,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	function first($create_record_if_null=false) {
 		$rec=parent::first();
 		if ($rec) return $rec;
-		return $create_record_if_null ? $this->new_record($this->query_options['options']) : new gs_null(GS_NULL_XML);
+		return $create_record_if_null ? $this->new_record(isset($this->query_options['options']) ? $this->query_options['options'] : array() ) : new gs_null(GS_NULL_XML);
 	}
 
 	function valid() {
@@ -215,12 +215,12 @@ abstract class gs_recordset_base extends gs_iterator {
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		$this->query_options['options']=$this->string2options($options);
 		$this->query_options['index_field_name'] = is_string($index_field_name) ? $index_field_name : $this->id_field_name;
-		if ($fields && !is_array($fields)) $fields=explode(',',$fields);
+		if ($fields && !is_array($fields)) $fields=array_filter(explode(',',$fields));
 		$this->query_options['fields']=$fields;
 		$this->reset();
 		$this->state=RS_STATE_UNLOADED;
 		cfg_set('handler_cache_status',cfg('handler_cache_status') | $this->handler_cache_status);
-		mlog('SET handler_cache_status in '.get_class($this).' to '.$this->handler_cache_status.' sum='.cfg('handler_cache_status'));
+		//mlog('SET handler_cache_status in '.get_class($this).' to '.$this->handler_cache_status.' sum='.cfg('handler_cache_status'));
 		mlog('RS_STATE_UNLOADED on '.get_class($this));//.' options:'.print_r($options,TRUE));
 		return $this;
 	}
@@ -229,6 +229,10 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->query_options['late_load_fields']=array();
 	}
 	public function load_records($fields=NULL) {
+		if (!isset($this->query_options['options'])) {
+			$this->state=RS_STATE_LOADED;
+			return $this;
+		}
 		$options=$this->query_options['options'];
 		$index_field_name=$this->query_options['index_field_name'];
 		$fields=$fields ? array_merge($fields,array($index_field_name)) : $this->query_options['fields'];

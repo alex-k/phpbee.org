@@ -280,6 +280,7 @@ class gs_config {
 		$this->lib_dbdrivers_dir=$this->lib_dir.'dbdrivers/';
 
 		$this->use_handler_cache=TRUE;
+		$this->s_handler_cnt=0;
 
 		foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {
 			if (file_exists($cfg_filename)) require_once($cfg_filename);
