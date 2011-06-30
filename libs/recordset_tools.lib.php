@@ -303,6 +303,7 @@ class field_interface {
 }
 
 class gs_rs_links extends gs_recordset{
+		public $handler_cache_status=2;
         public $id_field_name='id';
 		private $links=array();
         public $structure=array(

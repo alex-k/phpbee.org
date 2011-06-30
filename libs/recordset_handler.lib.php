@@ -105,10 +105,13 @@ class gs_recordset_handler extends gs_recordset_short {
 			$f=$h->new_record($o);
 			$f->gspgid=$gspgid;
 			$f->options=serialize($options);
-			if (is_array($options)) foreach ($options as $p) {
-				if($p['field']==$this->id_field_name) $f->rec_id=$p['value'];
+			if (is_array($options)) foreach ($options as $p_key=>$p) {
+				if (!is_array($p)) {
+					$p=array('field'=>$p_key,'case'=>'=','value'=>$p);
+				}
+				if(isset($p['field']) && $p['field']==$this->id_field_name) $f->rec_id=$p['value'];
 				if (isset($this->structure['recordsets'])) foreach ($this->structure['recordsets'] as $r) {
-					if ($p['field']==$r['local_field_name']) {
+					if (isset($p['field']) && $p['field']==$r['local_field_name']) {
 						$f->parent_name=$p['field'];
 						$f->parent_id=$p['value'];
 					}

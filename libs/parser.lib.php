@@ -52,6 +52,7 @@ class gs_parser {
 		$ret=array();
 		$ret['last']= new gs_null(GS_NULL_XML);
 		reset($this->current_handler);
+		//var_dump($this->current_handler);
 		while($handler=current($this->current_handler)) {
 			$h_key=key($this->current_handler);
 			if ($handler['name']=='end') return $ret['last'];
@@ -80,9 +81,10 @@ class gs_parser {
 			$cond_true= isset($cond[3]) ? $cond[3] : false;
 			$cond_false= isset($cond[5]) ? $cond[5] : false;
 
-			/*
 
-			var_dump('========'.$this->data['gspgid']);
+			/*
+			var_dump('========'.$this->data['gspgid'].':'.$handler['class_name'].'.'.$handler['method_name']);
+			echo "<pre>";
 			var_dump($condition);
 			var_dump($cond_true);
 			var_dump($cond_false);

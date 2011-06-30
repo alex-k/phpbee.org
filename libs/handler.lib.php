@@ -73,7 +73,7 @@ class gs_base_handler {
 		return $this->show();
 		return false;
 	}
-	function show($nodebug=FALSE) {
+	function show($ret,$nodebug=FALSE) {
 		if (empty($this->params['name'])) {
 			$this->params['name']=basename($this->data['handler_key']).'.html';
 		}
@@ -99,21 +99,10 @@ class gs_base_handler {
 		ob_end_clean();
 		$html=$tpl->fetch($tplname);
 		echo $html;
+		mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
 		if (DEBUG && !$nodebug) {
-			mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
-			$log=gs_logger::get_instance();
-			$txt2=$log->show();
-			if (trim($txt) || trim($txt2)) {
-				$txt=preg_replace("/\n/",'\\r\\n',addslashes($txt));
-echo <<<TXT
-<script>
-if (typeof console == 'object') {
-console.log('$txt');
-$txt2;
-}
-</script>
-TXT;
-			}
+			$g=gs_logger::get_instance();
+			$g->console();
 		}
 	}
 	protected function get_form() {
