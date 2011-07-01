@@ -342,8 +342,7 @@ class gs_logger {
 	private $messages=array();	
 	private $t,$tt;
 	function __construct() {
-		$this->t=$this->tt=microtime(true);
-		$this->time_start=microtime(true);
+		$this->tt=$this->time_start=microtime(true);
 	}
 	static function &get_instance()
 	{
@@ -355,11 +354,9 @@ class gs_logger {
 		return $instance;
 	}
 	function log($data) {
-		$this->messages[]=sprintf("%.3f:%.5f ",
-					microtime(true)-$this->t,
-					microtime(true)-$this->tt
-					).$data;
-		$this->tt=microtime(true);
+		$t=microtime(true);
+		$this->messages[]=sprintf("%.3f/%.4f ",$t-$this->time_start,$t-$this->tt).$data;
+		$this->tt=$t;
 		$this->log_to_file($data);
 	}
 	private function log_to_file($data) {
