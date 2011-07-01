@@ -93,9 +93,9 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 	function query($que='') {
 		$t=microtime(true);
-		if (DEBUG) {
-			md($que);
-		}
+
+		mlog($que);
+
 		$this->_res=mysql_query($que,$this->db_connection);
 		
 		if ($this->_res===FALSE) {
@@ -103,9 +103,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		}
 		$t=microtime(true)-$t;
 		$rows=mysql_affected_rows($this->db_connection);
-		if (DEBUG) {
-			md(sprintf("%.03f secounds, %d rows",$t, $rows));
-		}
+		mlog(sprintf("%.03f secounds, %d rows",$t, $rows));
 		$this->stats['total_time']+=$t;
 		$this->stats['total_queries']+=1;
 		$this->stats['total_rows']+=$rows;

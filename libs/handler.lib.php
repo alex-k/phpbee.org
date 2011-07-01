@@ -346,6 +346,7 @@ class gs_base_handler {
 		return array_merge($data,$newdata);
 	}
 	static function process_handler($params,$smarty) {
+		mlog('handler.process_handler');
 		$params['gspgid']=trim($params['gspgid'],'/');
 		$s_data=$data=$smarty->getTemplateVars('_gsdata');
 		$s_gspgid=cfg('s_gspgid');
