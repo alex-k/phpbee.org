@@ -60,9 +60,10 @@ class module extends gs_base_module implements gs_module {
 }
 
 class images_handler extends gs_base_handler {
-	function show( $data=null) {
-		if (!$data) {
+	function show($data=null) {
+		if (count($this->data['gspgid_va'])<5) {
 			$data=base64_decode($this->data['gspgid_va'][0]);
+			
 			$data=preg_replace("|\..+|is","",$data);
 			$data=explode("/",$data);
 		}
@@ -73,14 +74,18 @@ class images_handler extends gs_base_handler {
 			'f'=>'use_fields',
 			'c'=>'use_crop',
 		);
+		$data[4]=preg_replace("|\..+|is","",$data[4]);
 		$rec=new $data[0]();
 		$rec=$rec->get_by_id($data[4]);
-		$gd=new vpa_gd($rec->File_data,false);
-		if ($data[2]>0  && ($data[2]<$rec->File_width || $data[2]<$rec->File_height)) {
+		$file=$rec->File->first();
+		$txt=get_output();
+		$gd=new vpa_gd($file->File_data,false);
+		if ($data[2]>0  && ($data[2]<$file->File_width || $data[3]<$file->File_height)) {
 			$gd->set_bg_color(255,255,255);
 			$gd->resize($data[2],$data[3],$method[$data[1]]);
 		}
 		$gd->show();
+		//gs_logger::dump();
 		exit();
 	}
 	function s() {
@@ -124,8 +129,8 @@ class admin_handler extends gs_base_handler {
 	}
 	
 	function many2one() {
-		if ($this->data['gspgid_va'][4]=='delete') {
-			$rid=intval($this->data['gspgid_va'][5]);
+		if (isset($this->data['gspgid_va'][5]) && $this->data['gspgid_va'][5]=='delete') {
+			$rid=intval($this->data['gspgid_va'][6]);
 			$rs_name=$this->data['gspgid_va'][0];
 			$rs=new $rs_name;
 			$rec=$rs->get_by_id($rid);
@@ -136,10 +141,25 @@ class admin_handler extends gs_base_handler {
 			$res=preg_replace("|/delete/\d+|is","//",$this->data['gspgid']);
 			return html_redirect($res);
 		}
+		
+		if ($this->data['action']=='delete') {
+			$ids=$this->data['act'];
+			$rs_name=$this->data['gspgid_va'][0];
+			$rs=new $rs_name;
+			$recs=$rs->find_records(array('id'=>$ids));
+			foreach ($recs as $rec) {
+				$rec->delete();
+				$rec->commit();
+			}
+			return html_redirect($this->data['gspgid']);
+		}
+		
+		
 		$params=array(
 			$this->data['gspgid_va'][1]=>$this->data['gspgid_va'][2],
 		);
-		$url=$this->data['gspgid_va'][0].'/'.$this->data['gspgid_va'][1].'/'.$this->data['gspgid_va'][2].'/'.$this->data['gspgid_va'][3];
+		$g=array_slice($this->data['gspgid_va'],0,5);
+		$url=implode('/',$g);
 		if ($this->data['gspgid_va'][2]==0) {
 			$params[$this->data['gspgid_va'][1].'_hash']=$this->data['gspgid_va'][3];
 		}
