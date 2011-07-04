@@ -357,11 +357,11 @@ class gs_widget_gallery extends gs_widget {
 				$images=$r->find_records($find);
 				$images=$images->get_values();
 
-				$s='<div class="many2one_gallery" id="gallery_'.$hash.'">';
+				$s='<ul class="many2one_gallery" id="gallery_'.$hash.'">';
 						if (count($images)) {foreach ($images as $im) {
-								$s.=sprintf('<img src="/img/h/%s/100/%d.jpg" title="%s">',$this->params['options']['recordset'],$im['id'],$im['name']);
+								$s.=sprintf('<li><img src="/img/s/%s/h/100/100/%d.jpg" title="%s"></li>',$this->params['options']['recordset'],$im['id'],$im['name']);
 						}}
-				$s.='<div class="clear"></div></div>';
+				$s.='</ul><div class="clear"></div>';
 
 
 

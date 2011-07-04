@@ -73,6 +73,7 @@ class gs_base_handler {
 		return $this->show();
 		return false;
 	}
+	
 	function show($ret,$nodebug=FALSE) {
 		if (empty($this->params['name'])) {
 			$this->params['name']=basename($this->data['handler_key']).'.html';
@@ -231,6 +232,9 @@ class gs_base_handler {
 	}
 	function post() {
 		//if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
+		if(isset($this->data['handler_params']['form_class'])) {
+			$this->params['form_class']=$this->data['handler_params']['form_class'];
+		}
 		if ($this->data['gspgtype']==GS_DATA_GET) return $this->showform();
 
 		$tpl=gs_tpl::get_instance();

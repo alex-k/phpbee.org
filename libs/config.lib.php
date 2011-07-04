@@ -68,7 +68,7 @@ class gs_init {
 				$tpls=glob($tpldir.DIRECTORY_SEPARATOR.'*');
 				foreach ($tpls as $t) {
 					$mt=filemtime($t);
-					$mct=filemtime($tplcdir.DIRECTORY_SEPARATOR.basename($t));
+					$mct=file_exists($tplcdir.DIRECTORY_SEPARATOR.basename($t)) ? filemtime($tplcdir.DIRECTORY_SEPARATOR.basename($t)) : $mt+1;
 					//md($t.') '.$mt.' - '.$mct.' = '.intval($mt - $mct),1);
 					if ($mt>$mct) return true;
 				}
@@ -138,7 +138,9 @@ class gs_init {
 				$s=$tpl->fetch('string:'.$s);*/
 				$s=$tpl->fetch($f);
 				$pf=$tplcdir.DIRECTORY_SEPARATOR.basename($f);
-				file_put_contents($pf,$s);
+				if(!file_put_contents($pf,$s)) {
+					throw new gs_exception('Can`t move template '.$f.' into '.$pf);
+				}
 			}
 		}
 		return $ret;

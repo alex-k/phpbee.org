@@ -40,6 +40,8 @@ class vpa_gd {
 			$this->old_height=$info[1];
 			$this->old_mime=$info['mime'];
 			$this->old_img=imagecreatefromstring(file_get_contents($this->filename));
+			$w = imagecolorallocate($this->old_img, 255, 255, 255);
+			imagecolortransparent($this->old_img,$w);
 		}
 		elseif ($path==false)
 		{
@@ -104,6 +106,9 @@ class vpa_gd {
 		$this->new_width=intval($this->new_width);
 		$this->new_height=intval(ceil($this->new_width/$k));
 		$this->new_img=imagecreatetruecolor ($this->new_width, $this->new_height);
+		imagealphablending($this->new_img, false);
+		imagesavealpha($this->new_img, true);
+		$bg=imagecolorallocatealpha($this->new_img,255,255,255,127);
 		ImageCopyResampled($this->new_img, $this->old_img, 0, 0, 0, 0, $this->new_width, $this->new_height, $this->old_width, $this->old_height);
 	}
 	
@@ -114,8 +119,10 @@ class vpa_gd {
 		$this->new_width=intval(round($this->new_height*$k));
 		$this->new_height=intval($this->new_height);
 		$this->new_img=imagecreatetruecolor ($this->new_width, $this->new_height);
+		imagealphablending($this->new_img, false);
+		imagesavealpha($this->new_img, true);
+		$bg=imagecolorallocatealpha($this->new_img,255,255,255,127);
 		ImageCopyResampled($this->new_img, $this->old_img, 0, 0, 0, 0, $this->new_width, $this->new_height, $this->old_width, $this->old_height);
-		//$this->resize();
 	}
 	
 	function make_box()
@@ -134,6 +141,9 @@ class vpa_gd {
 			$this->new_width=intval(ceil($this->new_height*$k));
 		}
 		$this->new_img=imagecreatetruecolor ($this->new_width, $this->new_height);
+		imagealphablending($this->new_img, false);
+		imagesavealpha($this->new_img, true);
+		$bg=imagecolorallocatealpha($this->new_img,255,255,255,127);
 		ImageCopyResampled($this->new_img, $this->old_img, 0, 0, 0, 0, $this->new_width, $this->new_height, $this->old_width, $this->old_height);
 	}
 	
@@ -153,6 +163,9 @@ class vpa_gd {
 			$nw=intval(ceil($this->new_height*$k));
 		}
 		$this->new_img=imagecreatetruecolor ($this->new_width, $this->new_height);
+		imagealphablending($this->new_img, false);
+		imagesavealpha($this->new_img, true);
+		$bg=imagecolorallocatealpha($this->new_img,255,255,255,127);
 		ImageCopyResampled($this->new_img, $this->old_img, 0, 0, 0, 0, $nw, $nh, $this->old_width, $this->old_height);
 	}
 	
@@ -537,7 +550,13 @@ class vpa_gd {
 	function save($filename,$quality=0)
 	{
 		$img=($this->new_img) ? $this->new_img : $this->old_img;
-		imagejpeg($img,$filename,$quality);
+		if ($this->old_mime=='image/jpeg') {
+			imagejpeg($img,$filename,$quality);
+		} elseif ($this->old_mime=='image/gif') {
+			imagegif($img,$filename);
+		} elseif ($this->old_mime=='image/png') {
+			imagepng($img,$filename,4);
+		}
 	}
 
 }

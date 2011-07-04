@@ -39,6 +39,14 @@ function array_search_recursive($n,$a,$s=false) {
 	}
 	return FALSE;
 }
+
+function get_output() {
+	$txt=ob_get_contents();
+	ob_end_clean();
+	return $txt;
+}
+
+
 function array_merge_recursive_distinct ( array &$array1, array &$array2 )
 {
   $merged = $array1;
