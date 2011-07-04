@@ -70,10 +70,12 @@ class b_tree {
 	private function del_value($path,$value) {
 		$value.=PHP_EOL;
 		$path=$path.DIRECTORY_SEPARATOR.'idx';
-		$a=array_flip(file($path));
-		unset($a[$value]);
-		unset($a['!'.$value]);
-		file_put_contents($path,implode("",array_keys($a)));
+		if (file_exists($path)) {
+			$a=array_flip(file($path));
+			unset($a[$value]);
+			unset($a['!'.$value]);
+			file_put_contents($path,implode("",array_keys($a)));
+		}
 	}
 	
 	private function int2str($int) {

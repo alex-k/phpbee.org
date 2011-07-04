@@ -317,7 +317,7 @@ class g_forms_jstpl extends g_forms_html {
 			$wclass="gs_widget_".(isset($v['widget']) ? $v['widget'] : $v['type']);
 			$w =new $wclass($field,array($field=>"<%=t.values.$field%>"),$v);
 			$arr[$field]=array('label'=>isset($v['verbose_name']) ? $v['verbose_name']:$field,
-						//'input'=>$w->html($field,"<%=t.values.$field%>",$v)
+						/*'input'=>$w->html($field,"<%=t.values.$field%>",$v)*/
 						'input'=>$w->js()
 						);
 		}

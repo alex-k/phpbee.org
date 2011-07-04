@@ -255,7 +255,7 @@ class gs_config {
 		}
 
 		$this->www_admin_dir=$this->www_dir.'admin/';
-                $this->www_image_dir=$this->www_dir.'img/';
+		$this->www_image_dir=$this->www_dir.'img/';
 		$this->script_dir=rtrim(dirname($_SERVER['PHP_SELF']),'/').'/';
 		$this->index_filename=$_SERVER['SCRIPT_NAME'];
 		$this->referer= isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
@@ -279,7 +279,7 @@ class gs_config {
 		$this->lib_modules_dir=$this->root_dir.'modules/';
 		$this->lib_dbdrivers_dir=$this->lib_dir.'dbdrivers/';
 
-		$this->use_handler_cache=TRUE;
+		$this->use_handler_cache=FALSE;
 		$this->s_handler_cnt=0;
 
 		foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {

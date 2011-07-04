@@ -117,7 +117,6 @@ class gs_base_handler {
 		} else {
 			$rec=$obj->new_record();
 		}
-
 		return self::get_form_for_record($rec,$this->params,$this->data);
 	}
 	static function get_form_for_record($rec,$params,$data) {

@@ -172,12 +172,13 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 	
 	function _get_id($tablename,$id) {
 		$id=trim($id);
-		$id=$this->int2id($id);
+		//$id=$this->int2id($id);
 		$id=$this->split_id($id);
 		$ret=$this->root.DIRECTORY_SEPARATOR.$tablename.DIRECTORY_SEPARATOR.$id;
 		return $ret;
 	}
 	function split_id($id,$no_fs=false) {
+		
 		if (is_numeric($id)) {
 			$id=$this->int2id($id);
 			$id=str_split($id,1);
@@ -266,8 +267,6 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			unlink($f);
 		}
 		
-		
-		
 		rmdir($id);
 	}
 	function fetchall() {
@@ -327,15 +326,18 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			$files=$mask ? glob($fname.$mask): array();
 		}
 		
-		
 		foreach ($files as $f) {
+			$rid=basename($f);
+			if ($rset->structure['fields'][$rset->id_field_name]['type']=='varchar') {
+				$rid=str_replace('/','',str_replace($fname,'',$f));
+			}
 			$d=array(
-				$rset->id_field_name=>basename($f)
+				$rset->id_field_name=>$this->id2int($rid),
 				);
 			foreach ($fields as $field) {
 				if (!isset($d[$field])) $d[$field]=file_exists($f.DIRECTORY_SEPARATOR.$field) ? file_get_contents($f.DIRECTORY_SEPARATOR.$field) : NULL;
 			}
-			$this->_res[basename($f)]=$d;
+			$this->_res[$rid]=$d;
 		}
 
 		mlog(sprintf('File query: %s fields: %s records: %s (%.06f sec)',$mask,implode(',',$fields),count($this->_res),(microtime(1)-$t)));

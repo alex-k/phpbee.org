@@ -45,7 +45,11 @@ class gs_record implements arrayaccess {
 		if(method_exists($this->get_recordset(),'__record_wakeup')) $this->get_recordset()->__record_wakeup($this);
 	}
 	public function __call($func,$args) {
-		if (method_exists($this->get_recordset(),$func)) return $this->get_recordset()->$func($args,$this);
+		
+		if (method_exists($this->get_recordset(),$func)) {
+			//$args[]=$this;
+			return call_user_func(array($this->get_recordset(),$func),$args,$this);
+		}
 	}
 
 	public function append_child(&$child) {
@@ -217,31 +221,37 @@ class gs_record implements arrayaccess {
 	}
 
 	private function lazy_load($name) {
-		//md('lazy_load:'.$name,1);
+		//md('lazy_load:'.$name);
 		$rs=$this->init_linked_recordset($name);
 		$structure=$this->gs_recordset->structure['recordsets'][$name];
 		$id=$this->is_set($rs->local_field_name) ? $this->__get($rs->local_field_name) : NULL;
-
+		$links=array();
+		foreach ($rs->structure['recordsets'] as $s) {
+			$links[]=$s['local_field_name'];
+		}
+		$links[]=$rs->foreign_field_name;
+		$links=array_unique($links);
 		$structure['options'][$rs->foreign_field_name]=$id;
-		if($id!==NULL) $rs=$rs->find_records($structure['options'],null,$rs->index_field_name);
+		//if($id!==NULL) $rs=$rs->find_records($structure['options'],null,$rs->index_field_name);
+		if($id!==NULL) $rs=$rs->find_records($structure['options'],$links,$rs->index_field_name);
 		$this->values[$name]=$this->recordsets_array[$name]=$rs;
 		return $this->__get($name);
 	}
 
 
 	public function __get($name) {
-		//var_dump(get_class($this->gs_recordset).":".$name.":".$this->gs_recordset->state);
 		if (array_key_exists($name,$this->values)) return $this->values[$name];
 		if (isset($this->gs_recordset->structure['recordsets'][$name])) return $this->lazy_load($name);
-
 		if(isset($this->get_recordset()->structure['fields'][$name]) && $this->get_recordset()->state==RS_STATE_LATE_LOAD) {
+			
 			return $this->get_recordset()->query_options['late_load_fields'][$name]=$name;
 		}
-
+		
 		if(isset($this->get_recordset()->structure['fields'][$name]) && $this->get_recordset()->state==RS_STATE_LOADED) {
 			$this->get_recordset()->load_records(array($name));
 			if (array_key_exists($name,$this->values)) return $this->values[$name];
 		}
+		
 		/*
 		$cname=get_class($this->get_recordset()).'_'.$name;
 		if(class_exists($cname) && is_subclass_of($cname,'gs_recordset_base') && property_exists($cname,'parent_id_name')) {
