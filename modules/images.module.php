@@ -16,12 +16,15 @@ abstract class tw_images extends gs_recordset_handler {
 		}
 		return $ret;
 	}
-        function record_as_string($rec) {
-		return implode($this->img('small',$rec));
+	function record_as_string($rec) {
+		$res=$rec->File->img('small');
+		$res=trim(implode(' ',$res));
+		return $res;
 	}
-        public function __toString() {
-                return implode(' ',$this->recordset_as_string_array());
-        }
+	public function __toString() {
+		//return implode(' ',$this->recordset_as_string_array());
+		return 'image';
+	}
 }
 abstract class tw_file_images extends gs_recordset_short{
 	var $gs_connector_id='file_public';
@@ -46,11 +49,18 @@ abstract class tw_file_images extends gs_recordset_short{
 		return $ret;
 	}
 	function src($params,$record=null) {
+		if (is_array($params)) {
+			$type=$params[0];
+		} else {
+			$type=$params;
+		}
+		
 		$records=$record ? array($record) : $this;
 		$ret=array();
 		$fname=$this->get_connector()->www_root.'/'.$this->db_tablename;
 		foreach ($records as $rec) {
-			$ret[]=$fname.'/'.$this->get_connector()->split_id($rec->get_id(),true).'/'.(($params=='') ? 'File_data' : $params.'.jpg');
+			$this->resize($rec,'',true);
+			$ret[]=$fname.'/'.$this->get_connector()->split_id($rec->get_id(),true).'/'.(($type=='') ? 'File_data' : $type.'.jpg');
 		}
 		return $ret;
 	}
@@ -61,20 +71,23 @@ abstract class tw_file_images extends gs_recordset_short{
 		);
 	}
 	
-	function resize($rec,$type) {
+	function resize($rec,$type,$no_rewrite=false) {
 		$fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR;
-		$gd=new vpa_gd($rec->first()->File_data,false);
+		$sname=$fname.'File_data';
+		$gd=new vpa_gd($sname);
 		foreach ($this->config as $key => $data) {
-			$sname=$fname.'File_data';
+			
 			$iname=$fname.$key.'.jpg';
 			if ($data['width']>0  && ($data['width']<$rec->first()->File_width || $data['heigt']<$rec->first()->File_height)) {
 				if ($data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);
 				$gd->resize($data['width'],$data['height'],$data['method']);
 			}
-			if (isset($data['method']) && $data['method']=='copy') {
-				copy($sname,$iname);
-			} else {
-				$gd->save($iname,100);
+			if (!file_exists($iname) || ($no_rewrite==false && file_exists($iname))) {
+				if (isset($data['method']) && $data['method']=='copy') {
+					copy($sname,$iname);
+				} else {
+					$gd->save($iname,100);
+				}
 			}
 		}
 	}
