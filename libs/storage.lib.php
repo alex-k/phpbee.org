@@ -126,7 +126,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		foreach ($this->structure['recordsets'] as $link) {
 			$fields[]=$link['local_field_name'];
 		}
-		//$fields=array_unique($fields);
+		$fields=array_unique($fields);
 		return $this->find_records(array($this->id_field_name=>$id),$fields)->current();
 	}
 	public function set($values=array()) {
@@ -227,6 +227,11 @@ abstract class gs_recordset_base extends gs_iterator {
 		if ($fields && !is_array($fields)) {
 			$fields=array_filter(explode(',',$fields));
 		}
+		foreach ($this->structure['recordsets'] as $link) {
+			$fields[]=$link['local_field_name'];
+		}
+		$fields[]=$this->id_field_name;
+		if (is_array($fields)) $fields=array_unique($fields);
 		$this->query_options['fields']=$fields;
 		$this->reset();
 		$this->state=RS_STATE_UNLOADED;
