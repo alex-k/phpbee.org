@@ -230,13 +230,11 @@ abstract class gs_recordset_base extends gs_iterator {
 		foreach ($this->structure['recordsets'] as $link) {
 			$fields[]=$link['local_field_name'];
 		}
-		$fields[]=$this->id_field_name;
 		if (is_array($fields)) $fields=array_unique($fields);
 		$this->query_options['fields']=$fields;
 		$this->reset();
 		$this->state=RS_STATE_UNLOADED;
 		cfg_set('handler_cache_status',cfg('handler_cache_status') | $this->handler_cache_status);
-		//mlog('SET handler_cache_status in '.get_class($this).' to '.$this->handler_cache_status.' sum='.cfg('handler_cache_status'));
 		mlog('RS_STATE_UNLOADED on '.get_class($this));//.' options:'.print_r($options,TRUE));
 		return $this;
 	}
