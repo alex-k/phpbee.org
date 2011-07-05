@@ -113,7 +113,7 @@ class gs_recordset_handler extends gs_recordset_short {
 				if (isset($this->structure['recordsets'])) foreach ($this->structure['recordsets'] as $r) {
 					if (isset($p['field']) && $p['field']==$r['local_field_name']) {
 						$f->parent_name=$p['field'];
-						$f->parent_id=$p['value'];
+						$f->parent_id=intval($p['value']);
 					}
 				}
 			}
