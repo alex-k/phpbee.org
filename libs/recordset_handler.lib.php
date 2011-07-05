@@ -1,7 +1,7 @@
 <?php
 
 class tw_handlers_cache extends gs_recordset_short {
-	var $gs_connector_id='file_public';
+	var $gs_connector_id='handlers_cache';
 	protected $handler_cache_status=2;
 	public $id_field_name='md5';
 	function __construct($init_opts=false) { parent::__construct(array(
