@@ -37,6 +37,7 @@ class field_interface {
 				$structure['triggers']['before_insert'][$k]=$r['trigger'];
 				$structure['triggers']['before_update'][$k]=$r['trigger'];
 			}
+			if ($r['index'] && !isset($structure['indexes'][$k])) $structure['indexes'][$k]=$k;
 		}
 		return $structure;
 	}
@@ -73,7 +74,6 @@ class field_interface {
 			$structure['htmlforms'][$field]['default']=$opts['default'];
 		}
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
-		if ($opts['index']) $structure['indexes'][$field]=$field;
 	}
 	static function fPassword($field,$opts,&$structure,$init_opts) {
 		return self::fString($field,$opts,$structure,$init_opts);
