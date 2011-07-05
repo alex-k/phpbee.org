@@ -230,25 +230,32 @@ class gs_base_handler {
 		$ret=$tpl->fetch($tplname);
 		return $ret;
 	}
-	function post() {
+	function validate() {
 		//if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
 		if(isset($this->data['handler_params']['form_class'])) {
 			$this->params['form_class']=$this->data['handler_params']['form_class'];
 		}
-		if ($this->data['gspgtype']==GS_DATA_GET) return $this->showform();
+		if (!$this->is_post()) return $this->showform();
 
 		$tpl=gs_tpl::get_instance();
 		$f=$this->get_form();
 		$validate=$f->validate();
 		if ($validate['STATUS']===true) {
-			$f->rec->fill_values(self::explode_data($f->clean()));
-			$f->rec->get_recordset()->commit();
-			return $f->rec;
+			return $f;
 		}
 		$tpl->assign('formfields',$f->show($validate));
 		$tpl->assign('form',$f);
 		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
-		return $tpl->fetch($tplname);
+		$ret=$tpl->fetch($tplname);
+		return $ret;
+	}
+	function post() {
+		$f=$this->validate();
+		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+
+		$f->rec->fill_values(self::explode_data($f->clean()));
+		$f->rec->get_recordset()->commit();
+		return $f->rec;
 	}
 
 	function postform() {
