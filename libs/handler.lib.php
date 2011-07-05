@@ -66,7 +66,10 @@ class gs_base_handler {
 
 	function validate_gl() {
 		$url=trim(call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v']),'/');
-		return ($url==$this->data['gspgid']);
+		md($this->data,1);
+		var_dump($url);
+		md($_SERVER,1);
+		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/'));
 	}
 	function show404() {
 		header("HTTP/1.0 404 Not Found");
@@ -301,6 +304,14 @@ class gs_base_handler {
 		
 		if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
 		return html_redirect($this->data['gspgid_handler']);
+	}
+	function redirect_recid($ret) {
+		if (isset($this->params['gl'])) {
+			$this->params['href']=call_user_func($this->params['module_name'].'::gl',$this->params['gl'],$ret['last']);
+		} else if (isset($this->params['href'])) {
+			$this->params['href']=trim($this->params['href'],'/').'/'.$ret['last']->get_id();
+		}
+		return $this->redirect();
 	}
 	function redirect() {
 		return html_redirect($this->params['href']);
