@@ -224,7 +224,9 @@ abstract class gs_recordset_base extends gs_iterator {
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		$this->query_options['options']=$this->string2options($options);
 		$this->query_options['index_field_name'] = is_string($index_field_name) ? $index_field_name : $this->id_field_name;
-		if ($fields && !is_array($fields)) $fields=array_filter(explode(',',$fields));
+		if ($fields && !is_array($fields)) {
+			$fields=array_filter(explode(',',$fields));
+		}
 		$this->query_options['fields']=$fields;
 		$this->reset();
 		$this->state=RS_STATE_UNLOADED;
@@ -246,6 +248,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		$index_field_name=$this->query_options['index_field_name'];
 		$fields=$fields ? array_merge($fields,array($index_field_name)) : $this->query_options['fields'];
 		if(!$fields) $fields=array($index_field_name);
+		if (!in_array($this->id_field_name,$fields)) $fields[]=$this->id_field_name;
 		$this->get_connector()->select($this,$options,$fields);
 		$ret=NULL;
 		$records=$this->state==RS_STATE_LOADED ? $this->array : array();

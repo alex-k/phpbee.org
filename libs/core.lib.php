@@ -255,14 +255,15 @@ class gs_session {
 		$data[$name]=$obj;
 		$id=gs_cacher::save($data,'gs_session',isset($_COOKIE['gs_session']) ? $_COOKIE['gs_session'] : NULL);
 		$t=strtotime("now +".cfg('session_lifetime'));
-		return setcookie('gs_session',$id,$t,cfg('www_dir'));
+		setcookie('gs_session',$id,$t,cfg('www_dir'));
+		return $id;
 	}
 
 	static function load($name=NULL) {
 		if (!isset($_COOKIE['gs_session'])) return FALSE;
 		$ret=gs_cacher::load($_COOKIE['gs_session'],'gs_session');
-		return $name!==NULL  ? $ret[$name] : $ret;
-		//return isset($ret[$name]) ? $ret[$name] : $ret;
+		if ($name===NULL) return $ret;
+		return isset($ret[$name]) ? $ret[$name] : NULL;
 	}
 
 	static function clear($name=NULL) {
@@ -270,6 +271,7 @@ class gs_session {
 		return gs_cacher::clear($_COOKIE['gs_session'],'gs_session');
 		//return isset($ret[$name]) ? $ret[$name] : $ret;
 	}
+
 
 }
 

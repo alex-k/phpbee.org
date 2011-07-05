@@ -126,6 +126,8 @@ class gs_parser {
 				return is_object($result) && is_a($result,'gs_record');
 			case 'gs_recordset':
 				return is_object($result) && is_a($result,'gs_recordset');
+			case 'g_forms':
+				return is_object($result) && is_a($result,'g_forms');
 
 		}
 		return false;

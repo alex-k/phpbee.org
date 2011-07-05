@@ -305,7 +305,15 @@ class gs_base_handler {
 		if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
 		return html_redirect($this->data['gspgid_handler']);
 	}
-	function redirect_recid($ret) {
+	function delete() {
+		$id=$this->data['gspgid_va'][0];
+		$rs=new $this->params['classname'];
+		$rec=$rs->get_by_id($id);
+		$rec->delete();
+		$rec->commit();
+		return $rec;
+	}
+	function redirect_gl($ret) {
 		if (isset($this->params['gl'])) {
 			$this->params['href']=call_user_func($this->params['module_name'].'::gl',$this->params['gl'],$ret['last']);
 		} else if (isset($this->params['href'])) {
