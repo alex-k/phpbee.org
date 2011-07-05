@@ -12,6 +12,7 @@ class field_interface {
 		foreach ($arr as $k=>$r) {
 			if(!isset($r['required'])) $r['required']='true';
 			if (!isset($r['readonly'])) $r['readonly']=false;
+			if (!isset($r['index'])) $r['index']=false;
 			$r['func_name']=$r[0];
 			if (in_array($r['func_name'],array('lMany2Many','lMany2One','lOne2One'))) {
 				$r['linked_recordset']=$r[1];
@@ -72,6 +73,7 @@ class field_interface {
 			$structure['htmlforms'][$field]['default']=$opts['default'];
 		}
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
+		if ($opts['index']) $structure['indexes'][$field]=$field;
 	}
 	static function fPassword($field,$opts,&$structure,$init_opts) {
 		return self::fString($field,$opts,$structure,$init_opts);

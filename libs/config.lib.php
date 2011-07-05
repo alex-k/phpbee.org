@@ -329,6 +329,10 @@ function cfg($name) {
 	$config=gs_config::get_instance();
 	return isset($config->$name) ? $config->$name : NULL ;
 }
+function mlog($data) {
+	$log=gs_logger::get_instance();
+	$log->log($data);
+}
 function md($output,$type=false)
 {
 	if ($type) {
@@ -336,7 +340,7 @@ function md($output,$type=false)
 		echo "<pre>\n".$txt."</pre>\n";
 	} else {
 		$log=gs_logger::get_instance();
-		$log->log($output);
+		mlog($output);
 	}
 }
 class gs_logger {
@@ -356,8 +360,14 @@ class gs_logger {
 		return $instance;
 	}
 	function log($data) {
+
+			ob_start();
+			print_r($data);
+			$txt=ob_get_contents();
+			ob_end_clean();
+
 		$t=microtime(true);
-		$this->messages[]=sprintf("%.3f/%.4f ",$t-$this->time_start,$t-$this->tt).$data;
+		$this->messages[]=sprintf("%.3f/%.4f > ",$t-$this->time_start,$t-$this->tt).$txt;
 		$this->tt=$t;
 		$this->log_to_file($data);
 	}
@@ -456,10 +466,6 @@ function load_file($file,$return_contents=FALSE,$return_file=FALSE)
 	require_once($file);
 }
 
-function mlog($data) {
-	$log=gs_logger::get_instance();
-	$log->log('> '.$data);
-}
 
 function clean_path($path) {
 	return str_replace('\\','/',$path);
