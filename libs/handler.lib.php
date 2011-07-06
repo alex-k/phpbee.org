@@ -432,7 +432,7 @@ class gs_base_handler {
 		$o_p=gs_parser::get_instance($data,'handler');
 		if (isset($params['scope'])) {
 			$hndl=$o_p->get_current_handler();
-			if ($hndl[0]['params']['module_name']!=$params['scope']) return '';
+			if ($hndl['params']['module_name']!=$params['scope']) return '';
 		}
 		$ret=$o_p->process();
 		$ret_ob=ob_get_contents();

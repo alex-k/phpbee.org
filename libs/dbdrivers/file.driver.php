@@ -32,7 +32,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		$cinfo=$this->cinfo;
 		check_and_create_dir($cinfo['db_root']);
 		$this->root=$cinfo['db_root'];
-		$this->www_root=$cinfo['www_root'];
+		$this->www_root=isset($cinfo['www_root']) ? $cinfo['www_root'] : '';
 	}
 
 

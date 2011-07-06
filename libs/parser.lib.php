@@ -20,8 +20,7 @@ class gs_parser {
 	function __construct($data=null)
 	{
 		if($data) $this->data=$data;
-		$this->get_handlers_data=$this->get_handlers();
-		$this->registered_handlers=$this->parse_handlers_data($this->get_handlers_data);
+		$this->registered_handlers=$this->get_handlers();
 		if ($data) {
 			$this->prepare($data);
 		}
@@ -29,22 +28,74 @@ class gs_parser {
 	function prepare($data,$gspgtype=null) {
 		$data['gspgid']=trim($data['gspgid'],'/');
 		$this->data=$data;
-		$result=$this->registered_handlers[$gspgtype ? $gspgtype : $data['gspgtype']]->xpath($data['gspgid']);
-		$this->current_handler=$result->get_handler($gspgtype.'.'.$data['gspgid']);
-		$data['handler_key']=$result->handler_key;
-		$data['gspgid_v']=ltrim(preg_replace("|$result->handler_key|",'',$data['gspgid'],1),'/');
+
+		$result=$this->find_handler($this->registered_handlers[$gspgtype ? $gspgtype : $data['gspgtype']],$data['gspgid']);
+		$this->current_handler=$result['handler'];
+	
+		$data['handler_key']=$result['key'];
+		$len=count(explode('/',$result['key']));
+		$data['gspgid_v']=implode('/',array_slice(explode('/',$data['gspgid']),$len));
 		$data['gspgid_va']=explode('/',$data['gspgid_v']);
 		$data['gspgid_a']=explode('/',$data['gspgid']);
 		$this->data=$data;
 	}
+	function url_compare($gspgid,$url) {
+		$g=explode('/',$gspgid);
+		$u=empty($url) ? array() : explode('/',$url);
+		if (count($g)<count($u)) return -1;
+		
+		$cnt=0;
+		for ($k=0;$k<min(count($g),count($u));$k++) {
+			$cnt++;
+			if($u[$k]=='*') continue;
+			if ($u[$k]!=$g[$k]) return -1;
+			$cnt+=10;
+		}
+		return $cnt;
+	}
+	function find_handler($urls,$gspgid) {
+		$result=array('key'=>null,'handler'=>array());
+		if ($gspgid=='' && isset($urls[''])) {
+			$result['key']='';
+			$result['handler']=$urls[''];
+			return $result;
+		}
+		$max_c=-1;
+		foreach ($urls as $url=>$h) {
+			$c=$this->url_compare(trim($gspgid,'/'),trim($url,'/'));
+			if ($c>$max_c) {
+				$max_c=$c;
+				$result['key']=$url;
+				$result['handler']=$h;
+			}
+		}
+		return $result;
+	}
 	
 	function get_current_handler() {
-		return $this->current_handler;
+		return $this->parse_val(reset($this->current_handler));
 	}
 	
 	public function _get_handler()
 	{
 		return $this->current_handler;
+	}
+
+	function parse_val($val)
+	{
+		$params=array();
+		$parts=explode(':',str_replace(array("{","}"),"",$val));
+		$len=count($parts);
+		if ($len>2) for ($i=1;$i<$len;$i+=2) {
+			$params[$parts[$i]]=$parts[$i+1];
+		}
+
+		$ret=array(
+			'name'=>$parts[0],
+			'params'=>$params,
+		);
+		list($ret['class_name'],$ret['method_name'])=explode('.',$ret['name']);
+		return $ret;
 	}
 
 	function process() {
@@ -55,6 +106,7 @@ class gs_parser {
 		reset($handler_array);
 		while($handler=current($handler_array)) {
 			$h_key=key($handler_array);
+			$handler=$this->parse_val($handler);
 			if ($handler['name']=='end') return $ret['last'];
 			if (!class_exists($handler['class_name'],FALSE)) {
 				load_file($config->lib_handlers_dir.$handler['class_name'].'.class.php');
@@ -184,174 +236,5 @@ class gs_parser {
 	}
 }
 
-class gs_recurseparser {
-	var $node;
-	var $str;
-	var $params;
-	var $parts;
-	var $len;
-	var $pos;
-	var $type;
-	
-	function __construct(&$root,$str,$item,$type)
-	{
-		$this->str=$str;
-		$this->parse_val($item);
-		$this->type=$type;
-		$this->pos=0;
-		$this->parts=explode('/',$str);
-		$this->len=count($this->parts);
-		$this->parse($root);
-	}
-	
-	function parse_val($vals)
-	{
-		$this->params=array();
-		foreach ($vals as $key=>$val) {
-			$params=array();
-			$parts=explode(':',str_replace(array("{","}"),"",$val));
-			$len=count($parts);
-			if ($len<3) return;
-			for ($i=1;$i<$len;$i+=2)
-			{
-				$params[$parts[$i]]=$parts[$i+1];
-			}
-		$this->params[$key]=array('val'=>$parts[0],'params'=>$params);
-		}
-	}
-	
-	function parse(&$node)
-	{
-		if ($this->pos<$this->len-1)
-		{
-			$child=$node->get_node_by_name($this->parts[$this->pos]);
-			$child=is_null($child) ? new gs_node($this->parts[$this->pos]) : $child;
-			$node->append_child($child);
-			$this->pos+=1;
-			$this->parse($child);
-		}
-		else
-		{
-			$child=$node->get_node_by_name($this->parts[$this->pos]);
-			if (is_null($child))
-			{
-				$child=new gs_node($this->parts[$this->pos],$this->type,$this->params);
-			}
-			else
-			{
-				$child->_set_attibutes($this->type,$this->params);
-			}
-			$node->append_child($child);
-		}
-		
-	}
-}
-
-class gs_node {
-	var $parent;
-	var $parent_name;
-	var $childs;
-	var $name;
-	var $controller=array();
-	//static $gs_node_id=1;
-	
-	function __construct($name,$c_type='',$c_params=array())
-	{
-		global $gs_node_id;
-		$this->name=$name;
-		$this->_set_attibutes($c_type,$c_params);
-		$this->node_name=$gs_node_id;
-		$gs_node_id++;
-	}
-	
-	function _set_attibutes($c_type='',$c_params=array())
-	{
-		foreach ($c_params as $params_key=>$par) {
-			$controller=array(
-				'name'=>$par['val'],
-				'type'=>$c_type,
-				'params'=>$par['params'],
-				);
-			@list($controller['class_name'],$controller['method_name'])=explode('.',$controller['name']);
-			$this->controller[$params_key]=$controller;
-		}
-		/*
-		$this->controller['name']=$c_name;
-		$this->controller['type']=$c_type;
-		$this->controller['params']=$c_params;
-		// NOTICE !!! 
-		@list($this->controller['class_name'],$this->controller['method_name'])=explode('.',$c_name);
-		*/
-	}
-	
-	function get_handler($gspgid='')
-	{
-		mlog('process handler for '.$gspgid);
-		if ($this->controller)
-		{
-			return $this->controller;
-		}
-		//return isset($this->parent) ? $this->parent->get_handler() : $this->get_node_by_name('default')->controller;
-		if(!isset($this->parent)) throw new gs_exception('can not find handler for =>'.$gspgid.'<=');
-		return $this->parent->get_handler();
-	}
-	
-	function append_child($node)
-	{
-		if (!$this->node_has_child($node->name))
-		{
-			$this->childs[]=$node;
-		}
-		$node->set_parent($this);
-	}
-	
-	function get_node_by_name($name)
-	{
-		if (empty($this->childs)) return null;
-		foreach ($this->childs as $i => $child)
-		{
-			if ($child->name==$name) {
-				return $child;
-			}
-		}
-		foreach ($this->childs as $i => $child)
-		{
-			if (strlen($name) && $child->name=='*') {
-				return $child;
-			}
-		}
-		return null;
-	}
-	
-	function node_has_child($name)
-	{
-		if (empty($this->childs)) return false;
-		foreach ($this->childs as $i => $child)
-		{
-			if ($child->name==$name) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	function set_parent($node)
-	{
-		$this->parent=$node;
-		$this->parent_name=$node->node_name;
-	}
-	
-	function xpath($path, $mypath="")
-	{
-		$parts=explode('/',$path);
-		$current=array_shift ($parts);
-		$ret=$this->get_node_by_name($current);
-		if (!is_null($ret)) {
-			return $ret->xpath(implode('/',$parts),$mypath.'/'.$current);
-		}
-		$this->handler_key=ltrim($mypath,'/');
-		return $this;
-	}
-}
 
 ?>
