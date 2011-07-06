@@ -6,6 +6,10 @@
 				'db_root'=>$this->document_root.'files',
 				'www_root'=>'/files',
 				),
+			'handlers_cache'=>array( 
+				'db_type'=>'file',
+				'db_root'=>$this->var_dir.'handlers_cache/',
+				),
 			);
 
 	date_default_timezone_set('Europe/Moscow');
