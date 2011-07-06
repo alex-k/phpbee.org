@@ -1,0 +1,16 @@
+{assign var="year" value=$smarty.now|date_format:"%Y"}
+{assign var="year" value=$_gsdata.gspgid_va.0|default:$year}
+
+{assign var="month" value=$smarty.now|date_format:"%m"}
+{assign var="month" value=$_gsdata.gspgid_va.1|default:$month}
+{assign var="start_time" value="`$year`-`$month`-1"|@strtotime|date_format:"%Y-%m-%d"}
+{assign var="end_time" value="`$start_time` +1 month"|@strtotime|date_format:"%Y-%m-%d"}
+<ul class="list">
+	{controller _class="tw_news" _assign=news date="<=`$end_time`,>=`$start_time`"}
+	{foreach from=$news item=n}
+	<li><i>{$n.date|date:"%d %F %Y"}</i><br>
+	<a href="{gl show=$n}">{$n.subject}</a>
+		<p>{$n.text|strip_tags|truncate:300}</p>
+	</li>
+	{/foreach}
+</ul>
