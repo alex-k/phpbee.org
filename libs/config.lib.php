@@ -4,6 +4,7 @@ set_time_limit(2);
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
 DEFINE ('LOAD_TEMPLATES',4);
+DEFINE ('LOAD_EXTRAS',8);
 
 if (defined('DEBUG') && DEBUG) {
 ini_set('display_errors','On');
@@ -40,6 +41,28 @@ class gs_init {
 		if ($mode & LOAD_TEMPLATES) {
 			$this->load_templates();
 		}
+		if ($mode & LOAD_EXTRAS) {
+			$this->load_extras();
+		}
+	}
+
+	function save_handlers() {
+		gs_cacher::clear('handlers','config');
+		gs_cacher::clear('classes','config');
+		$o_h=new gs_parser();
+		$handlers=$o_h->get_registered_handlers();
+		gs_cacher::save($handlers,'config','handlers');
+
+		$cl_array=array();
+
+		$classes=get_declared_classes();
+		foreach ($classes as $cl) {
+			$r=new ReflectionClass($cl);
+			if($r->getFileName()) $cl_array[$cl]=$r->getFileName();
+		}
+		mlog($cl_array);
+		gs_cacher::save($cl_array,'config','classes');
+		//var_dump(gs_cacher::load('handlers','config'));
 	}
 
 	function check_compile_modules($path='') {
@@ -148,7 +171,10 @@ class gs_init {
 
 
 	public function load_modules($mask='*module.{php,xphp}') {
-		if ($this->check_compile_modules()) $this->compile_modules();
+		if ($this->check_compile_modules()) {
+			$this->compile_modules();
+			$this->save_handlers();
+		}
 
 		$path=$this->config->lib_modules_dir;
 		while (($files = glob($path.$mask,GLOB_BRACE)) && !empty($files)) {
@@ -184,23 +210,17 @@ class gs_init {
 	public function load_templates()
 	{
 		load_file($this->config->lib_dir.'tpl.lib.php');
-		load_file($this->config->lib_dir.'tpl_static.lib.php');
 		load_file($this->config->lib_dir.'forms.lib.php');
 		load_file($this->config->lib_dir.'widgets.lib.php');
 		load_file($this->config->lib_dir.'helpers.lib.php');
 		load_file($this->config->lib_dir.'dict.lib.php');
-		load_file($this->config->lib_dir.'vpa_gd.lib.php');
 	}
 	public function load_core()
 	{
 		load_file($this->config->lib_dir.'core.lib.php');
 		load_file($this->config->lib_dir.'parser.lib.php');
 		load_file($this->config->lib_dir.'handler.lib.php');
-		load_file($this->config->lib_dir.'validator.lib.php');
-		load_file($this->config->lib_dir.'newvalidator.lib.php');
 		load_file($this->config->lib_dir.'functions.lib.php');
-		load_file($this->config->lib_dir.'vpa_mail.lib.php');
-		load_file($this->config->lib_dir.'vpa_normalizator.lib.php');
 	}
 
 	public function load_storage() {
@@ -210,6 +230,15 @@ class gs_init {
 		load_file($this->config->lib_dir.'storage.lib.php');
 		load_file($this->config->lib_dir.'recordset_tools.lib.php');
 		load_file($this->config->lib_dir.'recordset_handler.lib.php');
+	}
+
+	public function load_extras() {
+		load_file($this->config->lib_dir.'vpa_mail.lib.php');
+		load_file($this->config->lib_dir.'vpa_normalizator.lib.php');
+		load_file($this->config->lib_dir.'validator.lib.php');
+		load_file($this->config->lib_dir.'newvalidator.lib.php');
+		load_file($this->config->lib_dir.'vpa_gd.lib.php');
+		load_file($this->config->lib_dir.'tpl_static.lib.php');
 	}
 	
 	
@@ -457,6 +486,7 @@ function check_and_create_dir($dir) {
 
 function load_file($file,$return_contents=FALSE,$return_file=FALSE)
 {
+	mlog('LOAD_FILE '.$file);
 	if (!file_exists($file))
 	{
 		throw new gs_exception('load_file: '.$file.'  not found');
@@ -506,6 +536,13 @@ class gs_var_storage {
 		$ret=isset($t->arr[$id]) ? $t->arr[$id] : NULL;
 		return $ret;
 	}
+}
+
+
+function __autoload($class_name) {
+	$classes=gs_cacher::load('classes','config');
+	mlog('AUTOLOAD '.$class_name);
+	load_file($classes[$class_name]);
 }
 
 

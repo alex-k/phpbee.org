@@ -20,7 +20,13 @@ class gs_parser {
 	function __construct($data=null)
 	{
 		if($data) $this->data=$data;
-		$this->registered_handlers=$this->get_handlers();
+		$this->registered_handlers=gs_cacher::load('handlers','config');
+		if (!$this->registered_handlers) {
+			$init=new gs_init('auto');
+			$init->load_modules();
+			$this->registered_handlers=$this->get_handlers();
+			gs_cacher::save($this->registered_handlers,'config','handlers');
+		}
 		if ($data) {
 			$this->prepare($data);
 		}
@@ -75,6 +81,12 @@ class gs_parser {
 	function get_current_handler() {
 		return $this->parse_val(reset($this->current_handler));
 	}
+
+	function get_registered_handlers() {
+		return $this->registered_handlers;
+	}
+
+
 	
 	public function _get_handler()
 	{
@@ -108,10 +120,10 @@ class gs_parser {
 			$h_key=key($handler_array);
 			$handler=$this->parse_val($handler);
 			if ($handler['name']=='end') return $ret['last'];
-			if (!class_exists($handler['class_name'],FALSE)) {
+			if (!class_exists($handler['class_name'],TRUE)) {
 				load_file($config->lib_handlers_dir.$handler['class_name'].'.class.php');
 			}
-			if (!class_exists($handler['class_name'],FALSE)) throw new gs_exception('gs_parser.process: Handler class not exists '.$handler['class_name']);
+			if (!class_exists($handler['class_name'],TRUE)) throw new gs_exception('gs_parser.process: Handler class not exists '.$handler['class_name']);
 			if (!method_exists($handler['class_name'],$handler['method_name'])) throw new gs_exception('gs_parser.process: Handler class method not exists '.$handler['class_name'].'.'.$handler['method_name']);
 			$module_name=$handler['params']['module_name'];
 

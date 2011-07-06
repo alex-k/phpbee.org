@@ -8,7 +8,9 @@ class gs_base_handler {
 		$this->params=$params;
 
 		$config=gs_config::get_instance();
-		$filename=$config->class_files[$this->params['module_name']];
+		//$filename=$config->class_files[$this->params['module_name']];
+		$classes=gs_cacher::load('classes','config');
+		$filename=$classes[$this->params['module_name']];
 		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',dirname($filename).'/'),'/');
 		$www_subdir=trim(cfg('www_dir').$subdir.'/','/');
 		$www_subdir=$www_subdir ? "/$www_subdir/" : '/';
