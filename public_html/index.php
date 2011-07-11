@@ -12,11 +12,13 @@ cfg_set('tpl_data_dir',array(
 	realpath(cfg('root_dir').'html'),
 ));
 //$init->init(LOAD_CORE | LOAD_STORAGE | LOAD_TEMPLATES | LOAD_EXTRAS);
-$init->init(LOAD_CORE);
 //$init->load_modules();
+$init->init(LOAD_CORE);
 session_start();
 
 $o_h=new gs_parser($init->data);
 $o_h->process();
+
+
 
 ?>

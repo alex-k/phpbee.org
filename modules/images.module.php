@@ -78,7 +78,7 @@ abstract class tw_file_images extends gs_recordset_short{
 		foreach ($this->config as $key => $data) {
 			
 			$iname=$fname.$key.'.jpg';
-			if ($data['width']>0  && ($data['width']<$rec->first()->File_width || $data['heigt']<$rec->first()->File_height)) {
+			if ($data['width']>0  && ($data['width']<$rec->first()->File_width || $data['height']<$rec->first()->File_height)) {
 				if ($data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);
 				$gd->resize($data['width'],$data['height'],$data['method']);
 			}
