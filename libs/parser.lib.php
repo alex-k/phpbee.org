@@ -127,6 +127,7 @@ class gs_parser {
 			if (!method_exists($handler['class_name'],$handler['method_name'])) throw new gs_exception('gs_parser.process: Handler class method not exists '.$handler['class_name'].'.'.$handler['method_name']);
 			$module_name=$handler['params']['module_name'];
 
+
 			// --------------------- 
 			if (call_user_func(array($module_name, 'admin_auth'),$this->data,$handler['params'])===false) return false;
 			if (method_exists($handler['params']['module_name'],'auth')) {

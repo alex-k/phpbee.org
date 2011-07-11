@@ -40,6 +40,7 @@ class gs_recordset_handler extends gs_recordset_short {
 
 	}
 	function _flush_handlers($rec,$type) {
+		if (!cfg('use_handler_cache')) return true;
 		$recordset=get_class($this);
 		$hh=new tw_handlers();
 

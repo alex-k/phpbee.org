@@ -539,11 +539,13 @@ class gs_var_storage {
 }
 
 
-function __autoload($class_name) {
-	$classes=gs_cacher::load('classes','config');
+function __gs_autoload($class_name) {
 	mlog('AUTOLOAD '.$class_name);
-	load_file($classes[$class_name]);
+	$classes=gs_cacher::load('classes','config');
+	if (array_key_exists($class_name,$classes)) load_file($classes[$class_name]);
 }
+
+spl_autoload_register('__gs_autoload');
 
 
 set_exception_handler('gs_exception_handler');
