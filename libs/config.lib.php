@@ -231,7 +231,6 @@ class gs_init {
 	}
 
 	public function load_storage() {
-		return;
 		load_file($this->config->lib_dir.'fkey.lib.php');
 		load_file($this->config->lib_dir.'indexator.lib.php');
 		load_file($this->config->lib_dir.'record.lib.php');
@@ -303,7 +302,7 @@ class gs_config {
 		$this->var_dir=$this->root_dir.'var/';
 		$this->img_dir=$this->root_dir.$this->www_image_dir;
 		$this->log_dir=$this->var_dir.'log/';
-		$this->log_file='gs.log';
+		$this->log_file=NULL;//'gs.log';
 		$this->cache_dir=$this->var_dir.'cache/';
 		$this->session_lifetime='2 hours';
 		$this->tmp_dir=$this->var_dir.'tmp/';
