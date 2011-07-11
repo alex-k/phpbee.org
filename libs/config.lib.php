@@ -222,6 +222,8 @@ class gs_init {
 	}
 	public function load_core()
 	{
+		//load_file($this->config->lib_dir.'__all.php'); return;
+
 		load_file($this->config->lib_dir.'core.lib.php');
 		load_file($this->config->lib_dir.'parser.lib.php');
 		load_file($this->config->lib_dir.'handler.lib.php');
@@ -229,6 +231,7 @@ class gs_init {
 	}
 
 	public function load_storage() {
+		return;
 		load_file($this->config->lib_dir.'fkey.lib.php');
 		load_file($this->config->lib_dir.'indexator.lib.php');
 		load_file($this->config->lib_dir.'record.lib.php');
@@ -470,6 +473,7 @@ function gs_exception_handler($ex)
 }
 
 function load_dbdriver($name) {
+	if (class_exists('gs_dbdriver_'.$name,FALSE)) return;
 	$cfg=gs_config::get_instance();
 	$name=gs_validator::validate('plain_word',$name);
 	load_file($cfg->lib_dbdrivers_dir.$name.'.driver.php');

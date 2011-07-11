@@ -95,4 +95,4 @@ class helper_tr {
 		return sprintf('<tr class="helper_tr"><td class="helper_tr_title">%s</td><td class="helper_tr_field">%s%s</td></tr>',$label,$txt,$e);
 	}
 }
-
+?>

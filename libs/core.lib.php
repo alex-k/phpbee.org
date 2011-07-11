@@ -214,24 +214,19 @@ class gs_cacher {
 		if (!$id) {
 			$fn=tempnam($dirname,'');
 			$id=basename($fn);
-			//$id.=substr(base64_encode(md5(rand())),0,8);
 		} else {
-			//$id=substr($id,0,-8);
 			$fn=$dirname.$id;
 		}
 		file_put_contents($fn,serialize($data));
 		return $id;
 	}
 	static function load($id,$subdir='.') {
-		//$id=substr($id,0,-8);
 		$dirname=cfg('cache_dir').'/'.$subdir.'/'.$id;
 		if (!file_exists($dirname)) return NULL;
 		$ret=unserialize(file_get_contents($dirname));
-		//unlink($dirname);
 		return $ret;
 	}
 	static function clear($id,$subdir='.') {
-		//$id=substr($id,0,-8);
 		$dirname=cfg('cache_dir').'/'.$subdir.'/'.$id;
 		return file_exists($dirname) && unlink($dirname);
 	}
