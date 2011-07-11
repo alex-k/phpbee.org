@@ -185,4 +185,4 @@ class form_table extends  g_forms_html {
 		$this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
 	}
 }
-
+?>
