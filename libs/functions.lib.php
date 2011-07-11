@@ -14,19 +14,19 @@ function html_redirect($gspgid=null,$data=array(),$type='302') {
 	$datastr='';
 	if ($data) $datastr='?'.http_build_query($data);
 	switch ($type) {
-		case '302':
-			header(sprintf('Location: %s%s',$url,$datastr));
+	case '302':
+		header(sprintf('Location: %s%s',$url,$datastr));
 		break;
 	}
 }
 function object_to_array($obj) {
 	$arr=array();
-        $_arr = is_object($obj) ? get_object_vars($obj) : $obj;
-        if (is_array($_arr)) foreach ($_arr as $key => $val) {
-                $val = (is_array($val) || is_object($val)) ? object_to_array($val) : $val;
-                $arr[$key] = $val;
-        }
-        return $arr;
+	$_arr = is_object($obj) ? get_object_vars($obj) : $obj;
+	if (is_array($_arr)) foreach ($_arr as $key => $val) {
+		$val = (is_array($val) || is_object($val)) ? object_to_array($val) : $val;
+		$arr[$key] = $val;
+	}
+	return $arr;
 }
 function array_search_recursive($n,$a,$s=false) {
 	$r=array_search($n,$a,$s);
@@ -49,21 +49,21 @@ function get_output() {
 
 function array_merge_recursive_distinct ( array &$array1, array &$array2 )
 {
-  $merged = $array1;
+	$merged = $array1;
 
-  foreach ( $array2 as $key => &$value )
-  {
-    if ( is_array ( $value ) && isset ( $merged [$key] ) && is_array ( $merged [$key] ) )
-    {
-      $merged [$key] = array_merge_recursive_distinct ( $merged [$key], $value );
-    }
-    else
-    {
-      $merged [$key] = $value;
-    }
-  }
+	foreach ( $array2 as $key => &$value )
+	{
+		if ( is_array ( $value ) && isset ( $merged [$key] ) && is_array ( $merged [$key] ) )
+		{
+			$merged [$key] = array_merge_recursive_distinct ( $merged [$key], $value );
+		}
+		else
+		{
+			$merged [$key] = $value;
+		}
+	}
 
-  return $merged;
+	return $merged;
 }
 function html_fetch($url,$data=array(),$scheme='GET') {
 	mlog($url);
@@ -78,68 +78,68 @@ function html_fetch($url,$data=array(),$scheme='GET') {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 	}
 
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 180);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 180);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
 
-    $result=curl_exec($ch);
-    if (curl_errno($ch)>0) {
-            throw new gs_exception(sprintf("html_fetch (%s) : CURL ERROR: %s : %s",$url,curl_errno($ch),curl_error($ch)));
-    }
-    curl_close($ch);
-    return $result;
+	$result=curl_exec($ch);
+	if (curl_errno($ch)>0) {
+		throw new gs_exception(sprintf("html_fetch (%s) : CURL ERROR: %s : %s",$url,curl_errno($ch),curl_error($ch)));
+	}
+	curl_close($ch);
+	return $result;
 
 }
 if (!function_exists('pmail')) {
 	function pmail($recipients, $body="",$subject="",$add_headers=false,$from=false,$debug=1) {
-    include_once("Mail.php");
-    $recipients=is_array($recipients) ? $recipients : array($recipients);
+		include_once("Mail.php");
+		$recipients=is_array($recipients) ? $recipients : array($recipients);
 
-    $pr_recipients=array();
-    foreach ($recipients as $rec) {
-            $pr_r=explode("\n",$rec);
-            foreach ($pr_r as $pr_rec) {
-                    $pr_recipients[]=$pr_rec;
-            }
-    }
-    $recipients=array_filter($pr_recipients);
+		$pr_recipients=array();
+		foreach ($recipients as $rec) {
+			$pr_r=explode("\n",$rec);
+			foreach ($pr_r as $pr_rec) {
+				$pr_recipients[]=$pr_rec;
+			}
+		}
+		$recipients=array_filter($pr_recipients);
 
-    $params["host"] = cfg('mail_smtp_host');
-    $params["port"] = cfg('mail_smtp_port');
-    $params["auth"] = cfg('mail_smtp_auth');
-    $params["username"] = cfg('mail_smtp_username');
-    $params["password"] = cfg('mail_smtp_password');
-    if ($debug) $params["debug"]=1;
-
-
-    $headers['From']    = !empty($from) ? $from : cfg('mail_from');
-    $headers['From'] =  (preg_replace_callback('/(.*)(<.+>)/',create_function('$a','return str_replace("."," ",$a[1]).$a[2];'),$headers['From']));
-    $headers['Subject'] = $subject;
-    $headers['Content-Type'] = 'text/plain; charset="UTF-8"';
-
-    foreach ($recipients as $key=> $recipient) {
-            $recipient=(preg_replace_callback('/(.*)(<.+>)/',create_function('$a','return str_replace("."," ",$a[1]).$a[2];'),$recipient));
-
-	    if (is_array($add_headers)) foreach ($add_headers as $name=>$value) {
-		$headers[$name] = $value;
-	    }
-
-        $headers['To']      = $recipient;
+		$params["host"] = cfg('mail_smtp_host');
+		$params["port"] = cfg('mail_smtp_port');
+		$params["auth"] = cfg('mail_smtp_auth');
+		$params["username"] = cfg('mail_smtp_username');
+		$params["password"] = cfg('mail_smtp_password');
+		if ($debug) $params["debug"]=1;
 
 
-        $mail_object =& Mail::factory(cfg('mail_type'), $params);
-        $ret=$mail_object->send($recipient, $headers, $body);
+		$headers['From']    = !empty($from) ? $from : cfg('mail_from');
+		$headers['From'] =  (preg_replace_callback('/(.*)(<.+>)/',create_function('$a','return str_replace("."," ",$a[1]).$a[2];'),$headers['From']));
+		$headers['Subject'] = $subject;
+		$headers['Content-Type'] = 'text/plain; charset="UTF-8"';
 
-    }
-    if ($debug) {
-                md($ret,1);
-    }
-    return $ret;
-}
+		foreach ($recipients as $key=> $recipient) {
+			$recipient=(preg_replace_callback('/(.*)(<.+>)/',create_function('$a','return str_replace("."," ",$a[1]).$a[2];'),$recipient));
+
+			if (is_array($add_headers)) foreach ($add_headers as $name=>$value) {
+				$headers[$name] = $value;
+			}
+
+			$headers['To']      = $recipient;
+
+
+			$mail_object =& Mail::factory(cfg('mail_type'), $params);
+			$ret=$mail_object->send($recipient, $headers, $body);
+
+		}
+		if ($debug) {
+			md($ret,1);
+		}
+		return $ret;
+	}
 }
 
 
@@ -176,15 +176,15 @@ function empty_array($a,$b) {
 }
 
 function xml_print($xml) {
-        $dom = new DOMDocument('1.0');
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML($xml);
-        return $dom->saveXML();
+	$dom = new DOMDocument('1.0');
+	$dom->preserveWhiteSpace = false;
+	$dom->formatOutput = true;
+	$dom->loadXML($xml);
+	return $dom->saveXML();
 }
 
 /**
-* Compatible functions 
+* Compatible functions
 **/
 
 if (PHP_VERSION_ID>=50300 && !function_exists('mb_split')) {
@@ -195,15 +195,15 @@ if (PHP_VERSION_ID>=50300 && !function_exists('mb_split')) {
 
 if (PHP_VERSION_ID>=50300 && !function_exists('mb_strlen')) {
 	/*function mb_strlen($string) {
-		return strlen($string);
+	    return strlen($string);
 	}
-	
+
 	function mb_detect_encoding($string,$encoding_list = null ,$strict = false) {
-		return 'UTF-8';
+	    return 'UTF-8';
 	}
-	
+
 	function mb_substr($string,$start,$length, $encoding='UTF-8') {
-		return substr($string,$start,$length);
+	    return substr($string,$start,$length);
 	}*/
 }
 
@@ -220,6 +220,20 @@ function load_submodules($parent_name,$dirname) {
 			file_put_contents($pf,$s);
 		}
 		load_file($pf);
+	}
+}
+
+function rrmdir($dir) {
+	if (is_dir($dir)) {
+		$objects = scandir($dir);
+		foreach ($objects as $object) {
+			if ($object != "." && $object != "..") {
+				if (filetype($dir."/".$object) == "dir") rrmdir($dir."/".$object);
+				else unlink($dir."/".$object);
+			}
+		}
+		reset($objects);
+		rmdir($dir);
 	}
 }
 

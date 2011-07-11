@@ -170,6 +170,11 @@ class gs_init {
 	}
 
 
+	public function clear_cache() {
+		rrmdir(cfg('tpl_var_dir'));
+	}
+
+
 	public function load_modules($mask='*module.{php,xphp}') {
 		if ($this->check_compile_modules()) {
 			$this->compile_modules();
