@@ -4,7 +4,7 @@
 class gs_parser {
 	
 	private $data;
-	private $registered_handlers;
+	private $registered_handlers=NULL;
 	private $current_handler;
 
 	static function &get_instance($data=null,$gspgtype=null)
@@ -20,13 +20,18 @@ class gs_parser {
 	function __construct($data=null)
 	{
 		if($data) $this->data=$data;
-		$this->registered_handlers=gs_cacher::load('handlers','config');
+
+		
+		$this->registered_handlers= DEBUG ? NULL : gs_cacher::load('handlers','config');
 		if (!$this->registered_handlers) {
+			mlog('WILL REHASH HANDLERS');
 			$init=new gs_init('auto');
 			$init->load_modules();
 			$this->registered_handlers=$this->get_handlers();
+			//mlog($this->registered_handlers);
 			gs_cacher::save($this->registered_handlers,'config','handlers');
 		}
+
 		if ($data) {
 			$this->prepare($data);
 		}

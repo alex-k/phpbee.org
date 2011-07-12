@@ -22,7 +22,7 @@ class gs_base_handler {
 		if (is_array($tpl->template_dir))
 			array_push($tpl->template_dir, $this->tpl_dir);
 		else
-			$tpl->template_dir = $this->tpl_dir;
+			$tpl->template_dir = array($tpl->template_dir,$this->tpl_dir);
 
 		$tpl->assign('tpl',$this);
 		$tpl->assign('_gssession',gs_session::load());
@@ -103,6 +103,8 @@ class gs_base_handler {
 		}
 		$txt=ob_get_contents();
 		ob_end_clean();
+		mlog('template_dir');
+		mlog($tpl->template_dir);
 		$html=$tpl->fetch($tplname);
 		echo $html;
 		mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));

@@ -307,7 +307,8 @@ class gs_config {
 		$this->session_lifetime='2 hours';
 		$this->tmp_dir=$this->var_dir.'tmp/';
 		$this->data_dir=$this->root_dir.'data/';
-		$this->tpl_data_dir=$this->data_dir.'templates/';
+		$this->tpl_data_dir_default=$this->data_dir.'templates/';
+		$this->tpl_data_dir=$this->tpl_data_dir_default;
 		$this->tpl_var_dir=$this->var_dir.'templates_c/';
 		$this->lib_tpl_dir=$this->lib_dir.'smarty/';
 		$this->tpl_plugins_dir=$this->lib_tpl_dir.'plugins/';
@@ -340,8 +341,10 @@ class gs_config {
 	}
 
 	function set_view($view) {
-		$this->tpl_data_dir=$this->data_dir.'templates/'.$view;
-		$this->tpl_var_dir=$this->var_dir.'templates_c/'.$view;
+		if ($this->tpl_data_dir==$this->tpl_data_dir_default) {
+			$this->tpl_data_dir=$this->data_dir.'templates/'.$view;
+			$this->tpl_var_dir=$this->var_dir.'templates_c/'.$view;
+		}
 		cfg_set('_gs_view',$view);
 		check_and_create_dir($this->tpl_var_dir);
 	}
