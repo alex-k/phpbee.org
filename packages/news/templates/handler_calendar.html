@@ -14,5 +14,14 @@
 		</li>
 		{/foreach}
 	</ul>
+	<div class="clear"></div>
+			{controller _class="tw_news_stats" _assign="min_year" _orderby="year" num='>0' _limit=1 _fields='id,year'}
+			<ul class="years">
+				{for $var=$smarty.now|date_format:"%Y" to $min_year->first()->year step -1}
+				{controller _class="tw_news_stats" _assign="y" year=$var num=">0" _fields='id,month' _orderby="month desc" _limit=1}
+				<li>{assign var="r" value=$y->first()}{if $r->month}<a href="/news/{$var}/{$r->month}" {if $var==$year}class="current"{/if}>{$var}</a>{else}{$var}{/if}</li>
+				{/for}
+			</ul>
+	<div class="clear"></div>
 </div>
 <div class="clear"></div>

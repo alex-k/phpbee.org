@@ -51,6 +51,11 @@ class metatags {
 		foreach ($s as $field => $opts) {
 			if (isset($opts['keywords']) && $opts['keywords']>0) {
 				$fields[$field]=$rec->$field;
+				/*md('======',1);
+				var_dump($rec->get_values($field));
+				var_dump('----',1);
+				var_dump($rec->get_modified_values($field));
+				var_dump(intval($rec->is_modified($field)));*/
 				$im+=intval($rec->is_modified($field));
 			}
 		}
@@ -59,6 +64,7 @@ class metatags {
 	
 	static function get_keywords($fields) {
 		if (get_class($fields)=='gs_record') $fields=metatags::get_fields($fields);
+		var_dump($fields);
 		$len=30;
 		$text=strip_tags(implode(' ',$fields));
 		$text=iconv('UTF-8','Windows-1251',$text);
@@ -82,5 +88,4 @@ class metatags {
 		return implode(', ',$keys);
 	}
 }
-
 ?>

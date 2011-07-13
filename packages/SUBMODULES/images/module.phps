@@ -1,5 +1,5 @@
 {%capture assign=DATA%}
-	LINKS::Images::lMany2One tw{%$MODULE_NAME%}:Parent 'Картинки' widget=gallery
+	LINKS::Images::lMany2One tw{%$MODULE_NAME%}:Parent 'Картинки' widget=gallery  counter=false
 	__LINKS::Stats::lMany2One tw{%$MODULE_NAME%}_stats:Parent 'Статсы'
 	__KEYS::Images::ondelete cascade
 {%/capture%}

@@ -23,12 +23,14 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 			'default'=>'gs_base_handler.show404:{name:404.html}',
 		),
 		'handler'=>array(
-			'info'=>'handler_pages.get_info',
+			'info'=>array(
+					'get'=>'handler{%$MODULE_NAME%}.get_info:return:gs_record',
+					'show'=>'gs_base_handler.fetch:name:meta.html:hkey:get',
+			),
 			'/admin/form/tw_pages'=>array(
 					'gs_base_handler.post:return:gs_record:{name:form.html:form_class:g_forms_table:classname:tw{%$MODULE_NAME%}:href:/admin/pages:form_class:form_admin}',
 					'gs_base_handler.redirect:{href:/admin/pages}',
 			),
-			'info'=>'handler{%$MODULE_NAME%}.get_info'
 		),
 		'get_post'=>array(
 			''=>'gs_base_handler.show:{name:pages.html}',
@@ -48,8 +50,9 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 		$info['title']=$rec->title;
 		$info['keywords']=$rec->keywords;
 		$info['description']=$rec->description;
-		$tpl=gs_tpl::get_instance();
-		$tpl->assign('page_info',$info);
+		//$tpl=gs_tpl::get_instance();
+		//$tpl->assign('page_info',$info);
+		return $rec;
 	}
 }
 
@@ -66,5 +69,4 @@ class tw{%$MODULE_NAME%} extends gs_recordset_handler{
 		),$init_opts);
 	}
 }
-
 ?>

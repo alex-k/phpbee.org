@@ -20,12 +20,14 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 	static function get_handlers() {
 		$data=array(
 		'get_post'=>array(
-			''=>array('gs_base_handler.show:{name:news.html}'),
+			''=>'gs_base_handler.show:{name:news.html}',
 			'show/*/*'=>array(
+					//'s'=>'gs_base_handler.validate_gl:{name:show:return:true&e404^555}',
 					'gs_base_handler.validate_gl:{name:show:return:true^e404}',
 					'gs_base_handler.show:{name:news_show.html}',
 					'end',
-					//'e404'=>'gs_base_handler.show404:return:true',
+					'e404'=>'gs_base_handler.show404:return:true',
+					'555'=>'gs_base_handler.show:{name:555.html:return:true}',
 					),
 			'/admin/news'=>'gs_base_handler.show:{name:adm_news.html:classname:tw{%$MODULE_NAME%}}',
 			'/admin/news/delete'=>'admin_handler.deleteform:{classname:tw{%$MODULE_NAME%}}',

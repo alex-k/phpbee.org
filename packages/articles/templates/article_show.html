@@ -1,0 +1,19 @@
+{extends file="index_page.html"}
+{block name="content"}
+{controller _class=tw_articles _assign=n _assign_type=plain id=$_gsdata.gspgid_va.0|replace:".html":"" _fields="id,name,description"}
+{assign var="root" value=$n}
+<div class="top_menu_line">{if $root}{include file="f_path_user.html" root=$root pid=$n.id}{/if}</div>
+<h1>{$n.name}</h1>
+		<ul class="list">
+			<li>
+				{if count($n.Childs)>0}
+				<ul>
+				{foreach from=$n.Childs item="l"}
+					<li><a href="{gl show=$l}">{$l.name}</a></li>
+				{/foreach}
+				</ul>
+				{/if}
+				{$n.description}
+			</li>
+		</ul>
+{/block}

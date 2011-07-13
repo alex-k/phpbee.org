@@ -1,6 +1,6 @@
 {extends file="admin_page.html"}
 {block name="main"}
-	{controller _class=$_gsparams.classname _assign="list" _paging="pagenums:20"}
+	{controller _class=$_gsparams.classname _assign="list" _paging="pagenums:20" _fields="id,subject"}
 	<table class="tb">
 	<thead>
 	<tr><th colspan="8" class="path">Страницы: {$list_paging}</th></tr>

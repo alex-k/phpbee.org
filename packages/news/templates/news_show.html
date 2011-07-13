@@ -12,9 +12,9 @@
 			<div class="h_{%$MODULE%}_{%$NAME%}">{handler scope="module_{%$MODULE%}_{%$NAME%}" gspgid="{%$MODULE%}/{%$NAME%}/list/`$_gsdata.gspgid_v`"}</div>
 		{%/foreach%}
 
-		{%if $SUBMODULES_DATA.MODULE.comments%}
+		{%*if $SUBMODULES_DATA.MODULE.comments%}
 			{handler scope="module_{%$MODULE%}_comments" gspgid="{%$MODULE%}/comments/form/add" Parent_id=$n->get_id()}
-		{%/if%}
+		{%/if*%}
 
 		{%*
 		{%sm_handlers modules="images,comments" gspgid="list"%}
