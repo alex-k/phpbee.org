@@ -253,6 +253,8 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 	public function delete($record) {
 		$this->_cache=array();
 		$rset=$record->get_recordset();
+		md('---------------',1);
+		md($record->get_id(),1);
 		$id=$this->root.DIRECTORY_SEPARATOR.$rset->db_tablename.DIRECTORY_SEPARATOR.$this->split_id($record->get_id());
 		$files=glob($id.DIRECTORY_SEPARATOR.'*');
 		
@@ -332,7 +334,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 				$rid=str_replace('/','',str_replace($fname,'',$f));
 			}
 			$d=array(
-				$rset->id_field_name=>$this->id2int($rid),
+				$rset->id_field_name=>(strlen($rid)==GS_DB_FILE_ID_LENGTH) ? $this->id2int($rid) : $rid,
 				);
 			foreach ($fields as $field) {
 				if (!isset($d[$field])) $d[$field]=file_exists($f.DIRECTORY_SEPARATOR.$field) ? file_get_contents($f.DIRECTORY_SEPARATOR.$field) : NULL;
