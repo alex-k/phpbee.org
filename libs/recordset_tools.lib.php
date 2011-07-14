@@ -227,10 +227,15 @@ class field_interface {
 	
 	static function lMany2One($field,$opts,&$structure,$init_opts) {
 		list($rname,$linkname)=explode(':',$opts['linked_recordset']);
-		$obj=new $rname();
+				// если в init_opts такой же рекордсет что и в $opts['linked_recordset'] - то не надо создавать новый объект, иначе скрипт уходит в рекурсию
+		if ($init_opts['recordset']!=$rname) {
+			$obj=new $rname();
+			$obj_rs=$obj->structure['recordsets'][$linkname];
+		} else {
+			$obj_rs=$structure['recordsets'][$linkname];
+		}
 		//if(isset($init_opts['skip_many2many'])) return;
 		//$obj=new $rname(array('skip_many2many'=>true));
-		$obj_rs=$obj->structure['recordsets'][$linkname];
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$rname,
 			'local_field_name'=>isset($opts['local_field_name']) ? $opts['local_field_name'] : 'id',
