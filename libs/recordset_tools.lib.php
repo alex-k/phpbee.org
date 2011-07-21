@@ -210,7 +210,7 @@ class field_interface {
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
-			'nulloption'=>(isset($opts['nulloption']) && $opts['nulloption'] && strtolower($opts['nulloption'])!='false') ? true : false ,
+			'nulloption'=>(isset($opts['nulloption']) && $opts['nulloption'] && strtolower($opts['nulloption'])!='false') ? explode(':',$opts['nulloption']) : false ,
 		);
 		$structure['indexes'][$fname]=$fname;
 		$structure['recordsets'][$field]=array(
