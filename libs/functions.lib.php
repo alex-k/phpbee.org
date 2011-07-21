@@ -237,4 +237,8 @@ function rrmdir($dir) {
 	}
 }
 
+function gsdict($t) {
+	return gs_dict::get($t);
+}
+
 ?>

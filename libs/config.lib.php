@@ -51,6 +51,7 @@ class gs_init {
 		gs_cacher::clear('classes','config');
 		$o_h=new gs_parser();
 		$handlers=$o_h->get_registered_handlers();
+		mlog($handlers);
 		gs_cacher::save($handlers,'config','handlers');
 
 		$cl_array=array();
@@ -177,6 +178,8 @@ class gs_init {
 
 	public function load_modules($mask='*module.{php,xphp}') {
 		if ($this->check_compile_modules()) {
+			$init=new gs_init('user');
+			$init->init(LOAD_CORE | LOAD_STORAGE | LOAD_TEMPLATES | LOAD_EXTRAS);
 			$this->compile_modules();
 			$this->save_handlers();
 		}
@@ -559,8 +562,7 @@ function __gs_autoload($class_name) {
 spl_autoload_register('__gs_autoload');
 
 
-set_exception_handler('gs_exception_handler');
+//set_exception_handler('gs_exception_handler');
 
-//echo $config->root_dir;
 
 ?>
