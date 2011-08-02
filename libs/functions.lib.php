@@ -9,6 +9,7 @@ function html_redirect($gspgid=null,$data=array(),$type='302') {
 		$scheme=parse_url($gspgid,PHP_URL_SCHEME);
 		$url=$scheme ? $gspgid : $config->www_dir.$gspgid;
 	}
+	$url=cfg('www_dir').$url;
 	$url='/'.ltrim($url,'/');
 	$data=array_merge($query,$data);
 	$datastr='';

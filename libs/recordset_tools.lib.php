@@ -84,6 +84,7 @@ class field_interface {
 			'type'=>'checkbox',
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
+			'index'=>isset($opts['index']) ? $opts['index'] : 0,
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumber'
 		);
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
@@ -93,6 +94,7 @@ class field_interface {
 		$structure['htmlforms'][$field]=array(
 			'type'=>'input',
 			'hidden'=>$opts['hidden'],
+			'index'=>isset($opts['index']) ? $opts['index'] : 0,
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumber'
 		);
@@ -115,6 +117,7 @@ class field_interface {
 		$structure['htmlforms'][$field]=array(
 			'type'=>'datetime',
 			'hidden'=>$opts['hidden'],
+			'index'=>isset($opts['index']) ? $opts['index'] : 0,
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isDate'
 		);
@@ -177,6 +180,7 @@ class field_interface {
 		$structure['htmlforms'][$field]=array(
 			'type'=>'Select',
 			'hidden'=>$opts['hidden'],
+			'index'=>isset($opts['index']) ? $opts['index'] : 0,
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
 			'options'=>array_combine(explode(',',$opts['values']),explode(',',$opts['values'])),

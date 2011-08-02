@@ -11,6 +11,11 @@ ini_set('display_errors','On');
 error_reporting(E_ALL);
 }
 
+if (!defined('PHP_VERSION_ID')) {
+    $version = explode('.', PHP_VERSION);
+    define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+}
+
 class gs_init {
 	
 	public $config;
@@ -554,7 +559,6 @@ class gs_var_storage {
 
 
 function __gs_autoload($class_name) {
-	mlog('AUTOLOAD '.$class_name);
 	$classes=gs_cacher::load('classes','config');
 	if (array_key_exists($class_name,$classes)) load_file($classes[$class_name]);
 }
