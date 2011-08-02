@@ -107,7 +107,7 @@ class gs_base_handler {
 		mlog($tpl->template_dir);
 		$html=$tpl->fetch($tplname);
 		echo $html;
-		mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
+		if (function_exists('memory_get_usage',0)) mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
 		if (DEBUG && !$nodebug) {
 			$g=gs_logger::get_instance();
 			$g->console();
@@ -326,7 +326,7 @@ class gs_base_handler {
 		return $this->redirect();
 	}
 	function redirect() {
-		return html_redirect($this->params['href']);
+		return html_redirect(isset($this->params['href']) ? $this->params['href']: null);
 	}
 	function many2one() {
 		if (isset($this->data['gspgid_va'][4]) && $this->data['gspgid_va'][4]=='delete') {
@@ -388,6 +388,7 @@ class gs_base_handler {
 		$s_handler_cnt=cfg_set('s_handler_cnt',cfg('s_handler_cnt')+1);
 
 		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
+
 		if (isset($data['gspgid_form']) && $data['gspgid_form']==$params['gspgid']) {
 			$gspgid_form=$data['gspgid_form'];
 			$c=new gs_data_driver_post;
@@ -411,10 +412,9 @@ class gs_base_handler {
 		if (!isset($data['gspgid_root'])) {
 			$data['gspgid_root']=$data['gspgid'];
 		}
-		$data['gspgid_handler']=$data['gspgid'];
+		$data['gspgid_handler']=isset($data['gspgid']) ? $data['gspgid'] : '';
 		$data['gspgid']=$params['gspgid'];
 		$data['handler_params']=$params;
-		
 
 
 		$tpl=gs_tpl::get_instance();
@@ -431,9 +431,10 @@ class gs_base_handler {
 		$assign['handler_params']=$params;
 
 		$tpl->assign($assign);
-
 		
-		$o_p=gs_parser::get_instance($data,'handler');
+		
+		if (isset($params['gspgtype'])) $data['gspgtype'] = $params['gspgtype'] ;
+		$o_p=gs_parser::get_instance($data,isset($params['gspgtype']) ? $params['gspgtype'] : 'handler');
 		if (isset($params['scope'])) {
 			$hndl=$o_p->get_current_handler();
 			if ($hndl['params']['module_name']!=$params['scope']) return '';
