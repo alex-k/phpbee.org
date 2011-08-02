@@ -58,10 +58,12 @@ function smarty_function_validate($params, &$smarty) {
     $_func_name = 'smarty_validate_criteria_' . $criteria;
 
     if(!function_exists($_func_name)) {
-	//if($_plugin_file = $smarty->_get_plugin_filepath('validate_criteria', $criteria)) {
-	if($_plugin_file = $smarty->plugins_dir[0].'validate_criteria.'.$criteria.'.php') {
+	$smarty->smarty->include_plugin('validate_criteria',$criteria);
+	/*
+	if($_plugin_file = $smarty->_get_plugin_filepath('validate_criteria', $criteria)) {
 	    include_once($_plugin_file);
 	    } 
+	*/
     }
     $value=$smarty->getTemplateVars($params[field]);
     $smarty->_validate_processed=1;

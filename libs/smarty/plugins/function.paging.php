@@ -9,7 +9,8 @@ function smarty_function_paging($params, &$smarty) {
 
 	$type=is_string($params[type]) ? $params[type] : "simple";
 	$strip_data=is_numeric($params[strip_data]) ? $params[strip_data] : 1;
-	$source=is_array($smarty->_tpl_vars[$sourcename]) ? $smarty->_tpl_vars[$sourcename] : array();
+	//$source=is_array($smarty->_tpl_vars[$sourcename]) ? $smarty->_tpl_vars[$sourcename] : array();
+	$source=is_array($smarty->getTemplateVars($sourcename)) ? $smarty->getTemplateVars($sourcename) : array();
 	$total_items=count($source);
 	$firstitemname="firstitem_$sourcename";
 	$first_item=is_numeric($_POST[$firstitemname]) && $_POST[$firstitemname]<=$total_items ? $_POST[$firstitemname] : 1;
@@ -48,7 +49,7 @@ function smarty_function_paging($params, &$smarty) {
 				$nh="[$a] ";
 				$h="[<a class=atable href=\"$href$firstitemname=$i\">$a</a>] ";
 				if ($i>=$first_item+$itemsperpage || $j<$first_item ) {
-					if ($a%10==0 || $a==1 || $j==$total_items || abs($i-$first_item)<3*$itemsperpage) {
+					if ( ($a%10==0 && abs($i-$first_item)<50*$itemsperpage) || $a%100==0 || $a==1 || $j==$total_items || abs($i-$first_item)<3*$itemsperpage) {
 						$ret.="[<a class=atable href=\"$href$firstitemname=$i\">$a</a>] ";
 					}
 				} else {

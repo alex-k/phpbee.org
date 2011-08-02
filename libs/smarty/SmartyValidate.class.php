@@ -317,12 +317,19 @@ class SmartyValidate {
             $_func_name = 'smarty_validate_transform_' . $name;
             if(!function_exists($_func_name)) {            
                 $_smarty_obj =& SmartyValidate::_object_instance('Smarty', $_dummy);
+		/*
                 if($_plugin_file = $_smarty_obj->_get_plugin_filepath('validate_transform', $name)) {
                     include_once($_plugin_file);
                 } else {
                     trigger_error("SmartyValidate: [is_valid] transform function '$name' was not found.");
                     return false;                    
                 }
+		*/
+		if (!$_smarty_obj->include_plugin('validate_transform',$name)) {
+			trigger_error("SmartyValidate: [is_valid] transform function '$name' was not found.");
+			return false;
+		}
+			
             }
         }
         if(strpos($_func_name,'->') !== false) {
@@ -416,12 +423,18 @@ class SmartyValidate {
             $_func_name = 'smarty_validate_criteria_' . $criteria;
             if(!function_exists($_func_name)) {            
                 $_smarty_obj =& SmartyValidate::_object_instance('Smarty', $_dummy);
+		if (!$_smarty_obj->include_plugin('validate_criteria',$criteria)) {
+			trigger_error("SmartyValidate: [is_valid] criteria function '$criteria' was not found.");
+			return false;
+		}
+		/*
                 if($_plugin_file = $_smarty_obj->_get_plugin_filepath('validate_criteria', $criteria)) {
                     include_once($_plugin_file);
                 } else {
                     trigger_error("SmartyValidate: [is_valid] criteria function '$criteria' was not found.");
                     return false;                    
                 }
+		*/
             }
         }
         if(strpos($_func_name,'->') !== false) {
