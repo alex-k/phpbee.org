@@ -220,7 +220,7 @@ class field_interface {
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$opts['linked_recordset'],
 			'local_field_name'=>$fname,
-			'foreign_field_name'=>'id',
+			'foreign_field_name'=>isset($opts['foreign_field_name']) ? $opts['foreign_field_name'] : 'id',
 			'update_recordset'=>$opts['linked_recordset'],
 			'mode'=>isset($opts['mode']) ? $opts['mode'] : null,
 			);

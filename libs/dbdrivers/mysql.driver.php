@@ -86,7 +86,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		}
 		if (isset($cinfo['codepage']) && !empty($cinfo['codepage'])) {
 			$this->query(sprintf('SET NAMES %s COLLATE %s_general_ci',$cinfo['codepage'],$cinfo['codepage']));
-			//$this->query(sprintf('SET NAMES %s',$cinfo['codepage']));
+		//	$this->query(sprintf('SET NAMES %s',$cinfo['codepage']));
 		}
 	}
 
