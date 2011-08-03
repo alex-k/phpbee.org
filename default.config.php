@@ -1,6 +1,6 @@
 <?
 	$this->gs_connectors=array (
-			'mysql'=>array( 'db_type'=>'mysql', 'db_hostname'=>'127.0.0.1','db_port'=>'3306','db_username'=>'root','db_password'=>'root','db_database'=>'test'),
+			'mysql'=>array( 'db_type'=>'mysql', 'db_hostname'=>'127.0.0.1','db_port'=>'3306','db_username'=>'root','db_password'=>'root','db_database'=>'test','codepage'=>'utf8'),
 			'file_public'=>array( 
 				'db_type'=>'file',
 				'db_root'=>$this->document_root.'files',
