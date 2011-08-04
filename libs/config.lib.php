@@ -51,12 +51,21 @@ class gs_init {
 		}
 	}
 
+	function h_sort($a,$b) {
+		$c1=preg_match_all('|/|',$a,$c);
+		$c2=preg_match_all('|/|',$b,$c);
+		return $c1==$c2 ? strcmp($a,$b) : $c1-$c2;
+	}
+
 	function save_handlers() {
 		gs_cacher::clear('handlers','config');
 		gs_cacher::clear('classes','config');
 		$o_h=new gs_parser();
 		$handlers=$o_h->get_registered_handlers();
-		mlog($handlers);
+		foreach ($handlers as $k=>$h) {
+			uksort($h,array($this,'h_sort'));
+			$handlers[$k]=$h;
+		}
 		gs_cacher::save($handlers,'config','handlers');
 
 		$cl_array=array();
