@@ -77,7 +77,6 @@ class gs_init {
 		}
 		mlog($cl_array);
 		gs_cacher::save($cl_array,'config','classes');
-		//var_dump(gs_cacher::load('handlers','config'));
 	}
 
 	function check_compile_modules($path='') {
@@ -295,10 +294,12 @@ class gs_config {
 	{
 		if (!isset($_SERVER['REQUEST_METHOD'])) $_SERVER['REQUEST_METHOD']='UNKNOWN';
 		if (!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST']='localhost';
-		if (!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI']=__FILE__;
+		if (!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI']=clean_path(__FILE__);
 
 		$this->host=$_SERVER['HTTP_HOST'];
-		$this->root_dir=clean_path(dirname(dirname(__FILE__))).'/';
+		$this->root_dir=__FILE__;
+		$this->root_dir=str_replace('phar://','',$this->root_dir);
+		$this->root_dir=clean_path(dirname(dirname($this->root_dir))).'/';
 		$this->root_dir=str_replace('\\','/',$this->root_dir);
 		$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
 		$this->document_root=$_document_root;
@@ -315,7 +316,7 @@ class gs_config {
 		$this->index_filename=$_SERVER['SCRIPT_NAME'];
 		$this->referer= isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
 		$this->referer_path= isset($_SERVER['HTTP_REFERER']) ?  preg_replace("|^$this->www_dir|",'',parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH)) : '';
-		$this->lib_dir=$this->root_dir.'libs/';
+		$this->lib_dir=strpos(__FILE__,'phar://')==0  ? pathinfo(__FILE__,PATHINFO_DIRNAME).'/' : $this->root_dir.'libs/';
 		$this->var_dir=$this->root_dir.'var/';
 		$this->img_dir=$this->root_dir.$this->www_image_dir;
 		$this->log_dir=$this->var_dir.'log/';
@@ -526,7 +527,8 @@ function load_file($file,$return_contents=FALSE,$return_file=FALSE)
 
 
 function clean_path($path) {
-	return str_replace('\\','/',$path);
+	$path=str_replace('\\','/',$path);
+	return $path;
 }
 
 function stripslashes_deep($value)
