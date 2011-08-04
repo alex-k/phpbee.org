@@ -41,7 +41,9 @@ class gs_widget_label extends gs_widget{
 }
 class gs_widget_input extends gs_widget{
 		function html() {
-				return sprintf('<input class="fString" type="text" name="%s" value="%s">', $this->fieldname,htmlspecialchars(trim($this->value)));
+				return sprintf('<input class="%s" type="text" name="%s" value="%s">',
+					isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fString',
+					 $this->fieldname,htmlspecialchars(trim($this->value)));
 		}
 }
 
@@ -78,7 +80,9 @@ class gs_widget_hidden extends gs_widget{
 }
 class gs_widget_text extends gs_widget{
 		function html() {
-				return sprintf('<textarea class="fText" name="%s">%s</textarea>', $this->fieldname,trim($this->value));
+				return sprintf('<textarea class="%s" name="%s">%s</textarea>', 
+					 isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fText',
+					 $this->fieldname,trim($this->value));
 		}
 }
 /*class gs_widget_image extends gs_widget{
@@ -105,7 +109,9 @@ class gs_widget_wysiwyg extends gs_widget{
 		}
 
 		function html() {
-				return sprintf('<textarea class="fWysiwyg" name="%s" _images="lMany2One_%s">%s</textarea>', $this->fieldname,$this->params['images_key'],trim($this->value));
+				return sprintf('<textarea class="%s" name="%s" _images="lMany2One_%s">%s</textarea>',
+				 isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fWysiwyg',
+				 $this->fieldname,$this->params['images_key'],trim($this->value));
 		}
 }
 

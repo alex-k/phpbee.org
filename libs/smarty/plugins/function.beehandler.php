@@ -1,4 +1,3 @@
-<pre>
 <?php
 function smarty_function_beehandler($params, &$smarty) {
 	if (isset($params['path']) && !class_exists('gs_base_handler',0)) {
