@@ -50,39 +50,39 @@ class gs_parser {
 		$data['gspgid_a']=explode('/',$data['gspgid']);
 		$this->data=$data;
 	}
-	function url_compare($gspgid,$url) {
-		$g=explode('/',$gspgid);
-		$u=empty($url) ? array() : explode('/',$url);
-		if (count($g)<count($u)) return -2;
-		
-		$cnt=0;
-		for ($k=0;$k<min(count($g),count($u));$k++) {
-			$cnt++;
-			if($u[$k]=='*') continue;
-			if ($u[$k]!=$g[$k]) return -1;
-			$cnt+=10;
-		}
-		return $cnt;
-	}
-	function find_handler($urls,$gspgid) {
-		$result=array('key'=>null,'handler'=>array());
-		if ($gspgid=='' && isset($urls[''])) {
-			$result['key']='';
-			$result['handler']=$urls[''];
-			return $result;
-		}
-		$max_c=-1;
-		foreach ($urls as $url=>$h) {
-			$c=$this->url_compare(trim($gspgid,'/'),trim($url,'/'));
-			if ($c==-2) break;
-			if ($c>$max_c) {
-				$max_c=$c;
-				$result['key']=$url;
-				$result['handler']=$h;
-			}
-		}
-		return $result;
-	}
+        function url_compare($gspgid,$url) {
+                $g=explode('/',$gspgid);
+                $u=empty($url) ? array() : explode('/',$url);
+                if (count($g)<count($u)) return -1;
+
+                $cnt=0;
+                for ($k=0;$k<min(count($g),count($u));$k++) {
+                        $cnt++;
+                        if($u[$k]=='*') continue;
+                        if ($u[$k]!=$g[$k]) return -1;
+                        $cnt+=10;
+                }
+                return $cnt;
+        }
+        function find_handler($urls,$gspgid) {
+                $result=array('key'=>null,'handler'=>array());
+                if ($gspgid=='' && isset($urls[''])) {
+                        $result['key']='';
+                        $result['handler']=$urls[''];
+                        return $result;
+                }
+                $max_c=-1;
+                foreach ($urls as $url=>$h) {
+                        $c=$this->url_compare(trim($gspgid,'/'),trim($url,'/'));
+                        if ($c>$max_c) {
+                                $max_c=$c;
+                                $result['key']=$url;
+                                $result['handler']=$h;
+                        }
+                }
+                return $result;
+        }
+
 	
 	function get_current_handler() {
 		return $this->parse_val(reset($this->current_handler));
