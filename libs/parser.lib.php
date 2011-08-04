@@ -53,7 +53,7 @@ class gs_parser {
 	function url_compare($gspgid,$url) {
 		$g=explode('/',$gspgid);
 		$u=empty($url) ? array() : explode('/',$url);
-		if (count($g)<count($u)) return -1;
+		if (count($g)<count($u)) return -2;
 		
 		$cnt=0;
 		for ($k=0;$k<min(count($g),count($u));$k++) {
@@ -74,6 +74,7 @@ class gs_parser {
 		$max_c=-1;
 		foreach ($urls as $url=>$h) {
 			$c=$this->url_compare(trim($gspgid,'/'),trim($url,'/'));
+			if ($c==-2) break;
 			if ($c>$max_c) {
 				$max_c=$c;
 				$result['key']=$url;
