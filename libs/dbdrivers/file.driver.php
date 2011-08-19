@@ -146,6 +146,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 	}
 	function get_id($tablename) {
 		$cname=$this->root.DIRECTORY_SEPARATOR.$tablename.DIRECTORY_SEPARATOR.'counter';
+		check_and_create_dir(dirname($cname));
 		$counter=file_exists($cname) ?  file_get_contents($cname)+1 : 0;
 
 		$r_id=$this->_get_id($tablename,$counter);
