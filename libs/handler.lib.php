@@ -120,7 +120,7 @@ class gs_base_handler {
 		$classname=$params['classname'];
 		$obj=new $classname;
 		$fields=array_keys($obj->structure['fields']);
-		if ($id || is_numeric($id)) {
+		if ($id && is_numeric($id)) {
 			$rec=$obj->get_by_id($id,$fields);
 		} else {
 			$rec=$obj->new_record();
@@ -319,7 +319,7 @@ class gs_base_handler {
 	}
 	function redirect_gl($ret) {
 		if (isset($this->params['gl'])) {
-			$this->params['href']=call_user_func($this->params['module_name'].'::gl',$this->params['gl'],$ret['last']);
+			$this->params['href']=call_user_func($this->params['module_name'].'::gl',$this->params['gl'],$ret['last'],$this->data);
 		} else if (isset($this->params['href'])) {
 			$this->params['href']=trim($this->params['href'],'/').'/'.$ret['last']->get_id();
 		}

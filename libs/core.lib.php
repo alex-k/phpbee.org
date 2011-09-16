@@ -110,7 +110,8 @@ class gs_iterator implements Iterator, arrayaccess {
 	    if ((is_subclass_of($element,'gs_record') || get_class($element)=='gs_record') && ($id!==NULL || $element->get_id() ) ) {
 		    return $this->array[ $id!==NULL ? $id : $element->get_id()]=$element;
 	    }
-	    return $this->array[]=$element;
+	    $this->array[]=$element;
+		return $this;	
     }
 
     function add($elements,$id=NULL) {
@@ -118,7 +119,7 @@ class gs_iterator implements Iterator, arrayaccess {
 		    foreach($elements as $e) {
 			    $this->add_element($e,$id);
 		    }
-		    return true;
+		    return $this;
 	    }
 	    return $this->add_element($elements,$id);
     }

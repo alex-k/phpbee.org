@@ -332,11 +332,32 @@ class g_forms_table extends  g_forms_html {
          $this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
     }
 }
+class g_forms_inline extends  g_forms_html {
+    function __construct($h,$data=array(),$rec=null)  {
+         parent::__construct($h,$data,$rec);
+         $this->view = new gs_glyph('helper',array('class'=>'inline'));
+         $this->view->addNode('helper',array('class'=>'inline'),array_keys($h));
+    }
+}
+class g_forms_empty extends  g_forms_html {
+    function __construct($h,$data=array(),$rec=null)  {
+         parent::__construct($h,$data,$rec);
+         $this->view = new gs_glyph('helper',array('class'=>'empty'));
+         $this->view->addNode('helper',array('class'=>'empty'),array_keys($h));
+    }
+}
 class g_forms_table_submit extends  g_forms_html {
     function __construct($h,$data=array(),$rec=null)  {
          parent::__construct($h,$data,$rec);
          $this->view = new gs_glyph('helper',array('class'=>'table_submit'));
          $this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
+    }
+}
+class g_forms_divbox extends  g_forms_html {
+    function __construct($h,$data=array(),$rec=null)  {
+         parent::__construct($h,$data,$rec);
+         $this->view = new gs_glyph('helper',array('class'=>'empty'));
+         $this->view->addNode('helper',array('class'=>'divbox'),array_keys($h));
     }
 }
 

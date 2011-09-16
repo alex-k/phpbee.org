@@ -101,7 +101,6 @@ abstract class gs_recordset_base extends gs_iterator {
 	public function recordset_as_string_array() {
 		$ret=array();
 		foreach ($this as $rec) {
-			//var_dump($rec->get_id());
 			if($rec->get_id()) $ret[$rec->get_id()]=trim($rec);
 		}
 		return $ret;

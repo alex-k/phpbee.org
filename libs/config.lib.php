@@ -8,7 +8,7 @@ DEFINE ('LOAD_EXTRAS',8);
 
 if (defined('DEBUG') && DEBUG) {
 ini_set('display_errors','On');
-error_reporting(E_ALL);
+error_reporting(E_ALL ^E_NOTICE);
 }
 
 if (!defined('PHP_VERSION_ID')) {
@@ -346,7 +346,7 @@ class gs_config {
 		if (!defined('DEBUG')) define('DEBUG',FALSE);
 		if (DEBUG) {
 		ini_set('display_errors','On');
-		error_reporting(E_ALL);
+		error_reporting(E_ALL ^E_NOTICE);
 		}
 
 	}

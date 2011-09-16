@@ -1,7 +1,7 @@
 <?php
 
 $config=gs_config::get_instance();
-load_file($config->lib_tpl_dir.'Smarty.class.php');
+if (!class_exists('Smarty',FALSE)) load_file($config->lib_tpl_dir.'Smarty.class.php');
 
 class gs_Smarty extends Smarty {
 	function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false) {

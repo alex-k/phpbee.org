@@ -94,7 +94,7 @@ class field_interface {
 	static function fInt($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'int');
 		$structure['htmlforms'][$field]=array(
-			'type'=>'input',
+			'type'=>'number',
 			'hidden'=>$opts['hidden'],
 			'index'=>isset($opts['index']) ? $opts['index'] : 0,
 			'verbose_name'=>$opts['verbose_name'],

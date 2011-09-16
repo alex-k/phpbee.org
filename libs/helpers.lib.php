@@ -53,13 +53,21 @@ class helper_table {
 
 class helper_empty {
 	function show($label,$txt,$errors=array()) {
-		return sprintf('%s',$txt);
+		$e = $errors ? '<span class="error">*</span>' : '';
+		return sprintf('%s%s',$txt,$e);
+	}
+}
+class helper_divbox{
+	function show($label,$txt,$errors=array()) {
+		$e = $errors ? '<span class="error">*</span>' : '';
+		return sprintf('<div class="divbox"><label>%s%s<br>%s</label></div>',$label,$e,$txt);
 	}
 }
 
 class helper_inline {
 	function show($label,$txt,$errors=array()) {
-		return sprintf('<div class="inline"><div>%s</div>%s</div>',$label,$txt);
+		$e = $errors ? '<span class="error">*</span>' : '';
+		return sprintf('<span class="inline"><label>%s%s%s</label></span>',$label,$txt,$e);
 	}
 }
 
