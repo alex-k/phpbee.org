@@ -1,0 +1,82 @@
+<?php
+gs_dict::append(array(
+	));
+
+class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
+	function __construct() {
+	}
+	function install() {
+		foreach(array(
+		<*foreach from=$module->recordsets item=rs*>
+			'<*$rs->name*>',
+		<*/foreach*>
+		) as $r){
+			$this->$r=new $r;
+			$this->$r->install();
+		}
+	}
+	
+	function get_menu() {
+		return '<a href="/admin/<*$module->name*>/"><*$module->title*></a>';
+	}
+	
+	static function get_handlers() {
+		$data=array(
+<*foreach from=$urls key=type item=handler*>
+'<*$type*>'=>array(
+<*foreach from=$handler key=type item=url*>
+'<*$url->gspgid_value*>'=>array(
+<*foreach from=$url->Handlers item=h*> <*if !$h->handler_keyname|is_numeric*>'<*$h->handler_keyname*>'=><*/if*> '<*$h->handler_value*>', 
+<*/foreach*>
+),
+<*/foreach*>
+),
+<*/foreach*>
+		);
+		return self::add_subdir($data,dirname(__file__));
+	}
+
+	static function gl($alias,$rec) {
+		if(!is_object($rec)) {
+			$obj=new tw{%$MODULE_NAME%};
+			$rec=$obj->get_by_id(intval($rec));
+		}
+		switch ($alias) {
+			case '___show____':
+				return sprintf('/{%$MODULE%}/show/%s/%d.html',
+						date('Y/m',strtotime($rec->date)),
+						$rec->get_id());
+			break;
+		}
+	}
+}
+
+class handler{%$MODULE_NAME%} extends gs_base_handler {
+}
+
+<*foreach from=$module->recordsets item=rs*>
+
+class <*$rs->name*> extends gs_recordset_short {
+	function __construct($init_opts=false) { parent::__construct(array(
+
+		<*foreach from=$rs->Fields item=f*>
+
+			'<*$f->name*>'=>'<*$f->type*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*> <*if $f->default_value*>default="<*$f->default_value*>" <*/if*> <*if $f->options*>options="<*$f->options*>" <*/if*> <*if $f->required*>required="<*$f->required*>" <*/if*> ',
+
+		<*/foreach*>
+		{%foreach from=$SUBMODULES_DATA.LINKS key=K item=L%}
+			'{%$K%}'=>"{%$L%}",
+		{%/foreach%}
+		),$init_opts);
+		
+	}
+
+}
+
+<*/foreach*>
+
+
+
+
+
+?>
