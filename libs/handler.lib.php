@@ -1,11 +1,16 @@
 <?php
-class gs_base_handler {
+abstract class gs_handler {
 	protected $blocks;
 	protected $data;
 	protected $params;
 	public function __construct($data=null,$params=null) {
 		$this->data=$data;
 		$this->params=$params;
+	}
+}
+class gs_base_handler extends gs_handler {
+	public function __construct($data=null,$params=null) {
+		parent::__construct($data,$params);
 
 		$config=gs_config::get_instance();
 		//$filename=$config->class_files[$this->params['module_name']];
@@ -328,6 +333,9 @@ class gs_base_handler {
 	function redirect() {
 		return html_redirect(isset($this->params['href']) ? $this->params['href']: null);
 	}
+	function redirect_up() {
+		return (isset($this->data['gspgid_va'][1])) ? html_redirect(dirname($this->data['gspgid_root'])) : html_redirect();
+	}
 	function many2one() {
 		if (isset($this->data['gspgid_va'][4]) && $this->data['gspgid_va'][4]=='delete') {
 			$rid=intval($this->data['gspgid_va'][5]);
@@ -410,7 +418,7 @@ class gs_base_handler {
 
 		ob_start();
 		if (!isset($data['gspgid_root'])) {
-			$data['gspgid_root']=$data['gspgid'];
+			$data['gspgid_root']=$s_data['gspgid'];
 		}
 		$data['gspgid_handler']=isset($data['gspgid']) ? $data['gspgid'] : '';
 		$data['gspgid']=$params['gspgid'];

@@ -384,7 +384,9 @@ function cfg_set($name,$value) {
 
 function cfg($name) {
 	$config=gs_config::get_instance();
-	return isset($config->$name) ? $config->$name : NULL ;
+	if (isset($config->$name)) return $config->$name ;
+	if (method_exists($config,$name)) return $config->$name();
+	return NULL ;
 }
 function mlog($data) {
 	$log=gs_logger::get_instance();
