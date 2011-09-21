@@ -1,89 +1,43 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
 <head>
-{handler gspgid="/pages/info"}
-{block name="header"}
-<title>{$page_info.title|default:''}</title>
-<meta name="keywords" content="{$page_info.keywords|default:''}">
-<meta name="description" content="{$page_info.description|default:''}">
-{/block}
-<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-<meta name="Powered_By" content="VPA(tm) Engine Copyright(C) 2010-2011">
-<meta name="Developed_By" content="Андрей Пахомов">
+	<title>{block name=title}TITLE{/block}</title>
 
-<link href="/css/main.css" rel="stylesheet" type="text/css" title="CSS for site" />
-<link rel="shortcut icon" href="/i/favicon.ico" />
-<script type="text/javascript" src="/js/jquery.min.js"></script>
-<script type="text/javascript" src="/js/jquery-ui.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/layout.css" media="screen" />
+	<link href="/css/main.css" rel="stylesheet" type="text/css" title="CSS for site" />
+	<link rel="shortcut icon" href="/i/favicon.ico" />
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/jquery-ui.js"></script>
+	<script type="text/javascript" src="/js/common.js"></script>
 </head>
 <body>
-<div class="center">
-	<a href="/" class="logo"><img src="/i/logo.gif" alt="Болгария в деталях"></a>
-	{*<ul class="langs">
-		<li>РУС</li>
-		<li><a href="#">БОЛ</a></li>
-	</ul>*}
-	<div class="top_ad"><a href="#"><img src="/i/ban_horiz.gif"></a></div>
-	<div class="menu">
-		<ul>
-			<li><a href="#">Получение визы</a></li>
-			<li><a href="#">Посольства и консульства</a></li>
-			<li><a href="#">О Богларии</a></li>
-			<li><a href="#">Недвижимость</a></li>
-			<li><a href="#">Болгарское гражданство</a></li>
-			<li><a href="#">Для болгарских граждан</a></li>
-			<li><a href="#">Бизнес</a></li>
-			<li><a href="#">Учеба и работа</a></li>
-		</ul>
-		<ul class="two">
-			<li><a href="/news">Новости</a></li>
-			<li><a href="#">Форум</a></li>
-		</ul>
-		<ul class="bans">
-			<li>{handler gspgid="auth/formlogin"}</li>
-			<li><a href="#"><img src="/i/ban_left.gif" alt=""></a></li>
-			<li><a href="#"><img src="/i/ban_left.gif" alt=""></a></li>
-		</ul>
-	</div>
-	<div class="content">
-	{block name="content"}
-		<h1>Все о республике Болгария</h1>
-		<div class="map">
-		{handler gspgid="/articles/main"}
+
+<div id="header">
+HEADER
+</div>
+<div class="colmask threecol">
+	<div class="colmid">
+		<div class="colleft">
+			<div class="col1">
+				CENTER
+					{block name="center"}content_block_center{/block}
+			</div>
+			<div class="col2">
+				LEFT
+					{block name="left"}content_block_left{/block}
+
+			</div>
+			<div class="col3">
+				RIGHT
+					{block name="right"}content_block_right{/block}
+			</div>
 		</div>
-		<div class="main_news">
-			<a href="/news/"><h2>Новости</h2></a>
-				
-				{handler gspgid="/news/last/2"}
-		</div>
-		<div class="visa">
-			<h3>Заявление на получение болгарской визы</h3>
-			<a href="#" class="ico_arch">Cкачать в архиве</a>
-			<a href="#" class="ico_word">Скачать в формате Word</a>
-		</div>
-		<div class="clear"></div>
-		<div class="bottom_ad"><a href="#"><img src="/i/ban_horiz.gif"></a></div>
-		{/block}
-	</div>
-	<div class="clear"></div>
-	<div class="footer">
-		<div class="copy">&copy; 2011 &laquo;Болгария в деталях&raquo;<br><br><a href="http://expo-vpa.ru">Создание сайта: expo-vpa.ru</a></div>
-		<ul>
-			<li><a href="#">Получение визы</a></li>
-			<li><a href="#">Посольства и консульства</a></li>
-			<li><a href="#">О Богларии</a></li>
-			<li><a href="#">Недвижимость</a></li>
-			<li><a href="#">Болгарское гражданство</a></li>
-			<li><a href="#">Для болгарских граждан</a></li>
-			<li><a href="#">Бизнес</a></li>
-			<li><a href="#">Учеба и работа</a></li>
-		</ul>
-		<ul class="two">
-			<li><a href="/news">Новости</a></li>
-			<li><a href="#">Форум</a></li>
-		</ul>
 	</div>
 </div>
+<div id="footer">
+FOOTER
+</div>
+
 </body>
 </html>
+
