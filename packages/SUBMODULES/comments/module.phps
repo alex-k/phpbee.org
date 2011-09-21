@@ -37,7 +37,7 @@ class tw{%$MODULE_NAME%} extends gs_recordset_handler{
 	function __construct($init_opts=false) {
 		parent::__construct( array(
 			'CommentText'=>"fText комментарий",
-			'Parent'=>"lOne2One tw_{%$PARENT_MODULE%} _mode=link widget=parent_list Parent",
+			'Parent'=>"lOne2One {%$PARENT_RECORDSET%} _mode=link widget=parent_list Parent",
 		{%foreach from=$SUBMODULES_DATA.LINKS key=K item=L%}
 			'{%$K%}'=>"{%$L%}",
 		{%/foreach%}

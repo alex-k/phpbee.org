@@ -41,7 +41,7 @@ class tw{%$MODULE_NAME%} extends tw_images {
 	function __construct($init_opts=false) {
 		parent::__construct( array(
 			//'Name'=> "fString 'Название' required=false",
-			'Parent'=>"lOne2One tw_{%$PARENT_MODULE%} mode=link",
+			'Parent'=>"lOne2One {%$PARENT_RECORDSET%} mode=link",
 			'File'=>"lOne2One tw{%$MODULE_NAME%}_files 'File' hidden=false widget=include_form",
 		),$init_opts);
 		$this->structure['fkeys']=array(
