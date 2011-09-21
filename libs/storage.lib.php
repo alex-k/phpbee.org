@@ -30,26 +30,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->gs_connector_id=$gs_connector_id;
 		$this->db_tablename=$db_tablename;
 		$this->db_scheme=$db_scheme;
-		//$this->make_forms();
 		$this->query_options['late_load_fields']=array();
-	}
-	function make_forms() {
-		$htmlforms=array();
-		$myforms=array();
-		foreach ($this->structure['fields'] as $n=>$f) {
-			$type='input';
-			//if ($f['type']=='serial') $type='hidden';
-			if ($f['type']=='serial') continue;
-			if ($f['type']=='text') $type='textarea';
-			$htmlforms[$n]=array('type'=> $type);
-		}
-		$myforms['all.add']=$myforms['all.edit']=$myforms['all.show']=array( 'fields'=>array_keys($htmlforms) );
-
-		if (isset($this->structure['recordsets'])) foreach ($this->structure['recordsets'] as $n=>$f) {
-			$htmlforms[$n]=array('type'=>'recordset');
-		}
-		$this->structure['htmlforms']=isset($this->structure['htmlforms']) ? array_merge($htmlforms,$this->structure['htmlforms']) : $htmlforms;
-		$this->structure['myforms']=isset($this->structure['myforms']) ? array_merge($myforms,$this->structure['myforms']) : $myforms;
 	}
 	protected function get_connector() {
 		if (!$this->gs_connector) {
@@ -217,6 +198,10 @@ abstract class gs_recordset_base extends gs_iterator {
 
 	function offset ($num) {
 		$this->query_options['options'][]=array('type'=>'offset','value'=>$num);
+		return $this;
+	}
+	function orderby($order) {
+		$this->query_options['options'][]=array('type'=>'orderby','value'=>$order);
 		return $this;
 	}
 

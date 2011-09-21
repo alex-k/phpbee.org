@@ -209,14 +209,29 @@ class gs_widget_select extends gs_widget{
 				return $ret;
 		}
 }
+class gs_data_widget_select{
+	function gd($rec,$k,$hh,$params,$data) {
+		if (method_exists($rec->get_recordset(),'gs_data_widget_select')) {
+			$variants=array();
+			$vrecs=$rec->get_recordset()->gs_data_widget_select($rec,$k);
+			foreach ($vrecs as $vrec) $variants[trim($vrec)]=trim($vrec); 
+			$hh[$k]['options']=$variants;
+			return $hh;
+		}
+	}
+}
+class gs_data_widget_select_enter extends gs_data_widget_select{}
+
+
 class gs_widget_select_enter extends gs_widget{
 		function html() {
+				if (!is_array($this->value)) $this->value=array('select'=>trim($this->value),'enter'=>trim($this->value));
 				$ret="<select onChange=\"$('input[selname=".$this->fieldname."]').val(this.value);\" class=\"fSelect\"  name=\"".$this->fieldname."[select]\"><option></option>\n";
 				if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 				foreach ($this->params['options'] as $v=>$l) {
 						$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n",
 									htmlspecialchars($v),
-									(empty($this->value['enter']) && trim($this->value['select'])==$v) ? 'selected="selected"' : '',
+									(trim($this->value['enter'])==$v && trim($this->value['select'])==$v) ? 'selected="selected"' : '',
 									$l);
 				}
 				$ret.="</select>\n";
@@ -225,6 +240,7 @@ class gs_widget_select_enter extends gs_widget{
 								$this->fieldname,
 								trim($this->value['enter'])
 								);
+
 				return $ret;
 		}
 		function clean() {

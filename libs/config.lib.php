@@ -144,6 +144,7 @@ class gs_init {
 		//$tpl->assign('MODULE',$module_name);
 		$tpl->assign('MODULE',$module_dir_name);
 		$tpl->assign('PARENT_MODULE',$parent_module);
+		$tpl->assign('PARENT_RECORDSET','tw_'.$parent_module);
 		$tpl->assign('SUBMODULE_NAME',basename($path));
 		$tpl->assign('SUBMODULES_DATA',$data);
 		foreach ($files as $f) {
@@ -185,6 +186,8 @@ class gs_init {
 
 
 	public function clear_cache() {
+		gs_cacher::clear('classes','config');
+		gs_cacher::clear('handlers','config');
 		rrmdir(cfg('tpl_var_dir'));
 	}
 
@@ -283,6 +286,7 @@ class gs_config {
 	public $lib_data_drivers_dir;
 	public $lib_handlers_dir;
 	public $lib_modules_dir;
+	public $lib_distpackages_dir;
 	public $lib_dbdrivers_dir;
 	public $tpl_blocks;
 	public $class_files=array();
@@ -334,6 +338,8 @@ class gs_config {
 		$this->lib_data_drivers_dir=$this->lib_dir.'data_drivers/';
 		$this->lib_handlers_dir=$this->root_dir.'handlers/';
 		$this->lib_modules_dir=$this->root_dir.'modules/';
+		$this->lib_distpackages_dir=$this->root_dir.'packages/';
+		$this->lib_distsubmodules_dir=$this->root_dir.'packages/SUBMODULES/';
 		$this->lib_dbdrivers_dir=$this->lib_dir.'dbdrivers/';
 
 		$this->use_handler_cache=FALSE;
@@ -573,6 +579,7 @@ class gs_var_storage {
 
 function __gs_autoload($class_name) {
 	$classes=gs_cacher::load('classes','config');
+	if (!$classes) return false;
 	if (array_key_exists($class_name,$classes)) load_file($classes[$class_name]);
 }
 

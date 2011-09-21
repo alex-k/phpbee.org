@@ -66,7 +66,10 @@ class field_interface {
 			}
 		}
 		if (isset($opts['unique']) && strtolower($opts['unique'])!='false' && $opts['unique']) {
-			$structure['htmlforms'][$field]['validate'][]='checkField';
+			if(!is_array($structure['htmlforms'][$field]['validate'])) {
+				$structure['htmlforms'][$field]['validate']=array($structure['htmlforms'][$field]['validate']);
+			}
+			$structure['htmlforms'][$field]['validate'][]='checkUnique';
 			$structure['htmlforms'][$field]['validate_params']['class']=$init_opts['recordset'];
 			$structure['htmlforms'][$field]['validate_params']['field']=$field;
 		}

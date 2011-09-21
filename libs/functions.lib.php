@@ -242,4 +242,18 @@ function gsdict($t) {
 	return gs_dict::get($t);
 }
 
+function copy_directory($src,$dst) {
+	check_and_create_dir($dst);
+	$dst=realpath($dst);
+	$files=glob(realpath($src).DIRECTORY_SEPARATOR.'*');
+	foreach ($files as $f) {
+		$newname=$dst.DIRECTORY_SEPARATOR.basename($f);
+		if (is_dir($f)) {
+			copy_directory($f,$newname);
+		} else {
+			copy($f,$newname);
+		}
+	}
+}
+
 ?>

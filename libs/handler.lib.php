@@ -61,13 +61,13 @@ class gs_base_handler extends gs_handler {
 		return $tpl->assign($name,$value);
 	}
 	function fetch($data) {
-		if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.show: empty params[name]');
+		if (empty($this->params['name'])) throw new gs_exception('gs_base_handler.fetch: empty params[name]');
 		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
 		if(isset($this->params['hkey'])) $tpl->assign('hdata',$data[$this->params['hkey']]);
-		if (!$tpl->templateExists($tplname)) throw new gs_exception('gs_base_handler.show: can not find template file for '.$tplname);
+		if (!$tpl->templateExists($tplname)) throw new gs_exception('gs_base_handler.fetch: can not find template file for '.$tplname);
 		return $tpl->fetch($tplname);
 	}
 
@@ -212,6 +212,15 @@ class gs_base_handler extends gs_handler {
 				break;
 			default:
 				break;
+			}
+
+
+			if (isset($v['widget'])) {
+				$dclass='gs_data_widget_'.$v['widget'];
+				if (class_exists($dclass)) {
+					$d=new $dclass();
+					$hh=$d->gd($rec,$k,$hh,$params,$data);
+				}
 			}
 		}
 		$fields=$rec->get_recordset()->id_field_name.','.implode(',',$fields);
