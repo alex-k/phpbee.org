@@ -1,0 +1,13 @@
+{extends file="admin_lite_page.html"}
+{block name="main"}
+
+
+<form action="" method="post">
+<input type=hidden name="gspgid" value="/admin/wizard/iddqdblocksubmit/{$_gsdata.gspgid_v}">
+<textarea name="block_content" class="fText">
+{$block_content}
+</textarea>
+<input type="submit">
+</form>
+
+{/block}

@@ -36,6 +36,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 		return self::add_subdir($data,dirname(__file__));
 	}
 
+	/*
 	static function gl($alias,$rec) {
 		if(!is_object($rec)) {
 			$obj=new tw{%$MODULE_NAME%};
@@ -49,6 +50,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 			break;
 		}
 	}
+	*/
 }
 
 class handler{%$MODULE_NAME%} extends gs_base_handler {
@@ -64,9 +66,16 @@ class <*$rs->name*> extends gs_recordset_short {
 			'<*$f->name*>'=>'<*$f->type*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*> <*if $f->default_value*>default="<*$f->default_value*>" <*/if*> <*if $f->options*>options="<*$f->options*>" <*/if*> <*if $f->required*>required="<*$f->required*>" <*/if*> ',
 
 		<*/foreach*>
+		<*foreach from=$rs->Links item=f*>
+
+			'<*$f->name*>'=>'<*$f->type*> <*$f->classname*><*if $f->linkname*>:<*$f->linkname*><*/if*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->options*>options="<*$f->options*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*>',
+
+		<*/foreach*>
+		<*if $rs->Submodules->count()*>
 		{%foreach from=$SUBMODULES_DATA.LINKS key=K item=L%}
 			'{%$K%}'=>"{%$L%}",
 		{%/foreach%}
+		<*/if*>
 		),$init_opts);
 		
 	}

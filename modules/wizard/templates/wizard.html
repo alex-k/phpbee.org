@@ -16,7 +16,7 @@
 	{foreach from=$list item="e"}
 	<tr class="{cycle values='odd,even'}">
 			<td>{$e.id}</td>
-			<td>{$e.name}</td>
+			<td><a href="/admin/wizard/module/{$e.id}">{$e.name}</a></td>
 			<td>{$e.title}</td>
 			<td class="cnt"><a href="/admin/wizard/recordsets/{$e.id}">recordsets</a></td>
 			<td class="cnt"><a href="/admin/wizard/urls/{$e.id}">urls</a></td>

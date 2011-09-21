@@ -1,6 +1,18 @@
 {extends file="admin_page.html"}
 
 {block name="main"}
+
+
+	{controller _class=wz_urls _assign=url _assign_type=first id=$_gsdata.gspgid_va.0}
+
+	<h3>
+	<a href="/admin/wizard/module/{$url.Module->first()->id}">{$url.Module->first()->name}</a>
+	=>
+	<a href="/admin/wizard/urls/{$url.Module->first()->id}/{$url.id}">{$url.gspgid_value}</a>
+	</h3>
+
+	<h4>handlers</h4>
+
 	<table class="tb">
 	<thead>
 	<tr><th>#</th>
@@ -10,21 +22,23 @@
 	<th></th>
 	<th></th>
 	</thead>
-	{controller _class=wz_handlers _assign="list" Url_id=$_gsdata.gspgid_va.0 _orderby="cnt"}
-	{foreach from=$list item="e"}
+	{foreach from=$url->Handlers item="e"}
 	<tr class="{cycle values='odd,even'}">
 			<td>{$e.id}</td>
 			<td>{$e.cnt}</td>
 			<td>{$e.handler_keyname}</td>
-			<td>{$e.handler_value}</td>
-			<td class="cnt"><a href="/admin/wizard/handlers/{$e.Url_id}/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
+			<td><a href="/admin/wizard/handlers/{$e.Url_id}/handlers/{$e.id}#form">{$e.handler_value}</a></td>
+			<td class="cnt"><a href="/admin/wizard/handlers/{$e.Url_id}/handlers/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
 			<td class="cnt"><a href="/admin/wizard/handlers/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
 	</tr>
 	{/foreach}
 	</table>
-	<h5>Редактировать/<a href="/admin/wizard/handlers/{$_gsdata.gspgid_va.0}#form">создать</a>:</h5>
+
+	<h5>Редактировать/<a href="/admin/wizard/handlers/{$_gsdata.gspgid_va.0}/handlers#form">создать</a>:</h5>
+	{if $_gsdata.gspgid_va.1=='handlers'}
 	<hr><br>
 	<a name="form"></a>
-	{handler gspgid="/admin/form/wz_handlers/edit/`$_gsdata.gspgid_va.1`" Url_id=$_gsdata.gspgid_va.0}
+	{handler gspgid="/admin/form/wz_handlers/edit/`$_gsdata.gspgid_va.2`" Url_id=$url.id}
+	{/if}
 
 {/block}
