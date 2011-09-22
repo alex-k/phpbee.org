@@ -46,6 +46,13 @@ class module_wizard extends gs_base_module implements gs_module {
 				'gs_base_handler.post:{name:form.html:classname:wz_handlers:form_class:form_admin}',
 				'gs_base_handler.redirect_up',
 			),
+			'/admin/wizard/templates'=>array(
+				'gs_wizard_handler.templates',
+			),
+			'/admin/form/templates'=>array(
+				'gs_wizard_handler.templatespost:return:true:name:form_submit.html:form_class:gs_wizard_template_form',
+				'gs_base_handler.redirect',
+			),
 		),
 		'post'=>array(
 			'/admin/wizard/iddqdblocksubmit'=>array(
@@ -99,6 +106,30 @@ class module_wizard extends gs_base_module implements gs_module {
 	);
 	return self::add_subdir($data,dirname(__file__));
 	}
+}
+
+
+class gs_wizard_template_form extends g_forms_inline{
+	function __construct($hh,$params=array(),$data=array()) {
+		$extends=array_map(basename,glob(cfg('tpl_data_dir')."*"));
+		array_unshift($extends,'');
+		$hh=array(
+		    'extends' => Array
+			(
+			    'type' => 'select',
+			    'validate' => 'dummyValid',
+			    'options' => array_combine($extends,$extends),
+			),
+		    'template_name' => Array
+			(
+			    'type' => 'input',
+			    'validate' => 'notEmpty',
+			),
+
+		);
+		return parent::__construct($hh,$params,$data);
+	}
+
 }
 
 class gs_wizard_handler extends gs_handler {
@@ -162,7 +193,7 @@ class gs_wizard_handler extends gs_handler {
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$this->data['gspgid_va'][1];
 
 		$template=file_get_contents($filename);
-		preg_match("|{block name=\"".$this->data['gspgid_va'][2]."\"}(.*){/block}|is",$template,$block);
+		preg_match("|{block name=\"".$this->data['gspgid_va'][2]."\"}(.*?){/block}|is",$template,$block);
 
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('block_content',$block[1]);
@@ -175,9 +206,43 @@ class gs_wizard_handler extends gs_handler {
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$this->data['gspgid_va'][1];
 
 		$template=file_get_contents($filename);
-		$template=preg_replace("|{block name=\"".$this->data['gspgid_va'][2]."\"}.*{/block}|is",'',$template);
+		$template=preg_replace("|{block name=\"".$this->data['gspgid_va'][2]."\"}.*?{/block}|is",'',$template);
 		$template.='{block name="'.$this->data['gspgid_va'][2].'"}'.$this->data['block_content'].'{/block}';
 		file_put_contents($filename,$template);
+		return true;
+	}
+
+	function templates() {
+
+		$module=record_by_id($this->data['gspgid_va'][0],'wz_modules');
+		$dirname=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR;
+
+		$templates=array_map(basename,glob($dirname.'*'));
+
+
+		$tpl=gs_tpl::get_instance();
+
+		$tpl->assign('templates',$templates);
+		$tpl->assign('module',$module);
+
+		return $tpl->fetch('templates.html');
+	}
+
+	function templatespost() {
+		$bh=new gs_base_handler($this->data,$this->params);
+		$f=$bh->validate();
+		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+
+		$module=record_by_id($this->data['handler_params']['Module_id'],'wz_modules');
+		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$this->data['template_name'];
+		if (file_exists($filename)) {
+			return $bh->fetch($this->data);
+		}
+
+
+		$text="";
+		if (!empty($this->data['extends'])) $text='{extends file="'.$this->data['extends'].'"}'.PHP_EOL;
+		file_put_contents($filename,$text);
 		return true;
 	}
 

@@ -1,0 +1,9 @@
+<h3>templates</h3>
+
+<ul>
+{foreach from=$templates item=t}
+	<li> <a href="/admin/wizard/iddqd/{$module.id}/{$t}">{$t}</a> </li>
+{/foreach}
+</ul>
+
+{handler gspgid="/admin/form/templates" Module_id=$module.id}

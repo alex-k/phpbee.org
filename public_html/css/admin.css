@@ -139,7 +139,7 @@ h5 {
 	width:100%;
 }
 
-.helper_table input[type=submit] {
+input[type=submit] {
 	border:1px solid #a0a0a0;
 	cursor:pointer;
 }
@@ -162,6 +162,10 @@ h5 {
 input.fString {
 	width:90%;
 	border:1px solid #a0a0a0;
+}
+
+.inline input.fString {
+	width:auto;
 }
 
 input.fInt {
