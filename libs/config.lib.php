@@ -23,13 +23,9 @@ class gs_init {
 	public $data;
 	private $view;
 	
-	function __construct($view)
+	function __construct()
 	{
 		$this->config=gs_config::get_instance();
-		$req=(strpos($_SERVER['REQUEST_URI'],$this->config->www_admin_dir)===0);
-		$this->view=$view=='auto' ? ($req ? 'admin' : 'user') : $view;
-		
-		$this->config->set_view($this->view);
 	}
 	
 	
@@ -49,6 +45,7 @@ class gs_init {
 		if ($mode & LOAD_EXTRAS) {
 			$this->load_extras();
 		}
+		check_and_create_dir(cfg('tpl_var_dir'));
 	}
 
 	function h_sort($a,$b) {
@@ -176,8 +173,8 @@ class gs_init {
 				$s=$tpl->fetch('string:'.$s);*/
 				$s=$tpl->fetch($f);
 				$pf=$tplcdir.DIRECTORY_SEPARATOR.basename($f);
-				if(!file_put_contents($pf,$s)) {
-					throw new gs_exception('Can`t move template '.$f.' into '.$pf);
+				if(file_put_contents($pf,$s)===FALSE) {
+					throw new gs_exception('Can`t copy template '.$f.' into '.$pf);
 				}
 			}
 		}
@@ -328,9 +325,12 @@ class gs_config {
 		$this->cache_dir=$this->var_dir.'cache/';
 		$this->session_lifetime='2 hours';
 		$this->tmp_dir=$this->var_dir.'tmp/';
+		/*
 		$this->data_dir=$this->root_dir.'data/';
 		$this->tpl_data_dir_default=$this->data_dir.'templates/';
 		$this->tpl_data_dir=$this->tpl_data_dir_default;
+		*/
+		$this->tpl_data_dir=$this->root_dir.'html/';
 		$this->tpl_var_dir=$this->var_dir.'templates_c/';
 		$this->lib_tpl_dir=$this->lib_dir.'smarty/';
 		$this->tpl_plugins_dir=$this->lib_tpl_dir.'plugins/';
@@ -365,12 +365,13 @@ class gs_config {
 	}
 
 	function set_view($view) {
+		/*
 		if ($this->tpl_data_dir==$this->tpl_data_dir_default) {
 			$this->tpl_data_dir=$this->data_dir.'templates/'.$view;
 			$this->tpl_var_dir=$this->var_dir.'templates_c/'.$view;
 		}
 		cfg_set('_gs_view',$view);
-		check_and_create_dir($this->tpl_var_dir);
+		*/
 	}
 
 	

@@ -121,16 +121,21 @@ class gs_base_handler extends gs_handler {
 	protected function get_form() {
 		$params=$this->params;
 		$data=$this->data;
-		$id=isset($data['gspgid_va'][1]) ? $data['gspgid_va'][1] : null;
-		$classname=$params['classname'];
-		$obj=new $classname;
-		$fields=array_keys($obj->structure['fields']);
-		if ($id && is_numeric($id)) {
-			$rec=$obj->get_by_id($id,$fields);
-		} else {
-			$rec=$obj->new_record();
+		if (isset($params['classname'])) {
+			$id=isset($data['gspgid_va'][1]) ? $data['gspgid_va'][1] : null;
+			$classname=$params['classname'];
+			$obj=new $classname;
+			$fields=array_keys($obj->structure['fields']);
+			if ($id && is_numeric($id)) {
+				$rec=$obj->get_by_id($id,$fields);
+			} else {
+				$rec=$obj->new_record();
+			}
+			return self::get_form_for_record($rec,$this->params,$this->data);
 		}
-		return self::get_form_for_record($rec,$this->params,$this->data);
+		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
+		$f=new $form_class_name(array(),$params,$data);
+		return $f;
 	}
 	static function get_form_for_record($rec,$params,$data) {
 		$h=$rec->get_recordset()->structure['htmlforms'];
@@ -261,11 +266,11 @@ class gs_base_handler extends gs_handler {
 		$tpl=gs_tpl::get_instance();
 		$f=$this->get_form();
 		$validate=$f->validate();
+		$tpl->assign('formfields',$f->show($validate));
+		$tpl->assign('form',$f);
 		if ($validate['STATUS']===true) {
 			return $f;
 		}
-		$tpl->assign('formfields',$f->show($validate));
-		$tpl->assign('form',$f);
 		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
 		$ret=$tpl->fetch($tplname);
 		return $ret;
