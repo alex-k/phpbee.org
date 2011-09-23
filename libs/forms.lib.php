@@ -335,7 +335,7 @@ class g_forms_table extends  g_forms_html {
 class g_forms_inline extends  g_forms_html {
     function __construct($h,$data=array(),$rec=null)  {
          parent::__construct($h,$data,$rec);
-         $this->view = new gs_glyph('helper',array('class'=>'inline'));
+         $this->view = new gs_glyph('helper',array('class'=>'empty'));
          $this->view->addNode('helper',array('class'=>'inline'),array_keys($h));
     }
 }
