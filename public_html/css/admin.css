@@ -219,6 +219,11 @@ textarea.fText {
 }
 
 
+[-data-href]:hover {
+	color:#aa0000;
+}
+
+
 <!-- Wysiwyg editor styles -->
 .editor { border:1px solid #e0e0e0;background-color:#BDC6CE;}
 .editor .menu { background-color:#e0e0e0; }

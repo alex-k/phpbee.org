@@ -2,7 +2,7 @@
 
 <ul>
 {foreach from=$templates item=t}
-	<li> <a href="/admin/wizard/iddqd/{$module.id}/{$t}">{$t}</a> </li>
+	<li> <a href="/admin/wizard/iddqd/{$module.id}/{$t}">{$t}</a> <a href="/admin/wizard/iddqdblock/{$module.id}/{$t}/"><img src="/i/admin/ico_edit.png" alt="edit" title="edit"></a></li>
 {/foreach}
 </ul>
 

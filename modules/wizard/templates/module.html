@@ -12,12 +12,17 @@
 		<h3><a href="/admin/wizard/urls/{$module.id}">urls</a></h3>
 		<ul>
 		{foreach from=$module->urls->orderby('type desc, gspgid_value') item=url}
-			<li>{$url.type} <a href="/admin/wizard/handlers/{$url.id}">{$url.gspgid_value|default:"_DEFAULT_"}</a>
+			<li>
+				<span {if $url.type=='get'}-data-href="/{$module.name}/{$url.gspgid_value}"{/if}>
+					{$url.type}
+				</span>
+				
+				<a href="/admin/wizard/handlers/{$url.id}">{$url.gspgid_value|default:"_DEFAULT_"}</a>
+				
 				<ul>
 				{foreach from=$url.Handlers item=h}
-					<li>{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}{$h.handler_value}
-					
-					<a href="/admin/wizard/templates/{$h.id}">tpl</a>
+					<li -data-href="/admin/wizard/handlers/{$url.id}/handlers/{$h.id}#form">
+						{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}{$h.handler_value}
 					</li>
 				{/foreach}
 				</ul>
@@ -37,16 +42,23 @@
 				{if $rs.Submodules->count()}({$rs.Submodules}){/if}
 				<ul>
 				{foreach from=$rs.Fields item=field}
-					<li><a href="/admin/wizard/recordset_fields/{$rs.id}/{$field.id}">{$field}</a></li>
+					<li -data-href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}">
+						{$field} 
+						<a href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a>
+					</li>
 				{/foreach}
 				{if $rs.Links->count()}<li></li>{/if}
 				{foreach from=$rs.Links item=link}
-					<li><a href="/admin/wizard/recordset_fields/{$rs.id}/{$link.id}">{$link}</a></li>
+					<li -data-href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}">
+						{$link} 
+						<a href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a>
+					</li>
 				{/foreach}
 				</ul>
 			</li>
 		{/foreach}
 		</ul>
+
 	</td>
 	</tr>
 	</table>

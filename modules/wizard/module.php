@@ -53,11 +53,14 @@ class module_wizard extends gs_base_module implements gs_module {
 				'gs_wizard_handler.templatespost:return:true:name:form_submit.html:form_class:gs_wizard_template_form',
 				'gs_base_handler.redirect',
 			),
+			'/admin/wizard/formmacros'=>array(
+						'wz_handler_mc.post:name:form_submit.html',
+						),
 		),
 		'post'=>array(
 			'/admin/wizard/iddqdblocksubmit'=>array(
 						'gs_wizard_handler.iddqdblocksubmit:return:true',
-						'gs_base_handler.redirect'
+						'gs_base_handler.redirect_gl:gl:iddqdblocksubmit',
 						),
 		),
 		'get'=>array(
@@ -68,11 +71,15 @@ class module_wizard extends gs_base_module implements gs_module {
 						'gs_base_handler.show',
 						),
 			'/admin/wizard/module'=>'gs_base_handler.show',
-			'/admin/wizard/commit'=>'gs_wizard_handler.commit',
+			'/admin/wizard/commit'=>array(
+					'gs_wizard_handler.commit:return:true',
+					'gs_base_handler.redirect',
+					),
 			'/admin/wizard/recordsets'=>'gs_base_handler.show',
 			'/admin/wizard/recordset_fields'=>'gs_base_handler.show',
 			'/admin/wizard/urls'=>'gs_base_handler.show',
 			'/admin/wizard/handlers'=>'gs_base_handler.show',
+			'/admin/wizard/macros'=>'gs_base_handler.show',
                         '/admin/wizard/delete'=>array(
                                         'gs_base_handler.delete:{classname:wz_modules}',
                                         'gs_base_handler.redirect',
@@ -106,31 +113,16 @@ class module_wizard extends gs_base_module implements gs_module {
 	);
 	return self::add_subdir($data,dirname(__file__));
 	}
-}
-
-
-class gs_wizard_template_form extends g_forms_inline{
-	function __construct($hh,$params=array(),$data=array()) {
-		$extends=array_map(basename,glob(cfg('tpl_data_dir')."*"));
-		array_unshift($extends,'');
-		$hh=array(
-		    'extends' => Array
-			(
-			    'type' => 'select',
-			    'validate' => 'dummyValid',
-			    'options' => array_combine($extends,$extends),
-			),
-		    'template_name' => Array
-			(
-			    'type' => 'input',
-			    'validate' => 'notEmpty',
-			),
-
-		);
-		return parent::__construct($hh,$params,$data);
+	static function gl($name,$record,$data) {
+		switch ($name) {
+			case 'iddqdblocksubmit':
+				if ($data['save_view']) return '/admin/wizard/iddqd/'.$data['gspgid_v'];
+				return '/admin/wizard/module/'.$data['gspgid_va'][0];
+			break;
+		}
 	}
-
 }
+
 
 class gs_wizard_handler extends gs_handler {
 
@@ -166,10 +158,7 @@ class gs_wizard_handler extends gs_handler {
 
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'compile_phps.html');
 
-		header("Content-type: text/plain");
-		echo $out;
-
-		file_put_contents($dirname.'module.phps',$out);
+		return file_put_contents($dirname.'module.phps',$out)!==FALSE;
 
 
 	}
@@ -193,21 +182,27 @@ class gs_wizard_handler extends gs_handler {
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$this->data['gspgid_va'][1];
 
 		$template=file_get_contents($filename);
-		preg_match("|{block name=\"".$this->data['gspgid_va'][2]."\"}(.*?){/block}|is",$template,$block);
-
 		$tpl=gs_tpl::get_instance();
-		$tpl->assign('block_content',$block[1]);
+
+		if (isset($this->data['gspgid_va'][2])) {
+			preg_match("|{block name=\"".$this->data['gspgid_va'][2]."\"}(.*?){/block}|is",$template,$block);
+			$template=$block[1];
+		}
+
+		$tpl->assign('block_content',$template);
 		return true;
 
 	}
 	function iddqdblocksubmit() {
-		md($this->data,1);
 		$module=record_by_id($this->data['gspgid_va'][0],'wz_modules');
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$this->data['gspgid_va'][1];
-
-		$template=file_get_contents($filename);
-		$template=preg_replace("|{block name=\"".$this->data['gspgid_va'][2]."\"}.*?{/block}|is",'',$template);
-		$template.='{block name="'.$this->data['gspgid_va'][2].'"}'.$this->data['block_content'].'{/block}';
+	
+		$template=$this->data['block_content'];
+		if (isset($this->data['gspgid_va'][2])) {
+			$template=file_get_contents($filename);
+			$template=preg_replace("|{block name=\"".$this->data['gspgid_va'][2]."\"}.*?{/block}|is",'',$template);
+			$template.='{block name="'.$this->data['gspgid_va'][2].'"}'.$this->data['block_content'].'{/block}'.PHP_EOL;
+		}
 		file_put_contents($filename,$template);
 		return true;
 	}
@@ -444,6 +439,94 @@ class wz_handlers extends gs_recordset_short {
 		'handler_value'=>"fString value",
 		'Url'=>'lOne2One wz_urls',
 		),$init_opts);
+	}
+}
+class gs_wizard_template_form extends g_forms_inline{
+	function __construct($hh,$params=array(),$data=array()) {
+		$extends=array_map(basename,glob(cfg('tpl_data_dir')."*"));
+		array_unshift($extends,'');
+		$hh=array(
+		    'extends' => Array
+			(
+			    'type' => 'select',
+			    'validate' => 'dummyValid',
+			    'options' => array_combine($extends,$extends),
+			),
+		    'template_name' => Array
+			(
+			    'type' => 'input',
+			    'validate' => 'notEmpty',
+			),
+
+		);
+		return parent::__construct($hh,$params,$data);
+	}
+
+}
+
+class wz_handler_mc extends gs_handler {
+
+	function post() {
+		$this->params['form_class']=$this->data['gspgid_va'][1];
+		$bh=new gs_base_handler($this->data,$this->params);
+		$f=$bh->validate();
+		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+	
+		
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('macros',json_encode($f->macros()));
+		return $tpl->fetch('macros_insert_close.html');
+	}
+
+}
+
+
+class wz_macros extends g_forms_html{
+	function escape($txt) {
+		$tpl=gs_tpl::get_instance();
+		$txt=str_replace(array('{','}'),array($tpl->left_delimiter,$tpl->right_delimiter),$txt);
+		return ($txt);
+	}
+}
+
+class wz_macros_handler extends wz_macros {
+	function __construct($hh,$params=array(),$data=array()) {
+		$module=record_by_id($data['gspgid_va'][0],'wz_modules');
+		$rs=new wz_urls();
+		$rs->find_records(array('Module_id'=>$module->get_id(),
+					array('field'=>'gspgid_value','case'=>'!=','value'=>''),
+					array('type'=>'orderby','value'=>'gspgid_value'),
+					));
+		$urls=array();
+		foreach ($rs as $r) {
+			$url=$r->gspgid_value;
+			if (substr($url,0,1)!='/') $url='/'.$module->name.'/'.$url;
+			$urls[$url]=$url;
+		}
+		$hh=array(
+		    'gspgid_value' => Array
+			(
+			    'verbose_name'=>'gspgid',
+			    'type' => 'select',
+			    'options' => $urls,
+			    'widget'=>'select_enter',
+			),
+		    'extra_params' => Array
+			(
+			    'type' => 'input',
+			    'validate' => 'dummyValid',
+			),
+
+		);
+		return parent::__construct($hh,$params,$data);
+	}
+	function macros() {
+		$d=$this->clean();
+
+		$str='{handler gspgid="%s" %s}';
+
+		return $this->escape(sprintf($str,$d['gspgid_value'],$d['extra_params']));
+
 	}
 }
 

@@ -2,12 +2,19 @@
 {block name="main"}
 
 
+<hr>
+<a target=_blank href="/admin/wizard/macros/{$_gsdata.gspgid_va.0}/wz_macros_handler" onClick="window.open(this.href,this.target,'width=600,height=600'); return false;">handler</a>
+<hr>
+
 <form action="" method="post">
 <input type=hidden name="gspgid" value="/admin/wizard/iddqdblocksubmit/{$_gsdata.gspgid_v}">
-<textarea name="block_content" class="fText">
+<textarea id="block_content" name="block_content" class="fText">
 {$block_content}
 </textarea>
-<input type="submit">
+<br> 
+<br>
+<input name="save" value="save & return" type="submit">
+<input name="save_view" value="save & view" type="submit">
 </form>
 
 {/block}
