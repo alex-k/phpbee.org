@@ -57,6 +57,9 @@ var lwRTE = function (textarea, options) {
 	this.textarea	= null;
 	if($('#'+textarea.getAttribute('_images')).length) {
 		this.images_link= $('#'+textarea.getAttribute('_images')).get(0).href.replace('many2one','images');
+		if ($('#'+textarea.getAttribute('_files')).get(0)) {
+			this.files_link= $('#'+textarea.getAttribute('_files')).get(0).href.replace('many2one','files');
+		}
 	}
 	this.event		= null;
 	this.range		= null;
