@@ -2,7 +2,7 @@
 
 {block name="main"}
 	{controller _class=wz_modules id=$_gsdata.gspgid_va.0 _assign=module _assign_type=first}
-	<h3>{$module.name} / {$module.title}</h3>
+	<h3><a href="/admin/wizard/module/{$module.id}">{$module.name} / {$module.title}</a></h3>
 	<a href="/admin/wizard/commit/{$module.id}" onclick="return confirm('Вы точно хотите коммитить запись ?');">commit</a>
 
 
@@ -22,7 +22,12 @@
 				<ul>
 				{foreach from=$url.Handlers item=h}
 					<li -data-href="/admin/wizard/handlers/{$url.id}/handlers/{$h.id}#form">
-						{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}{$h.handler_value}
+						{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}
+						{$h.handler_value}
+						<a href="/admin/wizard/module/{$module.id}/tpl/{$h.id}">tpl</a>
+						{if $_gsdata.gspgid_va.1=='tpl' && $_gsdata.gspgid_va.2==$h.id}
+							{handler gspgid="/admin/wizard/choosetpl" Handler_id=$h.id Module_id=$module.id}
+						{/if}
 					</li>
 				{/foreach}
 				</ul>

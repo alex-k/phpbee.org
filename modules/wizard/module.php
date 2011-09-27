@@ -54,8 +54,12 @@ class module_wizard extends gs_base_module implements gs_module {
 				'gs_base_handler.redirect',
 			),
 			'/admin/wizard/formmacros'=>array(
-						'wz_handler_mc.post:name:form_submit.html',
+				'wz_handler_mc.post:name:form_submit.html',
 						),
+			'/admin/wizard/choosetpl'=>array(
+				'gs_wizard_handler.choosetpl:name:form_submit.html:form_class:form_choosetpl:return:true',
+				'gs_base_handler.redirect_up',
+				),
 		),
 		'post'=>array(
 			'/admin/wizard/iddqdblocksubmit'=>array(
@@ -239,6 +243,39 @@ class gs_wizard_handler extends gs_handler {
 		if (!empty($this->data['extends'])) $text='{extends file="'.$this->data['extends'].'"}'.PHP_EOL;
 		file_put_contents($filename,$text);
 		return true;
+	}
+	function choosetpl() {
+		$bh=new gs_base_handler($this->data,$this->params);
+		$f=$bh->validate();
+		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+
+		$handler=record_by_id($this->data['handler_params']['Handler_id'],'wz_handlers');
+
+		$hv=preg_replace('|:name:[^:]+|','',$handler->handler_value);
+		if ($f->clean('template_name')) $hv.=':name:'.$f->clean('template_name');
+
+		$handler->handler_value=$hv;
+		$handler->commit();
+
+		return true;
+	}
+
+}
+class form_choosetpl extends g_forms_inline{
+	function __construct($hh,$params=array(),$data=array()) {
+		$module=record_by_id($data['handler_params']['Module_id'],'wz_modules');
+		$dirname=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR;
+		$extends=array_map(basename,glob($dirname."*"));
+		//array_unshift($extends,'');
+		$hh=array(
+		    'template_name' => Array
+			(
+			    'type' => 'select_enter',
+			    'validate' => 'dummyValid',
+			    'options' => array_combine($extends,$extends),
+			),
+		);
+		return parent::__construct($hh,$params,$data);
 	}
 
 }
