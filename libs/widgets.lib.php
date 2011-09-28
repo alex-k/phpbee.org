@@ -184,7 +184,6 @@ class gs_widget_email extends gs_widget{
 				return $v->validate($this->fieldname,$this->value);
 		}
 }
-
 class gs_widget_select extends gs_widget{
 		function js() {
 				$ret="<select class=\"fSelect\" name=\"".$this->fieldname."\">\n";
@@ -195,18 +194,33 @@ class gs_widget_select extends gs_widget{
 				$ret.="</select>\n";
 				return $ret;
 		}
-		function html() {
-				$ret=sprintf('<select class="%s"  name="%s">',
+		function html($multi=false) {
+				$ret=sprintf('<select class="%s"  name="%s%s" %s>',
 						 isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fSelect',
-						 $this->fieldname
+						 $this->fieldname,
+						 ($multi ? '[]' : ''),
+						 ($multi ? 'multiple="on"' : '')
 						);
 				if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 				foreach ($this->params['options'] as $v=>$l) {
-						$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n", htmlspecialchars($v), (trim($this->value)==$v) ? 'selected="selected"' : '', $l);
+						if (is_array($l)) {
+							$ret.=sprintf("<optgroup label=\"%s\">\n",htmlspecialchars($v));
+							foreach ($l as $vv=>$vl) {
+								$ret.=$this->option_string($vv,$vl);
+							}
+							$ret.="</optgroup>\n";
+						} else {
+							$ret.=$this->option_string($v,$l);
+						}
 				}
 
 				$ret.="</select>\n";
 				return $ret;
+		}
+		function option_string($v,$l) {
+			$sel=is_array($this->value) ? in_array($v,$this->value) : trim($this->value)==$v;
+
+			return sprintf("<option value=\"%s\" %s>%s</option>\n", htmlspecialchars($v), $sel ? 'selected="selected"' : '', $l);
 		}
 }
 class gs_data_widget_select{
@@ -218,6 +232,16 @@ class gs_data_widget_select{
 			$hh[$k]['options']=$variants;
 			return $hh;
 		}
+	}
+}
+class gs_widget_multiselect extends gs_widget_select {
+	function html() {
+		return parent::html(TRUE);
+	}
+	function clean() {
+		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
+		$ret=is_array($this->value) && count($this->value)>0 ? array_combine(array_values($this->value),array_values($this->value)) : array();
+		return $ret;
 	}
 }
 class gs_data_widget_select_enter extends gs_data_widget_select{}

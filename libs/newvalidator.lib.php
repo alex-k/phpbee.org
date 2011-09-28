@@ -530,9 +530,9 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 class gs_validate_notEmpty {
-function validate($field,$value,$data=array(),$params=array(),$record=null) {
-    return is_array($value) || strlen(trim($value)) > 0;
-}
+	function validate($field,$value,$data=array(),$params=array(),$record=null) {
+		return is_array($value) ? count($value)>0 : strlen(trim($value)) > 0;
+	}
 }
 
 ?>

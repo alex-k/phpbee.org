@@ -45,7 +45,6 @@ class gs_record implements arrayaccess {
 		if(method_exists($this->get_recordset(),'__record_wakeup')) $this->get_recordset()->__record_wakeup($this);
 	}
 	public function __call($func,$args) {
-		
 		if (method_exists($this->get_recordset(),$func)) {
 			//$args[]=$this;
 			return call_user_func(array($this->get_recordset(),$func),$args,$this);
