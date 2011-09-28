@@ -48,14 +48,14 @@
 				<ul>
 				{foreach from=$rs.Fields item=field}
 					<li -data-href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}">
-						{$field} 
+						{$field->text()} 
 						<a href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a>
 					</li>
 				{/foreach}
 				{if $rs.Links->count()}<li></li>{/if}
 				{foreach from=$rs.Links item=link}
 					<li -data-href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}">
-						{$link} 
+						{$link}
 						<a href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a>
 					</li>
 				{/foreach}

@@ -2,7 +2,11 @@
 
 <ul>
 {foreach from=$templates item=t}
-	<li> <a href="/admin/wizard/iddqd/{$module.id}/{$t}">{$t}</a> <a href="/admin/wizard/iddqdblock/{$module.id}/{$t}/"><img src="/i/admin/ico_edit.png" alt="edit" title="edit"></a></li>
+	<li> 
+		<a href="/admin/wizard/iddqd/{$module.id}/{$t}">{$t}</a> 
+		<a href="/admin/wizard/iddqdblock/{$module.id}/{$t}/"><img src="/i/admin/ico_edit.png" alt="edit" title="edit"></a>
+		<a href="/admin/wizard/templates/delete/{$module.id}/{$t}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a>
+	</li>
 {/foreach}
 </ul>
 
