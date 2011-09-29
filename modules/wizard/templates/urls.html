@@ -1,6 +1,17 @@
 {extends file="admin_page.html"}
 
 {block name="main"}
+
+	
+	{controller _class=wz_modules id=$_gsdata.gspgid_va.0 _assign=module _assign_type=first}
+
+	<h3>
+	<a href="/admin/wizard/module/{$module->id}">{$module->name}</a>
+	</h3>
+
+	<h4>handlers</h4>
+
+
 	<table class="tb">
 	<thead>
 	<tr><th>#</th>

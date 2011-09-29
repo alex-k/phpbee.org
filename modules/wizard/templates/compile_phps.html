@@ -17,7 +17,14 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 	}
 	
 	function get_menu() {
-		return '<a href="/admin/<*$module->name*>/"><*$module->title*></a>';
+		$ret=array();
+		$item=array();
+		$item[]='<a href="/admin/<*$module->name*>/"><*$module->title*></a>';
+		<*foreach from=$module->recordsets item=rs*>
+			<*if $rs->showadmin*>$item[]='<a href="/admin/<*$module->name*>/<*$rs->name*>"><*$rs->title*></a>';<*/if*>
+		<*/foreach*>
+		$ret[]=$item;
+		return $ret;
 	}
 	
 	static function get_handlers() {
@@ -26,7 +33,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 '<*$type*>'=>array(
 <*foreach from=$handler key=type item=url*>
 '<*$url->gspgid_value*>'=>array(
-<*foreach from=$url->Handlers item=h*> <*if !$h->handler_keyname|is_numeric*>'<*$h->handler_keyname*>'=><*/if*> '<*$h->handler_value*>', 
+<*foreach from=$url->Handlers->orderby('cnt') item=h*> <*if !$h->handler_keyname|is_numeric*>'<*$h->handler_keyname*>'=><*/if*> '<*$h->handler_value*>', 
 <*/foreach*>
 ),
 <*/foreach*>

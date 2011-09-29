@@ -96,13 +96,23 @@ img {
 .l_menu li {
 	margin:0px;
 	display:block;
-	height:25px;
+	min-height:25px;
 	line-height:20px;
 	padding-left:20px;
 	padding-right:20px;
 	border-bottom:1px dashed #e0e0e0;
 }
 
+.l_menu ul li ul {
+	border:0;
+	margin:0px;
+	padding-top:10px;
+	padding-bottom:0px;
+}
+.l_menu ul li ul li {
+	border-bottom: 0px;
+	border-top:1px dashed #e0e0e0;
+}
 .r_block {
 	padding:10px;
 	vertical-align:top;
@@ -241,3 +251,12 @@ textarea.fText {
 .alpha { filter:Alpha(Opacity=50,style=0); -moz-opacity: 0.5; background-color: #E7EFEF; }
 .alpha  *{ filter:Alpha(Opacity=50,style=0); -moz-opacity: 0.5; background-color: #E7EFEF; }
 .nonalpha {filter:Alpha(Opacity=100,style=0); -moz-opacity: 1;  background-color: #E7EFEF; }
+
+tr.over td {
+	background: #fae9eb !important;
+}
+
+img.icon {
+	margin-bottom:-4px;
+	margin-left:10px;
+}

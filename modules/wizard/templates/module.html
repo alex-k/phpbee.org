@@ -20,7 +20,7 @@
 				<a href="/admin/wizard/handlers/{$url.id}">{$url.gspgid_value|default:"_DEFAULT_"}</a>
 				
 				<ul>
-				{foreach from=$url.Handlers item=h}
+				{foreach from=$url.Handlers->orderby('cnt') item=h}
 					<li -data-href="/admin/wizard/handlers/{$url.id}/handlers/{$h.id}#form">
 						{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}
 						{$h.handler_value}
@@ -40,23 +40,26 @@
 
 	</td>
 	<td valign=top>
-		<h3><a href="/admin/wizard/recordsets/{$module.id}">recordsets</a></h3>
+		<h3><a href="/admin/wizard/recordsets/{$module.id}">recordsets</a>  </h3>
 		<ul>
 		{foreach from=$module.recordsets item=rs}
-			<li><a href="/admin/wizard/recordset_fields/{$rs.id}">{$rs.name}</a>
+			<li><a href="/admin/wizard/recordset_fields/{$rs.id}">{$rs.name}</a> 
+				<a href="/admin/wizard/module/{$module.id}/createadmin/{$rs.id}"><img src="/i/admin/ico_gear.png"  class="icon" title="generate admin pages"></a>
+				<a href="/admin/wizard/recordsets/{$module.id}/{$rs.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать"  class="icon" title="Редактировать"></a>
+
 				{if $rs.Submodules->count()}({$rs.Submodules}){/if}
 				<ul>
 				{foreach from=$rs.Fields item=field}
 					<li -data-href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}">
 						{$field->text()} 
-						<a href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a>
+						<a href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать"  class="icon" title="Редактировать"></a>
 					</li>
 				{/foreach}
 				{if $rs.Links->count()}<li></li>{/if}
 				{foreach from=$rs.Links item=link}
 					<li -data-href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}">
 						{$link}
-						<a href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a>
+						<a href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать"  class="icon" title="Редактировать"></a>
 					</li>
 				{/foreach}
 				</ul>

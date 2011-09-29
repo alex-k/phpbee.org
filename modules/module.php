@@ -102,8 +102,9 @@ class admin_handler extends gs_base_handler {
 		$menu=array();
 		if (is_array($modules)) foreach ($modules as $m) {
 			$mod=new $m;
-			if (method_exists($mod,'get_menu') && $mod->get_menu()) {
-				$menu[]=$mod->get_menu();
+			if (method_exists($mod,'get_menu') && $menuitem=$mod->get_menu()) {
+				if (!is_array($menuitem)) $menuitem=array($menuitem);
+				$menu=array_merge($menu,$menuitem);
 			}
 		}
 		$tpl=gs_tpl::get_instance();

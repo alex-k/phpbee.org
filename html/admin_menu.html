@@ -1,5 +1,15 @@
 <ul>
 {foreach from=$menu item="m"}
+	{if is_array($m)}
+		<li>{$m|array_shift}
+		<ul>
+			{foreach from=$m item=mi}
+				<li>{$mi}</li>
+			{/foreach}
+		</ul>
+		</li>
+	{else}
 	<li>{$m}</li>
+	{/if}
 {/foreach}
 </ul>

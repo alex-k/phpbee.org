@@ -1,4 +1,7 @@
 <?php
+define('KEY','050505');
+if (KEY!=$_GET['key']) die ('no access');
+
 if (class_exists('Phar',0) && file_exists(dirname(__FILE__).'/../gs_libs.phar.gz')) {
 	require_once('phar://'.dirname(__FILE__).'/../gs_libs.phar.gz/config.lib.php');
 } else {

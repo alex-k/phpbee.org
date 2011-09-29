@@ -14,4 +14,12 @@ $(document).ready (function (){
 	$("[-data-href]").each(function() {
 		$(this).attr('title',$(this).attr('-data-href'));
 	});
+
+	$("table.tb").children("tbody").children("tr").mouseover(function() {
+		$(this).addClass("over");
+	});
+
+	$("table.tb tr").mouseout(function() {
+		$(this).removeClass("over");
+	});
 });
