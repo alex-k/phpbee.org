@@ -348,7 +348,11 @@ class gs_base_handler extends gs_handler {
 		return html_redirect(isset($this->params['href']) ? $this->params['href']: null);
 	}
 	function redirect_up() {
-		return (isset($this->data['gspgid_va'][1])) ? html_redirect(dirname($this->data['gspgid_root'])) : html_redirect();
+		$level=isset($this->params['level'])? intval($this->params['level']) :1;
+		$href=$this->data['gspgid_root'];
+		for($i=0;$i<$level;$i++) $href=dirname($href);
+		return html_redirect($href);
+		//return (isset($this->data['gspgid_va'][1])) ? html_redirect($href) : html_redirect();
 	}
 	function many2one() {
 		if (isset($this->data['gspgid_va'][4]) && $this->data['gspgid_va'][4]=='delete') {
