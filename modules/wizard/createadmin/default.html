@@ -11,6 +11,9 @@
 	{%foreach from=$fields item=f%}
 	<th>{%$f.verbose_name%}</th>
 	{%/foreach%}
+	{%foreach from=$links item=f%}
+	<th>{%$f.verbose_name%}</th>
+	{%/foreach%}
 	<th></th>
 	<th></th>
 	</thead>
@@ -19,6 +22,9 @@
 	<tr class="{cycle values='odd,even'}">
 			<td>{$e.id}</td>
 			{%foreach from=$fields item=f%}
+			<td>{$e.{%$f.name%}}</td>
+			{%/foreach%}
+			{%foreach from=$links item=f%}
 			<td>{$e.{%$f.name%}}</td>
 			{%/foreach%}
 			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/modify/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>

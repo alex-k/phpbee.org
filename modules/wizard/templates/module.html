@@ -13,9 +13,11 @@
 		<ul>
 		{foreach from=$module->urls->orderby('type desc, gspgid_value') item=url}
 			<li>
-				<span {if $url.type=='get'}-data-href="/{$module.name}/{$url.gspgid_value}"{/if}>
-					{$url.type}
-				</span>
+					{if $url.type=="get"}
+					<a href="/{$module.name}/{$url.gspgid_value}">{$url.type}</a>
+					{else}
+						{$url.type}
+					{/if}
 				
 				<a href="/admin/wizard/handlers/{$url.id}">{$url.gspgid_value|default:"_DEFAULT_"}</a>
 				
@@ -58,7 +60,7 @@
 				{if $rs.Links->count()}<li></li>{/if}
 				{foreach from=$rs.Links item=link}
 					<li -data-href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}">
-						{$link}
+						{$link->text()}
 						<a href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать"  class="icon" title="Редактировать"></a>
 					</li>
 				{/foreach}

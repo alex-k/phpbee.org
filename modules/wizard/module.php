@@ -31,7 +31,7 @@ class module_wizard extends gs_base_module implements gs_module {
 			),
 			'/admin/form/wz_recordsets'=>array(
 				'gs_base_handler.post:{name:form.html:classname:wz_recordsets:form_class:form_admin}',
-				'gs_base_handler.redirect_up',
+				'gs_base_handler.redirect_up:level:2',
 			),
 			'/admin/form/wz_recordset_links'=>array(
 				'gs_base_handler.post:{name:form.html:classname:wz_recordset_links:form_class:form_admin}',
@@ -260,17 +260,51 @@ class gs_wizard_handler extends gs_handler {
 		$bh=new gs_base_handler($this->data,$this->params);
 		$f=$bh->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+		$d=$f->clean();
+
+
+		if(strpos($d['template_name'],'.')===FALSE) $d['template_name'].='.html';
 
 		$module=record_by_id($this->data['handler_params']['Module_id'],'wz_modules');
-		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$this->data['template_name'];
+
+		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$d['template_name'];
 		if (file_exists($filename)) {
-			return $bh->fetch($this->data);
+			return true;
 		}
 
-
 		$text="";
-		if (!empty($this->data['extends'])) $text='{extends file="'.$this->data['extends'].'"}'.PHP_EOL;
+		if (!empty($d['extends'])) $text='{extends file="'.$this->data['extends'].'"}'.PHP_EOL;
 		file_put_contents($filename,$text);
+
+		if (empty($d['url'])) return true;	
+
+		$template=array(
+			"get"=>array(
+				$d['url']=>array("gs_base_handler.show:name:".$d['template_name']),
+				),
+		);
+
+		foreach ($template as $type=>$urls) {
+			foreach ($urls as $url=>$handlers) {
+				$f=$module->urls->find(array('gspgid_value'=>$url));
+				if($f->count()) continue;
+				$wz_url=$module->urls->new_record();
+				$wz_url->gspgid_value=$url;
+				$wz_url->type=$type;
+				$cnt=0;
+				foreach ($handlers as $key=>$value) {
+					$cnt++;
+					$wz_h=$wz_url->Handlers->new_record();
+					$wz_h->cnt=$cnt;
+					$wz_h->handler_keyname=$key;
+					$wz_h->handler_value=$value;
+				}
+			}
+		}
+		$module->commit();
+
+
+
 		return true;
 	}
 	function choosetpl() {
@@ -294,10 +328,15 @@ class gs_wizard_handler extends gs_handler {
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 		$d=$f->clean();
 
-		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
-		$module=$rs->Module->first();
 		$fields=new wz_recordset_fields();
 		$fields->find_records(array('id'=>$d['fields']));
+		$links=new wz_recordset_links();
+		$links->find_records(array('id'=>$d['links']));
+
+
+		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
+		$module=$rs->Module->first();
+
 
 
 		$tpl=new gs_tpl();
@@ -308,6 +347,7 @@ class gs_wizard_handler extends gs_handler {
 		$tpl->assign('rs',$rs);
 		$tpl->assign('module',$module);
 		$tpl->assign('fields',$fields);
+		$tpl->assign('links',$links);
 
 
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'createadmin'.DIRECTORY_SEPARATOR.$d['template_name']);
@@ -323,7 +363,6 @@ class gs_wizard_handler extends gs_handler {
 
 		$template=array(
 			"get"=>array(
-				"$recordsetname"=>array("gs_base_handler.show"),
 				"/admin/$modulename/$recordsetname"=>array("gs_base_handler.show:name:adm_$recordsetname.html"),
 				"/admin/$modulename/$recordsetname/delete"=>array(
 						"gs_base_handler.delete:{classname:$recordsetname}",
@@ -379,6 +418,7 @@ class form_createadmin extends form_admin{
 		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'createadmin'.DIRECTORY_SEPARATOR;
 		$extends=array_map(basename,glob($dirname."*"));
 
+
 		$hh=array(
 		    'template_name' => Array
 			(
@@ -388,8 +428,13 @@ class form_createadmin extends form_admin{
 		    'fields' => Array
 			(
 			    'type' => 'multiselect',
-			    //'options'=>$module->recordsets->first()->Fields->recordset_as_string_array(),
 			    'options'=>$rs->Fields->recordset_as_string_array(),
+			    'validate'=>'notEmpty',
+			),
+		    'links' => Array
+			(
+			    'type' => 'multiselect',
+			    'options'=>$rs->Links->recordset_as_string_array(),
 			    'validate'=>'notEmpty',
 			),
 
@@ -436,49 +481,6 @@ class wz_recordsets extends gs_recordset_short {
 		'Submodules'=>"lMany2One wz_recordset_submodules:Recordset",
 		'showadmin'=>"fCheckbox 'show in admin'",
 		),$init_opts);
-
-		//$this->structure['triggers']['after_insert']='after_insert';
-	}
-	function after_insert($rec,$type) {
-		$module=$rec->Module->first();
-		$modulename=$module->name;
-		$recordsetname=$rec->name;
-
-		$template=array(
-			"get"=>array(
-				"$recordsetname"=>array("gs_base_handler.show"),
-				"/admin/$modulename/$recordsetname"=>array("gs_base_handler.show:name:admin_$recordsetname.html"),
-				"/admin/$modulename/$recordsetname/delete"=>array(
-						"gs_base_handler.delete:{classname:$recordsetname}",
-						"gs_base_handler.redirect",
-						),
-				),
-			"handler"=>array(
-				"/admin/form/$recordsetname"=>array(
-					"gs_base_handler.post:{name:form.html:classname:$recordsetname:form_class:form_admin}",
-					"gs_base_handler.redirect_up",
-					),
-				),
-		);
-
-		foreach ($template as $type=>$urls) {
-			foreach ($urls as $url=>$handlers) {
-				$wz_url=$rec->Module->first()->urls->new_record();
-				$wz_url->gspgid_value=$url;
-				$wz_url->type=$type;
-				//$wz_url->commit();
-				$cnt=0;
-				foreach ($handlers as $key=>$value) {
-					$cnt++;
-					$wz_h=$wz_url->Handlers->new_record();
-					$wz_h->cnt=$cnt;
-					$wz_h->handler_keyname=$key;
-					$wz_h->handler_value=$value;
-					//$wz_h->commit();
-				}
-			}
-		}
-		$rec->Module->first()->commit();
 	}
 }
 class wz_recordset_fields extends gs_recordset_short {
@@ -532,7 +534,7 @@ class wz_recordset_links extends gs_recordset_short {
 		'linkname'=>"fString linkname required=false",
 		'verbose_name'=> "fString verbose_name required=false",
 		'options'=>"fString options required=false",
-		'widget'=>"fSelect widget required=false",
+		'widget'=>"fSelect widget required=false widget=select",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
 
@@ -564,7 +566,7 @@ class wz_recordset_links extends gs_recordset_short {
 		return array();
 	}
 
-	function record_as_string($rec) {
+	function text($args,$rec) {
 
 		$fields=$this->structure['htmlforms'];
 		$ret="";
@@ -634,6 +636,11 @@ class gs_wizard_template_form extends g_forms_inline{
 			(
 			    'type' => 'input',
 			    'validate' => 'notEmpty',
+			),
+		    'url' => Array
+			(
+			    'type' => 'input',
+			    'validate' => 'dummyValid',
 			),
 
 		);
