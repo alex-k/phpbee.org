@@ -144,6 +144,9 @@ class gs_record implements arrayaccess {
 	public function get_recordset() {
 		return $this->gs_recordset;
 	}
+	public function get_recordset_name() {
+		return get_class($this->get_recordset());
+	}
 
 	private function unescape($val) {
 		if (is_array($val)) foreach ($val as $k=>$v) {

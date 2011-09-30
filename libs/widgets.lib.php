@@ -241,7 +241,7 @@ class gs_widget_multiselect extends gs_widget_select {
 	function clean() {
 		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
 		$ret=is_array($this->value) && count($this->value)>0 ? array_combine(array_values($this->value),array_values($this->value)) : array();
-		return $ret;
+		return array($this->fieldname=>$ret);
 	}
 }
 class gs_data_widget_select_enter extends gs_data_widget_select{}
@@ -439,7 +439,7 @@ class gs_data_widget_parent_list {
 		} else {
 			$rname=get_class($rec->init_linked_recordset($v['linkname']));
 			$vro=new $rname;
-			$vrecs=$vro->find_records();
+			$vrecs=$vro->find_records(array());
 		}
 		$variants=array();
 		foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);

@@ -399,6 +399,10 @@ abstract class gs_recordset_base extends gs_iterator {
 			}
 		}
 	}
+
+	public function get_recordset_name() {
+		return get_class($this);
+	}
 }
 
 

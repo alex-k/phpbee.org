@@ -57,6 +57,15 @@ function smarty_function_controller($params, &$smarty)
 
 	if (isset($params['_offset'])) $_offset=(int)$params['_offset'];
 
+	if (isset($params['_filters'])) {
+		$filternames=array_map(trim,explode(',',$params['_filters']));
+		$filters=gs_var_storage::load('filters');
+		foreach ($filternames as $f) {
+			$filter=$filters[$f];
+			$options=$filter->applyFilter($options,$obj);
+		}
+	}
+
 	if (!empty($params['_paging'])) {
 		if (!isset($_offset)) {
 			$get=$smarty->getTemplateVars('_gsdata');

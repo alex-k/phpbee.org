@@ -235,6 +235,7 @@ class gs_init {
 		load_file($this->config->lib_dir.'widgets.lib.php');
 		load_file($this->config->lib_dir.'helpers.lib.php');
 		load_file($this->config->lib_dir.'dict.lib.php');
+		load_file($this->config->lib_dir.'filters.lib.php');
 	}
 	public function load_core()
 	{

@@ -410,7 +410,7 @@ class gs_base_handler extends gs_handler {
 		$s_data=$data=$smarty->getTemplateVars('_gsdata');
 		$s_gspgid=cfg('s_gspgid');
 		cfg_set('s_gspgid',$params['gspgid']);
-			
+
 		$s_handler_cnt=cfg_set('s_handler_cnt',cfg('s_handler_cnt')+1);
 
 		if (isset($params['_params']) && is_array($params['_params'])) $params=array_merge($params,$params['_params']);
@@ -437,8 +437,10 @@ class gs_base_handler extends gs_handler {
 		ob_start();
 		if (!isset($data['gspgid_root'])) {
 			$data['gspgid_root']=$s_data['gspgid'];
+			$data['handler_key_root']=$s_data['handler_key'];
 		}
 		$data['gspgid_handler']=isset($data['gspgid']) ? $data['gspgid'] : '';
+		$data['gspgid_handler_va']=$data['gspgid_va'];
 		$data['gspgid']=$params['gspgid'];
 		$data['handler_params']=$params;
 
