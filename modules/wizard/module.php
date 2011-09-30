@@ -142,7 +142,8 @@ class module_wizard extends gs_base_module implements gs_module {
 		switch ($name) {
 			case 'iddqdblocksubmit':
 				if ($data['save_view']) return '/admin/wizard/iddqd/'.$data['gspgid_v'];
-				return '/admin/wizard/module/'.$data['gspgid_va'][0];
+				if ($data['save_return']) return '/admin/wizard/module/'.$data['gspgid_va'][0];
+				return null;
 			break;
 		}
 	}

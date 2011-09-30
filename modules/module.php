@@ -53,6 +53,8 @@ class module extends gs_base_module implements gs_module {
 			),
 			'handler'=>array(
 				'/admin/menu'=>'admin_handler.show_menu',
+				'/filter'=>'gs_filters_handler.init',
+				'/filter/show'=>'gs_filters_handler.show',
 			),
 		);
 		return self::add_subdir($data,dirname(__file__));

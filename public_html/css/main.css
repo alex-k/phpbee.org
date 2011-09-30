@@ -1,0 +1,9 @@
+a.filter_current {
+	font-weight: bold;
+}
+
+.links_line {
+	margin:10px;
+	padding:10px;
+	background-color:#e5e5e5;
+}
