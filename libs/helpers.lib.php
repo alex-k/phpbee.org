@@ -85,7 +85,7 @@ class helper_table_admin {
 }
 class helper_table_submit{
     function show($label,$txt,$errors=array()) {
-         return sprintf('<table class="helper_table"> %s <tr> <td class="helper_table_submit_r"><input type="submit" value="%s"></td></tr> </table>',
+         return sprintf('<table class="helper_table"> %s <tr> <td class="helper_table_submit_r" colspan="2"><input type="submit" value="%s"></td></tr> </table>',
 			 $txt, gs_dict::get('SUBMIT_FORM'));
     }
 }
