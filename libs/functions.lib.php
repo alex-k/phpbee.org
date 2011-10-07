@@ -143,6 +143,15 @@ if (!function_exists('pmail')) {
 	}
 }
 
+function bee_mail($to,$subj,$text,$from='') {
+	$mail=new html_mime_mail();
+	$mail->headers = $mail->headers.sprintf("From: support@%s\r\n",$_SERVER['HTTP_HOST']);
+	//$subj=iconv( 'UTF-8', 'KOI8-R', $subject );
+	$mail->add_html($text);
+	$mail->build_message('koi8');
+	mail ($to,$subj,$mail->mime,$mail->headers);
+}
+
 
 function record_by_id($id=0,$classname='gs_null') {
 	$r=new $classname;
