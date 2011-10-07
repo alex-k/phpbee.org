@@ -417,7 +417,7 @@ class gs_widget_gallery extends gs_widget {
 
 				$s='<ul class="many2one_gallery" id="gallery_'.$hash.'">';
 						if (count($images)) {foreach ($images as $im) {
-								$s.=sprintf('<li><img src="/img/s/%s/h/100/100/%d.jpg" title="%s"></li>',$this->params['options']['recordset'],$im['id'],$im['name']);
+								$s.=sprintf('<li><img src="/img/s/%s/h/100/100/%d.jpg" title="%s"></li>',$this->params['options']['recordset'],$im['id'],isset($im['name']) ? $im['name'] : '');
 						}}
 				$s.='</ul><div class="clear"></div>';
 
@@ -447,6 +447,21 @@ class gs_data_widget_parent_list {
 		return $hh;
 	}
 }
+
+class gs_widget_121_radio extends gs_widget_lOne2One{
+	function html() {
+			$ret="";
+				foreach ($this->params['variants'] as $k=>$v) {
+						$ret.=sprintf("<label class=\"radio_121\"><input type=\"radio\" name=\"%s\" value=\"%d\" %s>%s</label>\n",$this->fieldname, $k, ($this->value==$k) ? 'checked="checked"' : '',$v);
+				}
+				$ret.='<div class="radio_121_end"></div>';
+				return $ret;
+		}
+}
+class gs_data_widget_121_radio extends gs_data_widget_parent_list{}
+
+
+
 class gs_data_widget_include_form {
 	function gd($rec,$k,$hh,$params,$data) {
 		if ($hh[$k]['type']=='lOne2One') {
