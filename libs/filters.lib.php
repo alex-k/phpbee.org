@@ -26,11 +26,19 @@ class gs_filter {
 		$this->loadValues();
 	}
 	function loadValues() {
-		$d=$this->data['gspgid_handler_va'];
 		$arr=array();
-		for($i=0;$i<count($d);$i+=2) {
-			$j=$i+1;
-			if (isset($d[$j])) $arr[$d[$i]]=$d[$j];
+		switch ($this->data['handler_params']['urltype']) {
+			case 'get': 
+				$ds=new gs_data_driver_get();
+				$arr=$ds->import();
+				unset($arr['gspgtype']);
+				break;
+			default:
+				$d=$this->data['gspgid_handler_va'];
+				for($i=0;$i<count($d);$i+=2) {
+					$j=$i+1;
+					if (isset($d[$j])) $arr[$d[$i]]=$d[$j];
+				}
 		}
 		$this->va=$arr;
 		$this->value=isset($arr[$this->name]) ? $arr[$this->name] : null;
@@ -100,16 +108,43 @@ class gs_filter_select_by_links extends gs_filter {
 
 			$name=trim($rec);
 			$arr[$this->name]=$key;
-			$href=$this->data['handler_key_root'];
-			foreach ($arr as $k=>$v) $href.="/$k/$v";
-			$links[$href]=array('name'=>$name,'key'=>$key,'count'=>$count);
+			/*
+			switch ($this->data['handler_params']['urltype']) {
+				case 'get':
+					$link=$this->data['gspgid_root'].'?'.http_build_query($arr);	
+					break;
+				default:
+					$link=$this->data['handler_key_root'];
+					foreach ($arr as $k=>$v) $link.="/$k/$v";
+			}
+			*/
+
+			$links[]=array('name'=>$name,'key'=>$key,'count'=>$count,
+				'va'=>$arr,
+				);
 		}
-		$href=$this->data['handler_key_root'];
-		unset($arr[$this->name]);
-		foreach ($arr as $k=>$v) $href.="/$k/$v";
-		$tpl->assign('link_all',$href);
+		foreach($links as $key=>$l) {
+			switch ($this->data['handler_params']['urltype']) {
+				case 'get':
+					$link=$this->data['gspgid_root'].'?'.http_build_query($l['va']);	
+					unset($l['va'][$this->name]);
+					$link_all=$this->data['gspgid_root'].'?'.http_build_query($l['va']);	
+					break;
+				default:
+					$link=$this->data['handler_key_root'];
+					foreach ($l['va'] as $k=>$v) $link.="/$k/$v";
 
+					unset($l['va'][$this->name]);
+					$link_all=$this->data['handler_key_root'];
+					foreach ($l['va'] as $k=>$v) $link_all.="/$k/$v";
+			}
+			$l['href']=$link;
+			unset($l['va']);
+			$links[$key]=$l;
+			
+		}
 
+		$tpl->assign('link_all',$link_all);
 		$tpl->assign('links',$links);
 		$tpl->assign('current',$this->value);
 		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
