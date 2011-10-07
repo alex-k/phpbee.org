@@ -73,9 +73,9 @@ class gs_base_handler extends gs_handler {
 
 	function validate_gl() {
 		$url=trim(call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v']),'/');
-		md($this->data,1);
+		/*md($this->data,1);
 		var_dump($url);
-		md($_SERVER,1);
+		md($_SERVER,1);*/
 		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/'));
 	}
 	function show404() {
@@ -347,6 +347,31 @@ class gs_base_handler extends gs_handler {
 	function redirect() {
 		return html_redirect(isset($this->params['href']) ? $this->params['href']: null);
 	}
+	
+	function get_record($data) {
+		return record_by_id($this->data['gspgid_va'][$this->params['key']],$this->params['rs']);
+	}
+	
+	function set_record($data) {
+		$rec=$this->hpar($data);
+		if (!$rec) {
+			$rec=record_by_id($this->data['gspgid_va'][$this->params['key']],$this->params['rs']);
+		}
+		$f=$this->params['field'];
+		$v=$this->params['value'];
+		$rec->$f=$v;
+		$rec->commit();
+		return $rec;
+	}
+	
+	/**
+	* Analogue "redirect" but put in sprintf pattern of "href" field`s value of record from previous handler  
+	**/
+	function redirect_rs_hkey($data) {
+		$rec=$this->hpar($data);
+		return html_redirect(sprintf($this->params['href'],$rec->{$this->params['field']}));
+	}
+	
 	function redirect_up() {
 		$level=isset($this->params['level'])? intval($this->params['level']) :1;
 		$href=$this->data['gspgid_root'];
@@ -487,12 +512,13 @@ class gs_base_handler extends gs_handler {
 	}
 
 	function hpar($data,$name='hkey',$default=null) {
+		if ($name=='hkey' && !isset($this->params[$name])) {
+			return $data['last'];
+		}
 		return isset($this->params[$name]) ? $data[$this->params[$name]] : $default;
 	}
 
 	function send_email($data) {
-
-
 		$to=$this->hpar($data,'email',array());
 		$to=$this->hpar($data,'hkey',$to);
 
@@ -502,6 +528,40 @@ class gs_base_handler extends gs_handler {
 
 		pmail($to,$subj,$txt);
 
+	}
+	
+	/**
+	* Send email with data from record
+	* If field $this->params['email'] contains @ - get address from her, else not contains - use her as name of record`s field with address 
+	**/
+	function email4record($data) {
+		$rec=$this->hpar($data);
+		if(isset($this->params['email']) && strpos($this->params['email'],'@')!==false){
+			$to=$this->params['email'];
+		} else {
+			$to=$rec->{$this->params['email']};
+		}
+		// if email incorrect - don`t send letter
+		if(empty($to) || strpos($to,'@')===false) return false;
+		
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('rec',$rec);
+		$subj=$tpl->fetch(str_replace(".html","_title.html",$this->params['template']));
+		$txt=$tpl->fetch($this->params['template']);
+		bee_mail($to,$subj,$txt);
+		return true;
+	}
+
+	function test_id($data) {
+		//$code=$this->hpar($data);
+		$code=$this->data['gspgid_va'][0];
+		md($code,1);
+		md($this->params,1);
+		$res=preg_match("|(\d+)a(.*)|is",$code,$out);
+		if (count($out)<2) return false;
+		if (md5($out[1])!=$out[2]) return false;
+		$id=intval($out[1]);
+		return record_by_id($id,$this->params['rs']);
 	}
 }
 
