@@ -333,6 +333,8 @@ class gs_wizard_handler extends gs_handler {
 		$fields->find_records(array('id'=>$d['fields']));
 		$links=new wz_recordset_links();
 		$links->find_records(array('id'=>$d['links']));
+		$filters=new wz_recordset_links();
+		$filters->find_records(array('id'=>$d['filters']));
 
 
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
@@ -349,9 +351,11 @@ class gs_wizard_handler extends gs_handler {
 		$tpl->assign('module',$module);
 		$tpl->assign('fields',$fields);
 		$tpl->assign('links',$links);
+		$tpl->assign('filters',$filters);
 
 
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'createadmin'.DIRECTORY_SEPARATOR.$d['template_name']);
+
 
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'adm_'.$rs->name.'.html';
 
@@ -428,17 +432,25 @@ class form_createadmin extends form_admin{
 			),
 		    'fields' => Array
 			(
-			    'type' => 'multiselect',
+			    'type' => 'checkboxes',
 			    'options'=>$rs->Fields->recordset_as_string_array(),
 			    'validate'=>'notEmpty',
+			    'default'=>array_keys($rs->Fields->recordset_as_string_array()),
 			),
 		    'links' => Array
 			(
-			    'type' => 'multiselect',
+			    'type' => 'checkboxes',
 			    'options'=>$rs->Links->recordset_as_string_array(),
 			    'validate'=>'notEmpty',
+			    'default'=>array_keys($rs->Links->recordset_as_string_array()),
 			),
-
+		    'filters' => Array
+			(
+			    'type' => 'checkboxes',
+			    'options'=>$rs->Links->recordset_as_string_array(),
+			    'validate'=>'notEmpty',
+			    'default'=>array_keys($rs->Links->recordset_as_string_array()),
+			),
 		);
 		return parent::__construct($hh,$params,$data);
 	}

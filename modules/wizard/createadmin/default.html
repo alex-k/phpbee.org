@@ -5,8 +5,22 @@
 
 	<h4>{%$rs.name%}</h4>
 
+
+	{%foreach from=$filters item=f%}
+		{handler gspgid="/filter/" class="select_by_links" link="{%$rs.name%}.{%$f.name%}:urlkey" name="{%$f.name%}" urltype=get }
+		{%$s_filters=$s_filters|cat:$f.name|cat:","%}
+	{%/foreach%}
+	{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="{%$s_filters|trim:","%}"}
+
 	<table class="tb">
 	<thead>
+	<tr class="filters"><td colspan="100">
+	<table><tr>
+	{%foreach from=$filters item=f%}
+		<td>{%$f.verbose_name%}: {handler gspgid="/filter/show" name="{%$f.name%}"  recordset=${%$rs.name%} tpl="links_line.html"  }</td>
+	{%/foreach%}
+	</tr></table>
+	</td> </tr>
 	<tr><th>#</th>
 	{%foreach from=$fields item=f%}
 	<th>{%$f.verbose_name%}</th>
@@ -16,8 +30,8 @@
 	{%/foreach%}
 	<th></th>
 	<th></th>
+	</tr>
 	</thead>
-	{controller _class="{%$rs.name%}" _assign="{%$rs.name%}"}
 	{foreach from=${%$rs.name%} item="e"}
 	<tr class="{cycle values='odd,even'}">
 			<td>{$e.id}</td>
