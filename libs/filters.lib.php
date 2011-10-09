@@ -92,9 +92,10 @@ class gs_filter_select_by_links extends gs_filter {
 		$recordsetname=$this->link['recordset'];
 		$rec_rs=new $recordsetname();
 		$rec_rs=$rec_rs->find_records(array());
-
+		
+		if (!isset($ps['params']) || empty($ps['params'])) $ps['params']=array();
+		
 		$tpl=gs_tpl::get_instance();
-
 		$links=array();
 		foreach ($rec_rs as $rec) {
 			$arr=$this->va;
@@ -120,9 +121,12 @@ class gs_filter_select_by_links extends gs_filter {
 			*/
 
 			$links[]=array('name'=>$name,'key'=>$key,'count'=>$count,
-				'va'=>$arr,
+				'va'=>$arr,'rec'=>$rec,
 				);
 		}
+		
+		$current_name='';
+		
 		foreach($links as $key=>$l) {
 			switch ($this->data['handler_params']['urltype']) {
 				case 'get':
@@ -141,12 +145,14 @@ class gs_filter_select_by_links extends gs_filter {
 			$l['href']=$link;
 			unset($l['va']);
 			$links[$key]=$l;
-			
+			if ($l['key']==$this->value) $current_name=$l['name'];
 		}
 
 		$tpl->assign('link_all',$link_all);
 		$tpl->assign('links',$links);
 		$tpl->assign('current',$this->value);
+		$tpl->assign('current_name',$current_name);
+		$tpl->assign('filter_params',$ps['params']);
 		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
 		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
 		return $out;

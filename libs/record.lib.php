@@ -204,8 +204,9 @@ class gs_record implements arrayaccess {
 		$structure=$this->gs_recordset->structure['recordsets'][$name];
 		if (isset($structure['rs1_name']) && isset($structure['rs2_name'])) 
 			$rs=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset'],$structure['rs_link'],$name);
-		 else 
-			$rs=new $structure['recordset'];
+		 else {
+				$rs=new $structure['recordset'];
+			}
 
 
 		$local_field_name=isset($structure['local_field_name']) ? $structure['local_field_name'] : $this->gs_recordset->id_field_name;

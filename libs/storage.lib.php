@@ -200,12 +200,14 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->query_options['options'][]=array('type'=>'offset','value'=>$num);
 		return $this;
 	}
-	function orderby($order) {
-		$this->query_options['options'][]=array('type'=>'orderby','value'=>$order);
+	
+	function orderby ($orderby) {
+		$this->query_options['options'][]=array('type'=>'orderby','value'=>$orderby);
 		return $this;
 	}
 
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
+		mlog('RS_INIT on '.get_class($this));//.' options:'.print_r($options,TRUE));
 		$this->query_options['options']=$this->string2options($options);
 		$this->query_options['index_field_name'] = is_string($index_field_name) ? $index_field_name : $this->id_field_name;
 		if ($fields && !is_array($fields)) {
@@ -263,6 +265,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 	public function count_records($options=null) {
 		$options=$this->string2options($options);
+		$options=array_merge($this->query_options['options'],$options); // Add to array of options all options what already used from lazy load (c) Andrey Pakhomov
 		if (is_array($options)) foreach($options as $k=>$o) {
 			if (in_array(strtolower($o['type']),array('limit','offset','orderby'))) unset($options[$k]);
 		}

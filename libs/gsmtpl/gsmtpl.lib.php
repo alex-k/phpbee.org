@@ -109,7 +109,17 @@ class gsmtpl {
 		return $path==$abs_path;
 	}
 	
+	public function templateExists($file) {
+		return ($this->get_file($file)) ? true : false;
+	}
+	
 	private function find_file($file) {
+		$ret=$this->get_file($file);
+		if ($ret) return $ret;
+		throw new gs_exception('gstpl: template '.$file.' not found');
+	}
+	
+	private function get_file($file) {
 		$rname=$file;
 		if ($this->is_abs_path($file)) {
 			if(!file_exists($file)) throw new gs_exception('gstpl: template '.$file.' not found');
@@ -124,7 +134,7 @@ class gsmtpl {
 			$file=realpath($dir.DS.$rname);
 			if(file_exists($file)) return $file;
 		}
-		throw new gs_exception('gstpl: template '.$rname.' not found');
+		return null;
 	}
 	
 	public function get_source_info($url) {
@@ -264,6 +274,7 @@ class gstpl_compiler {
 	private function compile_literal($blockname,$block,$counter,$code) {
 		$regexp=sprintf("|%s(%s:%d)(.*?)%s(.*?)%s/\\1%s|is",$this->ld,$blockname,$counter,$this->rd,$this->ld,$this->rd);
 		$code=preg_replace($regexp,PHP_EOL.$this->ld.$blockname."_".$block['params']['name'].' '.$block['params_string'].$this->rd.PHP_EOL,$code);
+		//$code=preg_replace($regexp,PHP_EOL.$this->ld.$blockname." name='".$block['params']['name']."' ".$block['params_string'].$this->rd.PHP_EOL,$code);
 		return $code;
 	}
 	
@@ -473,6 +484,9 @@ class gstpl_compiler {
 	function parse_func($matches) {
 		$params=$this->string_to_params($matches[1]);
 		$params[0]=ltrim($params[0],'/');
+		if (strpos($params[0],'literal')!==false) {
+			return sprintf('$res.=$this->%s();%s',$params[0],PHP_EOL);
+		}
 		if (in_array($params[0],$this->reserved)) {
 			return $matches[0];
 		}
@@ -487,7 +501,6 @@ class gstpl_compiler {
 		$this->func_num++;
 		$params=$this->make_params_string($params);
 		$real_func_name=$this->call($func_name,$params);
-		
 		return sprintf("\n\$res.=%s;\n",$real_func_name);
 	}
 	
@@ -495,7 +508,6 @@ class gstpl_compiler {
 		if (method_exists($this->o,'__'.$func)) {
 			return sprintf('$this->__%s(%s)',$func,$params);
 		}
-		
 		$func_file='function.'.$func.'.php';
 		$func_full_file=$this->tpl->plugins_dir.DS.$func_file;
 		$func_name=sprintf('smarty_function_%s',$func);
@@ -743,7 +755,9 @@ class gs_page_blank {
 	}
 	
 	protected function assign_vars($params) {
-		$this->assign=array_merge($this->assign,$params);
+		if (!empty($params) && is_array($params)) {
+			$this->assign=array_merge($this->assign,$params);
+		}
 	}
 	
 	function get_var($name) {
