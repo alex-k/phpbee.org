@@ -16,9 +16,9 @@ class module_wizard extends gs_base_module implements gs_module {
 		$modules=new wz_modules();
 		$modules->find_records(array());
 		foreach($modules as $m) {
-			$ret[1][]='<a href="/admin/wizard/module/'.$m->id.'">'.$m->name.'</a>';
+			$ret[1][]='<a href="/admin/wizard/module/'.$m->id.'">'.$m->title.'</a>';
 		}
-		$ret[2]='<a href="/admin/wizard/install">Install</a>';
+		$ret[1][]='<a href="/admin/wizard/install">Install</a>';
 		return $ret;
 	}
 	
@@ -625,7 +625,7 @@ class wz_urls extends gs_recordset_short {
 class wz_handlers extends gs_recordset_short {
 	function __construct($init_opts=false) { parent::__construct(array(
 		'cnt'=> "fInt cnt",
-		'handler_keyname'=> "fString key required=false",
+		'handler_keyname'=> "fString key",
 		'handler_value'=>"fString value",
 		'Url'=>'lOne2One wz_urls',
 		),$init_opts);

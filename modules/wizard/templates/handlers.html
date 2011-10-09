@@ -22,7 +22,7 @@
 	<th></th>
 	<th></th>
 	</thead>
-	{foreach from=$url->Handlers item="e"}
+	{foreach from=$url->Handlers->orderby('cnt') item="e"}
 	<tr class="{cycle values='odd,even'}">
 			<td>{$e.id}</td>
 			<td>{$e.cnt}</td>
