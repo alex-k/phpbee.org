@@ -1,15 +1,12 @@
 <ul>
 {foreach from=$menu item="m"}
 	{if is_array($m)}
-		<li>{$m|array_shift}
-		<ul>
-			{foreach from=$m item=mi}
-				<li>{$mi}</li>
-			{/foreach}
-		</ul>
-		</li>
+	<li><b>{$mr=$m|current}{$mr|array_shift}</b></li>
+		{foreach from=$mr item=mi}
+    		<li style="padding-left:30px;">{$mi}</li>
+		{/foreach}
 	{else}
-	<li>{$m}</li>
+	<li><b>{$m}</b></li>
 	{/if}
 {/foreach}
 </ul>

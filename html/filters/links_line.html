@@ -1,7 +1,7 @@
 <div class="links_line">	
 	<a href="/{$link_all}">Все</a>
 	{foreach from=$links item=i key=link}
-	<a {if $i.key==$current}class="filter_current"{/if}   href="/{$link}">{$i.name} ({$i.count})</a>
+	<a {if $i.key==$current}class="filter_current"{/if}   href="/{$i.href}">{$i.name} [{$i.count}]</a>
 	{/foreach}
 </div>
 

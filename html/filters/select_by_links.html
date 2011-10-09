@@ -1,6 +1,6 @@
 <ul class="gs_filter_select_by_links">
 
 	{foreach from=$links item=i key=link}
-	<li><a {if $i.key==$current}class="filter_current"{/if}   href="/{$link}">{$i.name}</a></li>
+	<li><a {if $i.key==$current}class="filter_current"{/if}   href="/{$i.href}">{$i.name}</a></li>
 	{/foreach}
 </ul>
