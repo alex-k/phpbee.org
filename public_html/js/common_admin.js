@@ -22,4 +22,9 @@ $(document).ready (function (){
 	$("table.tb tr").mouseout(function() {
 		$(this).removeClass("over");
 	});
+	
+	$('#tpl_content').each(function (){
+		var myCodeMirror = CodeMirror.fromTextArea(this, { mode:"text/html", tabMode:"indent",lineNumbers: true });
+	});
+	
 });
