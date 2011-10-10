@@ -46,7 +46,7 @@
 		<ul>
 		{foreach from=$module.recordsets item=rs}
 			<li><a href="/admin/wizard/recordset_fields/{$rs.id}">{$rs.name}</a> 
-				<a href="/admin/wizard/module/{$module.id}/createadmin/{$rs.id}"><img src="/i/admin/ico_gear.png"  class="icon" title="generate admin pages"></a>
+				<a href="/admin/wizard/createadmin/{$module.id}/{$rs.id}"><img src="/i/admin/ico_gear.png"  class="icon" title="generate admin pages"></a>
 				<a href="/admin/wizard/recordsets/{$module.id}/{$rs.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать"  class="icon" title="Редактировать"></a>
 
 				{if $rs.Submodules->count()}({$rs.Submodules}){/if}

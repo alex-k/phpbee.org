@@ -70,11 +70,6 @@ class module_wizard extends gs_base_module implements gs_module {
 			'/admin/wizard/macros/list'=>array(
 				'gs_wizard_handler.macros_list:name:macros_list.html',
 				),
-			'/admin/wizard/form/createadmin'=>array(
-				'gs_wizard_handler.createadmin:name:form.html:form_class:form_createadmin:return:gs_record',
-				'gs_wizard_handler.commit:return:true',
-				'gs_base_handler.redirect_up:{level:2}',
-				),
 		),
 		'post'=>array(
 			'/admin/wizard/iddqdblocksubmit'=>array(
@@ -85,7 +80,6 @@ class module_wizard extends gs_base_module implements gs_module {
 		'get'=>array(
 			'/admin/wizard'=>'gs_base_handler.show',
 			'/admin/wizard/install'=>'gs_base_handler.show',
-			'/admin/wizard/module/*/createadmin'=>'gs_base_handler.show',
 			'/admin/wizard/iddqd'=>'gs_wizard_handler.iddqd',
 			'/admin/wizard/iddqdblock'=>array(
 						'gs_wizard_handler.iddqdblock:return:true',
@@ -323,87 +317,6 @@ class gs_wizard_handler extends gs_handler {
 
 		return true;
 	}
-	function createadmin() {
-		$bh=new gs_base_handler($this->data,$this->params);
-		$f=$bh->validate();
-		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
-		$d=$f->clean();
-
-		$fields=new wz_recordset_fields();
-		$fields->find_records(array('id'=>$d['fields']));
-		$links=new wz_recordset_links();
-		$links->find_records(array('id'=>$d['links']));
-		$filters=new wz_recordset_links();
-		$filters->find_records(array('id'=>$d['filters']));
-
-
-		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
-		$module=$rs->Module->first();
-
-
-
-		$tpl=new gs_tpl();
-		$tpl=$tpl->init();
-		$tpl->left_delimiter='{%';
-		$tpl->right_delimiter='%}';
-
-		$tpl->assign('rs',$rs);
-		$tpl->assign('module',$module);
-		$tpl->assign('fields',$fields);
-		$tpl->assign('links',$links);
-		$tpl->assign('filters',$filters);
-
-
-		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'createadmin'.DIRECTORY_SEPARATOR.$d['template_name']);
-
-
-		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'adm_'.$rs->name.'.html';
-
-		file_put_contents($filename,$out);
-
-		$rs->showadmin=1;
-
-		$modulename=$module->name;
-		$recordsetname=$rs->name;
-
-		$template=array(
-			"get"=>array(
-				"/admin/$modulename/$recordsetname"=>array("gs_base_handler.show:name:adm_$recordsetname.html"),
-				"/admin/$modulename/$recordsetname/delete"=>array(
-						"gs_base_handler.delete:{classname:$recordsetname}",
-						"gs_base_handler.redirect",
-						),
-				),
-			"handler"=>array(
-				"/admin/form/$recordsetname"=>array(
-					"gs_base_handler.post:{name:admin_form.html:classname:$recordsetname:form_class:form_admin}",
-					"gs_base_handler.redirect_up:level:2",
-					),
-				),
-		);
-
-		foreach ($template as $type=>$urls) {
-			foreach ($urls as $url=>$handlers) {
-				$f=$module->urls->find(array('gspgid_value'=>$url));
-				if($f->count()) continue;
-				$wz_url=$module->urls->new_record();
-				$wz_url->gspgid_value=$url;
-				$wz_url->type=$type;
-				$cnt=0;
-				foreach ($handlers as $key=>$value) {
-					$cnt++;
-					$wz_h=$wz_url->Handlers->new_record();
-					$wz_h->cnt=$cnt;
-					$wz_h->handler_keyname=$key;
-					$wz_h->handler_value=$value;
-					//$wz_h->commit();
-				}
-			}
-		}
-		$rs->commit();
-		//die();
-		return $module;
-	}
 
 
 	function macros_list() {
@@ -414,46 +327,6 @@ class gs_wizard_handler extends gs_handler {
 		return $bh->show($this->data);
 	}
 
-}
-class form_createadmin extends form_admin{
-	function __construct($hh,$params=array(),$data=array()) {
-		$rs=record_by_id($data['handler_params']['Recordset_id'],'wz_recordsets');
-
-		$module=$rs->Module->first();
-		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'createadmin'.DIRECTORY_SEPARATOR;
-		$extends=array_map(basename,glob($dirname."*"));
-
-
-		$hh=array(
-		    'template_name' => Array
-			(
-			    'type' => 'select',
-			    'options' => array_combine($extends,$extends),
-			),
-		    'fields' => Array
-			(
-			    'type' => 'checkboxes',
-			    'options'=>$rs->Fields->recordset_as_string_array(),
-			    'validate'=>'notEmpty',
-			    'default'=>array_keys($rs->Fields->recordset_as_string_array()),
-			),
-		    'links' => Array
-			(
-			    'type' => 'checkboxes',
-			    'options'=>$rs->Links->recordset_as_string_array(),
-			    'validate'=>'notEmpty',
-			    'default'=>array_keys($rs->Links->recordset_as_string_array()),
-			),
-		    'filters' => Array
-			(
-			    'type' => 'checkboxes',
-			    'options'=>$rs->Links->recordset_as_string_array(),
-			    'validate'=>'notEmpty',
-			    'default'=>array_keys($rs->Links->recordset_as_string_array()),
-			),
-		);
-		return parent::__construct($hh,$params,$data);
-	}
 }
 class form_choosetpl extends g_forms_inline{
 	function __construct($hh,$params=array(),$data=array()) {
@@ -475,6 +348,7 @@ class form_choosetpl extends g_forms_inline{
 }
 
 class wz_modules extends gs_recordset_short {
+	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'title'=> "fString 'название'",
@@ -485,6 +359,7 @@ class wz_modules extends gs_recordset_short {
 }
 
 class wz_recordsets extends gs_recordset_short {
+	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'title'=> "fString 'название'",
@@ -497,6 +372,7 @@ class wz_recordsets extends gs_recordset_short {
 	}
 }
 class wz_recordset_fields extends gs_recordset_short {
+	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'verbose_name'=> "fString verbose_name",
@@ -540,6 +416,7 @@ class wz_recordset_fields extends gs_recordset_short {
 	}
 }
 class wz_recordset_links extends gs_recordset_short {
+	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'type'=>"fSelect type values='lOne2One,lMany2One,lMany2Many'",
@@ -590,6 +467,7 @@ class wz_recordset_links extends gs_recordset_short {
 	}
 }
 class wz_recordset_submodules extends gs_recordset_short {
+	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=>"fSelect name widget=select",
 		'Recordset'=>'lOne2One wz_recordsets',
@@ -602,6 +480,7 @@ class wz_recordset_submodules extends gs_recordset_short {
 	}
 }
 class wz_urls extends gs_recordset_short {
+	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'gspgid_value'=> "fString gspgid required=false unique=true",
 		'type'=>'fSelect type values="get,handler,post"',
@@ -623,6 +502,7 @@ class wz_urls extends gs_recordset_short {
 
 }
 class wz_handlers extends gs_recordset_short {
+	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'cnt'=> "fInt cnt",
 		'handler_keyname'=> "fString key",
