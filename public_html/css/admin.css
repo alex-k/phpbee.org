@@ -256,6 +256,20 @@ tr.over td {
 	background: #fae9eb !important;
 }
 
+.tb tr.filters * {
+	background: #fff;
+	border: 0px;
+}
+
+a.filter_current {
+	font-weight: bold;
+}
+
+.links_line {
+	margin:5px;
+	padding:5px;
+}
+
 img.icon {
 	margin-bottom:-4px;
 	margin-left:10px;
