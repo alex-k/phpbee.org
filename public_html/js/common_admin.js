@@ -24,7 +24,7 @@ $(document).ready (function (){
 	});
 	
 	$('#tpl_content').each(function (){
-		var myCodeMirror = CodeMirror.fromTextArea(this, { mode:"text/html", tabMode:"indent",lineNumbers: true });
+		window['tpl_codemirror'] = CodeMirror.fromTextArea(this, { mode:"text/html", tabMode:"indent",lineNumbers: true });
 	});
 	
 });
