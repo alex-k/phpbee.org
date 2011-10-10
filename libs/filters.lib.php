@@ -97,6 +97,7 @@ class gs_filter_select_by_links extends gs_filter {
 		
 		$tpl=gs_tpl::get_instance();
 		$links=array();
+		$count_all=0;
 		foreach ($rec_rs as $rec) {
 			$arr=$this->va;
 			$key=$rec->{$this->fieldname};
@@ -104,25 +105,28 @@ class gs_filter_select_by_links extends gs_filter {
 			
 			if ($ps['recordset']) {
 				$rs=$ps['recordset'];
-				$count=$rs->find(array($this->link['local_field_name']=>$id))->count();
+				$count_array=$rs->query_options['options'];
+				foreach ($count_array as $ca_key=>$ca) {
+					if ($ca_key===$this->link['local_field_name'] 
+						|| (is_array($ca) && isset($ca['field']) && $ca['field']==$this->link['local_field_name'])
+						) {
+
+						unset($count_array[$ca_key]);
+					}
+				}
+				$count_array[]=array('type'=>'value',
+							    'field'=>$this->link['local_field_name'],
+							    'value'=>$id);
+				$rsname=$ps['recordset']->get_recordset_name();
+				$rs=new $rsname();
+				$count=$rs->count_records($count_array);
+				$count_all+=$count;
 			}
 
 			$name=trim($rec);
 			$arr[$this->name]=$key;
-			/*
-			switch ($this->data['handler_params']['urltype']) {
-				case 'get':
-					$link=$this->data['gspgid_root'].'?'.http_build_query($arr);	
-					break;
-				default:
-					$link=$this->data['handler_key_root'];
-					foreach ($arr as $k=>$v) $link.="/$k/$v";
-			}
-			*/
 
-			$links[]=array('name'=>$name,'key'=>$key,'count'=>$count,
-				'va'=>$arr,'rec'=>$rec,
-				);
+			$links[]=array('name'=>$name,'key'=>$key,'count'=>$count, 'va'=>$arr,'rec'=>$rec,);
 		}
 		
 		$current_name='';
@@ -147,8 +151,9 @@ class gs_filter_select_by_links extends gs_filter {
 			$links[$key]=$l;
 			if ($l['key']==$this->value) $current_name=$l['name'];
 		}
+		$link_all_array=array('name'=>'all','key'=>'all','href'=>$link_all,'count'=>$count_all, 'va'=>null,'rec'=>null);
 
-		$tpl->assign('link_all',$link_all);
+		$tpl->assign('link_all',$link_all_array);
 		$tpl->assign('links',$links);
 		$tpl->assign('current',$this->value);
 		$tpl->assign('current_name',$current_name);

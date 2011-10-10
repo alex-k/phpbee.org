@@ -472,6 +472,21 @@ class gs_recordset_short extends gs_recordset {
 			$this->structure['fields']['_ctime']=array('type'=>'date');
 			$this->structure['fields']['_mtime']=array('type'=>'date');
 		}
+		if(!isset($this->no_urlkey) || !$this->no_urlkey) {
+			$this->structure['fields']['urlkey']=array('type'=>'varchar','options'=>'128');
+			$this->structure['triggers']['before_insert'][]='trigger_urlkey';
+			$this->structure['htmlforms']['urlkey']=array(
+				'type'=>'input', 
+				'verbose_name'=>'Urlkey', 
+				'validate'=>'checkUnique',
+				'validate_params'=>array(
+					'class'=>$this->init_opts['recordset'],
+					'field'=>'urlkey',
+					'func'=>'check_unique_urlkey',
+					),
+
+				);
+		}
 		parent::__construct($this->gs_connector_id,$this->table_name);
 	}
 
@@ -541,6 +556,17 @@ class gs_recordset_short extends gs_recordset {
 		$v=array_keys(array_filter($v,create_function('$a','return $a["type"]!="hidden" && (!isset($a["hidden"]) || $a["hidden"]!="true");')));
 		return $v;
 	}
+
+	function check_unique_urlkey($field,$value,$params,$rec_id) {
+		$recs=$this->find_records(array($field=>$value));
+		if ($recs->count()==0) return true;
+		return $recs->first()->get_id()===$params['rec_id'];
+	}
+
+	function trigger_urlkey($rec,$type) {
+		$rec->urlkey=string_to_safeurl(trim($rec));
+	}
+
 }
 
 ?>

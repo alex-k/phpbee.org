@@ -459,7 +459,6 @@ class gs_base_handler extends gs_handler {
 
 		cfg_set('handler_cache_status',0);
 
-		ob_start();
 		if (!isset($data['gspgid_root'])) {
 			$data['gspgid_root']=$s_data['gspgid'];
 			$data['handler_key_root']=$s_data['handler_key'];
@@ -492,7 +491,14 @@ class gs_base_handler extends gs_handler {
 			$hndl=$o_p->get_current_handler();
 			if ($hndl['params']['module_name']!=$params['scope']) return '';
 		}
-		$ret=$o_p->process();
+		ob_start();
+		try {
+			$ret=$o_p->process();
+		} catch (gs_dbd_exception $e) {
+			throw $e;
+		} catch (gs_exception $e) {
+			throw $e;
+		}
 		$ret_ob=ob_get_contents();
 		ob_end_clean();
 

@@ -117,7 +117,8 @@ class gs_validate_checkUnique{
 	function validate($field,$value,$data=array(),$params=array(),$record=null) {
 		$classname=$params['class'];
 		$obj=new $classname;
-		return $obj->check_unique($params['field'],$value,$params,$params['rec_id']);
+		$func_name=isset($params['func']) ? $params['func'] : 'check_unique';
+		return $obj->$func_name($params['field'],$value,$params,$params['rec_id']);
 
 	}
 }

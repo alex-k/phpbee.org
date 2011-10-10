@@ -152,6 +152,32 @@ function bee_mail($to,$subj,$text,$from='') {
 	mail ($to,$subj,$mail->mime,$mail->headers);
 }
 
+function string_to_safeurl($str, $replace=array(), $delimiter='-') {
+	md('---------',1);
+	$old_locale=setlocale(LC_ALL,"0");
+	setlocale(LC_ALL, 'ru_RU.UTF-8');
+	if( !empty($replace) ) {
+		$str = str_replace((array)$replace, ' ', $str);
+	}
+
+	$clean = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $str);
+	$clean_test = preg_replace("/[^a-zA-Z0-9]/", '', $clean);
+	var_dump($clean_test);
+	if($str && !$clean_test) {
+		$clean = iconv("UTF-8", "KOI8-R//IGNORE", $str);
+		$clean=str_split($clean,1);
+		$clean=implode(array_map(create_function('$a','return chr(ord($a) & 127) ;'),$clean));
+	}
+
+	$clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
+	$clean = strtolower(trim($clean, '-'));
+	$clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
+
+	setlocale(LC_ALL, $old_locale);
+
+	return $clean;
+}
+
 
 function record_by_id($id=0,$classname='gs_null') {
 	$r=new $classname;

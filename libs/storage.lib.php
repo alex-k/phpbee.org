@@ -263,10 +263,10 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->state=RS_STATE_LOADED;
 		return $this;
 	}
-	public function count_records($options=null) {
+	public function count_records($options=array()) {
 		$options=$this->string2options($options);
-		$options=array_merge($this->query_options['options'],$options); // Add to array of options all options what already used from lazy load (c) Andrey Pakhomov
-		if (is_array($options)) foreach($options as $k=>$o) {
+		if (isset($this->query_options['options'])) $options=array_merge($this->query_options['options'],$options); // Add to array of options all options what already used from lazy load (c) Andrey Pakhomov
+		foreach($options as $k=>$o) {
 			if (in_array(strtolower($o['type']),array('limit','offset','orderby'))) unset($options[$k]);
 		}
 		$this->get_connector()->select($this,$options,array('count(*) as count'));
