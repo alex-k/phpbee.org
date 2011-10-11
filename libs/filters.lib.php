@@ -51,6 +51,39 @@ class gs_filter {
 	}
 }
 
+class gs_filter_like extends gs_filter {
+	function __construct($data) {
+		parent::__construct($data);
+		$this->fields=array_map(trim,explode(',',$this->params['fields']));
+	}
+	function getHtmlBlock($ps) {
+		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
+		return $this->getHtmlBlockNonExlusive($ps);
+	}
+	function getHtmlBlockNonExlusive($ps) {
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('current',$this->value);
+		$tpl->assign('keyname',$this->name);
+		$tpl->assign('prelabel',$ps['prelabel']);
+		$tpl->assign('label',$ps['label']);
+		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
+		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
+		return $out;
+	}
+	function applyFilter($options,$rs) {
+		if (empty($this->value)) return $options;
+		foreach ($this->fields as $field) {
+			$options['OR'][]=array(
+					'type'=>'value',
+					'field'=>$field,
+					'value'=>$this->value,
+					'case'=>'LIKE',
+					);
+		}
+		return $options;
+	}
+}
+
 
 class gs_filter_select_by_links extends gs_filter {
 	function __construct($data) {
