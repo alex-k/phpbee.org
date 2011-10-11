@@ -1,5 +1,7 @@
 <?php
 
+abstract class gs_wizard_strategy_module extends gs_base_module {}
+
 
 class module_wizard extends gs_base_module implements gs_module {
 	function __construct() {
@@ -70,6 +72,9 @@ class module_wizard extends gs_base_module implements gs_module {
 			'/admin/wizard/macros/list'=>array(
 				'gs_wizard_handler.macros_list:name:macros_list.html',
 				),
+			'/admin/form/strategy'=>array(
+				'gs_wizard_handler.strategy:return:true:name:form_submit.html:form_class:gs_wizard_strategy_form',
+			),
 		),
 		'post'=>array(
 			'/admin/wizard/iddqdblocksubmit'=>array(
@@ -317,6 +322,15 @@ class gs_wizard_handler extends gs_handler {
 
 		return true;
 	}
+	function strategy() {
+		$bh=new gs_base_handler($this->data,$this->params);
+		$f=$bh->validate();
+		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+		$d=$f->clean();
+		$filename=basename(dirname(__class_filename($d['strategy'])));	
+		$href="/admin/wizard/".$filename."/".$d['recordset'];
+		return html_redirect($href);
+	}
 
 
 	function macros_list() {
@@ -534,6 +548,26 @@ class gs_wizard_template_form extends g_forms_inline{
 			(
 			    'type' => 'input',
 			    'validate' => 'dummyValid',
+			),
+
+		);
+		return parent::__construct($hh,$params,$data);
+	}
+
+}
+class gs_wizard_strategy_form extends g_forms_inline{
+	function __construct($hh,$params=array(),$data=array()) {
+		$module=record_by_id($data['handler_params']['Module_id'],'wz_modules');
+		$hh=array(
+		    'recordset' => Array
+			(
+			    'type' => 'select',
+			    'options'=>$module->recordsets->recordset_as_string_array(),
+			),
+		    'strategy' => Array
+			(
+			    'type' => 'select',
+			    'options' => class_members('gs_wizard_strategy_module'),
 			),
 
 		);

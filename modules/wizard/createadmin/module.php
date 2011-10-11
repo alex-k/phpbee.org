@@ -1,5 +1,8 @@
 <?php
-class module_wizard_createadmin extends gs_base_module implements gs_module {
+class module_wizard_createadmin extends gs_wizard_strategy_module implements gs_module {
+	static function _desc() {
+		return "админка";
+	}
 	function __construct() {
 	}
 	function install() {
@@ -10,7 +13,7 @@ class module_wizard_createadmin extends gs_base_module implements gs_module {
 			'/admin/wizard/createadmin/form'=>array(
 				'gs_strategy_createadmin_handler.createadmin:name:form.html:form_class:form_createadmin:return:gs_record',
 				'gs_wizard_handler.commit:return:true',
-				'gs_base_handler.redirect_up:{level:2}',
+				'gs_base_handler.redirect_gl:gl:back',
 				),
 			),
 		'get'=>array(
@@ -18,6 +21,13 @@ class module_wizard_createadmin extends gs_base_module implements gs_module {
 			),
 		);
 		return self::add_subdir($data,dirname(__file__));
+	}
+	static function gl($name,$record,$data) {
+		switch ($name) {
+			case 'back':
+				return '/admin/wizard/module/'.$data['handler_params']['Module_id'];
+			break;
+		}
 	}
 }
 class gs_strategy_createadmin_handler extends gs_handler {
