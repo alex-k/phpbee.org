@@ -58,6 +58,7 @@ class gs_filter_select_by_links extends gs_filter {
 		list($recordsetname,$linkname)=explode('.',$this->params['link']);
 		list($this->linkname,$this->fieldname)=explode(':',$linkname);
 		$rs=new $recordsetname();
+		$this->recordset=$rs;
 		$this->link=$rs->structure['recordsets'][$this->linkname];
 
 
@@ -69,14 +70,35 @@ class gs_filter_select_by_links extends gs_filter {
 		$fieldname=$this->fieldname;
 		$link=$this->link;
 
-		$rec_rs_name=$link['recordset'];
-		$rec_rs=new $rec_rs_name();
-		$rec=$rec_rs->find_records(array($fieldname=>$this->value))->first();
-		$options[]=array(
-				'type'=>'value',
-				'field'=>$link['local_field_name'],
-				'value'=>$rec->{$link['foreign_field_name']},
-				);
+
+		if ($link['type']=='many') {
+
+			$rec_rs_name=$link['rs2_name'];
+			$rec_rs=new $rec_rs_name();
+
+			$backlink='_'.$rs->get_backlink_name($this->linkname);
+			$link_ids=array();
+			foreach($rec_rs->find_records(array($fieldname=>$this->value)) as $filter_rec) {
+				foreach ($filter_rec->$backlink as $a) $link_ids[]=$a[$link['foreign_field_name']];
+			}
+			$options[]=array(
+					'type'=>'value',
+					'field'=>$rs->id_field_name,
+					'value'=>$link_ids,
+					);
+		} else {
+			$rec_rs_name=$link['recordset'];
+			$rec_rs=new $rec_rs_name();
+			$values=array();
+			foreach ($rec_rs->find_records(array($fieldname=>$this->value)) as $rec) {
+				$values[]=$rec->{$link['foreign_field_name']};
+			}
+			$options[]=array(
+					'type'=>'value',
+					'field'=>$link['local_field_name'],
+					'value'=>$values,
+					);
+		}
 		return $options;
 	}
 	function getHtmlBlock($ps) {
@@ -90,6 +112,8 @@ class gs_filter_select_by_links extends gs_filter {
 		*/
 
 		$recordsetname=$this->link['recordset'];
+		if ($this->link['type']=='many') $recordsetname=$this->link['rs2_name'];
+
 		$rec_rs=new $recordsetname();
 		$rec_rs=$rec_rs->find_records(array());
 		
@@ -101,7 +125,15 @@ class gs_filter_select_by_links extends gs_filter {
 		foreach ($rec_rs as $rec) {
 			$arr=$this->va;
 			$key=$rec->{$this->fieldname};
-			$id=$rec->{$this->link['foreign_field_name']};
+			if ($this->link['type']=='many') {
+				$field=$this->recordset->id_field_name;
+				$backlink='_'.$this->recordset->get_backlink_name($this->linkname);
+				$id=array();
+				foreach ($rec->$backlink as $a) $id[]=$a[$this->link['foreign_field_name']];
+			} else {
+				$field=$this->link['local_field_name'];
+				$id=$rec->{$this->link['foreign_field_name']};
+			}
 			
 			if ($ps['recordset']) {
 				$rs=$ps['recordset'];
@@ -114,20 +146,22 @@ class gs_filter_select_by_links extends gs_filter {
 						unset($count_array[$ca_key]);
 					}
 				}
+				$count_array_all=$count_array;
 				$count_array[]=array('type'=>'value',
-							    'field'=>$this->link['local_field_name'],
+							    'field'=>$field,
 							    'value'=>$id);
+
 				$rsname=$ps['recordset']->get_recordset_name();
 				$rs=new $rsname();
 				$count=$rs->count_records($count_array);
-				$count_all+=$count;
 			}
 
 			$name=trim($rec);
 			$arr[$this->name]=$key;
 
-			$links[]=array('name'=>$name,'key'=>$key,'count'=>$count, 'va'=>$arr,'rec'=>$rec,);
+			$links[]=array('name'=>$name,'keyname'=>$this->name,'key'=>$key,'count'=>$count, 'va'=>$arr,'rec'=>null,);
 		}
+		$count_all=$rs->count_records($count_array_all);
 		
 		$current_name='';
 		

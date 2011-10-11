@@ -295,7 +295,11 @@ function class_members($classname=null) {
 	$classes=gs_cacher::load('classes','config');
 	if (!$classname) return $classes;
 	$classes=array_filter(array_keys($classes),create_function('$a','return  is_subclass_of($a,"'.$classname.'");'));
-	return array_combine($classes,$classes);
+	$names=array();
+	foreach ($classes as $c) {
+		$names[]=method_exists($c,'_desc') ? $c::_desc() : $c;
+	}
+	return array_combine($classes,$names);
 }
 
 ?>

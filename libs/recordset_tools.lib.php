@@ -567,6 +567,20 @@ class gs_recordset_short extends gs_recordset {
 		$rec->urlkey=string_to_safeurl(trim($rec));
 	}
 
+	function get_backlink_class($linkname) {
+		return $this->structure['recordsets'][$linkname]['rs2_name'];
+	}
+	function get_backlink_name($linkname) {
+		$link=$this->structure['recordsets'][$linkname];
+
+		$l_rs=new $link['rs2_name'];
+
+		foreach($l_rs->structure['recordsets'] as $backlink=>$rs_link) {
+			if (substr($backlink,0,1)!='_' && $rs_link['recordset']==$link['recordset']) return $backlink;
+		}
+		return null;
+	}
+
 }
 
 ?>

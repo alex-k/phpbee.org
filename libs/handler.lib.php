@@ -164,7 +164,7 @@ class gs_base_handler extends gs_handler {
 					$rsl=$rec->init_linked_recordset($k);
 					$rsname=$rsl->structure['recordsets']['childs']['recordset'];
 					$rs=new $rsname();
-					$vrecs=$rs->find_records();
+					$vrecs=$rs->find_records(array());
 				}
 				$variants=array();
 				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);

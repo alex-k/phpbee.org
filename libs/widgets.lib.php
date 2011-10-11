@@ -275,7 +275,7 @@ class gs_widget_select_enter extends gs_widget {
 
 class gs_widget_checkboxes extends gs_widget_multiselect {
 	function html($multi=false) {
-		$ret="";
+		$ret='<input type="hidden" name="'.$this->fieldname.'[]" value="">';
 		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 		foreach ($this->params['options'] as $v=>$l) {
 			if (is_array($l)) {
@@ -298,6 +298,13 @@ class gs_widget_checkboxes extends gs_widget_multiselect {
 				htmlspecialchars($v), 
 				$sel ? 'checked="checked"' : '', $l
 				);
+	}
+	function clean() {
+		$d=parent::clean();
+		if (is_array($d)) foreach ($d as $k=>$dd)  {
+			if (is_array($dd)) $d[$k]=array_filter($dd);
+		}
+		return $d;
 	}
 }
 class gs_widget_checkbox extends gs_widget {

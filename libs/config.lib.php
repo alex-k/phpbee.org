@@ -579,10 +579,16 @@ class gs_var_storage {
 }
 
 
-function __gs_autoload($class_name) {
+function __class_filename($class_name) {
 	$classes=gs_cacher::load('classes','config');
-	if (!$classes) return false;
-	if (array_key_exists($class_name,$classes)) load_file($classes[$class_name]);
+	if (!$classes) return null;
+	return (array_key_exists($class_name,$classes)) ? $classes[$class_name] : null;
+}
+
+
+function __gs_autoload($class_name) {
+	$filename=__class_filename($class_name);
+	if($filename) load_file($filename);
 }
 
 spl_autoload_register('__gs_autoload');
