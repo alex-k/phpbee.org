@@ -84,8 +84,11 @@ class gs_strategy_createadmin_handler extends gs_handler {
 				),
 			"handler"=>array(
 				"/admin/form/$recordsetname"=>array(
-					"gs_base_handler.post:{name:admin_form.html:classname:$recordsetname:form_class:form_admin}",
-					"gs_base_handler.redirect_up:level:2",
+					"gs_base_handler.redirect_if:gl:save_cancel:return:true",
+					"gs_base_handler.post:{name:admin_form.html:classname:$recordsetname:form_class:g_forms_table}",
+					"gs_base_handler.redirect_if:gl:save_continue:return:true",
+					"gs_base_handler.redirect_if:gl:save_return:return:true",
+					//"gs_base_handler.redirect_up:level:2",
 					),
 				),
 		);
@@ -121,6 +124,9 @@ class form_createadmin extends form_admin{
 		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
 		$extends=array_map(basename,glob($dirname."*"));
 
+		$links=$rs->Links->find(array('type'=>array('lMany2Many','lOne2One')))->recordset_as_string_array();
+		if(!is_array($links)) $links=array();
+
 
 		$hh=array(
 		    'template_name' => Array
@@ -138,16 +144,16 @@ class form_createadmin extends form_admin{
 		    'links' => Array
 			(
 			    'type' => 'checkboxes',
-			    'options'=>$rs->Links->recordset_as_string_array(),
+			    'options'=>$links,
 			    'validate'=>'notEmpty',
-			    'default'=>array_keys($rs->Links->recordset_as_string_array()),
+			    'default'=>array_keys($links),
 			),
 		    'filters' => Array
 			(
 			    'type' => 'checkboxes',
-			    'options'=>$rs->Links->recordset_as_string_array(),
+			    'options'=>$links,
 			    'validate'=>'notEmpty',
-			    'default'=>array_keys($rs->Links->recordset_as_string_array()),
+			    'default'=>array_keys($links),
 			),
 		);
 		return parent::__construct($hh,$params,$data);

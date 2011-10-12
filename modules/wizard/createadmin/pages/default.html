@@ -6,11 +6,15 @@
 	<h4>{%$rs.title%}</h4>
 
 
+
 	{%foreach from=$filters item=f%}
 		{handler gspgid="/filter/" class="select_by_links" link="{%$rs.name%}.{%$f.name%}:urlkey" name="{%$f.name%}" urltype=get }
 		{%$s_filters=$s_filters|cat:$f.name|cat:","%}
 	{%/foreach%}
-	{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="{%$s_filters|trim:","%}" _paging="pagenums:20"}
+
+		{handler gspgid="/filter/" class="like" name="search" fields="{%$fields%}" urltype=get }
+	{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,{%$s_filters%}" _paging="pagenums:20"}
+
 
 	<table class="tb">
 	<thead>
@@ -19,6 +23,12 @@
 	{%foreach from=$filters item=f%}
 		<tr><td>{%$f.verbose_name%}:</td><td>{handler gspgid="/filter/show" name="{%$f.name%}"  recordset=${%$rs.name%} tpl="links_line.html"  }</td></tr>
 	{%/foreach%}
+		<tr><td>Find:</td><td>
+			<form class="filterform" method="get">
+			{handler gspgid="/filter/show" name="search"  recordset=${%$rs.name%} tpl="like.html"  }
+			<input type="submit" value="">
+			</form>
+		</td></tr>
 	</table>
 	</td> </tr>
 	<tr class="pager"><td colspan="100">Страницы: {${%$rs.name%}_paging}</td></tr>

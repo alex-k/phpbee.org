@@ -59,6 +59,18 @@ class module extends gs_base_module implements gs_module {
 		);
 		return self::add_subdir($data,dirname(__file__));
 	}
+	static function gl($name,$record,$data) {
+		switch ($name) {
+			case 'save_cancel':
+				return $data['handler_key_root'];
+			case 'save_continue':
+				return $data['gspgid_root'];
+			case 'save_return':
+				return $data['handler_key_root'];
+			break;
+			}
+		return null;
+	}
 }
 
 class images_handler extends gs_base_handler {

@@ -90,6 +90,7 @@ img {
 	border:0px;
 }
 
+
 .tb thead tr.filters td .links_line {
 	padding-top:5px;
 	padding-bottom:10px;
@@ -102,6 +103,29 @@ img {
 
 .tb thead tr.filters td .links_line a:hover {
 	text-decoration:none;
+}
+
+.filterform {
+	position: relative;
+	width:310px;
+	padding: 0px;
+	margin: 0px;
+}
+.filterform input[type="text"]{
+	border:1px solid #808080 !important;
+	width:300px;
+	height:18px;
+	position: relative;
+	top: 0px;
+	left: 0px;
+}
+.filterform input[type="submit"]{
+	width:16px;
+	height:15px;
+	position: absolute;
+	top: 8px;
+	right: 0px;
+	background:url('/i/admin/ico_find.png')  0 0 no-repeat !important;
 }
 
 
