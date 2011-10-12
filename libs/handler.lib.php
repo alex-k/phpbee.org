@@ -344,6 +344,14 @@ class gs_base_handler extends gs_handler {
 		}
 		return $this->redirect();
 	}
+	function redirect_if($ret) {
+		if (!isset($this->data[$this->params['gl']])) return true;
+
+
+		$this->params['href']=call_user_func('module::gl',$this->params['gl'],$ret['last'],$this->data);
+		$this->redirect();
+		return false;
+	}
 	function redirect() {
 		return html_redirect(isset($this->params['href']) ? $this->params['href']: null);
 	}
