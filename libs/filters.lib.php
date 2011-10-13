@@ -54,7 +54,7 @@ class gs_filter {
 class gs_filter_like extends gs_filter {
 	function __construct($data) {
 		parent::__construct($data);
-		$this->fields=array_map(trim,explode(',',$this->params['fields']));
+		$this->fields=array_map(trim,array_filter(explode(',',$this->params['fields'])));
 	}
 	function getHtmlBlock($ps) {
 		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
