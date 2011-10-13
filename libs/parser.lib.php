@@ -21,12 +21,12 @@ class gs_parser {
 	{
 		if($data) $this->data=$data;
 
-		$init=new gs_init('auto');
-		$init->load_modules();
 		
 		$this->registered_handlers= DEBUG ? NULL : gs_cacher::load('handlers','config');
 		if (!$this->registered_handlers) {
 			mlog('WILL REHASH HANDLERS');
+			$init=new gs_init('auto');
+			$init->load_modules();
 			$this->registered_handlers=$this->get_handlers();
 			//mlog($this->registered_handlers);
 			gs_cacher::save($this->registered_handlers,'config','handlers');

@@ -560,6 +560,11 @@ abstract class gs_prepare_sql {
 				$txt=$this->construct_where($value,'OR');
 			} else if ($kkey==="AND") {
 				$txt=$this->construct_where($value,'AND');
+			} else if (is_array($value) && isset($value['type']) && $value['type']=='condition') {
+				unset($value['type']);
+				$condition=$value['condition'];
+				unset($value['condition']);
+				$txt=$this->construct_where($value,$condition);
 			} else {
 				if (!is_array($value) || !isset($value['value'])) {
 					$value=array('type'=>'value', 'field'=>$kkey,'case'=>'=','value'=>$value);

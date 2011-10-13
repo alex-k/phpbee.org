@@ -351,6 +351,8 @@ class gs_base_handler extends gs_handler {
 		unset($values['urlkey']);
 		$newrec=$rs->new_record($values);
 		$newrec->commit();
+		$newrec->urlkey=$newrec->get_id();
+		$newrec->commit();
 		return $rec;
 	}
 	function redirect_gl($ret) {

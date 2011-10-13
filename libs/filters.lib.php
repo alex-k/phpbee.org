@@ -72,14 +72,51 @@ class gs_filter_like extends gs_filter {
 	}
 	function applyFilter($options,$rs) {
 		if (empty($this->value)) return $options;
+		$to=array(
+			'type'=>'condition',
+			'condition'=>'OR',
+		);
 		foreach ($this->fields as $field) {
-			$options['OR'][]=array(
+			$to[]=array(
 					'type'=>'value',
 					'field'=>$field,
 					'value'=>$this->value,
 					'case'=>'LIKE',
 					);
 		}
+		$options[$this->name]=$to;
+		return $options;
+	}
+}
+
+class gs_filter_calendar extends gs_filter_like {
+	function applyFilter($options,$rs) {
+		if (empty($this->value)) return $options;
+		$to=array(
+			'type'=>'condition',
+			'condition'=>'OR',
+		);
+		foreach ($this->fields as $field) {
+			$to[]=array(
+				'type'=>'condition',
+				'condition'=>'AND',
+
+				array(
+					'type'=>'value',
+					'field'=>$field,
+					'value'=>date(DATE_ATOM,strtotime($this->value)),
+					'case'=>'>=',
+				),
+				array(
+					'type'=>'value',
+					'field'=>$field,
+					'value'=>date(DATE_ATOM,strtotime("$this->value +1day")),
+					'case'=>'<',
+				),
+			);
+
+		}
+		$options[$this->name]=$to;
 		return $options;
 	}
 }
