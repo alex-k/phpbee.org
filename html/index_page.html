@@ -1,167 +1,44 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	{block name="header"}
-	{handler gspgid="/pages/info"}
-	{/block}
-	{*block name="header"}
-	<title>{$page_info.title|default:''}</title>
-	<meta name="keywords" content="{$page_info.keywords|default:''}">
-	<meta name="description" content="{$page_info.description|default:''}">
-	{/block*}
-	<link rel="stylesheet" href="/css/style.css" type="text/css" media="screen, projection" />
+	<title>{block name=title}TITLE{/block}</title>
+
+	<link rel="stylesheet" type="text/css" href="/css/layout.css" media="screen" />
+	<link href="/css/main.css" rel="stylesheet" type="text/css" title="CSS for site" />
+	<link rel="shortcut icon" href="/i/favicon.ico" />
 	<script type="text/javascript" src="/js/jquery.min.js"></script>
-	<script type="text/javascript" src="/js/jquery.prettyPhoto.js"></script>
-	<script type="text/javascript" src="/js/jquery.aviaSlider.min.js"></script>
-	<script type="text/javascript" src="/js/jquery.tinycarousel.min.js"></script>
+	<script type="text/javascript" src="/js/jquery-ui.js"></script>
 	<script type="text/javascript" src="/js/common.js"></script>
 </head>
 
 <body>
-<!-- Yandex.Metrika counter -->
-<div style="display:none;"><script type="text/javascript">
-{literal}
-(function(w, c) {
-    (w[c] = w[c] || []).push(function() {
-        try {
-            w.yaCounter9334996 = new Ya.Metrika({id:9334996, enableAll: true});
-        }
-        catch(e) { }
-    });
-})(window, "yandex_metrika_callbacks");
-{/literal}
-</script></div>
-<script src="//mc.yandex.ru/metrika/watch.js" type="text/javascript" defer="defer"></script>
-<noscript><div><img src="//mc.yandex.ru/watch/9334996" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-<!-- /Yandex.Metrika counter -->
-<div id="wrapper">
+{block name="filters"}
 
-	<div id="header">
-				<div id="header_menu">
-					<ul>
-						<li><img src="/i/str.jpg"> <a href="/adevertisments">Доска объявлений</a></li>
-						<li><img src="/i/str.jpg"> <a href="/map_severodvinsk">Карта Северодвинска</a></li>
-					</ul>
-					<ul>
-						<li><img src="/i/str.jpg"> <a href="/companies/list">Каталог компаний</a></li>
-						<li><img src="/i/str.jpg"> <a href="/articles/catalogue">Каталог статей</a></li>
-						<li><img src="/i/str.jpg"> <a href="/articles/school">Школа ремонта</a></li>
-					</ul>
-				</div>
-		<div id="logo">
-			<a href="/"> <img src="/i/logo.jpg" alt=""></></a>
+{/block}
+
+<div id="header">
+header
+</div>
+<div class="colmask threecol">
+	<div class="colmid">
+		<div class="colleft">
+			<div class="col1">
+					{block name="center"}content_block_center{/block}
+			</div>
+			<div class="col2">
+					{block name="left"}content_block_left{/block}
+
+			</div>
+			<div class="col3">
+					{block name="right"}content_block_right{/block}
+			</div>
 		</div>
-
-	</div><!-- #header-->
-	<div id="middle">
-			<div id="menu">
-				<ul>
-					<li><a href="/">ГЛАВНАЯ</a></li>
-					<li><a href="/info/about">О НАС</a></li>
-					<li><a href="/news">НОВОСТИ</a></li>
-					<li><a href="/info/adv">РЕКЛАМА</a></li>
-				</ul>
-			</div>
-		<div id="container">
-			<!-- #content-->
-			<div id="content">
-			{block name="content"}
-			<div id="bg_1">
-					<ul id="frontpage-slider" class="aviaslider">
-						<li><a href="/i/slides/1.jpg" title="" ><img src="/i/slides/1.jpg" alt="" /></a></li>
-						<li><a href="/i/slides/2.jpg" title=""><img src="/i/slides/2.jpg" alt="" /></a></li>
-						<li><a href="/i/slides/5.jpg" title=""><img src="/i/slides/3.jpg" alt="" /></a></li>
-						<li><a href="/i/slides/4.jpg" title=""><img src="/i/slides/4.jpg" alt="" /></a></li>
-						<li><a href="/i/slides/5.jpg" title=""><img src="/i/slides/5.jpg" alt="" /></a></li>
-					</ul>
-			</div>
-			<div id="bg_2">
-				<div id="left_menu">
-					{handler gspgid='/articles/last/catalog'}
-				</div>
-				<div id="right_menu">
-					{handler gspgid='/articles/school'}
-				</div>
-			</div>
-			<div id="bg_3">
-				<div id="catalog">
-					<ul>
-						<li><a href="/">ТЦ Лагуна</a></li>
-						<li><a href="/">ФОК Звездочка</a></li>
-						<li><a href="/">ОАО Березка</a></li>
-						<li><a href="/">СантехМастер</a></li>
-					</ul>
-					<ul>
-						<li><a href="/">ИП Кузнецова</a></li>
-						<li><a href="/">Кузовной ремонт</a></li>
-						<li><a href="/">ЧерМет Трест</a></li>
-						<li><a href="/">ООО Звездочка</a></li>
-					</ul>
-					<ul>
-						<li><a href="/">ООО Ионит-телеком</a></li>
-						<li><a href="/">Шиномонтаж</a></li>
-						<li><a href="/">Кафе Шале</a></li>
-						<li><a href="/">Ресторан Северный</a></li>
-					</ul>
-				</div>
-			</div>
-			{/block}
-			</div>
-			<!-- #content-->
-		</div><!-- #container-->
-
-		<div class="sidebar" id="sideRight">
-			<div id="bg_news">
-				{handler gspgid="/news/last/4"}
-			</div>
-				<div id="bg_do">
-					<ul>
-						<li><a href="/">- Ищу мастера</a></li>
-						<li><a href="/">- Нужен телефон</a></li>
-						<li><a href="/">- Продам кафель не дорого!</a></li>
-						<li><a href="/">- Школа ремонта в Северо...</a></li> 
-						<li><a href="/">- Услуги дворника</a></li>
-						<li><a href="/">- Грузоперевозки</a></li>
-						<li><a href="/">- Шпон оптом</a></li>
-						<li><a href="/">- Дачные срубы под ключ и...</a></li>
-					</ul>
-				</div>
-		</div><!-- .sidebar#sideRight -->
-
-	</div><!-- #middle-->
-
-</div><!-- #wrapper -->
-
-<div id="footer">
-	<div id="footer_menu">
-		<ul>
-			<li><a href="/info/about">О нас</a></li>
-			<li><a href="/news">Новости</a></li>
-			<li><a href="mailto:info@stroibaza29.ru">Обратная связь</a></li>
-			<li><a href="/info/adv">Реклама</a></li>
-		</ul>
 	</div>
-		<div id="footer_copy">
-			<ul>
-				<li>Copyright © {$smarty.now|date_format:"%Y"} stroibaza29.ru</li>
-			</ul>
-		</div>
-		<p align="right">
-		<!--LiveInternet counter--><script type="text/javascript"><!--
-document.write("<a href='http://www.liveinternet.ru/click' "+
-"target=_blank><img src='//counter.yadro.ru/hit?t18.5;r"+
-escape(document.referrer)+((typeof(screen)=="undefined")?"":
-";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
-screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
-";"+Math.random()+
-"' alt='' title='LiveInternet: показано число просмотров за 24"+
-" часа, посетителей за 24 часа и за сегодня' "+
-"border='0' width='88' height='31'><\/a>")
-//--></script><!--/LiveInternet-->
-		</p>
-</div><!-- #footer -->
-
+</div>
+<div id="footer">
+footer
+</div>
 
 </body>
 </html>
+
