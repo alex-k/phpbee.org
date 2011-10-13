@@ -17,11 +17,14 @@
 	{%/foreach%}
 
 		{handler gspgid="/filter/" class="like" name="search" fields="{%$fields%}" urltype=get }
-		{handler gspgid="/filter/" class="calendar" name="calendar" fields="_ctime,_mtime" urltype=get }
-	{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,{%$s_filters%}" _paging="pagenums:20"}
+		{handler gspgid="/filter/" class="calendar" name="calendar" fields="_ctime,_mtime,{%$datefields%}" urltype=get }
 
 
-	datefields:{$datefields}
+
+		{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,{%$s_filters%}" _paging="pagenums:20"}
+
+
+	datefields:{%$datefields%}
 
 	<table class="tb">
 	<thead>
@@ -33,7 +36,8 @@
 		<tr><td>Find:</td><td>
 			<form class="filterform" method="get">
 			{handler gspgid="/filter/show" name="search"  recordset=${%$rs.name%} tpl="like.html"  }
-			{handler gspgid="/filter/show" name="calendar"  recordset=${%$rs.name%} tpl="calendar.html"  }
+			{handler gspgid="/filter/show" name="calendar"  recordset=${%$rs.name%} tpl="calendar.html" prelabel="date"  }
+
 			<input type="submit" value="">
 			</form>
 		</td></tr>
