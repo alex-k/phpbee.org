@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<head>
+	<title>{block name=title}TITLE{/block}</title>
+
+	<link rel="stylesheet" type="text/css" href="/css/layout.css" media="screen" />
+	<link href="/css/main.css" rel="stylesheet" type="text/css" title="CSS for site" />
+	<link rel="shortcut icon" href="/i/favicon.ico" />
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/jquery-ui.js"></script>
+	<script type="text/javascript" src="/js/common.js"></script>
+</head>
+
+<body>
+{block name="filters"}
+
+{/block}
+
+<div id="header">
+header
+</div>
+<div class="colmask threecol">
+	<div class="colmid">
+		<div class="colleft">
+			<div class="col1">
+					{block name="center"}content_block_center{/block}
+			</div>
+			<div class="col2">
+					{block name="left"}content_block_left{/block}
+
+			</div>
+			<div class="col3">
+					{block name="right"}content_block_right{/block}
+			</div>
+		</div>
+	</div>
+</div>
+<div id="footer">
+footer
+</div>
+
+</body>
+</html>
+
