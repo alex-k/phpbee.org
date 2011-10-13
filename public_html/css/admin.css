@@ -12,7 +12,7 @@ body {
 	height:100%;
 	margin:0px;
 	padding:0px;
-	background:#FFFFFF url('/i/admin/bg.jpg');
+	background:#FFFFFF; /* url('/i/admin/bg.jpg'); */
 	background-attachment: fixed;
 }
 
@@ -111,15 +111,18 @@ img {
 	padding: 0px;
 	margin: 0px;
 }
+
+
 .filterform input.fDateTimeFilter {
-	width: 80px !important;
+	width: 160px !important;
+	height:18px;
 }
 .filterform input[type="text"]{
 	border:1px solid #808080 !important;
 	margin-left:3px;
-	/*
 	width:300px;
 	height:18px;
+	/*
 	position: relative;
 	top: 0px;
 	left: 0px;

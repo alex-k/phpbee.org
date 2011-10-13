@@ -1,7 +1,6 @@
 $(document).ready (function (){
 	$(".lMany2Many").gs_multiselect();
 	$(".fDateTime").datepicker();
-	$(".fDateTimeFilter").datepicker();
 	$('.fWysiwyg').rte({
 		//css: ['default.css'],
 		controls_rte: rte_toolbar,
@@ -27,5 +26,22 @@ $(document).ready (function (){
 	$('#tpl_content').each(function (){
 		window['tpl_codemirror'] = CodeMirror.fromTextArea(this, { mode:"text/html", tabMode:"indent",lineNumbers: true });
 	});
-	
+
+
+	/*
+	$('fDateTimeFilter').daterangepicker( {
+		  presetRanges: [
+		      {text: 'My Range', dateStart: '03/07/08', dateEnd: 'Today' }
+		        ]
+			 } );
+	*/
+	$('.fDateTimeFilter').daterangepicker(
+		{
+			dateFormat: $.datepicker.ATOM,
+			onOpen: function(){ 
+				$('.ui-daterangepicker:visible .ui-daterangepicker-specificDate').trigger('click'); 
+			} 
+		}
+	);
+
 });
