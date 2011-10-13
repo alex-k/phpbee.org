@@ -92,6 +92,10 @@ class gs_filter_like extends gs_filter {
 class gs_filter_calendar extends gs_filter_like {
 	function applyFilter($options,$rs) {
 		if (empty($this->value)) return $options;
+		$dates=array_map(trim,explode(' - ',$this->value));
+		$date1=array_shift($dates);
+		$date2=$dates ? array_shift($dates) : $date1;
+
 		$to=array(
 			'type'=>'condition',
 			'condition'=>'OR',
@@ -104,13 +108,13 @@ class gs_filter_calendar extends gs_filter_like {
 				array(
 					'type'=>'value',
 					'field'=>$field,
-					'value'=>date(DATE_ATOM,strtotime($this->value)),
+					'value'=>date(DATE_ATOM,strtotime($date1)),
 					'case'=>'>=',
 				),
 				array(
 					'type'=>'value',
 					'field'=>$field,
-					'value'=>date(DATE_ATOM,strtotime("$this->value +1day")),
+					'value'=>date(DATE_ATOM,strtotime("$date2 +1day")),
 					'case'=>'<',
 				),
 			);
