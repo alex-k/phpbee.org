@@ -1,5 +1,9 @@
 {extends file="admin_page.html"}
 
+{block name="title"}
+	{%$rs.title%}
+{/block}
+
 {block name="main"}
 
 
@@ -41,6 +45,7 @@
 	{%/foreach%}
 	<th></th>
 	<th></th>
+	<th></th>
 	</tr>
 	</thead>
 	
@@ -54,6 +59,7 @@
 			<td>{$e.{%$f.name%}}</td>
 			{%/foreach%}
 			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/modify/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
+			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/copy/{$e.id}"><img src="/i/admin/ico_copy.png" alt="Копировать" title="Копировать"></a></td>
 			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
 	</tr>
 	{/foreach}

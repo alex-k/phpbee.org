@@ -81,6 +81,10 @@ class gs_strategy_createadmin_handler extends gs_handler {
 						"gs_base_handler.delete:{classname:$recordsetname}",
 						"gs_base_handler.redirect",
 						),
+				"/admin/$modulename/$recordsetname/copy"=>array(
+						"gs_base_handler.copy:{classname:$recordsetname}",
+						"gs_base_handler.redirect",
+						),
 				),
 			"handler"=>array(
 				"/admin/form/$recordsetname"=>array(

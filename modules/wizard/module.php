@@ -439,6 +439,7 @@ class wz_recordset_links extends gs_recordset_short {
 		'verbose_name'=> "fString verbose_name required=false",
 		'options'=>"fString options required=false",
 		'widget'=>"fSelect widget required=false widget=select",
+		'required'=>"fCheckbox verbose_name=required",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
 
