@@ -44,6 +44,9 @@ class gs_strategy_createadmin_handler extends gs_handler {
 		$filters=new wz_recordset_links();
 		$filters->find_records(array('id'=>$d['filters']));
 
+		$datefields=new wz_recordset_fields();
+		$datefields->find_records(array('id'=>$d['fields'],'type'=>'fDateTime'));
+
 
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
 		$module=$rs->Module->first();
@@ -58,6 +61,7 @@ class gs_strategy_createadmin_handler extends gs_handler {
 		$tpl->assign('rs',$rs);
 		$tpl->assign('module',$module);
 		$tpl->assign('fields',$fields);
+		$tpl->assign('datefields',$datefields);
 		$tpl->assign('links',$links);
 		$tpl->assign('filters',$filters);
 

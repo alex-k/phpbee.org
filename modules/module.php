@@ -114,6 +114,9 @@ class images_handler extends gs_base_handler {
 
 class admin_handler extends gs_base_handler {
 	function show_menu () {
+		$init=new gs_init('auto');
+		$init->load_modules();
+
 		$cfg=gs_config::get_instance();
 		$modules=$cfg->get_registered_modules();
 		$menu=array();
