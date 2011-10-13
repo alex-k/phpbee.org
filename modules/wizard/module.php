@@ -389,7 +389,7 @@ class wz_recordset_fields extends gs_recordset_short {
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
-		'verbose_name'=> "fString verbose_name",
+		'verbose_name'=> "fString verbose_name required=false",
 		'type'=>"fSelect type values='fString,fText,fInt' widget=select",
 		'options'=>"fString options required=false",
 		'widget'=>"fSelect widget required=false widget=select",

@@ -132,8 +132,10 @@ class form_createadmin extends form_admin{
 		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
 		$extends=array_map(basename,glob($dirname."*"));
 
+		$all_links=$rs->Links->recordset_as_string_array();
 		$links=$rs->Links->find(array('type'=>array('lMany2Many','lOne2One')))->recordset_as_string_array();
 		if(!is_array($links)) $links=array();
+		if(!is_array($all_links)) $all_links=array();
 
 
 		$hh=array(
@@ -152,14 +154,14 @@ class form_createadmin extends form_admin{
 		    'links' => Array
 			(
 			    'type' => 'checkboxes',
-			    'options'=>$links,
+			    'options'=>$all_links,
 			    'validate'=>'notEmpty',
 			    'default'=>array_keys($links),
 			),
 		    'filters' => Array
 			(
 			    'type' => 'checkboxes',
-			    'options'=>$links,
+			    'options'=>$all_links,
 			    'validate'=>'notEmpty',
 			    'default'=>array_keys($links),
 			),
