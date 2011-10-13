@@ -188,6 +188,7 @@ class field_interface {
 	}
 	
 	static function fSelect($field,$opts,&$structure,$init_opts) {
+		$options=isset($opts['values']) ? explode(',',$opts['values']) : explode(',',$opts['options']);
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
 		$structure['htmlforms'][$field]=array(
 			'type'=>'Select',
@@ -195,7 +196,7 @@ class field_interface {
 			'index'=>isset($opts['index']) ? $opts['index'] : 0,
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
-			'options'=>array_combine(explode(',',$opts['values']),explode(',',$opts['values'])),
+			'options'=>array_combine($options,$options),
 		);
 		$structure['indexes'][$field]=$field;
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
@@ -564,7 +565,7 @@ class gs_recordset_short extends gs_recordset {
 	}
 
 	function trigger_urlkey($rec,$type) {
-		$rec->urlkey=string_to_safeurl(trim($rec));
+		if(!trim($rec->urlkey)) $rec->urlkey=string_to_safeurl(trim($rec));
 	}
 
 	function get_backlink_class($linkname) {

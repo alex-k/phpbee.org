@@ -336,6 +336,23 @@ class gs_base_handler extends gs_handler {
 		$rec->commit();
 		return $rec;
 	}
+	function copy() {
+		$id=$this->data['gspgid_va'][0];
+		$rs=new $this->params['classname'];
+		$rec=$rs->get_by_id($id);
+		/*
+		$rec->delete();
+		$rec->commit();
+		*/
+		$values=$rec->get_values();
+		unset($values[$rs->id_field_name]);
+		unset($values['_ctime']);
+		unset($values['_mtime']);
+		unset($values['urlkey']);
+		$newrec=$rs->new_record($values);
+		$newrec->commit();
+		return $rec;
+	}
 	function redirect_gl($ret) {
 		if (isset($this->params['gl'])) {
 			$this->params['href']=call_user_func($this->params['module_name'].'::gl',$this->params['gl'],$ret['last'],$this->data);
