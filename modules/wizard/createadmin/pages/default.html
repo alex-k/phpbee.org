@@ -24,8 +24,6 @@
 		{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,{%$s_filters%}" _paging="pagenums:20"}
 
 
-	datefields:{%$datefields%}
-
 	<table class="tb">
 	<thead>
 	<tr class="filters"><td colspan="100">
@@ -36,9 +34,8 @@
 		<tr><td>Find:</td><td>
 			<form class="filterform" method="get">
 			{handler gspgid="/filter/show" name="search"  recordset=${%$rs.name%} tpl="like.html"  }
-			{handler gspgid="/filter/show" name="calendar"  recordset=${%$rs.name%} tpl="calendar.html" prelabel="date"  }
-
-			<input type="submit" value="">
+			{handler gspgid="/filter/show" name="calendar"  recordset=${%$rs.name%} tpl="calendar.html" prelabel="date:"  }
+			<div class="links_inline"><input type="submit" value=""></div>
 			</form>
 		</td></tr>
 	</table>

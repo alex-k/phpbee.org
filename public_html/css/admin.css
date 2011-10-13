@@ -107,25 +107,33 @@ img {
 
 .filterform {
 	position: relative;
-	width:310px;
+	width:100%;
 	padding: 0px;
 	margin: 0px;
 }
+.filterform input.fDateTimeFilter {
+	width: 80px !important;
+}
 .filterform input[type="text"]{
 	border:1px solid #808080 !important;
+	margin-left:3px;
+	/*
 	width:300px;
 	height:18px;
 	position: relative;
 	top: 0px;
 	left: 0px;
+	*/
 }
 .filterform input[type="submit"]{
 	width:16px;
 	height:15px;
+	background:url('/i/admin/ico_find.png')  0 0 no-repeat !important;
+	/*
 	position: absolute;
 	top: 8px;
 	right: 0px;
-	background:url('/i/admin/ico_find.png')  0 0 no-repeat !important;
+	*/
 }
 
 
@@ -379,6 +387,12 @@ a.filter_current {
 .links_line {
 	margin:5px;
 	padding:5px;
+}
+
+.links_inline {
+	margin:5px;
+	padding:5px;
+	float:left;
 }
 
 img.icon {
