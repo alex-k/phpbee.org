@@ -1,10 +1,10 @@
 * {
 	font-family:arial;
-	font-size:12px;
+	font-size:16px;
 }
 
 a {
-	color:#aa0000;
+	color:#900000;
 }
 
 body {
@@ -13,6 +13,7 @@ body {
 	margin:0px;
 	padding:0px;
 	background:#FFFFFF; /* url('/i/admin/bg.jpg'); */
+	color:#909090;
 	background-attachment: fixed;
 }
 
@@ -30,6 +31,7 @@ img {
 	width:100%;
 	border:1px solid #e0e0e0;
 	border-collapse:collapse;
+	color:#505050;
 }
 
 .tb * {
@@ -86,6 +88,7 @@ img {
 }
 
 .tb thead tr.filters td * {
+	color:#a0a0a0;
 	background-color:#FFF !important;
 	border:0px;
 }
@@ -97,8 +100,8 @@ img {
 }
 
 .tb thead tr.filters td .links_line a {
-	font-size:11px;
-	padding-left:10px;
+	font-size:16px;
+	padding-right:10px;
 }
 
 .tb thead tr.filters td .links_line a:hover {
@@ -144,6 +147,7 @@ img {
 	border:1px solid #e0e0e0;
 	padding-left:10px;
 	padding-right:10px;
+	height:35px;
 }
 
 .sel_filter {
@@ -179,10 +183,11 @@ img {
 .l_menu li {
 	margin:0px;
 	display:block;
-	min-height:25px;
 	line-height:20px;
 	padding-left:20px;
 	padding-right:20px;
+	padding-top:6px;
+	padding-bottom:6px;
 	border-bottom:1px dashed #e0e0e0;
 }
 
