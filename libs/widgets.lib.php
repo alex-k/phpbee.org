@@ -228,7 +228,13 @@ class gs_data_widget_select {
 		if (method_exists($rec->get_recordset(),'gs_data_widget_select')) {
 			$variants=array();
 			$vrecs=$rec->get_recordset()->gs_data_widget_select($rec,$k);
-			foreach ($vrecs as $vrec) $variants[trim($vrec)]=trim($vrec);
+			foreach ($vrecs as $key=>$vrec) {
+				if (is_array($vrec) || is_string($vrec)) {
+					$variants[$key]=$vrec;
+				} else {
+					$variants[trim($vrec)]=trim($vrec);
+				}
+			}
 			$hh[$k]['options']=$variants;
 			return $hh;
 		}
@@ -247,16 +253,21 @@ class gs_widget_multiselect extends gs_widget_select {
 
 class gs_data_widget_select_enter extends gs_data_widget_select {}
 
-class gs_widget_select_enter extends gs_widget {
+class gs_widget_select_enter extends gs_widget_select {
 	function html() {
 		if (!is_array($this->value)) $this->value=array('select'=>trim($this->value),'enter'=>trim($this->value));
 		$ret="<select onChange=\"$('input[selname=".$this->fieldname."]').val(this.value);\" class=\"fSelect\"  name=\"".$this->fieldname."[select]\"><option></option>\n";
 		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 		foreach ($this->params['options'] as $v=>$l) {
-			$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n",
-						  htmlspecialchars($v),
-						  (trim($this->value['enter'])==$v && trim($this->value['select'])==$v) ? 'selected="selected"' : '',
-						  $l);
+			if (is_array($l)) {
+				$ret.=sprintf("<optgroup label=\"%s\">\n",htmlspecialchars($v));
+				foreach ($l as $vv=>$vl) {
+					$ret.=$this->option_string($vv,$vl);
+				}
+				$ret.="</optgroup>\n";
+			} else {
+				$ret.=$this->option_string($v,$l);
+			}
 		}
 		$ret.="</select>\n";
 		$ret.=sprintf("</label><label><input class=\"fSelect\"  name=\"%s[enter]\" selname=\"%s\" value=\"%s\">",
