@@ -59,8 +59,10 @@ class module_wizard extends gs_base_module implements gs_module {
 				'gs_wizard_handler.templates',
 			),
 			'/admin/form/templates'=>array(
-				'gs_wizard_handler.templatespost:return:true:name:form_submit.html:form_class:gs_wizard_template_form',
-				'gs_base_handler.redirect',
+				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+				'gs_wizard_handler.templatespost:return:true:name:admin_form.html:form_class:gs_wizard_template_form',
+				'gs_base_handler.redirect_if:gl:save_continue:return:true',
+				'gs_base_handler.redirect_up',
 			),
 			'/admin/wizard/formmacros'=>array(
 				'wz_handler_mc.post:name:form_submit.html',
@@ -377,6 +379,7 @@ class wz_recordsets extends gs_recordset_short {
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'title'=> "fString 'название'",
+		'extends'=>"fString 'extends' required=false",
 		'Module'=>'lOne2One wz_modules',
 		'Fields'=>"lMany2One wz_recordset_fields:Recordset",
 		'Links'=>"lMany2One wz_recordset_links:Recordset",
@@ -392,6 +395,7 @@ class wz_recordset_fields extends gs_recordset_short {
 		'verbose_name'=> "fString verbose_name required=false",
 		'type'=>"fSelect type values='fString,fText,fInt' widget=select",
 		'options'=>"fString options required=false",
+		'extra_options'=>"fString extra_options required=false",
 		'widget'=>"fSelect widget required=false widget=select",
 		'default_value'=>"fString default required=false",
 		'required'=>"fCheckbox verbose_name=required",
@@ -438,33 +442,56 @@ class wz_recordset_links extends gs_recordset_short {
 		'linkname'=>"fString linkname required=false",
 		'verbose_name'=> "fString verbose_name required=false",
 		'options'=>"fString options required=false",
+		'extra_options'=>"fString extra_options required=false",
 		'widget'=>"fSelect widget required=false widget=select",
 		'required'=>"fCheckbox verbose_name=required",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
+		$this->structure['triggers']['before_insert'][]='before_insert';
 
 
 
 
 	}
+	function before_insert($rec,$type) {
+		if (!is_subclass_of($rec->classname,'wz_link')) return;
+
+		$wzl=new $rec->classname;
+		$type=$rec->type;
+
+		$wzl->$type($rec);
+
+	}
 	function gs_data_widget_select($rec,$field) {
 		switch($field) {
 			case 'classname':
-				$rsets=gs_cacher::load('classes','config');
-				$rsets=array_filter(array_keys($rsets),create_function('$a','return  is_subclass_of($a,"gs_recordset_short");'));
+				//$rsets=gs_cacher::load('classes','config');
+				//$rsets=array_filter(array_keys($rsets),create_function('$a','return  is_subclass_of($a,"gs_recordset_short");'));
+				$rsets=class_members('gs_recordset_short');
+
 				$rs=new wz_recordsets();
 				$rs->find_records(array());
 				foreach($rs as $r) {
 					array_unshift($rsets,$r->name);
 				}
 
+				$links=class_members('wz_link');
+
+				$rsets=array(
+					'magic'=>$links,
+					'recordsets'=>$rsets,
+					);
 				return $rsets;
 				break;
 			case 'widget':
+				/*
 				$widgets=gs_cacher::load('classes','config');
 				$widgets=array_filter(array_keys($widgets),create_function('$a','return  is_subclass_of($a,"gs_widget");'));
 				$widgets=str_replace('gs_widget_','',$widgets);
-				array_unshift($widgets,'');
+				*/
+				$widgets=str_replace('gs_widget_','',class_members('gs_widget'));
+				$widgets=array_combine($widgets,$widgets);
+				$widgets=array_merge(array(''=>''),$widgets);
 				return $widgets;
 				break;
 		}
@@ -529,7 +556,7 @@ class wz_handlers extends gs_recordset_short {
 		);
 	}
 }
-class gs_wizard_template_form extends g_forms_inline{
+class gs_wizard_template_form extends g_forms_table{
 	function __construct($hh,$params=array(),$data=array()) {
 		$extends=array_map(basename,glob(cfg('tpl_data_dir')."*"));
 		array_unshift($extends,'');
@@ -594,5 +621,6 @@ class wz_handler_mc extends gs_handler {
 }
 
 require('macros.php');
+require('links.php');
 
 ?>

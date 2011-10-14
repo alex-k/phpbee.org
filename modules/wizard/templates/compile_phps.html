@@ -65,17 +65,17 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 
 <*foreach from=$module->recordsets item=rs*>
 
-class <*$rs->name*> extends gs_recordset_short {
+class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 	function __construct($init_opts=false) { parent::__construct(array(
 
 		<*foreach from=$rs->Fields item=f*>
 
-			'<*$f->name*>'=>'<*$f->type*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*> <*if $f->default_value*>default="<*$f->default_value*>" <*/if*> <*if $f->options*>options="<*$f->options*>" <*/if*> required=<*if $f->required*>true<*else*>false<*/if*> ',
+			'<*$f->name*>'=>'<*$f->type*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*> <*if $f->default_value*>default="<*$f->default_value*>" <*/if*> <*if $f->options*>options="<*$f->options*>" <*/if*> required=<*if $f->required*>true<*else*>false<*/if*> <*$f->extra_options*> ',
 
 		<*/foreach*>
 		<*foreach from=$rs->Links item=f*>
 
-			'<*$f->name*>'=>'<*$f->type*> <*$f->classname*><*if $f->linkname*>:<*$f->linkname*><*/if*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->options*>options="<*$f->options*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*> required=<*if $f->required*>true<*else*>false<*/if*> ',
+			'<*$f->name*>'=>'<*$f->type*> <*$f->classname*><*if $f->linkname*>:<*$f->linkname*><*/if*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->options*>options="<*$f->options*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*> required=<*if $f->required*>true<*else*>false<*/if*>   <*$f->extra_options*>  ',
 
 		<*/foreach*>
 		<*if $rs->Submodules->count()*>

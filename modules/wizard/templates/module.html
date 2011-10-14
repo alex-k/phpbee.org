@@ -2,13 +2,20 @@
 
 {block name="main"}
 	{controller _class=wz_modules id=$_gsdata.gspgid_va.0 _assign=module _assign_type=first}
-	<h3><a href="/admin/wizard/module/{$module.id}">{$module.name} / {$module.title}</a></h3>
-	<a href="/admin/wizard/commit/{$module.id}" onclick="return confirm('Вы точно хотите коммитить запись ?');">commit</a>
+	<h3>
+		<a href="/admin/wizard/module/{$module.id}">{$module.name} / {$module.title}</a>
+
+		<a href="/admin/wizard/commit/{$module.id}">commit</a>
+	</h3>	
 
 
 	<table width=100%>
 	<tr>
 	<td width=50% valign=top>
+
+
+		{handler gspgid="/admin/wizard/templates/{$module.id}"}
+
 		<h3><a href="/admin/wizard/urls/{$module.id}">urls</a></h3>
 		<ul>
 		{foreach from=$module->urls->orderby('type desc, gspgid_value') item=url}
@@ -26,7 +33,9 @@
 					<li -data-href="/admin/wizard/handlers/{$url.id}/handlers/{$h.id}#form">
 						{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}
 						{$h.handler_value}
+						{*
 						<a href="/admin/wizard/module/{$module.id}/tpl/{$h.id}">tpl</a>
+						*}
 						{if $_gsdata.gspgid_va.1=='tpl' && $_gsdata.gspgid_va.2==$h.id}
 							{handler gspgid="/admin/wizard/choosetpl" Handler_id=$h.id Module_id=$module.id}
 						{/if}
@@ -38,10 +47,12 @@
 		</ul>
 
 
-		{handler gspgid="/admin/wizard/templates/{$module.id}"}
 
 	</td>
 	<td valign=top>
+		<h3>apply strategy:</h3>
+		<dd>{handler gspgid="/admin/form/strategy" Module_id=$module.id}</dd>
+
 		<h3><a href="/admin/wizard/recordsets/{$module.id}">recordsets</a>  </h3>
 		<ul>
 		{foreach from=$module.recordsets item=rs}
@@ -68,9 +79,6 @@
 			</li>
 		{/foreach}
 		</ul>
-	<h4>apply strategy:</h4>
-	<dd>{handler gspgid="/admin/form/strategy" Module_id=$module.id}</dd>
-
 	</td>
 	</tr>
 	</table>

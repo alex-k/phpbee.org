@@ -149,7 +149,7 @@ class admin_handler extends gs_base_handler {
 		return html_redirect($res,$query);
 	}
 	
-	function many2one() {
+	function many2one($ret) {
 		if (isset($this->data['gspgid_va'][5]) && $this->data['gspgid_va'][5]=='delete') {
 			$rid=intval($this->data['gspgid_va'][6]);
 			$rs_name=$this->data['gspgid_va'][0];
@@ -187,7 +187,7 @@ class admin_handler extends gs_base_handler {
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('url',$url);
 		$tpl->assign('params',$params);
-		parent::show();
+		parent::show($ret);
 	}
 }
 

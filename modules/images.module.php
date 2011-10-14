@@ -1,5 +1,6 @@
 <?php
 abstract class tw_images extends gs_recordset_handler {
+	var $no_urlkey=1;
 	function src($params,$record=null) {
 		$records=$record ? array($record) : $this;
 		$ret=array();
@@ -27,6 +28,7 @@ abstract class tw_images extends gs_recordset_handler {
 	}
 }
 abstract class tw_file_images extends gs_recordset_short{
+	var $no_urlkey=1;
 	var $gs_connector_id='file_public';
 	var $config=array();
 	var $fields=array(
@@ -68,6 +70,9 @@ abstract class tw_file_images extends gs_recordset_short{
 	function config_previews() {
 		$this->config=array(
 			'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
+			'admin'=>array('width'=>50,'height'=>50,'method'=>'use_height','bgcolor'=>array(200,200,200)),
+			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(240,240,240)),
+			'gallery'=>array('width'=>150,'height'=>150,'method'=>'use_height','bgcolor'=>array(200,200,200)),
 		);
 	}
 	
