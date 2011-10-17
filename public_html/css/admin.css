@@ -1,6 +1,6 @@
 * {
 	font-family:arial;
-	font-size:16px;
+	font-size:14px;
 }
 
 a {
@@ -43,6 +43,11 @@ img {
 	color:#000000;
 	border-right:1px solid #ffffff;
 }
+
+.tb thead img {
+	border:0;
+}
+
 
 .tb tfoot td {
 	background-color:#e0e0e0;
@@ -95,8 +100,8 @@ img {
 
 
 .tb thead tr.filters td .links_line {
-	padding-top:5px;
-	padding-bottom:10px;
+	padding-top:3px;
+	padding-bottom:3px;
 }
 
 .tb thead tr.filters td .links_line a {
@@ -131,6 +136,13 @@ img {
 	left: 0px;
 	*/
 }
+
+.filterform select{
+	border:1px solid #808080 !important;
+	margin-left:3px;
+	height:20px;
+}
+
 .filterform input[type="submit"]{
 	width:16px;
 	height:15px;
@@ -414,4 +426,8 @@ textarea.big_text {
 
 .tpl_editor {
 	border:1px solid #e0e0e0;
+}
+
+.frm_fCheckbox {
+	text-align:center;
 }
