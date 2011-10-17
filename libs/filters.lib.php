@@ -89,6 +89,36 @@ class gs_filter_like extends gs_filter {
 	}
 }
 
+class gs_filter_sort extends gs_filter {
+	function __construct($data) {
+		parent::__construct($data);
+		$this->fields=array_map(trim,array_filter(explode(',',$this->params['fields'])));
+	}
+	function getHtmlBlock($ps) {
+		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
+		return $this->getHtmlBlockNonExlusive($ps);
+	}
+	function getHtmlBlockNonExlusive($ps) {
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('current',$this->value);
+		$tpl->assign('keyname',$this->name);
+		$tpl->assign('prelabel',$ps['prelabel']);
+		$tpl->assign('label',$ps['label']);
+		$tpl->assign('values',$this->fields);
+		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
+		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
+		return $out;
+	}
+	function applyFilter($options,$rs) {
+		if (empty($this->value)) return $options;
+		$value=str_replace(":"," ",$this->value);
+		$options[$this->name]=array('type'=>'orderby','value'=>$value);
+
+		return $options;
+	}
+}
+
+
 class gs_filter_calendar extends gs_filter_like {
 	function applyFilter($options,$rs) {
 		if (empty($this->value)) return $options;
@@ -240,6 +270,7 @@ class gs_filter_select_by_links extends gs_filter {
 		$current_name='';
 		
 		foreach($links as $key=>$l) {
+			ksort($l['va']);
 			switch ($this->data['handler_params']['urltype']) {
 				case 'get':
 					$link=$this->data['gspgid_root'].'?'.http_build_query($l['va']);	

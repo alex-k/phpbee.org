@@ -6,6 +6,9 @@ DEFINE ('LOAD_STORAGE',2);
 DEFINE ('LOAD_TEMPLATES',4);
 DEFINE ('LOAD_EXTRAS',8);
 
+DEFINE ('DEBUG_LOAD_FILE',1);
+DEFINE ('DEBUG_SQL',2);
+
 if (defined('DEBUG') && DEBUG) {
 ini_set('display_errors','On');
 error_reporting(E_ALL ^E_NOTICE);
@@ -351,6 +354,7 @@ class gs_config {
 		}
 
 		if (!defined('DEBUG')) define('DEBUG',FALSE);
+		if (!defined('DEBUG_LEVEL')) define('DEBUG_LEVEL',65537);
 		if (DEBUG) {
 		ini_set('display_errors','On');
 		error_reporting(E_ALL ^E_NOTICE);
@@ -396,9 +400,11 @@ function cfg($name) {
 	if (method_exists($config,$name)) return $config->$name();
 	return NULL ;
 }
-function mlog($data) {
-	$log=gs_logger::get_instance();
-	$log->log($data);
+function mlog($data,$debug_level=255) {
+	if ($debug_level & DEBUG_LEVEL) {
+		$log=gs_logger::get_instance();
+		$log->log($data);
+	}
 }
 function md($output,$type=false)
 {
@@ -525,7 +531,7 @@ function check_and_create_dir($dir) {
 
 function load_file($file,$return_contents=FALSE,$return_file=FALSE)
 {
-	mlog('LOAD_FILE '.$file);
+	mlog('LOAD_FILE '.$file,DEBUG_LOAD_FILE);
 	if (!file_exists($file))
 	{
 		throw new gs_exception('load_file: '.$file.'  not found');
