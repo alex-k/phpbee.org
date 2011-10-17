@@ -18,10 +18,11 @@
 
 		{handler gspgid="/filter/" class="like" name="search" fields="{%$fields%}" urltype=get }
 		{handler gspgid="/filter/" class="calendar" name="calendar" fields="_ctime,_mtime,{%$datefields%}" urltype=get }
+		{handler gspgid="/filter/" class="sort" name="sort" fields="{%$fields%}" urltype=get }
 
 
 
-		{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,{%$s_filters%}" _paging="pagenums:20"}
+		{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,sort,{%$s_filters%}" _paging="pagenums:20"}
 
 
 	<table class="tb">
@@ -35,6 +36,7 @@
 			<form class="filterform" method="get">
 			{handler gspgid="/filter/show" name="search"  recordset=${%$rs.name%} tpl="like.html"  }
 			{handler gspgid="/filter/show" name="calendar"  recordset=${%$rs.name%} tpl="calendar.html" prelabel="date:"  }
+			{handler gspgid="/filter/show" name="sort"  recordset=${%$rs.name%} tpl="sort.html" prelabel="sort by:"  }
 			<div class="links_inline"><input type="submit" value=""></div>
 			</form>
 		</td></tr>
@@ -43,7 +45,7 @@
 	<tr class="pager"><td colspan="100">Страницы: {${%$rs.name%}_paging}</td></tr>
 	<tr><th>#</th>
 	{%foreach from=$fields item=f%}
-	<th>{%$f.verbose_name%}</th>
+	<th>{field_name name="{%$f.verbose_name%}" type="{%$f.type%}" key="{%$f.name%}" id="{%$f.id%}"}</th>
 	{%/foreach%}
 	{%foreach from=$links item=f%}
 	<th>{%$f.verbose_name%}</th>
@@ -58,7 +60,7 @@
 	<tr class="{cycle values='odd,even'}">
 			<td>{$e.id}</td>
 			{%foreach from=$fields item=f%}
-			<td>{$e.{%$f.name%}}</td>
+			<td class="frm_{%$f.type%}">{field_formatter value=$e.{%$f.name%} type="{%$f.type%}"}</td>
 			{%/foreach%}
 			{%foreach from=$links item=f%}
 			<td>{$e.{%$f.name%}}</td>
