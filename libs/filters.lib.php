@@ -265,7 +265,7 @@ class gs_filter_select_by_links extends gs_filter {
 
 			$links[]=array('name'=>$name,'keyname'=>$this->name,'key'=>$key,'count'=>$count, 'va'=>$arr,'rec'=>null,);
 		}
-		$count_all=$rs->count_records($count_array_all);
+		$count_all= $rs ? $rs->count_records($count_array_all) : 0;
 		
 		$current_name='';
 		

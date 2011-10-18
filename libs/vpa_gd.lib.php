@@ -76,6 +76,17 @@ class vpa_gd {
 	* use_box - вписываем картинку в прямоугольник заданных размеров, уменьшая по самой большой координате
 	* use_fields - вписываем картинку в прямоугольник заданных размеров, но добавляем поля, чтобы картинка была четко той ширины и высоты, которой нам надо
 	**/
+	function modifier($width,$height,$type)
+	{
+		$this->new_width=$width;
+		$this->new_height=$height;
+		switch($type)
+		{
+			case 'check_and_rotate_left':
+				$this->check_and_rotate_left();
+			break;
+		}
+	}
 	function resize($width,$height,$type)
 	{
 		$this->new_width=min($width,$this->old_width);
@@ -91,6 +102,9 @@ class vpa_gd {
 			case 'use_box':
 				$this->make_box();
 			break;
+			case 'use_space':
+				$this->make_space();
+			break;
 			case 'use_fields':
 				$this->make_fields();
 			break;
@@ -98,6 +112,21 @@ class vpa_gd {
 				$this->make_crop();
 			break;
 		}
+	}
+
+	function check_and_rotate_left() {
+		$k=$this->old_width/$this->old_height;
+		$k1=$this->new_width/$this->new_height;
+		if ( ($k>1&& $k1<1) 
+			|| ($k<1 && $k1>1)) {
+
+			$this->rotate_left();
+		}
+
+	}
+	function rotate_left() {
+		$this->old_img=imagerotate($this->old_img,90,0);
+		list($this->old_width,$this->old_height)=array($this->old_height,$this->old_width);
 	}
 	
 	function make_width()
@@ -123,6 +152,19 @@ class vpa_gd {
 		imagesavealpha($this->new_img, true);
 		$bg=imagecolorallocatealpha($this->new_img,255,255,255,127);
 		ImageCopyResampled($this->new_img, $this->old_img, 0, 0, 0, 0, $this->new_width, $this->new_height, $this->old_width, $this->old_height);
+	}
+
+	function make_space() {
+		$k=$this->old_width/$this->old_height;
+		$k1=$this->new_width/$this->new_height;
+
+		if ( ($k>1&& $k1<1) 
+			|| ($k<1 && $k1>1)) {
+			$nw=$this->new_width;
+			$this->new_width=$this->new_height;
+			$this->new_height=$nw;
+		}
+		return $this->make_box();
 	}
 	
 	function make_box()

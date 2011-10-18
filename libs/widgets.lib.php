@@ -452,21 +452,32 @@ class gs_widget_gallery extends gs_widget {
 		return array('fake'=>true);
 	}
 	function html() {
+		$hash_field_name=$this->params['linkname'].'_hash';
+		$hash=isset($this->data[$hash_field_name]) ? $this->data[$hash_field_name] : time().rand(10,99);
 		$rid_name=$this->params['options']['local_field_name'];
 		$rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
 		$r=new $this->params['options']['recordset'];
+
+		$images=$r->find_records(array(
+				$this->params['options']['foreign_field_name']=>0,
+				array('field'=>'_ctime','case'=>'<=','value'=>date(DATE_ATOM,strtotime('now -1 day'))),
+				));
+		$images->delete();
+		$images->commit();
+
 		$find=array();
-		$find[$this->params['options']['foreign_field_name']]=$rid;
-		$hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
+		if (isset ($this->data[$rid_name])) {
+			$find[$this->params['options']['foreign_field_name']]=$this->data[$rid_name];
+		} else {
+			$find[$this->params['options']['foreign_field_name'].'_hash']=$hash;
+		}
+			
 		$images=$r->find_records($find);
-		$images=$images->get_values();
+		//$images=$images->get_values();
 
 		$s='<ul class="many2one_gallery" id="gallery_'.$hash.'">';
-		if (count($images)) {
-			foreach ($images as $im) {
-				$s.=sprintf('<li><img src="/img/s/%s/h/100/100/%d.jpg" title="%s"></li>',$this->params['options']['recordset'],$im['id'],isset($im['name']) ? $im['name'] : '');
-			}
-		}
+			$images=$images->img('admin');
+			if(count($images)) $s.=sprintf('<li>%s</li>',implode('</li><li>',$images));
 		$s.='</ul><div class="clear"></div>';
 
 
@@ -572,6 +583,7 @@ class gs_widget_iframe_gallery extends gs_widget {
 		$rid_name=$this->params['options']['local_field_name'];
 		$rid=isset ($this->data[$rid_name]) ? $this->data[$rid_name] : 0;
 		$hash=isset($this->data[$this->params['linkname'].'_hash']) ? $this->data[$this->params['linkname'].'_hash'] : time().rand(10,99);
+
 		$s='<div class="many2one_gallery" id="gallery_'.$hash.'">';
 		if ($rid>0) {
 			$r=new $this->params['options']['recordset'];

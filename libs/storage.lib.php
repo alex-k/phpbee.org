@@ -326,7 +326,11 @@ abstract class gs_recordset_base extends gs_iterator {
 		return $r;
 	}
 
-	public function delete($record) {
+	public function delete($record=null) {
+		if ($record===null) {
+			foreach ($this as $r) $r->delete();
+			return $this;
+		}
 		$this->process_trigger('before_delete',$record);
 		$r=$this->get_connector()->delete($record);
 		$this->process_trigger('after_delete',$record);
