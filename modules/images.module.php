@@ -34,8 +34,8 @@ abstract class tw_file_images extends gs_recordset_short{
 	var $fields=array(
 		'File'=> "fFile 'Файл'",
 	);
-	function __construct($init_opts=false) {
-		parent::__construct($this->fields,$init_opts);
+	function __construct($f=array(),$init_opts=false) {
+		parent::__construct(array_merge($f,$this->fields),$init_opts);
 		$this->config_previews();
 		$this->structure['triggers']['after_insert']='resize';
 		$this->structure['triggers']['after_update']='resize';
