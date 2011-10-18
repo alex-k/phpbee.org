@@ -409,14 +409,15 @@ class wz_recordset_fields extends gs_recordset_short {
 		switch($field) {
 			case 'type':
 				$types=get_class_methods('field_interface');
+				$types=array_combine($types,$types);
 				$types=array_filter($types,create_function('$a','return  preg_match("|^f[A-Z]|",$a);'));
 				return $types;
 				break;
 			case 'widget':
-				$widgets=gs_cacher::load('classes','config');
-				$widgets=array_filter(array_keys($widgets),create_function('$a','return  is_subclass_of($a,"gs_widget");'));
+				$widgets=class_members('gs_widget');
 				$widgets=str_replace('gs_widget_','',$widgets);
 				array_unshift($widgets,'');
+				$widgets=array_combine($widgets,$widgets);
 				return $widgets;
 				break;
 		}
@@ -445,6 +446,8 @@ class wz_recordset_links extends gs_recordset_short {
 		'extra_options'=>"fString extra_options required=false",
 		'widget'=>"fSelect widget required=false widget=select",
 		'required'=>"fCheckbox verbose_name=required",
+		'fkey_on_delete'=>"fSelect on_delete values='RESTRICT,CASCADE,SET_NULL' default='RESTRICT' widget=radio",
+		'fkey_on_update'=>"fSelect on_update values='RESTRICT,CASCADE,SET_NULL' default='CASCADE' widget=radio",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
 		$this->structure['triggers']['before_insert'][]='before_insert';
@@ -465,15 +468,11 @@ class wz_recordset_links extends gs_recordset_short {
 	function gs_data_widget_select($rec,$field) {
 		switch($field) {
 			case 'classname':
-				//$rsets=gs_cacher::load('classes','config');
-				//$rsets=array_filter(array_keys($rsets),create_function('$a','return  is_subclass_of($a,"gs_recordset_short");'));
-				$rsets=class_members('gs_recordset_short');
 
 				$rs=new wz_recordsets();
-				$rs->find_records(array());
-				foreach($rs as $r) {
-					array_unshift($rsets,$r->name);
-				}
+				$rsets=$rs->find_records(array())->recordset_as_string_array();
+				$rsets=array_combine($rsets,$rsets);
+				$rsets=array_merge($rsets,class_members('gs_recordset_short'));
 
 				$links=class_members('wz_link');
 
@@ -484,11 +483,6 @@ class wz_recordset_links extends gs_recordset_short {
 				return $rsets;
 				break;
 			case 'widget':
-				/*
-				$widgets=gs_cacher::load('classes','config');
-				$widgets=array_filter(array_keys($widgets),create_function('$a','return  is_subclass_of($a,"gs_widget");'));
-				$widgets=str_replace('gs_widget_','',$widgets);
-				*/
 				$widgets=str_replace('gs_widget_','',class_members('gs_widget'));
 				$widgets=array_combine($widgets,$widgets);
 				$widgets=array_merge(array(''=>''),$widgets);

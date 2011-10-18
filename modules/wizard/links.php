@@ -41,6 +41,8 @@ class wz_link_images extends wz_link {
 				 'classname'=>$rec->Recordset->first()->name,
 				 'linkname'=>'',
 				 'extra_options'=>'mode=link',
+				 'fkey_on_delete'=>'CASCADE',
+				 'fkey_on_update'=>'CASCADE',
 				 ));
 		$rec_images->Links->new_record(array(
 				 'name'=>'File',
@@ -49,6 +51,8 @@ class wz_link_images extends wz_link {
 				 'verbose_name'=>'File',
 				 'widget'=>'include_form',
 				 'extra_options'=>'hidden=false',
+				 'fkey_on_delete'=>'CASCADE',
+				 'fkey_on_update'=>'CASCADE',
 				 ));
 
 		$arr=array('type'=>'handler','gspgid_value'=>'/admin/form/'.$name_rs_images);

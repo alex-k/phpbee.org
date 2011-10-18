@@ -84,6 +84,15 @@ class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 		{%/foreach%}
 		<*/if*>
 		),$init_opts);
+
+		<*$fkeys=$rs->Links->find('type=lOne2One') *>
+		<*if $fkeys->count()>0*>
+		$this->structure['fkeys']=array(
+		<*foreach from=$fkeys item=f*>
+				array('link'=>'<*$f->name*>','on_delete'=>'<*$f->fkey_on_delete*>','on_update'=>'<*$f->fkey_on_update*>'),
+		<*/foreach*>
+		     );
+		<*/if*>
 		
 	}
 
