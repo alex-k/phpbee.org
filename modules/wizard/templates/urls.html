@@ -26,15 +26,16 @@
 	<tr class="{cycle values='odd,even'}">
 			<td>{$e.id}</td>
 			<td>{$e.type}</td>
-			<td><a href="/admin/wizard/urls/{$e.Module_id}/{$e.id}#form">{$e.gspgid_value}</a></td>
+			<td><a href="/admin/wizard/urls/{$e.Module_id}/modify/{$e.id}#form">{$e.gspgid_value}</a></td>
 			<td class="cnt"><a href="/admin/wizard/handlers/{$e.id}">handlers</a></td>
-			<td class="cnt"><a href="/admin/wizard/urls/{$e.Module_id}/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
+			<td class="cnt"><a href="/admin/wizard/urls/{$e.Module_id}/modify/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
 			<td class="cnt"><a href="/admin/wizard/urls/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
 	</tr>
 	{/foreach}
 	</table>
-	<h5>Редактировать/<a href="/admin/wizard/urls/{$_gsdata.gspgid_va.0}#form">создать</a>:</h5>
-	<hr><br>
-	<a name="form"></a>
-	{handler gspgid="/admin/form/wz_urls/edit/`$_gsdata.gspgid_va.1`" Module_id=$_gsdata.gspgid_va.0}
+	<h5>Редактировать/<a href="/admin/wizard/urls/{$_gsdata.gspgid_va.0}/modify/0#form">создать</a>:</h5>
+	<br>
+	{if $_gsdata.gspgid_va.1=='modify'}
+	{handler gspgid="/admin/form/wz_urls/edit/`$_gsdata.gspgid_va.2`" Module_id=$_gsdata.gspgid_va.0}
+	{/if}
 {/block}

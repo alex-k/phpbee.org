@@ -48,7 +48,9 @@ class module_wizard extends gs_base_module implements gs_module {
 				'gs_base_handler.redirect_up',
 			),
 			'/admin/form/wz_urls'=>array(
-				'gs_base_handler.post:{name:form.html:classname:wz_urls:form_class:form_admin}',
+				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+				'gs_base_handler.post:{name:admin_form.html:classname:wz_urls:form_class:g_forms_table}',
+				'gs_base_handler.redirect_if:gl:save_continue:return:true',
 				'gs_base_handler.redirect_up',
 			),
 			'/admin/form/wz_handlers'=>array(
@@ -330,7 +332,7 @@ class gs_wizard_handler extends gs_handler {
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 		$d=$f->clean();
 		$filename=basename(dirname(__class_filename($d['strategy'])));	
-		$href="/admin/wizard/".$filename."/".$d['recordset'];
+		$href="/admin/wizard/".$filename."/".$d['recordset']."/".$this->data['handler_params']['Module_id'];
 		return html_redirect($href);
 	}
 
@@ -580,11 +582,20 @@ class gs_wizard_template_form extends g_forms_table{
 class gs_wizard_strategy_form extends g_forms_inline{
 	function __construct($hh,$params=array(),$data=array()) {
 		$module=record_by_id($data['handler_params']['Module_id'],'wz_modules');
+
+				$rs=new wz_recordsets();
+				$rsets=$rs->find_records(array())->recordset_as_string_array();
+
+				$rsets=array(
+					'module'=>$module->recordsets->recordset_as_string_array(),
+					'wizard'=>$rsets,
+					//'all'=>class_members('gs_recordset_short'),
+					);
 		$hh=array(
 		    'recordset' => Array
 			(
 			    'type' => 'select',
-			    'options'=>$module->recordsets->recordset_as_string_array(),
+			    'options'=>$rsets,
 			),
 		    'strategy' => Array
 			(
