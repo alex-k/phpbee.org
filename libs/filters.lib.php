@@ -17,6 +17,10 @@ class gs_filters_handler extends gs_handler {
 	
 
 	}
+	static function get($name) {
+		$filters=gs_var_storage::load('filters');
+		return $filters[$name];
+	}
 }
 class gs_filter {
 	function __construct($data) {
@@ -31,6 +35,16 @@ class gs_filter {
 			case 'get': 
 				$ds=new gs_data_driver_get();
 				$arr=$ds->import();
+				unset($arr['gspgtype']);
+				break;
+			case 'session': 
+				$ds=new gs_data_driver_get();
+				$arr=$ds->import();
+				if(isset($arr[$this->name])) {
+					gs_session::save($arr[$this->name],'filter_'.$this->name);
+				} else {
+					$arr[$this->name]=gs_session::load('filter_'.$this->name);
+				}
 				unset($arr['gspgtype']);
 				break;
 			default:
@@ -168,8 +182,8 @@ class gs_filter_select_by_links extends gs_filter {
 
 	}
 	function applyFilter($options,$rs) {
-		if (empty($this->value)) return $options;
 		$this->recordset=$rs;
+		if (empty($this->value)) return $options;
 
 		$fieldname=$this->fieldname;
 		$link=$this->link;
@@ -215,11 +229,20 @@ class gs_filter_select_by_links extends gs_filter {
 		$link=$ps['recordset']->structure['recordsets'][$linkname];
 		*/
 
+
 		$recordsetname=$this->link['recordset'];
 		if ($this->link['type']=='many') $recordsetname=$this->link['rs2_name'];
 
 		$rec_rs=new $recordsetname();
-		$rec_rs=$rec_rs->find_records(array());
+		//$rec_rs=$rec_rs->find_records(array());
+		$options=array();
+		$options=string_to_params($this->params['options']);
+		foreach ($this->recordset->query_options['options'] as $o) {
+			if (isset($o['field']) && isset($rec_rs->structure['fields'][$o['field']])) {
+				$options[]=$o;
+			}
+		}
+		$rec_rs=$rec_rs->find_records($options);
 		
 		if (!isset($ps['params']) || empty($ps['params'])) $ps['params']=array();
 		

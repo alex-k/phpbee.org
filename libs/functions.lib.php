@@ -302,4 +302,8 @@ function class_members($classname=null) {
 	return array_combine($classes,$names);
 }
 
+function filter($name) {
+	return gs_filters_handler::get($name);
+}
+
 ?>

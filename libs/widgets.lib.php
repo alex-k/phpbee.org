@@ -498,7 +498,11 @@ class gs_data_widget_parent_list {
 		} else {
 			$rname=get_class($rec->init_linked_recordset($v['linkname']));
 			$vro=new $rname;
-			$vrecs=$vro->find_records(array());
+			$options=array();
+			foreach($data['handler_params'] as $o=>$v) {
+				if (isset($vro->structure['fields'][$o])) $options[$o]=$v;
+			}
+			$vrecs=$vro->find_records($options);
 		}
 		$variants=array();
 		foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
