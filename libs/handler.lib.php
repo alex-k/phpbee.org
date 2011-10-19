@@ -597,7 +597,15 @@ class gs_base_handler extends gs_handler {
 
 	function check_login($data) {
 		$id=gs_session::load('login_'.$this->params['classname']);
-		return record_by_id($id,$this->params['classname']);
+		$rec=record_by_id($id,$this->params['classname']);
+		if(isset($this->data['handler_params']['assign'])) {
+			/*
+			$tpl=gs_tpl::get_instance();
+			$tpl->assign($this->data['handler_params']['assign'],$rec);
+			*/
+			gs_var_storage::save($this->data['handler_params']['assign'],$rec);
+		}
+		return $rec;
 	}
 	function post_logout($data) {
 		gs_session::clear('login_'.$this->params['classname']);
@@ -621,8 +629,9 @@ class gs_base_handler extends gs_handler {
 
 		$rec=$rs->find_records($d)->first();
 
-		gs_session::save($rec->get_id(),'login_'.$rsname);
+		if (!$rec) return $this->showform();
 
+		gs_session::save($rec->get_id(),'login_'.$rsname);
 		return $rec;
 
 	}
