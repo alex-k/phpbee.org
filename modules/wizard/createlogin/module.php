@@ -36,8 +36,6 @@ class gs_strategy_createlogin_handler extends gs_handler {
 		$f=$bh->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 		$d=$f->clean();
-		md($d,1);
-		md($this->data,1);
 
 
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
@@ -67,7 +65,6 @@ class gs_strategy_createlogin_handler extends gs_handler {
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'login_form_'.$rs->name.'.html';
 		file_put_contents($filename,$out_form);
 
-		md($out,1);
 
 		$rs->showadmin=1;
 
@@ -87,7 +84,7 @@ class gs_strategy_createlogin_handler extends gs_handler {
 					"show"=>"gs_base_handler.show:name:login_$recordsetname.html",
 				),
 				"login/form/$recordsetname"=>array(
-					"gs_base_handler.post_login:classname:$recordsetname:name:login_form_$recordsetname.html:form_class:g_forms_table:fields:".implode(',',$d['login_fields']),
+					"gs_base_handler.post_login:return:gs_record:classname:$recordsetname:name:login_form_$recordsetname.html:form_class:".$d['form_class'].":fields:".implode(',',$d['login_fields']),
 					"gs_base_handler.redirect",
 					),
 				),
@@ -95,8 +92,11 @@ class gs_strategy_createlogin_handler extends gs_handler {
 
 		foreach ($template as $type=>$urls) {
 			foreach ($urls as $url=>$handlers) {
-				$f=$module->urls->find(array('gspgid_value'=>$url));
-				if($f->count()) continue;
+				//$f=$module->urls->find(array('gspgid_value'=>$url));
+				//if($f->count()) continue;
+				$f=$module->urls->find_records(array('gspgid_value'=>$url));
+				$f->delete();
+
 				$wz_url=$module->urls->new_record();
 				$wz_url->gspgid_value=$url;
 				$wz_url->type=$type;
@@ -109,9 +109,9 @@ class gs_strategy_createlogin_handler extends gs_handler {
 					$wz_h->handler_value=$value;
 					//$wz_h->commit();
 				}
+				$module->commit();
 			}
 		}
-		$module->commit();
 		$rs->commit();
 
 		md($out,1);
@@ -132,16 +132,21 @@ class form_createlogin extends form_admin{
 		$fields=array_combine($fields,$fields);
 
 
+		$forms=class_members('g_forms');
+
+
 		$hh=array(
 		    'template_name' => Array
 			(
 			    'type' => 'select',
 			    'options' => array_combine($extends,$extends),
+			    'default'=>'default.html',
 			),
 		    'form_template_name' => Array
 			(
 			    'type' => 'select',
 			    'options' => array_combine($extends,$extends),
+			    'default'=>'default_form.html',
 			),
 		    'assign' => Array 
 		    	(
@@ -159,6 +164,18 @@ class form_createlogin extends form_admin{
 			(
 			    'type' => 'checkboxes',
 			    'options'=>$fields,
+			    'validate'=>'notEmpty',
+			),
+		    'form_fields' => Array
+			(
+			    'type' => 'radio',
+			    'options'=>array('basic'=>'basic','detailed'=>'detailed'),
+			    'validate'=>'notEmpty',
+			),
+		    'form_class' => Array
+			(
+			    'type' => 'select',
+			    'options'=>class_members('g_forms'),
 			    'validate'=>'notEmpty',
 			),
 		);
