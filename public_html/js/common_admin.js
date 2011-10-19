@@ -1,5 +1,6 @@
 $(document).ready (function (){
 	$(".lMany2Many").gs_multiselect();
+	$(".lOne2One").sel_filter({slide_width: 150, min_options: 1, crop: false});
 	$(".fDateTime").datepicker();
 	$('.fWysiwyg').rte({
 		//css: ['default.css'],
