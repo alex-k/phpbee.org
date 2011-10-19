@@ -84,6 +84,7 @@ abstract class g_forms implements g_forms_interface{
 		if (!is_array($data)) $data=array();
 		$this->params=$params;
 		$this->clean_data=array();
+		$this->validate_errors=array();
 		$form_default=array();
 		foreach ($h as $k=>$ih) {
 			if(isset($ih['hidden']) && $ih['hidden']) {
@@ -180,6 +181,7 @@ abstract class g_forms implements g_forms_interface{
 			}
 		}
 		if(is_array($ret['STATUS'])) $ret['STATUS']=!in_array(FALSE,$ret['STATUS']);
+		$this->validate_errors=$ret;
 		return $ret;
 
 	}
@@ -189,6 +191,13 @@ abstract class g_forms implements g_forms_interface{
 			$arr[$k]=$this->data[$k];
 		}
 		return http_build_query($arr);
+	}
+	function get_inputs() {
+		$inputs=$this->_prepare_inputs();
+		if (isset($this->validate_errors['FIELDS'])) foreach ($this->validate_errors['FIELDS'] as $f=>$e) {
+			$inputs[$f]['errors']=$e;
+		}
+		return($inputs);
 	}
 	function get_input($field,$suffix=null) {
 		$inputs=$this->_prepare_inputs();

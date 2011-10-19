@@ -93,6 +93,7 @@ class gs_base_handler extends gs_handler {
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
+		$tpl->assign('_gsstack',$ret);
 
 
 		if (isset($this->data['handler_params'])) {
@@ -455,7 +456,6 @@ class gs_base_handler extends gs_handler {
 		return array_merge($data,$newdata);
 	}
 	static function process_handler($params,$smarty) {
-		mlog('handler.process_handler');
 		$params['gspgid']=trim($params['gspgid'],'/');
 		$s_data=$data=$smarty->getTemplateVars('_gsdata');
 		$s_gspgid=cfg('s_gspgid');
@@ -508,7 +508,6 @@ class gs_base_handler extends gs_handler {
 		$assign['handler_params']=$params;
 
 		$tpl->assign($assign);
-		
 		
 		if (isset($params['gspgtype'])) $data['gspgtype'] = $params['gspgtype'] ;
 		$o_p=gs_parser::get_instance($data,isset($params['gspgtype']) ? $params['gspgtype'] : 'handler');
@@ -594,6 +593,40 @@ class gs_base_handler extends gs_handler {
 		$id=intval($out[1]);
 		return record_by_id($id,$this->params['rs']);
 	}
+
+
+	function check_login($data) {
+		$id=gs_session::load('login_'.$this->params['classname']);
+		return record_by_id($id,$this->params['classname']);
+	}
+	function post_logout($data) {
+		gs_session::clear('login_'.$this->params['classname']);
+		return true;
+	}
+
+	function post_login($data) {
+		$bh=new gs_base_handler($this->data,$this->params);
+		$f=$bh->validate();
+		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+		$d=$f->clean();
+
+		$rsname=$this->params['classname'];
+
+		$rs=new $rsname;
+
+
+		foreach ($this->data['handler_params'] as $n=>$v) {
+			if (isset($rs->structure['fields'][$n])) $d[$n]=$v;
+		}
+
+		$rec=$rs->find_records($d)->first();
+
+		gs_session::save($rec->get_id(),'login_'.$rsname);
+
+		return $rec;
+
+	}
+
 }
 
 class gs_tpl_block {
