@@ -21,5 +21,9 @@
 	$this->mail_from='info';
 	$this->mail_type='smtp';
 
+	$this->languages=NULL;
+	//$this->languages=array('ru'=>'RUS','en'=>'ENG');
+	//$this->languages='tw_languages';
+
 	DEFINE ('DEBUG',1);
 ?>
