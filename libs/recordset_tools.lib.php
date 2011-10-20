@@ -13,6 +13,7 @@ class field_interface {
 			if(!isset($r['required'])) $r['required']='true';
 			if (!isset($r['readonly'])) $r['readonly']=false;
 			if (!isset($r['index'])) $r['index']=false;
+			if(!isset($r['multilang'])) $r['multilang']=false;
 			$r['func_name']=$r[0];
 			if (in_array($r['func_name'],array('lMany2Many','lMany2One','lOne2One'))) {
 				$r['linked_recordset']=$r[1];
@@ -45,6 +46,7 @@ class field_interface {
 
 	static function fString($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
+		$structure['fields'][$field]['multilang']=$opts['multilang'];
 		$structure['htmlforms'][$field]=array(
 			'type'=>'input', 
 			'hidden'=>$opts['hidden'],
@@ -84,6 +86,7 @@ class field_interface {
 	}
 	static function fCheckbox($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'int');
+		$structure['fields'][$field]['multilang']=$opts['multilang'];
 		$structure['htmlforms'][$field]=array(
 			'type'=>'checkbox',
 			'hidden'=>$opts['hidden'],
@@ -96,6 +99,7 @@ class field_interface {
 	}
 	static function fInt($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'int');
+		$structure['fields'][$field]['multilang']=$opts['multilang'];
 		$structure['htmlforms'][$field]=array(
 			'type'=>'number',
 			'hidden'=>$opts['hidden'],
@@ -122,6 +126,7 @@ class field_interface {
 	}
 	static function fDateTime($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'date');
+		$structure['fields'][$field]['multilang']=$opts['multilang'];
 		$structure['htmlforms'][$field]=array(
 			'type'=>'datetime',
 			'hidden'=>$opts['hidden'],
@@ -134,6 +139,7 @@ class field_interface {
 	}
 	static function fText($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'text');
+		$structure['fields'][$field]['multilang']=$opts['multilang'];
 		$structure['htmlforms'][$field]=array(
 			'type'=>'text',
 			'hidden'=>$opts['hidden'],
@@ -420,10 +426,6 @@ class gs_rs_links extends gs_recordset{
 		}
 	}
 	public function commit() {
-		/*
-		md('rs_links::commit',1);
-		md($this->links,1);
-		*/
 		foreach ($this->structure['recordsets'] as $l=>$st) {
 			$prec=new $st['recordset'];
 			$update_link=$st['update_link'];
@@ -461,6 +463,7 @@ class gs_rs_links extends gs_recordset{
 }
 class gs_recordset_short extends gs_recordset {
 	function __construct($s=false,$init_opts=false) {
+		$this->init_fields=$s;
 		$this->init_opts=$init_opts;
 		$this->init_opts['recordset']=get_class($this);
 		if (!$s || !is_array($s)) throw new gs_exception('gs_recordset_short :: empty init values on '.get_class($this));
@@ -489,6 +492,100 @@ class gs_recordset_short extends gs_recordset {
 				);
 		}
 		parent::__construct($this->gs_connector_id,$this->table_name);
+		$lng=languages();
+		if (count($lng)<2) return;
+		array_shift($lng);
+
+
+
+		$ml=0;
+		$hf=array();
+		
+		foreach ($this->structure['htmlforms'] as $k=>$h) {
+			$hf[$k]=$h;
+			if (isset($this->structure['fields'][$k]) 
+				&& isset($this->structure['fields'][$k]['multilang']) 
+				&& $this->structure['fields'][$k]['multilang']) {
+				$ml=1;
+
+				foreach($lng as $l=>$lname) {
+					$new_h=$h;
+					$new_h['verbose_name'].="/$lname";
+					$hf['Lang:'.$l.':'.$k]=$new_h;
+				}
+
+
+			}
+		}
+
+		if (!$ml) return;
+
+		$this->structure['htmlforms']=$hf;
+
+		$classname='i18n_'.get_class($this);
+		$ml_opts=array(
+			'required' => true,
+			'readonly' => false,
+			'index' => 0,
+			'multilang' => 0,
+			'func_name' => 'lMany2One',
+			'linked_recordset' => $classname.':Parent',
+			'hidden' => 1,
+			'verbose_name' => false,
+			'counter' => 0,
+			'widget'=>'hidden',
+
+		);
+		field_interface::lMany2One('Lang',$ml_opts,$this->structure,$this->init_opts);
+		$this->structure['recordsets']['Lang']['index_field_name']='lang';
+
+		//md($this->structure,1);
+
+
+	}
+	function install() {
+		$ret=parent::install();
+		$this->i18n_install();
+		return $ret;
+	}
+	function i18n_install () {
+		$s=$this->init_fields;
+		$lng=languages();
+		if (count($lng)<2) return;
+		$classname='i18n_'.get_class($this);
+		$ml_options=array();
+		$ml_options['lang']='fString';
+		$ml_options['Parent']='lOne2One '.get_class($this);
+		foreach ($this->structure['fields'] as $k=>$f) {
+			if (isset($f['multilang']) && $f['multilang']) {
+				$ml_options[$k]=$s[$k];
+
+			}
+		}
+		$ml_options=str_replace('multilang=true','',$ml_options);
+		if(count($ml_options)<=2) return;
+		md($ml_options,1);
+
+		$tpl= '<?php
+class %s extends gs_recordset_i18n {
+	public $no_urlkey=1;
+	function __construct($init_opts=false) { parent::__construct(
+		%s
+		,$init_opts);
+	}
+}
+?>';
+
+
+		$classstr=sprintf($tpl, $classname ,var_export($ml_options,true));
+
+		$fname=cfg('lib_modules_dir').'i18n'.DIRECTORY_SEPARATOR.$classname.'.module.php';
+		check_and_create_dir(dirname($fname));
+		file_put_contents($fname,$classstr);
+		include_once($fname);
+		$rs=new $classname;
+		$rs->install();
+
 	}
 
 	function selfinit($arr) {
@@ -582,6 +679,21 @@ class gs_recordset_short extends gs_recordset {
 		return null;
 	}
 
+}
+
+abstract class gs_recordset_i18n extends gs_recordset_short {
+	function offsetGet($offset) {
+		$langs=languages();
+		if ($langs) {
+			$default_lang=key($langs);
+			array_shift($langs);
+			if ($default_lang==$offset) {
+				$this->parent_record->disable_multilang=1;
+				return $this->parent_record;
+			}
+		}
+		return parent::offsetGet($offset);
+	}
 }
 
 ?>

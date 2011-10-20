@@ -176,6 +176,22 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->preload();
 		return parent::valid();
 	}
+    function offsetSet($offset, $value) {
+		$this->preload();
+		return parent::offsetSet($offset, $value);
+    }
+    function offsetExists($offset) {
+		$this->preload();
+		return parent::offsetExists($offset);
+    }
+    function offsetUnset($offset) {
+		$this->preload();
+		return parent::offsetUnset($offset);
+    }
+    function offsetGet($offset) {
+		$this->preload();
+		return parent::offsetGet($offset);
+    }
 
 	function count() {
 		if ($this->state==RS_STATE_UNLOADED) {
@@ -235,7 +251,12 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 		$options=$this->query_options['options'];
 		$index_field_name=$this->query_options['index_field_name'];
-		$fields=$fields ? array_merge($fields,array($index_field_name)) : $this->query_options['fields'];
+		//$fields=$fields ? array_merge($fields,array($index_field_name)) : $this->query_options['fields'];
+
+		if (!$fields) $fields=$this->query_options['fields'];
+		$fields=array_unique(array_merge($fields,array($index_field_name)));
+
+
 		if(!$fields) $fields=array($index_field_name);
 		if (!in_array($this->id_field_name,$fields)) $fields[]=$this->id_field_name;
 		$this->get_connector()->select($this,$options,$fields);
@@ -255,9 +276,11 @@ abstract class gs_recordset_base extends gs_iterator {
 			$record=new gs_record($this,$fields);
 			$record->fill_values($r);
 			$record->recordstate = RECORD_UNCHANGED;
-			if (!$record->$index_field_name || isset($records[$record->$index_field_name]))
+			if (!$record->$index_field_name || isset($records[$record->$index_field_name])) {
 				$records[]=$record;
-			else $records[$record->$index_field_name]=$record;
+			} else {
+				$records[$record->$index_field_name]=$record;
+			}
 		}
 		if (isset($records)) $this->replace($records);
 		$this->state=RS_STATE_LOADED;

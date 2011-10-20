@@ -306,4 +306,16 @@ function filter($name) {
 	return gs_filters_handler::get($name);
 }
 
+function languages() {
+	$langs=cfg('languages');
+	if (is_string($langs)) {
+		$rs=new $langs;
+		$langs=$rs->find_records(array())->recordset_as_string_array();
+		$langs=array_combine($langs,$langs);
+	} 
+	if (!is_array($langs)) $langs=array();
+
+	return $langs;
+}
+
 ?>

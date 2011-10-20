@@ -117,6 +117,7 @@ class gs_record implements arrayaccess {
 				*/
 				if (!isset($struct['type']) || $struct['type']=='one') $value=$this->$local_field_name ? array($this->$local_field_name=>$value) : array($value);
 				foreach ($value as $k=>$v) {
+					if(isset($struct['index_field_name'])) $v[$struct['index_field_name']]=$k;
 					if ($this->recordsets_array[$field][$k]) {
 						$this->recordsets_array[$field][$k]->fill_values($v);
 					} else {
@@ -243,6 +244,26 @@ class gs_record implements arrayaccess {
 
 
 	public function __get($name) {
+
+		if (isset($this->gs_recordset->structure['fields'][$name]['multilang'])
+			&& $this->gs_recordset->structure['fields'][$name]['multilang']
+			) {
+			$language=gs_var_storage::load('multilanguage_lang');
+			if ($this->disable_multilang) {
+				$this->disable_multilang=0;
+			} else if ($language) {
+				$langs=languages();
+				if ($langs) {
+					$default_lang=key($langs);
+					array_shift($langs);
+					if ($langs && $language!=$default_lang) {
+						$l=$this->__get('Lang');
+						if ($l[$language]) return $l[$language]->$name;
+					}
+				}
+			}
+		}
+
 		if (array_key_exists($name,$this->values)) return $this->values[$name];
 		if (isset($this->gs_recordset->structure['recordsets'][$name])) return $this->lazy_load($name);
 		if(isset($this->get_recordset()->structure['fields'][$name]) && $this->get_recordset()->state==RS_STATE_LATE_LOAD) {
@@ -254,20 +275,6 @@ class gs_record implements arrayaccess {
 			$this->get_recordset()->load_records(array($name));
 			if (array_key_exists($name,$this->values)) return $this->values[$name];
 		}
-		
-		/*
-		$cname=get_class($this->get_recordset()).'_'.$name;
-		if(class_exists($cname) && is_subclass_of($cname,'gs_recordset_base') && property_exists($cname,'parent_id_name')) {
-			$this->get_recordset()->structure['recordsets'][$name]=array(
-				'recordset' => $cname,
-				'local_field_name' => $this->get_recordset()->id_field_name,
-				'foreign_field_name' => $cname::$parent_id_name,
-				'type' => 'many',
-				'mode' => 'link',
-			);
-			return $this->__get($name);
-		}
-		*/
 		return new gs_null(GS_NULL_XML);
 	}
 

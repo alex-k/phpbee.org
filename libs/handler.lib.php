@@ -278,7 +278,9 @@ class gs_base_handler extends gs_handler {
 		$f=$this->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 
+
 		$f->rec->fill_values(self::explode_data($f->clean()));
+		
 		$f->rec->get_recordset()->commit();
 		return $f->rec;
 	}
@@ -453,7 +455,8 @@ class gs_base_handler extends gs_handler {
 			}
 			$newdata=array_merge_recursive_distinct($newdata,$v);
 		}
-		return array_merge($data,$newdata);
+		$ret=array_merge($data,$newdata);
+		return $ret;
 	}
 	static function process_handler($params,$smarty) {
 		$params['gspgid']=trim($params['gspgid'],'/');
