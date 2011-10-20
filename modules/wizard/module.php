@@ -396,6 +396,7 @@ class wz_recordset_fields extends gs_recordset_short {
 		'name'=> "fString name",
 		'verbose_name'=> "fString verbose_name required=false",
 		'type'=>"fSelect type values='fString,fText,fInt' widget=select",
+		'multilang'=>"fCheckbox multilang",
 		'options'=>"fString options required=false",
 		'extra_options'=>"fString extra_options required=false",
 		'widget'=>"fSelect widget required=false widget=select",

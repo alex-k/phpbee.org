@@ -28,6 +28,7 @@ abstract class gs_base_module {
 		}
 		return true;
 	}
+
 }
 
 class module extends gs_base_module implements gs_module {
