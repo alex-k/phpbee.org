@@ -254,6 +254,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		//$fields=$fields ? array_merge($fields,array($index_field_name)) : $this->query_options['fields'];
 
 		if (!$fields) $fields=$this->query_options['fields'];
+		if (!$fields) $fields=array();
 		$fields=array_unique(array_merge($fields,array($index_field_name)));
 
 

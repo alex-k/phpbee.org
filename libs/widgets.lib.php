@@ -524,6 +524,7 @@ class gs_widget_121_radio extends gs_widget_lOne2One {
 class gs_data_widget_121_radio extends gs_data_widget_parent_list {}
 
 
+class gs_widget_include_form extends gs_widget {}
 
 class gs_data_widget_include_form {
 	function gd($rec,$k,$hh,$params,$data) {
@@ -535,6 +536,8 @@ class gs_data_widget_include_form {
 			$nrs=$rec->$k;
 		}
 
+
+		if (!is_object($nrs) || !$nrs) return $hh;
 		$nrs->first(true);
 
 		foreach($nrs as $nobj) {

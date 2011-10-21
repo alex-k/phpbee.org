@@ -492,21 +492,34 @@ class gs_recordset_short extends gs_recordset {
 				);
 		}
 		parent::__construct($this->gs_connector_id,$this->table_name);
+
+
+		$classname='i18n_'.get_class($this);
+		if (!class_exists($classname,true)) return;
+
+
+		$ml=0;
+		foreach ($this->structure['fields'] as $k=>$h) {
+			if(isset($h['multilang']) && $h['multilang']) {
+				$ml=1;
+				break;
+			}
+		}
+
+		if (!$ml) return;
+
 		$lng=languages();
 		if (count($lng)<2) return;
 		array_shift($lng);
 
 
 
-		$ml=0;
 		$hf=array();
-		
 		foreach ($this->structure['htmlforms'] as $k=>$h) {
 			$hf[$k]=$h;
 			if (isset($this->structure['fields'][$k]) 
 				&& isset($this->structure['fields'][$k]['multilang']) 
 				&& $this->structure['fields'][$k]['multilang']) {
-				$ml=1;
 
 				foreach($lng as $l=>$lname) {
 					$new_h=$h;
@@ -518,11 +531,9 @@ class gs_recordset_short extends gs_recordset {
 			}
 		}
 
-		if (!$ml) return;
 
 		$this->structure['htmlforms']=$hf;
 
-		$classname='i18n_'.get_class($this);
 		$ml_opts=array(
 			'required' => true,
 			'readonly' => false,
@@ -572,6 +583,9 @@ class %s extends gs_recordset_i18n {
 	function __construct($init_opts=false) { parent::__construct(
 		%s
 		,$init_opts);
+		$this->structure["fkeys"]=array(
+			array("link"=>"Parent","on_delete"=>"CASCADE","on_update"=>"CASCADE"),
+			);
 	}
 }
 ?>';
