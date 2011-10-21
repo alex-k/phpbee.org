@@ -89,7 +89,9 @@ class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 		<*if $fkeys->count()>0*>
 		$this->structure['fkeys']=array(
 		<*foreach from=$fkeys item=f*>
-				array('link'=>'<*$f->name*>','on_delete'=>'<*$f->fkey_on_delete*>','on_update'=>'<*$f->fkey_on_update*>'),
+		<*if $f->fkey_on_delete!='NONE' && $f->fkey_on_update!='NONE'*>
+				array('link'=>'<*$f->fkey_name|default:$f->name*>','on_delete'=>'<*$f->fkey_on_delete*>','on_update'=>'<*$f->fkey_on_update*>'),
+		<*/if*>		
 		<*/foreach*>
 		     );
 		<*/if*>

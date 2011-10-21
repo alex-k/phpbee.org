@@ -8,10 +8,11 @@ class wz_link_images extends wz_link {
 
 	function lMany2Many($rec) { return; }
 
-	function lOne2One($rec) { return; }
+	function lOne2One($rec) { 
+		return $this->lMany2One($rec,true); 
+	}
 
-	function lMany2One($rec) { 
-		md($rec->get_values(),1);
+	function lMany2One($rec,$l121=false) { 
 
 		$name_rs_images=$rec->Recordset->first().'_images';
 		$name_rs_images_files=$name_rs_images.'_files';
@@ -43,6 +44,7 @@ class wz_link_images extends wz_link {
 				 'extra_options'=>'mode=link',
 				 'fkey_on_delete'=>'CASCADE',
 				 'fkey_on_update'=>'CASCADE',
+				 'fkey_name'=>$rec->Recordset->first()->name.'.'.$rec->name,
 				 ));
 		$rec_images->Links->new_record(array(
 				 'name'=>'File',
@@ -51,8 +53,16 @@ class wz_link_images extends wz_link {
 				 'verbose_name'=>'File',
 				 'widget'=>'include_form',
 				 'extra_options'=>'hidden=false',
+				 'fkey_on_delete'=>'NONE',
+				 'fkey_on_update'=>'NONE',
+				 ));
+		$rec_images_files->Links->new_record(array(
+				 'name'=>'Parent',
+				 'type'=>'lOne2One',
+				 'classname'=>$name_rs_images,
 				 'fkey_on_delete'=>'CASCADE',
 				 'fkey_on_update'=>'CASCADE',
+				 'fkey_name'=>"$name_rs_images.File",
 				 ));
 
 		$arr=array('type'=>'handler','gspgid_value'=>'/admin/form/'.$name_rs_images);
@@ -72,7 +82,7 @@ class wz_link_images extends wz_link {
 
 		$rec->fill_values(array(
 			'classname'=>$name_rs_images,
-			'linkname'=>'Parent',
+			'linkname'=>$l121? '' : 'Parent',
 			));
 
 		$rec_images->commit();

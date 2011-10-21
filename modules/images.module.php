@@ -23,7 +23,7 @@ abstract class tw_images extends gs_recordset_handler {
 		return $res;
 	}
 	public function __toString() {
-		//return implode(' ',$this->recordset_as_string_array());
+		return implode(' ',$this->recordset_as_string_array());
 		return 'image';
 	}
 }
@@ -59,7 +59,7 @@ abstract class tw_file_images extends gs_recordset_short{
 		$ret=array();
 		$fname=$this->get_connector()->www_root.'/'.$this->db_tablename;
 		foreach ($records as $rec) {
-			//$this->resize($rec,'',true);
+			//$this->resize($rec,'',null,true);
 			$ret[]=$fname.'/'.$this->get_connector()->split_id($rec->get_id(),true).'/'.(($type=='') ? 'File_data' : $type.'.jpg');
 		}
 		return $ret;
@@ -77,7 +77,7 @@ abstract class tw_file_images extends gs_recordset_short{
 		);
 	}
 	
-	function resize($rec,$type,$no_rewrite=false) {
+	function resize($rec,$type,$ret,$no_rewrite=false) {
 		$fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR;
 		$sname=$fname.'File_data';
 		$gd=new vpa_gd($sname);

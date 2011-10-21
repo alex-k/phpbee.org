@@ -404,6 +404,9 @@ class wz_recordset_fields extends gs_recordset_short {
 		'required'=>"fCheckbox verbose_name=required",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
+		$this->structure['fkeys']=array(
+			array('link'=>'Recordset','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
+		);
 
 
 
@@ -449,11 +452,15 @@ class wz_recordset_links extends gs_recordset_short {
 		'extra_options'=>"fString extra_options required=false",
 		'widget'=>"fSelect widget required=false widget=select",
 		'required'=>"fCheckbox verbose_name=required",
-		'fkey_on_delete'=>"fSelect on_delete values='RESTRICT,CASCADE,SET_NULL' default='RESTRICT' widget=radio",
-		'fkey_on_update'=>"fSelect on_update values='RESTRICT,CASCADE,SET_NULL' default='CASCADE' widget=radio",
+		'fkey_on_delete'=>"fSelect on_delete values='NONE,RESTRICT,CASCADE,SET_NULL' widget=radio ",
+		'fkey_on_update'=>"fSelect on_update values='NONE,RESTRICT,CASCADE,SET_NULL' widget=radio ",
+		'fkey_name'=>"fString required=false",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
 		$this->structure['triggers']['before_insert'][]='before_insert';
+		$this->structure['fkeys']=array(
+			array('link'=>'Recordset','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
+		);
 
 
 
