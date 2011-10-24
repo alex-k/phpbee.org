@@ -278,7 +278,6 @@ class gs_base_handler extends gs_handler {
 		$f=$this->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 
-
 		$f->rec->fill_values(self::explode_data($f->clean()));
 		
 		$f->rec->get_recordset()->commit();

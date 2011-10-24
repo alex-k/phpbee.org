@@ -81,6 +81,7 @@ class gs_glyph {
 
 abstract class g_forms implements g_forms_interface{
 	function __construct($h,$params=array(),$data=array()) {
+		//md($h,1);
 		if (!is_array($data)) $data=array();
 		$this->params=$params;
 		$this->clean_data=array();

@@ -448,8 +448,9 @@ class gs_widget_lMany2One extends gs_widget {
 
 class gs_widget_gallery extends gs_widget {
 	function clean() {
-		//md($this->data,1);
-		return array('fake'=>true);
+		$hash_field_name=$this->params['linkname'].'_hash';
+		return array($hash_field_name=>$this->data[$hash_field_name]);
+		//return array('fake'=>true);
 	}
 	function html() {
 		$hash_field_name=$this->params['linkname'].'_hash';
