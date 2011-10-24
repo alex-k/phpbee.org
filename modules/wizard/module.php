@@ -85,6 +85,11 @@ class module_wizard extends gs_base_module implements gs_module {
 						'gs_wizard_handler.iddqdblocksubmit:return:true',
 						'gs_base_handler.redirect_gl:gl:iddqdblocksubmit',
 						),
+			'/admin/wizard/clone_urls'=>array(
+				'gs_wizard_handler.clone_urls',
+				'gs_base_handler.redirect',
+			),
+
 		),
 		'get'=>array(
 			'/admin/wizard'=>'gs_base_handler.show',
@@ -193,6 +198,28 @@ class gs_wizard_handler extends gs_handler {
 		return file_put_contents($dirname.'module.phps',$out)!==FALSE;
 
 
+	}
+	
+	function clone_urls() {
+		
+		$ids=$this->data['manage'];
+		$m_id=$this->data['module_id'];
+		$urls=new wz_urls;
+		$urls_new=new wz_urls;
+		$r_urls=$urls->find_records(array('id'=>array_keys($ids)));
+		foreach ($r_urls as $rec) {
+				$values=$rec->get_values();
+				if (isset($rec->get_recordset()->id_field_name)) unset($values[$rec->get_recordset()->id_field_name]);
+				$values['Module_id']=$m_id;
+				$r=$urls_new->new_record($values);
+				$r_handlers=$rec->Handlers->find(array());
+				foreach ($r_handlers as $rec_h) {
+					$values=$rec_h->get_values();
+					unset($values[$rec_h->get_recordset()->id_field_name]);
+					$r->Handlers->new_record($values);
+				}
+		}
+		$urls_new->commit();
 	}
 
 	function iddqd($data) {
@@ -387,6 +414,7 @@ class wz_recordsets extends gs_recordset_short {
 		'Links'=>"lMany2One wz_recordset_links:Recordset",
 		'Submodules'=>"lMany2One wz_recordset_submodules:Recordset",
 		'showadmin'=>"fCheckbox 'show in admin'",
+		'no_urlkey'=>"fCheckbox 'No URL key'",
 		),$init_opts);
 	}
 }

@@ -66,6 +66,7 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 <*foreach from=$module->recordsets item=rs*>
 
 class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
+	<*if $rs->no_urlkey*>public $no_urlkey=true; <*/if*>
 	function __construct($init_opts=false) { parent::__construct(array(
 
 		<*foreach from=$rs->Fields item=f*>
