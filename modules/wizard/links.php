@@ -83,6 +83,7 @@ class wz_link_images extends wz_link {
 		$rec->fill_values(array(
 			'classname'=>$name_rs_images,
 			'linkname'=>$l121? '' : 'Parent',
+			'extra_options'=>'mode=link',
 			));
 
 		$rec_images->commit();
