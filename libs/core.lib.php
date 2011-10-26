@@ -148,11 +148,17 @@ class gs_iterator implements Iterator, arrayaccess {
 	    return $this->current();
     }
     function reverse() {
-	    $this->array=array_reverse($this->array);
+	    $values=$this->array;
+	    $keys=array_keys($values);
+	    if($keys && $values) $this->array=array_combine(array_reverse($keys),array_reverse($values));
 	    return $this;
     }
     function current() {
 	    return current($this->array);
+    }
+
+    function array_keys() {
+	    return array_keys($this->array);
     }
 
     function key() {

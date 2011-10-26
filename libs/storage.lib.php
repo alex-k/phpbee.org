@@ -176,6 +176,14 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->preload();
 		return parent::valid();
 	}
+    function array_keys() {
+		$this->preload();
+		return parent::array_keys();
+    }
+    function reverse() {
+		$this->preload();
+		return parent::reverse();
+    }
     function offsetSet($offset, $value) {
 		$this->preload();
 		return parent::offsetSet($offset, $value);

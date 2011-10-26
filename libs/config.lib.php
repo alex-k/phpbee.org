@@ -66,6 +66,7 @@ class gs_init {
 			uksort($h,array($this,'h_sort'));
 			$handlers[$k]=$h;
 		}
+		md($handlers);
 		gs_cacher::save($handlers,'config','handlers');
 
 		$cl_array=array();
@@ -334,7 +335,7 @@ class gs_config {
 		$this->tpl_data_dir_default=$this->data_dir.'templates/';
 		$this->tpl_data_dir=$this->tpl_data_dir_default;
 		*/
-		$this->tpl_data_dir=$this->root_dir.'html/';
+		$this->tpl_data_dir=$this->root_dir.'html';
 		$this->tpl_var_dir=$this->var_dir.'templates_c/';
 		$this->lib_tpl_dir=$this->lib_dir.'smarty/';
 		$this->tpl_plugins_dir=$this->lib_tpl_dir.'plugins/';

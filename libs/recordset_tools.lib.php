@@ -674,6 +674,11 @@ class %s extends gs_recordset_i18n {
 		if ($recs->count()==0) return true;
 		return $recs->first()->get_id()===$params['rec_id'];
 	}
+        function check_unique($field,$value,$params,$record=null) {
+		$recs=$this->find_records(array($field=>$value));
+		if ($recs->count()==0) return true;
+		return $recs->first()->get_id()===$params['rec_id'];
+        }
 
 	function trigger_urlkey($rec,$type) {
 		if(!trim($rec->urlkey)) $rec->urlkey=string_to_safeurl(trim($rec));

@@ -80,6 +80,7 @@ class gs_filter_like extends gs_filter {
 		$tpl->assign('keyname',$this->name);
 		$tpl->assign('prelabel',$ps['prelabel']);
 		$tpl->assign('label',$ps['label']);
+		$tpl->assign('params',$ps);
 		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
 		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
 		return $out;
@@ -320,6 +321,49 @@ class gs_filter_select_by_links extends gs_filter {
 		$tpl->assign('current',$this->value);
 		$tpl->assign('current_name',$current_name);
 		$tpl->assign('filter_params',$ps['params']);
+		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
+		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
+		return $out;
+	}
+}
+class gs_filter_select_records extends gs_filter {
+	function __construct($data) {
+		parent::__construct($data);
+
+		$rs=$this->params['recordset'];
+		if (is_object($rs) && is_subclass_of($rs,'gs_recordset')) {
+			$this->recordset=$rs;
+		} else {
+			$this->recordset= new $rs;
+		}
+		$this->recordset->find_records(array())->preload();
+
+	}
+	function current() {
+		return $this->value ? $this->recordset[$this->value] : $this->recordset->first();
+	}
+	function applyFilter($options,$rs) {
+		$options[]=array(
+				'type'=>'value',
+				'field'=>$this->recordset->id_field_name,
+				'value'=>$this->value,
+				);
+		return $options;
+	}
+	function getHtmlBlock($ps) {
+		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
+		return $this->getHtmlBlockNonExlusive($ps);
+	}
+	function getHtmlBlockNonExlusive($ps) {
+		$tpl=gs_tpl::get_instance();	
+		//$this->recordset=$this->recordset->find_records(array())->preload();
+		$links=$this->recordset->recordset_as_string_array();
+		$tpl->assign('links',$links);
+		$tpl->assign('current',$this->value);
+		$tpl->assign('keyname',$this->name);
+		$tpl->assign('prelabel',$ps['prelabel']);
+		$tpl->assign('label',$ps['label']);
+		$tpl->assign('params',$ps);
 		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
 		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
 		return $out;

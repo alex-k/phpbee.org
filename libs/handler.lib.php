@@ -78,19 +78,49 @@ class gs_base_handler extends gs_handler {
 		md($_SERVER,1);*/
 		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/'));
 	}
-	function show404() {
+	function show404($ret) {
 		header("HTTP/1.0 404 Not Found");
-		return $this->show();
+		return $this->show($ret);
 		return false;
 	}
 	
 	function show($ret,$nodebug=FALSE) {
+		$tpl=gs_tpl::get_instance();
+
 		if (empty($this->params['name'])) {
 			$this->params['name']=basename($this->data['handler_key']).'.html';
 		}
-		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
 
-		$tpl=gs_tpl::get_instance();
+		$tplname=false;
+		if (!$tplname && file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'])) $tplname=$this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'];
+		if (!$tplname && file_exists(cfg('tpl_data_dir').DIRECTORY_SEPARATOR.$this->params['name'])) $tplname=cfg('tpl_data_dir').DIRECTORY_SEPARATOR.$this->params['name'];
+		if (!$tplname) $tplname=$this->params['name'];
+
+
+		$language=false;
+		if (!$lang) $language=gs_var_storage::load('multilanguage_lang');
+		if (!$lang) $language=gs_session::load('multilanguage_lang');
+
+		if ($language) {
+			$langs=languages();
+			if ($langs) {
+				$default_lang=key($langs);
+				array_shift($langs);
+				if ($langs && $language!=$default_lang) {
+					$newtplname=dirname($tplname).DIRECTORY_SEPARATOR.$language.DIRECTORY_SEPARATOR.(basename($tplname));
+					if (file_exists($newtplname)) {
+						$tplname=$newtplname;
+						$dir=$tpl->getTemplateDir();
+						if (!is_array($dir)) $dir=array($dir);
+						array_unshift($dir,'.',dirname($newtplname));
+						$tpl->setTemplateDir($dir);
+					}
+
+				}
+			}
+			
+		}
+
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
 		$tpl->assign('_gsstack',$ret);
