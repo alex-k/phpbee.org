@@ -1,5 +1,10 @@
 <?
 
+
+var_dump($_SERVER);
+phpinfo();
+
+
 $urls=array(
 	'',
 	'news',

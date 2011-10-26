@@ -68,21 +68,21 @@ abstract class tw_file_images extends gs_recordset_short{
 	function config_previews() {
 		$this->config=array(
 			'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
-			'admin'=>array('width'=>50,'height'=>50,'method'=>'use_height','bgcolor'=>array(200,200,200)),
-			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(240,240,240)),
-			'gallery'=>array('width'=>190,'height'=>126,'method'=>'use_box','bgcolor'=>array(200,200,200), 'modifier'=>'check_and_rotate_left'),
-			'tumb'=>array('width'=>300,'height'=>200,'method'=>'use_height','bgcolor'=>array(200,200,200)),
-			'details'=>array('width'=>500,'height'=>333,'method'=>'use_space','bgcolor'=>array(200,200,200)),
-			'zoom'=>array('width'=>1600,'height'=>1200,'method'=>'use_fields','bgcolor'=>array(200,200,200)),
+			'ico'=>array('width'=>20,'height'=>13,'method'=>'use_fields','bgcolor'=>array(0,0,0)),
+			'admin'=>array('width'=>50,'height'=>50,'method'=>'use_height','bgcolor'=>array(255,255,255)),
+			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(255,255,255)),
+			'tumb'=>array('width'=>300,'height'=>255,'method'=>'use_height','bgcolor'=>array(255,255,255)),
+			'details'=>array('width'=>500,'height'=>333,'method'=>'use_space','bgcolor'=>array(255,255,255)),
+			'zoom'=>array('width'=>1600,'height'=>1255,'method'=>'use_fields','bgcolor'=>array(255,255,255)),
+			'gallery'=>array('width'=>190,'height'=>126,'method'=>'use_box','bgcolor'=>array(255,255,255), 'modifier'=>'check_and_rotate_left'),
 		);
 	}
 	
 	function resize($rec,$type,$ret,$no_rewrite=false) {
 		$fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR;
 		$sname=$fname.'File_data';
-		$gd=new vpa_gd($sname);
 		foreach ($this->config as $key => $data) {
-			
+			$gd=new vpa_gd($sname);
 			$iname=$fname.$key.'.jpg';
 			if ($data['width']>0  && ($data['width']<$rec->first()->File_width || $data['height']<$rec->first()->File_height)) {
 				if ($data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);

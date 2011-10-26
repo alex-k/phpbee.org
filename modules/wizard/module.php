@@ -563,12 +563,6 @@ class wz_urls extends gs_recordset_short {
 		),$init_opts);
 	}
         function check_unique($field,$value,$params,$record=null) {
-		/*
-		md($params,1);
-		md($record,1);
-		return false;
-		$recs=$this->find_records(array($field=>$value,'Module_id'=>$record->Module_id));
-		*/
 		$recs=$this->find_records(array($field=>$value));
 		if ($recs->count()==0) return true;
 		return $recs->first()->get_id()===$params['rec_id'];

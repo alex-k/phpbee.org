@@ -41,7 +41,6 @@ class wz_link_images extends wz_link {
 				 'type'=>'lOne2One',
 				 'classname'=>$rec->Recordset->first()->name,
 				 'linkname'=>'',
-				 'extra_options'=>'mode=link',
 				 'fkey_on_delete'=>'CASCADE',
 				 'fkey_on_update'=>'CASCADE',
 				 'fkey_name'=>$rec->Recordset->first()->name.'.'.$rec->name,
