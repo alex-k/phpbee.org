@@ -114,9 +114,6 @@ class gs_strategy_createlogin_handler extends gs_handler {
 		}
 		$rs->commit();
 
-		md($out,1);
-		md($out_form,1);
-		die();
 		return $module;
 	}
 }
