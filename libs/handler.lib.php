@@ -402,7 +402,7 @@ class gs_base_handler extends gs_handler {
 		return false;
 	}
 	function redirect() {
-		return html_redirect(isset($this->params['href']) ? $this->params['href']: null);
+		return html_redirect(isset($this->params['href']) ? $this->params['href']: null,array(),'302',$this->params['clean_get']);
 	}
 	
 	function get_record($data) {
@@ -631,10 +631,6 @@ class gs_base_handler extends gs_handler {
 		$id=gs_session::load('login_'.$this->params['classname']);
 		$rec=record_by_id($id,$this->params['classname']);
 		if(isset($this->data['handler_params']['assign'])) {
-			/*
-			$tpl=gs_tpl::get_instance();
-			$tpl->assign($this->data['handler_params']['assign'],$rec);
-			*/
 			gs_var_storage::save($this->data['handler_params']['assign'],$rec);
 		}
 		return $rec;

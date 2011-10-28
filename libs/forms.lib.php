@@ -121,7 +121,7 @@ abstract class g_forms implements g_forms_interface{
 				if ($field['type']=='hidden' || (isset($field['widget']) && $field['widget']=='hidden')) {
 					$arr[]=$value['input'];
 				} else {
-					$arr[]=$helper->show($value['label'],$value['input'],isset($validate['FIELDS'][$name]) ? $validate['FIELDS'][$name] : NULL);
+					$arr[]=$helper->show($value['label'],$value['input'],isset($validate['FIELDS'][$name]) ? $validate['FIELDS'][$name] : NULL,$field);
 				}
 			}
 		}
@@ -368,6 +368,13 @@ class g_forms_divbox extends  g_forms_html {
          parent::__construct($h,$data,$rec);
          $this->view = new gs_glyph('helper',array('class'=>'empty'));
          $this->view->addNode('helper',array('class'=>'divbox'),array_keys($h));
+    }
+}
+class g_forms_label extends  g_forms_html {
+    function __construct($h,$data=array(),$rec=null)  {
+         parent::__construct($h,$data,$rec);
+         $this->view = new gs_glyph('helper',array('class'=>'empty'));
+         $this->view->addNode('helper',array('class'=>'label_br'),array_keys($h));
     }
 }
 

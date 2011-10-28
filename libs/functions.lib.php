@@ -1,10 +1,10 @@
 <?php
-function html_redirect($gspgid=null,$data=array(),$type='302') {
+function html_redirect($gspgid=null,$data=array(),$type='302', $clean_get=false) {
 	$config=gs_config::get_instance();
 	$query=array();
 	if($gspgid===null) {
 		$url=$config->referer_path;
-		parse_str(parse_url($config->referer,PHP_URL_QUERY),$query);
+		if (!$clean_get) parse_str(parse_url($config->referer,PHP_URL_QUERY),$query);
 	} else {
 		$scheme=parse_url($gspgid,PHP_URL_SCHEME);
 		$url=$scheme ? $gspgid : $config->www_dir.$gspgid;
