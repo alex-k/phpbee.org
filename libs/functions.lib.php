@@ -206,6 +206,14 @@ function string_to_params($inp) {
 	}
 	return is_array($inp) ? $ret : reset($ret);
 }
+function params_to_string ($params) {
+	if (is_string($params)) return $params;
+	$s='';
+	foreach ($params as $k=>$v) {
+		$s.=sprintf('%s="%s" ',$k,$v);
+	}
+	return trim($s);
+}
 
 function empty_array($a,$b) {
 	return is_array($b) ? $a || array_reduce($b,'empty_array') : $a || ($b && $b!=4);

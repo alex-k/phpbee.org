@@ -1,7 +1,18 @@
 <?php
 
+class gs_validate {
+	function get_name () {
+		return str_replace('gs_validate_','',get_class($this));
+	}
+	function description() {
+		return $this->get_name();
+	}
+}
 
-class gs_validate_dummyValid {
+class gs_validate_dummyValid  extends gs_validate {
+	function description() {
+		return 'always true (dummyValid)';
+	}
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     return true;
 }
@@ -9,7 +20,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_plain_word {
+class gs_validate_plain_word  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 	preg_match_all('/\w+/',$value,$ret);
 	$ret=implode('',$ret[0]);
@@ -21,7 +32,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isCCExpDate {
+class gs_validate_isCCExpDate  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return false;
@@ -60,7 +71,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
  
 
-class gs_validate_isCCNum {
+class gs_validate_isCCNum  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 	if(strlen($value) == 0)
 		return$params['empty']&&TRUE;
@@ -104,7 +115,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_checkField {
+class gs_validate_checkField  extends gs_validate {
 	function validate($field,$value,$data=array(),$params=array(),$record=null) {
 	    $classname=$params['class'];
 		$obj=new $classname;
@@ -113,7 +124,7 @@ class gs_validate_checkField {
 	}
 }
 
-class gs_validate_checkUnique{
+class gs_validate_checkUnique extends gs_validate {
 	function validate($field,$value,$data=array(),$params=array(),$record=null) {
 		$classname=$params['class'];
 		$obj=new $classname;
@@ -124,7 +135,7 @@ class gs_validate_checkUnique{
 }
  
 
-class gs_validate_isCCType {
+class gs_validate_isCCType  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 	$ccNum=$data[$params[CCNumField]];
@@ -153,7 +164,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isDate {
+class gs_validate_isDate  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return false;
@@ -165,7 +176,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isDateAfter {
+class gs_validate_isDateAfter  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
@@ -195,7 +206,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isDateBefore {
+class gs_validate_isDateBefore  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
@@ -225,7 +236,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isDateEqual {
+class gs_validate_isDateEqual  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
@@ -255,7 +266,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isDateOnOrAfter {
+class gs_validate_isDateOnOrAfter  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
@@ -285,7 +296,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isDateOnOrBefore {
+class gs_validate_isDateOnOrBefore  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(strlen($value) == 0)
@@ -317,7 +328,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
  
 
-class gs_validate_isEmail {
+class gs_validate_isEmail  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
     if(strlen($value) == 0)
@@ -342,14 +353,14 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isEmpty {
+class gs_validate_isEmpty  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     return strlen($value) == 0;
 }
 }
 
 
-class gs_validate_notEqual {
+class gs_validate_notEqual  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isEqual] parameter 'field2' is missing.");            
@@ -363,7 +374,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 }
 
 
-class gs_validate_isEqual {
+class gs_validate_isEqual  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isEqual] parameter 'field2' is missing.");            
@@ -384,7 +395,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isFloat {
+class gs_validate_isFloat  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return false;
@@ -396,7 +407,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isInt {
+class gs_validate_isInt  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(strlen($value) == 0)
             return false;        
@@ -408,7 +419,10 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isLength {
+class gs_validate_isLength  extends gs_validate {
+	function description() {
+		return parent::description().' min=X max=Y';
+	}
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
         if(!isset($params['min'])) {
@@ -433,13 +447,13 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isChecked {
+class gs_validate_isChecked  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     return 1 && $value;
 }
 }
 
-class gs_validate_isNumber {
+class gs_validate_isNumber  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return isset($params['empty']) &&$params['empty'];        
@@ -451,7 +465,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isOnly {
+class gs_validate_isOnly  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
 	
         if(!isset($params['field2'])) {
@@ -465,7 +479,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isPrice {
+class gs_validate_isPrice  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return false;
@@ -477,7 +491,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isRange {
+class gs_validate_isRange  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(!isset($params['low'])) {
                 trigger_error("SmartyValidate: [isRange] parameter 'low' is missing.");            
@@ -499,7 +513,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
  
 
-class gs_validate_isRegExp {
+class gs_validate_isRegExp  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
         if(!isset($params['validate_regexp'])) {
                 trigger_error("SmartyValidate: [isRegExp] parameter 'expression' is missing.");            
@@ -518,7 +532,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_isURL {
+class gs_validate_isURL  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
         return$params['empty'];        
@@ -530,7 +544,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 
 
-class gs_validate_notEmpty {
+class gs_validate_notEmpty  extends gs_validate {
 	function validate($field,$value,$data=array(),$params=array(),$record=null) {
 		return is_array($value) ? count($value)>0 : strlen(trim($value)) > 0;
 	}

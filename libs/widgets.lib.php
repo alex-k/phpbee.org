@@ -196,7 +196,7 @@ class gs_widget_select extends gs_widget {
 	}
 	function html($multi=false) {
 		$ret=sprintf('<select class="%s"  name="%s%s" %s>',
-					 isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fSelect',
+					 isset($this->params['cssclass']) ? $this->params['cssclass'] : ($multi ? 'fMultiSelect' : 'fSelect'),
 					 $this->fieldname,
 					 ($multi ? '[]' : ''),
 					 ($multi ? 'multiple="on"' : '')

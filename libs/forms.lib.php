@@ -5,6 +5,7 @@ interface g_forms_interface {
 	function as_list();
 	function as_labels();
 	function clean();
+	function get_data($name);
 }
 class gs_glyph {
 	private $tagName;
@@ -99,8 +100,12 @@ abstract class g_forms implements g_forms_interface{
 		$this->view = new gs_glyph('helper',array('class'=>'dl'));
 		$this->view->addNode('helper',array('class'=>'dt'),array_keys($h));
 	}
-	function show($validate=array(),$view=NULL) {
-		$delimiter="\n";
+	function get_data($name=null) {
+		if ($name===NULL) return $this->data;
+		return isset($this->data[$name]) ? $this->data[$name] : NULL;
+	}
+	function show_arr($validate=array(),$view=NULL) {
+		if (!$validate) $validate=$this->validate_errors;
 		$arr=array();
 		$inputs=$this->_prepare_inputs();
 		if($view===NULL) $view=$this->view;
@@ -125,7 +130,11 @@ abstract class g_forms implements g_forms_interface{
 				}
 			}
 		}
-		return implode($delimiter,$arr);
+		return $arr;
+	}
+	function show ($validate=array(),$view=NULL)  {
+		$delimiter="\n";
+		return implode($delimiter,$this->show_arr($validate,$view));
 	}
 	function clean($name=null) {
 		return $name ? $this->clean_data[$name] : $this->clean_data;
@@ -204,6 +213,9 @@ abstract class g_forms implements g_forms_interface{
 		$inputs=$this->_prepare_inputs();
 		$v=$inputs[$field];
 		return sprintf('<label>%s%s %s</label>', $v['label'],trim($v['label']) ? $suffix : null ,$v['input']);
+	}
+	function get_error($field) {
+		return isset($this->validate_errors['FIELDS'][$field]) ? $this->validate_errors['FIELDS'][$field] :array();
 	}
 	function add_helper_clone($fieldname) {
 		$posts=$this->view->find("name",$fieldname);
