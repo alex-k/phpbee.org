@@ -32,7 +32,7 @@
 				{foreach from=$url.Handlers->orderby('cnt') item=h}
 					<li -data-href="/admin/wizard/handlers/{$url.id}/handlers/{$h.id}#form">
 						{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}
-						{$h.handler_value}
+						{$h.handler_value|wordwrap:80:' ':1}
 						{*
 						<a href="/admin/wizard/module/{$module.id}/tpl/{$h.id}">tpl</a>
 						*}
@@ -77,6 +77,13 @@
 				{/foreach}
 				</ul>
 			</li>
+		{/foreach}
+		</ul>
+
+		<h3><a href="/admin/wizard/forms/{$module.id}">forms</a>  </h3>
+		<ul>
+		{foreach from=$module.forms->orderby('classname') item=rs}
+			<li><a href="/admin/wizard/form_fields/{$rs.id}">{$rs.classname}</a> </li>
 		{/foreach}
 		</ul>
 	</td>

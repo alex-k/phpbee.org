@@ -104,6 +104,44 @@ class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 <*/foreach*>
 
 
+<*foreach from=$module->forms item=form*>
+
+class <*$form->classname*> extends <*$form->extends*>{
+	function __construct($hh,$params=array(),$data=array()) {
+		$hh=array(
+
+		    <*foreach $form->Fields->orderby('cnt') as $f*>
+		    '<*$f->name*>' => Array
+			(
+			    'widget' => '<*$f->widget*>',
+			    <*if $f->verbose_name*>     'verbose_name'=>'<*$f->verbose_name*>',<*/if*>
+			    <*if $f->default_value*>    'default'=>'<*$f->default_value*>',<*/if*>
+			    <*if $f->readonly_field*>     'readonly'=>'<*$f->readonly_field*>',<*/if*>
+			    <*if $f->options*>     'options'=>'<*$f->options*>',<*/if*>
+			    'validate' => Array 
+			    	(
+				<*foreach $f->Validators as $v*>
+					'<*$v->class*>',
+				<*/foreach*>
+				),	
+			    'validate_params' => Array 
+			    	(
+				<*foreach $f->Validators as $v*>
+				<*foreach $v->options|string_to_params as $k=>$p*>
+					'<*$k*>'=>'<*$p*>',
+				<*/foreach*>
+				<*/foreach*>
+				),	
+			),
+			<*/foreach*>
+		);
+		return parent::__construct($hh,$params,$data);
+	}
+
+}
+
+
+<*/foreach*>
 
 
 
