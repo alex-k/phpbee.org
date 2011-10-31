@@ -212,6 +212,7 @@ class wz_form_fields extends gs_recordset_short {
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=>'fString name min_length=3 max_length=55',
 		'verbose_name'=>'fString verbose_name required=false',
+		'cssclass'=>'fString cssclass required=false',
 		'widget'=>"fSelect widget ",
 		'default_value'=>"fString default required=false",
 		'readonly_field'=>"fCheckbox readonly",

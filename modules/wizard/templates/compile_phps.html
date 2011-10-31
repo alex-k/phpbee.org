@@ -115,6 +115,7 @@ class <*$form->classname*> extends <*$form->extends*>{
 			(
 			    'widget' => '<*$f->widget*>',
 			    <*if $f->verbose_name*>     'verbose_name'=>'<*$f->verbose_name*>',<*/if*>
+			    <*if $f->cssclass*>     'cssclass'=>'<*$f->cssclass*>',<*/if*>
 			    <*if $f->default_value*>    'default'=>'<*$f->default_value*>',<*/if*>
 			    <*if $f->readonly_field*>     'readonly'=>'<*$f->readonly_field*>',<*/if*>
 			    <*if $f->options*>     'options'=>'<*$f->options*>',<*/if*>

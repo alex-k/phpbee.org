@@ -1,0 +1,12 @@
+	<form enctype="multipart/form-data" action="" name="edit" method="post" class="content form">
+		<input type=hidden name="root" value="{$pid_id}">
+		<input type=hidden name="gspgid_form" value="{$gspgid_form}">
+	
+	{%foreach $fields as $f%} 
+
+		<label>{%$f->verbose_name%} {$form->get_input('{%$f->name%}')} {$e=$form->get_error('{%$f->name%}')}{if $e}<span class="error">{$e|implode:' '}</span>{/if}</label><br>
+
+	{%/foreach%}
+
+		<input type=submit>
+	</form>

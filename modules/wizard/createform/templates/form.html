@@ -1,0 +1,57 @@
+	<form enctype="multipart/form-data" action="" name="edit" method="post">
+		<input type=hidden name="root" value="{$pid_id}">
+		<input type=hidden name="gspgid_form" value="{$gspgid_form}">
+
+		{$form->get_input('classname')}<br>
+		{$form->get_input('extends')}<br>
+		{$form->get_input('template')}<br>
+		{$form->get_input('template_name')}<br>
+		{$form->get_input('gspgid_name')}<br>
+
+		<div id=inputs>
+
+
+		{$id=0}
+		{foreach $form->get_inputs() as $name=>$f}
+			{$id=explode(':',$name)}
+			{$id=$id[1]}
+			{*
+			{if strpos($name,'enabled')===FALSE}{$fields[$id][$name]=$f}{/if}
+			*}
+			{if $id}
+			{$fields[$id][$name]=$f}
+			{/if}
+		{/foreach}
+		{foreach $fields as $i=>$field}
+			<div><a href="#">{$form->get_data(key($field))}</a>
+			{foreach $field as $name=>$f}
+				{$d=$form->get_data($name)}
+				{if is_array($d)}{implode(',',$d)}{else}{$d}{/if}
+			{/foreach}
+			{*
+			{$form->get_input("enabled:`$i`")}
+			*}
+			</div>
+			<div>
+			<table>
+			{foreach $field as $name=>$f}
+			<tr>
+				<td>
+				<label for="$name">{$f.label}</label>
+				</td><td>	
+				{$f.input}
+				{if $form->get_error($name)}<br><span class="error">{$form->get_error($name)|implode}</span>{/if}
+				</td>
+			</tr>
+			{/foreach}
+			</table>
+			</div>
+		{/foreach}
+		</div>
+
+		</div>
+		<input type="submit">
+	</form>
+<script>
+jQuery("#inputs").accordion();
+</script>
