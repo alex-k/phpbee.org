@@ -280,6 +280,10 @@ class gs_base_handler extends gs_handler {
 		$tpl=gs_tpl::get_instance();
 		$f=$this->get_form();
 		$tpl->assign('formfields',$f->show());
+		/*
+		$tpl->assign('forminputs',$f->get_inputs());
+		$tpl->assign('formerrors',$f->validate_errors['FIELDS']);
+		*/
 		$tpl->assign('form',$f);
 		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
 		$ret=$tpl->fetch($tplname);

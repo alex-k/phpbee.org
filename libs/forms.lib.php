@@ -209,10 +209,18 @@ abstract class g_forms implements g_forms_interface{
 		}
 		return($inputs);
 	}
+	/*
 	function get_input($field,$suffix=null) {
 		$inputs=$this->_prepare_inputs();
 		$v=$inputs[$field];
 		return sprintf('<label>%s%s %s</label>', $v['label'],trim($v['label']) ? $suffix : null ,$v['input']);
+	}
+	*/
+	function get_input($name) {
+		return (isset($this->_inputs[$name])) ? $this->_inputs[$name]['input'] : null;
+	}
+	function get_label($name) {
+		return (isset($this->_inputs[$name])) ? $this->_inputs[$name]['label'] : null;
 	}
 	function get_error($field) {
 		return isset($this->validate_errors['FIELDS'][$field]) ? $this->validate_errors['FIELDS'][$field] :array();
@@ -270,6 +278,7 @@ class g_forms_html extends g_forms {
 						'input'=>$w->html()
 						);
 		}
+		$this->_inputs=$arr;
 		return $arr;
 	}
 	function as_dl($delimiter="\n",$validate=array(),$inputs=null,$outstr='<dl class="row"><dt><label for="%s">%s%s</label></dt> <dd><div>%s</div>%s</dd> </dl>'){
