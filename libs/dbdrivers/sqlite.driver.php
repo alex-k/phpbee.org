@@ -1,5 +1,5 @@
 <?php 
-class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface {
+class gs_dbdriver_sqlite extends gs_prepare_sql implements gs_dbdriver_interface {
 	private $cinfo;
 	private $db_connection;
 	private $_res;
@@ -7,6 +7,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	private $stats;
 	function __construct($cinfo) {
 		parent::__construct();
+		$this->_field_types['serial']='INTEGER PRIMARY KEY';
 		$this->cinfo=$cinfo;
 		$this->_id=rand();
 		$this->_cache=array();
@@ -37,9 +38,9 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 			}
 			return sprintf('(%s)',implode(',',$arr));
 		} else if ($c=='LIKE') {
-			return sprintf('%s',mysql_real_escape_string($v));
+			return sprintf('%s',$this->db_connection->escapeString($v));
 		} else {
-			return sprintf("'%s'",mysql_real_escape_string($v));
+			return sprintf("'%s'",$this->db_connection->escapeString($v));
 		}
 	}
 
@@ -75,18 +76,10 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	function connect() {
 
 
-		$cinfo=$this->cinfo;
-		if(!function_exists('mysql_connect')) throw new gs_dbd_exception('gs_dbdriver_mysql: undefined function mysql_connect() ');
-		$this->db_connection=@mysql_connect($cinfo['db_hostname'].':'.$cinfo['db_port'],$cinfo['db_username'],$cinfo['db_password'],TRUE);
-		if ($this->db_connection ===FALSE) {
-			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error());
-		}
-		if (mysql_select_db($cinfo['db_database'],$this->db_connection)===FALSE) {
-			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error());
-		}
-		if (isset($cinfo['codepage']) && !empty($cinfo['codepage'])) {
-			$this->query(sprintf('SET NAMES %s COLLATE %s_general_ci',$cinfo['codepage'],$cinfo['codepage']));
-		//	$this->query(sprintf('SET NAMES %s',$cinfo['codepage']));
+		if(!class_exists('SQLite3')) throw new gs_dbd_exception('gs_dbdriver_sqlite : undefined class SQLite3 ');
+		$this->db_connection=new SQLite3($this->cinfo['db_file']);
+		if (!$this->db_connection) {
+			throw new gs_dbd_exception('gs_dbdriver_sqlite: can not open database '.$this->cinfo['db_file']);
 		}
 	}
 
@@ -96,13 +89,30 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 		mlog($que);
 
-		$this->_res=mysql_query($que,$this->db_connection);
+		$this->_res=$this->db_connection->query($que);
 		
 		if ($this->_res===FALSE) {
-			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error().' in query '.$que);
+			throw new gs_dbd_exception('gs_dbdriver_sqlite: '.$this->db_connection->lastErrorMsg().' in query '.$que);
 		}
 		$t=microtime(true)-$t;
-		$rows=mysql_affected_rows($this->db_connection);
+		$rows=count($this->_res);
+		mlog(sprintf("%.03f secounds, %d rows",$t, $rows));
+		$this->stats['total_time']+=$t;
+		$this->stats['total_queries']+=1;
+		$this->stats['total_rows']+=$rows;
+		return $this->_res;
+
+	}
+	function exec($que='') {
+		$t=microtime(true);
+		$que=trim($que,';').';';
+		mlog($que);
+		$this->_res=$this->db_connection->exec($que);
+		if (!$this->_res) {
+			throw new gs_dbd_exception('gs_dbdriver_sqlite: '.$this->db_connection->lastErrorMsg().' in query '.$que);
+		}
+		$t=microtime(true)-$t;
+		$rows=0;
 		mlog(sprintf("%.03f secounds, %d rows",$t, $rows));
 		$this->stats['total_time']+=$t;
 		$this->stats['total_queries']+=1;
@@ -111,26 +121,30 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 	}
 	function get_insert_id() {
-		return mysql_insert_id($this->db_connection);
+		return $this->db_connection->lastInsertRowID();
 	}
 	public function table_exists($tablename) {
-		$que=sprintf("SHOW TABLES LIKE '%s'",$tablename);
+		$que=sprintf("SELECT name FROM sqlite_master WHERE type = 'table' and name='%s'",$tablename);
 		$this->query($que);
 		return $this->fetch();
 	}
 
 	public function get_table_fields($tablename) {
-		$que=sprintf("SHOW FIELDS from %s",$tablename);
+		$que=sprintf("PRAGMA table_info(%s)",$tablename);
 		$this->query($que);
 		$r=array();
 		while ($a=$this->fetch()) { 
-			$r[$a['Field']]=$a['Field'];
+			$str=$a['name']." ".$a['type'];
+			if($a['notnull']) $str.=" NOT NULL";
+			if($a['pk']) $str.=" PRIMARY KEY";
+			if($a['dflt_value']!==NULL) $str.=" DEFAULT ".$a['dflt_value'];
+			$r[$a['name']]=$str;
 		}
 		return $r;
 	}
 
 	public function get_table_keys($tablename) {
-		$que=sprintf("SHOW KEYS from %s",$tablename);
+		$que=sprintf("PRAGMA index_list(%s)",$tablename);
 		$this->query($que);
 		$r=array();
 		while ($a=$this->fetch()) { 
@@ -146,26 +160,39 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	function construct_altertable_fields($tablename,$options) {
 		$tf=array();
 		$table_fields=$this->construct_table_fields($options);
+
 		$old_fields=$this->get_table_fields($tablename);
 
-		$add_fields=array_diff(array_keys($table_fields),array_keys($old_fields));
-		foreach($add_fields as $k=>$v) {
-			$tf[]="ADD ".str_ireplace('AUTO_INCREMENT PRIMARY KEY','',$table_fields[$v]);
-		}
+		if($table_fields==$old_fields) return $tf;
 
-		$mod_fields=array_intersect(array_keys($old_fields),array_keys($table_fields));
-		foreach($mod_fields as $k=>$v) {
-			if (!isset($options['fields'][$k]['type']) && $options['fields'][$v]['type']!='serial') 
-				$tf[]="MODIFY ".str_ireplace('AUTO_INCREMENT PRIMARY KEY','',$table_fields[$v]);
-		}
+		$old_keys=array_keys($old_fields);
+		$new_keys=array_keys($table_fields);
+		$copy_s=implode(',',array_intersect($old_keys,$new_keys));
+		$new_s=implode(',',$new_keys);
+		$new_def=implode(',',$table_fields);
 
-		$drop_fields=array_diff(array_keys($old_fields),array_keys($table_fields));
-		foreach($drop_fields as $k=>$v) {
-			if (!isset($options['fields'][$v]['type']) || $options['fields'][$v]['type']!='serial') 
-				$tf[]="DROP $v";
-		}
 
-		return sprintf ('%s',implode(",",$tf));
+		$tf[]="
+		BEGIN TRANSACTION;
+		CREATE TEMPORARY TABLE _backup_$tablename($new_def);
+		INSERT INTO _backup_$tablename ($copy_s)  SELECT $copy_s FROM $tablename;
+		DROP TABLE $tablename;
+		CREATE TABLE $tablename($new_def);
+		INSERT INTO $tablename ($copy_s)  SELECT $copy_s FROM _backup_$tablename;
+		DROP TABLE _backup_$tablename;
+		COMMIT;
+		";
+
+
+		/*
+		var_dump($tablename);
+		var_dump($old_fields);
+		var_dump($table_fields);
+		md($tf,1);
+		*/
+
+		return $tf;
+
 	}
 	function construct_indexes($tablename,$structure) {
 			$construct_indexes=isset($structure['indexes']) && is_array($structure['indexes']) ? $structure['indexes'] : array();
@@ -186,66 +213,34 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 					}
 					if (!isset($index['type'])) $index['type']='key';
 					if (!isset($this->_index_types[$index['type']])) {
-						throw new gs_dbd_exception('gs_dbdriver_mysql.construct_altertable: can not find definition for _index_types_'.$index['type']);
+						throw new gs_dbd_exception('gs_dbdriver_sqlite.construct_altertable: can not find definition for _index_types_'.$index['type']);
 					}
-					if (isset($old_keys[$name])) {
-						//$que=sprintf('ALTER TABLE %s DROP %s KEY',$tablename,$old_keys[$name]);
-						//$this->query($que);
-					} else {
-						$que=sprintf('CREATE %s INDEX %s ON %s(%s%s)',$this->_index_types[$index['type']],$name,$tablename,$name,isset($index['options'])?$index['options']:'');
+					if (!isset($old_keys[$name])) {
+						$que=sprintf('CREATE %s INDEX IF NOT EXISTS  %s ON %s(%s%s)',$this->_index_types[$index['type']],$name,$tablename,$name,isset($index['options'])?$index['options']:'');
 						$this->query($que);
 					}
 				}
 	}
 
 	public function construct_droptable($tablename) {
-			$que=sprintf('DROP TABLE IF EXISTS  %s',$tablename);
-			return $this->query($que);
+			if ($this->table_exists($tablename)) {
+				$que=sprintf('DROP TABLE IF EXISTS %s',$tablename);
+				return $this->exec($que);
+			}
 	}
 	public function construct_altertable($tablename,$structure) {
-		switch (isset($structure['type']) ? $structure['type'] : '') {
-		case 'view':
-			$this->construct_droptable($tablename);
-			return $this->construct_createtable($tablename,$structure);
-		break;
-		default:
-			$construct_fields=$this->construct_altertable_fields($tablename,$structure);
-			$que=sprintf('ALTER TABLE  %s %s',$tablename, $construct_fields);
-			$this->query($que);
+		$construct_fields=$this->construct_altertable_fields($tablename,$structure);
+		if ($construct_fields) foreach ($construct_fields as $af) {
+			$this->exec($af);
 			$this->construct_indexes($tablename,$structure);
-			break;
 		}
 	}
 	public function construct_createtable($tablename,$structure) {
-		switch (isset($structure['type']) ? $structure['type'] : '') {
-		case 'view':
-			foreach($structure['recordsets'] as $rs_name) {
-				$obj[$rs_name]=new $rs_name;
-				if (isset($obj[$rs_name]->structure['keys'])) foreach ($obj[$rs_name]->structure['keys'] as $key) {
-					if ($key['type']=='foreign' && in_array($key['recordset'],$structure['recordsets'] )) {
-						$que=sprintf('CREATE VIEW %s AS SELECT * FROM %s LEFT JOIN  %s ON (%s.%s=%s.%s)',
-								$tablename,$obj[$key['recordset']]->table_name,$obj[$rs_name]->table_name,
-								$obj[$rs_name]->table_name, $key['local_field_name'],
-								$obj[$key['recordset']]->table_name,$key['foreign_field_name']);
-
-						var_dump($que);
-						$this->query($que);
-						return TRUE;
-
-					}
-				}
-
-			}
-				
-		break;
-		default:
-			$construct_fields=$this->construct_createtable_fields($structure);
-			$this->construct_droptable($tablename);
-			$que=sprintf('CREATE TABLE  %s %s ENGINE=MyISAM',$tablename, $construct_fields);
-			$this->query($que);
-			$this->construct_indexes($tablename,$structure);
-			break;
-		}
+		$construct_fields=$this->construct_createtable_fields($structure);
+		$this->construct_droptable($tablename);
+		$que=sprintf('CREATE TABLE  %s %s ',$tablename, $construct_fields);
+		$this->exec($que);
+		$this->construct_indexes($tablename,$structure);
 	}
 	public function insert($record) {
 		$this->_cache=array();
@@ -288,11 +283,11 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	function fetchall() {
 		$ret=array();
 		if (!$this->_que) {
-			while ($r=mysql_fetch_assoc($this->_res)) $ret[]=$r;
+			while ($r=$this->_res->fetchArray(SQLITE3_ASSOC)) $ret[]=$r;
 			return $ret;
 		}
 		if (!isset($this->_cache[$this->_que])) {
-			while ($r=mysql_fetch_assoc($this->_res)) $ret[]=$r;
+			while ($r=$this->_res->fetchArray(SQLITE3_ASSOC)) $ret[]=$r;
 			$this->_cache[$this->_que]=$ret;
 		}
 		$ret=$this->_cache[$this->_que];
@@ -300,7 +295,8 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		return $ret;
 	}
 	function fetch() {
-		return mysql_fetch_assoc($this->_res);
+		$res=$this->_res->fetchArray(SQLITE3_ASSOC);
+		return $res;
 	}
 	function select($rset,$options,$fields=NULL) {
 		$where=$this->construct_where($options);
@@ -316,10 +312,10 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 					$str_offset=sprintf(' OFFSET %d ',$this->escape_value($o['value']));
 					break;
 				case 'orderby':
-					$str_orderby=sprintf(' ORDER BY %s ',mysql_real_escape_string($o['value']));
+					$str_orderby=sprintf(' ORDER BY %s ',$this->db_connection->escapeString($o['value']));
 					break;
 				case 'groupby':
-					$str_groupby=sprintf(' GROUP BY %s ',mysql_real_escape_string($o['value']));
+					$str_groupby=sprintf(' GROUP BY %s ',$this->db_connection->escapeString($o['value']));
 					break;
 			}
 		}

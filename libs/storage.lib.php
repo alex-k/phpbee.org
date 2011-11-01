@@ -582,7 +582,7 @@ abstract class gs_prepare_sql {
 				$k=$this->replace_pattern($k,$field['options']);
 			}
 			$name=!isset($field['name'])?$key:$field['name'];
-			$table_fields[$name]=sprintf("%s %s %s",$name, $k, isset($field['default']) ? 'NOT NULL DEFAULT '.$this->escape_value($field['default']) : '');
+			$table_fields[$name]=trim(sprintf("%s %s %s",$name, $k, isset($field['default']) ? 'NOT NULL DEFAULT '.$this->escape_value($field['default']) : ''));
 
 		}
 		return $table_fields;

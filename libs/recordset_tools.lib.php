@@ -354,7 +354,7 @@ class gs_rs_links extends gs_recordset{
 		$this->rs1_name=$rs1;
 		$this->rs2_name=$rs2;
 		$this->rs_link=$rs_link;
-		$this->gs_connector_id=$conn_id=key(cfg('gs_connectors'));
+		$this->gs_connector_id=key(cfg('gs_connectors'));
 
 		$f1=$rs1.'_id';
 		$f2=$rs1!=$rs2 ? $rs2.'_id': 'id2';
@@ -370,7 +370,7 @@ class gs_rs_links extends gs_recordset{
 		*/
 		$this->structure['fkeys'][]=array('link'=>'parents','on_delete'=>'CASCADE','on_update'=>'CASCADE');
 		$this->structure['fkeys'][]=array('link'=>'childs','on_delete'=>'CASCADE','on_update'=>'CASCADE');
-                return parent::__construct($conn_id,$table_name);
+                return parent::__construct($this->gs_connector_id,$table_name);
 
 	}
 	public function find($opts,$linkname=null) {
