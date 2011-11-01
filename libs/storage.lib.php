@@ -442,6 +442,16 @@ abstract class gs_recordset_base extends gs_iterator {
 	public function get_recordset_name() {
 		return get_class($this);
 	}
+
+	public function xml_export(&$x=NULL) {
+		if($x===NULL) $x=new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><xml></xml>');
+		$xrs=$x->addChild('recordset');
+		$xrs->addAttribute('name',get_class($this));
+		foreach ($this as $rec) {
+			$rec->xml_export($xrs);
+		}
+		return $x;
+	}
 }
 
 

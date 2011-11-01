@@ -220,6 +220,7 @@ function empty_array($a,$b) {
 }
 
 function xml_print($xml) {
+	if (!$xml) return;
 	$dom = new DOMDocument('1.0');
 	$dom->preserveWhiteSpace = false;
 	$dom->formatOutput = true;

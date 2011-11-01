@@ -390,6 +390,38 @@ class gs_record implements arrayaccess {
 		unset($this->values[$offset]);
 	}
 
+	public function xml_export(&$node=NULL) {
+		if($node===NULL) {
+			$xml=new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><xml></xml>');
+			$node=$xml->addChild('recordset');
+			$node->addAttribute('name',$this->get_recordset_name());
+		}
+		$fkey=gs_fkey::get_instance();
+		$fkey_arr=$fkey->key_array[$this->get_recordset_name()];
+		$structure=$this->get_recordset()->structure['recordsets'];
+		/*
+		md($fkey_arr,1);
+		md($structure,1);
+		*/
+		$x=$node->addChild('record');
+		$values=$this->get_values();
+		unset($values[$this->get_recordset()->id_field_name]);
+		foreach ($structure as $link_name=>$link_structure) {
+			if (isset($fkey_arr[$link_structure['recordset']])) {
+				$fkey_structure=reset($fkey_arr[$link_structure['recordset']]);
+				$xv=$x->addChild($link_name);
+				//$xv->addChild('test',rand());
+				$this->$link_name->xml_export($xv);
+				if (isset($values[$fkey_structure['local_field_name']])) unset ($values[$fkey_structure['local_field_name']]);
+
+			}
+		}
+		foreach ($values as $name=>$value) {
+			$xv=$x->addChild($name,$value);
+		}
+		if (isset($xml)) return $xml;
+	}
+
 }
 
 ?>
