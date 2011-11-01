@@ -40,17 +40,27 @@
   CodeMirror.defineMode("php", function(config, parserConfig) {
     var htmlMode = CodeMirror.getMode(config, "text/html");
     var jsMode = CodeMirror.getMode(config, "text/javascript");
+    var smartyMode = CodeMirror.getMode(config, "text/smarty");
     var cssMode = CodeMirror.getMode(config, "text/css");
     var phpMode = CodeMirror.getMode(config, phpConfig);
 
     function dispatch(stream, state) { // TODO open PHP inside text/css
       if (state.curMode == htmlMode) {
         var style = htmlMode.token(stream, state.curState);
+		console.debug(style);
+		console.debug(stream.current());
         if (style == "meta" && /^<\?/.test(stream.current())) {
           state.curMode = phpMode;
           state.curState = state.php;
           state.curClose = /^\?>/;
 		  state.mode =  'php';
+        }
+        else if (/^{/.test(stream.current())) {
+		console.debug('&&&&&&&&&&&&&');
+          state.curMode = smartyMode;
+          state.curState = smartyMode.startState(htmlMode.indent(state.curState, ""));
+          state.curClose = /^}/;
+		  state.mode =  'smarty';
         }
         else if (style == "tag" && stream.current() == ">" && state.curState.context) {
           if (/^script$/i.test(state.curState.context.tagName)) {

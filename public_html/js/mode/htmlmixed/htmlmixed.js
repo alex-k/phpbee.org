@@ -1,10 +1,23 @@
 CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
   var htmlMode = CodeMirror.getMode(config, {name: "xml", htmlMode: true});
+  var smartyMode = CodeMirror.getMode(config, {name: "smarty", htmlMode: true});
   var jsMode = CodeMirror.getMode(config, "javascript");
   var cssMode = CodeMirror.getMode(config, "css");
 
   function html(stream, state) {
     var style = htmlMode.token(stream, state.htmlState);
+
+	/*
+	console.debug('++++++++');
+	console.debug(stream.current());
+	console.debug('~~~~~~~~~');
+    if (stream.current().indexOf("{")) {
+        state.token = smarty;
+        state.localState = smartyMode.startState(htmlMode.indent(state.htmlState, ""));
+        state.mode = "smarty";
+    }
+    */
+
     if (style == "tag" && stream.current() == ">" && state.htmlState.context) {
       if (/^script$/i.test(state.htmlState.context.tagName)) {
         state.token = javascript;
@@ -35,6 +48,16 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
     return maybeBackup(stream, /<\/\s*script\s*>/,
                        jsMode.token(stream, state.localState));
   }
+  function smarty(stream, state) {
+    if (stream.match(/}/,false)) {
+      state.token = html;
+      state.curState = null;
+      state.mode = "html";
+      return html(stream, state);
+    }
+    return maybeBackup(stream, /}/,
+                       smartyMode.token(stream, state.localState));
+  }
   function css(stream, state) {
     if (stream.match(/^<\/\s*style\s*>/i, false)) {
       state.token = html;
@@ -49,6 +72,7 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
   return {
     startState: function() {
       var state = htmlMode.startState();
+      //var state = smartyMode.startState();
       return {token: html, localState: null, mode: "html", htmlState: state};
     },
 

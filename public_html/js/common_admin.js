@@ -26,7 +26,18 @@ $(document).ready (function (){
 	});
 	
 	$('#tpl_content').each(function (){
-		window['tpl_codemirror'] = CodeMirror.fromTextArea(this, { mode:"text/html", tabMode:"indent",lineNumbers: true });
+		//window['tpl_codemirror'] = CodeMirror.fromTextArea(this, { mode:"text/html", tabMode:"indent",lineNumbers: true });
+
+		window['tpl_codemirror'] = CodeMirror.fromTextArea(this, 
+			{ 
+				lineNumbers: true,
+				matchBrackets: true,
+				mode: "application/x-httpd-php",
+				indentUnit: 8,
+				indentWithTabs: true,
+				enterMode: "keep",
+				tabMode: "shift"
+			});
 	});
 
 
