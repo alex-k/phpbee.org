@@ -92,11 +92,12 @@ class gs_widget_text extends gs_widget {
 					   $this->fieldname,trim($this->value));
 	}
 }
-/*class gs_widget_image extends gs_widget{
-		function html() {
-				return trim($this->value) ? sprintf('<img src=/img/%s>',trim($this->value)) : '';
-		}
-}*/
+
+class gs_widget_plaintext  extends gs_widget_text {
+	function clean() {
+		return strip_tags(parent::clean());
+	}
+}
 
 class gs_widget_wysiwyg extends gs_widget {
 

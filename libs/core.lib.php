@@ -215,6 +215,7 @@ class gs_iterator implements Iterator, arrayaccess {
 
 
 class gs_cacher {
+
 	static function save($data,$subdir='.',$id=NULL) {
 		$dirname=cfg('cache_dir').'/'.$subdir.'/';
 		check_and_create_dir($dirname);
@@ -259,6 +260,12 @@ class gs_session {
 		$t=strtotime("now +".cfg('session_lifetime'));
 		setcookie('gs_session',$id,$t,cfg('www_dir'));
 		return $id;
+	}
+
+	static function get_id() {
+		$id=isset($_COOKIE['gs_session']) ? $_COOKIE['gs_session'] : NULL;
+		if (!$id) $id=self::save('_get_id','_get_id');
+		return ($id);
 	}
 
 	static function load($name=NULL) {

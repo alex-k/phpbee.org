@@ -269,6 +269,7 @@ class field_interface {
 			'type'=>'many',
 			'mode'=>isset($obj_rs['mode']) ? $obj_rs['mode'] : null,
 			);
+		if (isset($opts['index_field_name'])) $structure['recordsets'][$field]['index_field_name']=$opts['index_field_name'];
 		$structure['htmlforms'][$field.'_hash']=array(
 			'type'=>'hidden',
 			'validate'=>'dummyValid'
