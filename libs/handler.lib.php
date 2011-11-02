@@ -156,7 +156,13 @@ class gs_base_handler extends gs_handler {
 			$obj=new $classname;
 			$fields=array_keys($obj->structure['fields']);
 			if ($id && is_numeric($id)) {
-				$rec=$obj->get_by_id($id,$fields);
+				$options=array();
+				$options[$obj->id_field_name]=$id;
+				foreach($data['handler_params'] as $hk=>$hv) {
+					if (isset($obj->structure['fields'][$hk])) $options[$hk]=$hv;
+				}
+				//$rec=$obj->get_by_id($id,$fields);
+				$rec=$obj->find_records($options,$fields)->first(true);
 			} else {
 				$rec=$obj->new_record();
 			}
