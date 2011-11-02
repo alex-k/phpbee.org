@@ -442,6 +442,25 @@ abstract class gs_recordset_base extends gs_iterator {
 	public function get_recordset_name() {
 		return get_class($this);
 	}
+	public function xml_import($x,$find=FALSE) {
+		foreach($x as $tagname=>$tag) {
+			if($tagname=='record') {
+				$values=array();
+				foreach($tag->values[0] as $name=>$value) {
+					if (isset($this->structure['fields'][$name])) $values[trim($name)]=trim($value);
+				}
+				if ($find && $values) {
+					$rec=$this->find_records($values)->first(true)->fill_values($values);
+				} else {
+					$rec=$this->new_record($values);
+				}
+				foreach($tag->links[0] as $name=>$link) {
+					$rec->$name->xml_import($link->recordset[0],$find);
+				}
+			}
+		}
+		return $this;
+	}
 
 	public function xml_export(&$x=NULL) {
 		if($x===NULL) $x=new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><xml></xml>');
@@ -636,6 +655,21 @@ abstract class gs_prepare_sql {
 		$this->_where=$ret;
 		return $ret;
 	}
+}
+
+function recordset_import_xml($x=null) {
+	if (is_string($x)) $x=simplexml_load_string($x);
+	if (!$x) return new gs_null(GS_NULL_XML);
+	$ret=array();
+	foreach ($x as $tag) {
+		if ($tag->getName()=='recordset') {
+			$rs_name=trim($tag['name']);
+			$rs=new $rs_name;
+			$ret[]=$rs->xml_import($tag);
+		}
+	}
+	return $ret;
+
 }
 
 
