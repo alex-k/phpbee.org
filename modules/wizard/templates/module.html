@@ -20,13 +20,9 @@
 		<ul>
 		{foreach from=$module->urls->orderby('type desc, gspgid_value') item=url}
 			<li>
-					{if $url.type=="get"}
-					<a href="/{$module.name}/{$url.gspgid_value}">{$url.type}</a>
-					{else}
 						{$url.type}
-					{/if}
 				
-				<a href="/admin/wizard/handlers/{$url.id}">{$url.gspgid_value|default:"_DEFAULT_"}</a>
+				<a href="/admin/wizard/urls/{$module.id}/modify/{$url.id}#form">{$url.gspgid_value|default:"_DEFAULT_"}</a>
 				
 				<ul>
 				{foreach from=$url.Handlers->orderby('cnt') item=h}
