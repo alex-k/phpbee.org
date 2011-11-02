@@ -41,9 +41,11 @@ class gs_widget_label extends gs_widget {
 }
 class gs_widget_input extends gs_widget {
 	function html() {
+		$value=$this->value;
+		if (is_string($this->value)) $value=htmlspecialchars(trim($this->value));
 		return sprintf('<input class="%s" type="text" name="%s" value="%s">',
 					   isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fString',
-					   $this->fieldname,htmlspecialchars(trim($this->value)));
+					   $this->fieldname,$value);
 	}
 }
 class gs_widget_number extends gs_widget {
