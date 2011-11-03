@@ -20,6 +20,7 @@
 	<th></th>
 	<th></th>
 	<th></th>
+	<th></th>
 	</thead>
 	{controller _class=wz_recordsets _assign="list" Module_id=$_gsdata.gspgid_va.0}
 	{foreach from=$list item="e"}
@@ -30,6 +31,7 @@
 			<td>{if $e.showadmin}+{/if}</td>
 			<td class="cnt"><a href="/admin/wizard/recordset_fields/{$e.id}">fields</a></td>
 			<td class="cnt"><a href="/admin/wizard/recordsets/{$e.Module_id}/form1/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
+			<td class="cnt"><a href="/admin/wizard/recordsets/clone/{$e.id}"><img src="/i/admin/ico_copy.png" alt="копировать" title="копировать"></a></td>
 			<td class="cnt"><a href="/admin/wizard/recordsets/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
 	</tr>
 	{/foreach}

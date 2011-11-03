@@ -137,6 +137,10 @@ class module_wizard extends gs_base_module implements gs_module {
                                         'gs_base_handler.delete:{classname:wz_recordsets}',
                                         'gs_base_handler.redirect',
                                         ),
+			'/admin/wizard/recordsets/clone'=>array(
+					'gs_base_handler.xml_clone:{classname:wz_recordsets}',
+					'gs_base_handler.redirect',
+			),
                         '/admin/wizard/recordset_fields/delete'=>array(
                                         'gs_base_handler.delete:{classname:wz_recordset_fields}',
                                         'gs_base_handler.redirect',

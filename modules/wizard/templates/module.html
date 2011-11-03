@@ -54,7 +54,8 @@
 		{foreach from=$module.recordsets->orderby('name') item=rs}
 			<li><a href="/admin/wizard/recordset_fields/{$rs.id}">{$rs.name}</a> 
 				<a href="/admin/wizard/createadmin/{$rs.id}"><img src="/i/admin/ico_gear.png"  class="icon" title="generate admin pages"></a>
-				<a href="/admin/wizard/recordsets/{$module.id}/{$rs.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать"  class="icon" title="Редактировать"></a>
+				<a href="/admin/wizard/recordsets/{$module.id}/form1/{$rs.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать"  class="icon" title="Редактировать"></a>
+				<a href="/admin/wizard/recordsets/clone/{$rs.id}"><img src="/i/admin/ico_copy.png" alt="копировать" title="копировать" class="icon"></a>
 
 				{if $rs.Submodules->count()}({$rs.Submodules}){/if}
 				<ul>
