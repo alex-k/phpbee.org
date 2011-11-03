@@ -38,12 +38,16 @@ class module_wizard extends gs_base_module implements gs_module {
 				'gs_base_handler.redirect_up:level:2',
 			),
 			'/admin/form/wz_recordset_links'=>array(
-				'gs_base_handler.post:{name:form.html:classname:wz_recordset_links:form_class:form_admin}',
-				'gs_base_handler.redirect_up',
+				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+				'gs_base_handler.post:{name:admin_form.html:classname:wz_recordset_links:form_class:g_forms_table}',
+				'gs_base_handler.redirect_if:gl:save_continue:return:true',
+				'gs_base_handler.redirect_up:level:1',
 			),
 			'/admin/form/wz_recordset_fields'=>array(
-				'gs_base_handler.post:{name:form.html:classname:wz_recordset_fields:form_class:form_admin}',
-				'gs_base_handler.redirect_up',
+				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+				'gs_base_handler.post:{name:admin_form.html:classname:wz_recordset_fields:form_class:g_forms_table}',
+				'gs_base_handler.redirect_if:gl:save_continue:return:true',
+				'gs_base_handler.redirect_up:level:1',
 			),
 			'/admin/form/wz_recordset_submodules'=>array(
 				'gs_base_handler.post:{name:form.html:classname:wz_recordset_submodules:form_class:form_admin}',
@@ -145,8 +149,16 @@ class module_wizard extends gs_base_module implements gs_module {
                                         'gs_base_handler.delete:{classname:wz_recordset_fields}',
                                         'gs_base_handler.redirect',
                                         ),
+                        '/admin/wizard/recordset_fields/copy'=>array(
+                                        'gs_base_handler.copy:{classname:wz_recordset_fields}',
+                                        'gs_base_handler.redirect',
+                                        ),
                         '/admin/wizard/recordset_links/delete'=>array(
                                         'gs_base_handler.delete:{classname:wz_recordset_links}',
+                                        'gs_base_handler.redirect',
+                                        ),
+                        '/admin/wizard/recordset_links/copy'=>array(
+                                        'gs_base_handler.copy:{classname:wz_recordset_links}',
                                         'gs_base_handler.redirect',
                                         ),
                         '/admin/wizard/recordset_submodules/delete'=>array(

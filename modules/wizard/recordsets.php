@@ -85,10 +85,10 @@ class wz_recordset_links extends gs_recordset_short {
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
+		'verbose_name'=> "fString verbose_name required=false",
 		'type'=>"fSelect type values='lOne2One,lMany2One,lMany2Many'",
 		'classname'=>"fSelect classname widget=select_enter",
 		'linkname'=>"fString linkname required=false",
-		'verbose_name'=> "fString verbose_name required=false",
 		'options'=>"fString options required=false",
 		'extra_options'=>"fString extra_options required=false",
 		'widget'=>"fSelect widget required=false widget=select",
