@@ -656,8 +656,10 @@ abstract class gs_prepare_sql {
 		return $ret;
 	}
 }
-
-function recordset_import_xml($x=null) {
+function xml_import($x=null) {
+	return reset(xml_import_recordsets($x));
+}
+function xml_import_recordsets($x=null) {
 	if (is_string($x)) $x=simplexml_load_string($x);
 	if (!$x) return new gs_null(GS_NULL_XML);
 	$ret=array();

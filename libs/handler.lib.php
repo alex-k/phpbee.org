@@ -395,6 +395,17 @@ class gs_base_handler extends gs_handler {
 		$newrec->commit();
 		return $rec;
 	}
+	function xml_clone() {
+		$id=$this->data['gspgid_va'][0];
+		$rs=new $this->params['classname'];
+		$rec=$rs->get_by_id($id);
+		if (!$rec) return $rec;
+		$xml=$rec->xml_export();
+		//md($xml,1);
+		$newrs=xml_import($xml);
+		$newrs->commit();
+		return $rec;
+	}
 	function redirect_gl($ret) {
 		if (isset($this->params['gl'])) {
 			$this->params['href']=call_user_func($this->params['module_name'].'::gl',$this->params['gl'],$ret['last'],$this->data);
