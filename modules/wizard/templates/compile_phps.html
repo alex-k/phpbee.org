@@ -99,6 +99,17 @@ class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 		<*/if*>
 		
 	}
+	
+	<*if $rs->Resizes->count()*>
+	function config_previews() {
+		parent::config_previews();
+		$this->config=array_merge($this->config,array(
+		<*foreach from=$rs->Resizes item=r*>
+			'<*$r.name*>'=>array('width'=><*$r.width*>,'height'=><*$r.height*>,'method'=>'<*$r.method*>','bgcolor'=>array(<*$r.bgcolor*>)),
+		<*/foreach*>
+		));
+	}
+	<*/if*>
 
 }
 

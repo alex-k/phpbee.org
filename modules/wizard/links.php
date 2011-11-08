@@ -26,14 +26,19 @@ class wz_link_images extends wz_link {
 		$rec_images_files=$wz_rs->find_records(array('name'=>$name_rs_images_files))->first(true);
 
 		$rec_images->fill_values(array(
-			'name'=>$name_rs_images,'title'=>$rec->verbose_name,'Module_id'=>$module->get_id(),
-			'extends'=>'tw_images'));
+			'name'=>$name_rs_images,
+			'title'=>$rec->verbose_name,
+			'Module_id'=>$module->get_id(),
+			'extends'=>'tw_images',
+			'no_urlkey'=>1,
+		));
 
 		$rec_images_files->fill_values(array(
 			'name'=>$name_rs_images_files,
 			'title'=>'Image',
 			'Module_id'=>$module->get_id(),
 			'extends'=>'tw_file_images',
+			'no_urlkey'=>1,
 			));
 
 		$rec_images->Links->new_record(array(

@@ -9,7 +9,7 @@ class module_wizard extends gs_base_module implements gs_module {
 	function __construct() {
 	}
 	function install() {
-		foreach(array('wz_modules','wz_recordsets','wz_recordset_fields','wz_recordset_links','wz_recordset_submodules','wz_urls','wz_handlers','wz_forms','wz_form_fields','wz_form_fields_validators') as $r){
+		foreach(array('wz_modules','wz_recordsets','wz_recordset_fields','wz_recordset_resizes','wz_recordset_links','wz_recordset_submodules','wz_urls','wz_handlers','wz_forms','wz_form_fields','wz_form_fields_validators') as $r){
 			$this->$r=new $r;
 			$this->$r->install();
 		}
@@ -46,6 +46,12 @@ class module_wizard extends gs_base_module implements gs_module {
 			'/admin/form/wz_recordset_fields'=>array(
 				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
 				'gs_base_handler.post:{name:admin_form.html:classname:wz_recordset_fields:form_class:g_forms_table}',
+				'gs_base_handler.redirect_if:gl:save_continue:return:true',
+				'gs_base_handler.redirect_up:level:1',
+			),
+			'/admin/form/wz_recordset_resizes'=>array(
+				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+				'gs_base_handler.post:{name:admin_form.html:classname:wz_recordset_resizes:form_class:g_forms_table}',
 				'gs_base_handler.redirect_if:gl:save_continue:return:true',
 				'gs_base_handler.redirect_up:level:1',
 			),
@@ -130,6 +136,7 @@ class module_wizard extends gs_base_module implements gs_module {
 					),
 			'/admin/wizard/recordsets'=>'gs_base_handler.show',
 			'/admin/wizard/recordset_fields'=>'gs_base_handler.show',
+			'/admin/wizard/recordset_resizes'=>'gs_base_handler.show',
 			'/admin/wizard/urls'=>'gs_base_handler.show',
 			'/admin/wizard/handlers'=>'gs_base_handler.show',
 			'/admin/wizard/macros'=>'gs_base_handler.show',
