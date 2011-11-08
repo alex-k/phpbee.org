@@ -125,7 +125,6 @@ class gs_base_handler extends gs_handler {
 		$tpl->assign('_gsparams',$this->params);
 		$tpl->assign('_gsstack',$ret);
 
-
 		if (isset($this->data['handler_params'])) {
 			try {
 				$html=$tpl->fetch($tplname);
@@ -368,12 +367,32 @@ class gs_base_handler extends gs_handler {
 		if (isset($this->params['href'])) return html_redirect($this->subdir.$this->params['href'].'/'.$f->rec->get_id().'/'.get_class($f->rec->get_recordset()).'/'.$this->data['gspgid_v']);
 		return html_redirect($this->data['gspgid_handler']);
 	}
+	/**
+	* NEVER use this handler on client side, use delete_link instead
+	**/
 	function delete() {
 		$id=$this->data['gspgid_va'][0];
 		$rs=new $this->params['classname'];
 		$rec=$rs->get_by_id($id);
 		$rec->delete();
 		$rec->commit();
+		return $rec;
+	}
+	/**
+	*	'gs_base_handler.check_login:return:gs_record^redirect:classname:customers:assign:customer'
+	*	'gs_base_handler.delete_link:{link:customer.Shipping_address}'
+	*	'redirect'=>'gs_base_handler.redirect'
+	**/
+	function delete_link() {
+		list($classname,$linkname)=explode('.',$this->params['link']);
+		$rec=gs_var_storage::load($classname);
+		if (!$rec) return;
+		$id=$this->data['gspgid_va'][0];
+		$links=$rec->$linkname;
+		if ($links && $links[$id]) {
+			$links[$id]->delete();
+			$links->commit();
+		}
 		return $rec;
 	}
 	function copy() {
@@ -653,6 +672,9 @@ class gs_base_handler extends gs_handler {
 		$rec=record_by_id($id,$this->params['classname']);
 		if(isset($this->data['handler_params']['assign'])) {
 			gs_var_storage::save($this->data['handler_params']['assign'],$rec);
+		}
+		if(isset($this->params['assign'])) {
+			gs_var_storage::save($this->params['assign'],$rec);
 		}
 		return $rec;
 	}

@@ -10,10 +10,8 @@ class gs_filters_handler extends gs_handler {
 		return;
 	}
 	function show() {
-		$ps=$this->data['handler_params'];
-		$filters=gs_var_storage::load('filters');
-		$filter=$filters[$ps['name']];
-		return $filter->getHtmlBlock($ps);
+		$filter=self::get($this->data['handler_params']['name']);
+		if ($filter) return $filter->getHtmlBlock($this->data['handler_params']);
 	
 
 	}
@@ -333,10 +331,11 @@ class gs_filter_select_records extends gs_filter {
 		$rs=$this->params['recordset'];
 		if (is_object($rs) && is_subclass_of($rs,'gs_recordset')) {
 			$this->recordset=$rs;
+			$this->recordset->preload();
 		} else {
 			$this->recordset= new $rs;
+			$this->recordset->find_records(array())->preload();
 		}
-		$this->recordset->find_records(array())->preload();
 
 	}
 	function current() {
@@ -356,8 +355,11 @@ class gs_filter_select_records extends gs_filter {
 	}
 	function getHtmlBlockNonExlusive($ps) {
 		$tpl=gs_tpl::get_instance();	
-		//$this->recordset=$this->recordset->find_records(array())->preload();
-		$links=$this->recordset->recordset_as_string_array();
+		//$links=$this->recordset->recordset_as_string_array();
+		$links=array();
+		foreach($this->recordset as $rec) {
+			$links[$rec->get_id()]=$rec;
+		}
 		$tpl->assign('links',$links);
 		$tpl->assign('current',$this->value);
 		$tpl->assign('keyname',$this->name);
