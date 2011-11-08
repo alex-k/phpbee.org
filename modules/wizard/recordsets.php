@@ -40,6 +40,7 @@ class wz_recordset_resizes extends gs_recordset_short {
 		'height'=> "fInt 'Высота'",
 		'method'=>"fSelect 'Метод' values='use_width,use_height,use_box,use_space,use_fields,use_crop'",
 		'bgcolor'=> "fString 'Цвет фона R,G,B'",
+		'modifier'=>"fSelect 'Модификатор' values=',check_and_rotate_left'",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
 		$this->structure['fkeys']=array(
