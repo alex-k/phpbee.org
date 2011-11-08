@@ -52,7 +52,7 @@ class tw{%$MODULE_NAME%} extends tw_images {
 
 class tw{%$MODULE_NAME%}_files extends tw_file_images {
 	function __construct($init_opts=false) {
-		parent::__construct($init_opts);
+		parent::__construct(array(),$init_opts);
 		$this->structure['fkeys']=array(
 			array('link'=>'tw{%$MODULE_NAME%}.File','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
 		);
