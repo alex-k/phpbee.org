@@ -74,6 +74,7 @@ abstract class tw_file_images extends gs_recordset_short{
 	
 	function show($type,$rec) {
 		$fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR.$type.'.jpg';
+		header ('Content-Type: image/jpeg');
 		readfile($fname);
 	}
 	

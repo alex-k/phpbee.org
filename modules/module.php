@@ -102,7 +102,6 @@ class images_handler extends gs_base_handler {
 			header ('HTTP/1.1 404 Not Found');
 			die();
 		}
-		header ('Content-Type: image/jpeg');
 		$o->resize($rec,'');
 		$result=$o->show($type,$rec);
 	}
