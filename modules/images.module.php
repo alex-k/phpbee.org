@@ -1,6 +1,5 @@
 <?php
 abstract class tw_images extends gs_recordset_handler {
-	var $no_urlkey=1;
 	function src($params,$record=null) {
 		$records=$record ? array($record) : $this;
 		$ret=array();
@@ -23,19 +22,20 @@ abstract class tw_images extends gs_recordset_handler {
 		return $res;
 	}
 	public function __toString() {
-		return implode(' ',$this->recordset_as_string_array());
+		//return implode(' ',$this->recordset_as_string_array());
 		return 'image';
 	}
 }
 abstract class tw_file_images extends gs_recordset_short{
-	var $no_urlkey=1;
 	var $gs_connector_id='file_public';
 	var $config=array();
 	var $fields=array(
 		'File'=> "fFile 'Файл'",
+		//'Name'=> "fString 'Названице' ",
+		//'desc'=> "fText",
 	);
-	function __construct($f=array(),$init_opts=false) {
-		parent::__construct(array_merge($f,$this->fields),$init_opts);
+	function __construct($init_opts=false) {
+		parent::__construct($this->fields,$init_opts);
 		$this->config_previews();
 		$this->structure['triggers']['after_insert']='resize';
 		$this->structure['triggers']['after_update']='resize';
@@ -59,7 +59,7 @@ abstract class tw_file_images extends gs_recordset_short{
 		$ret=array();
 		$fname=$this->get_connector()->www_root.'/'.$this->db_tablename;
 		foreach ($records as $rec) {
-			//$this->resize($rec,'',null,true);
+			//$this->resize($rec,'',true);
 			$ret[]=$fname.'/'.$this->get_connector()->split_id($rec->get_id(),true).'/'.(($type=='') ? 'File_data' : $type.'.jpg');
 		}
 		return $ret;
@@ -68,32 +68,30 @@ abstract class tw_file_images extends gs_recordset_short{
 	function config_previews() {
 		$this->config=array(
 			'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
-			'ico'=>array('width'=>20,'height'=>13,'method'=>'use_fields','bgcolor'=>array(0,0,0)),
-			'admin'=>array('width'=>50,'height'=>50,'method'=>'use_height','bgcolor'=>array(255,255,255)),
-			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(255,255,255)),
-			'tumb'=>array('width'=>300,'height'=>255,'method'=>'use_height','bgcolor'=>array(255,255,255)),
-			'details'=>array('width'=>500,'height'=>333,'method'=>'use_space','bgcolor'=>array(255,255,255)),
-			'zoom'=>array('width'=>1600,'height'=>1255,'method'=>'use_fields','bgcolor'=>array(255,255,255)),
-			'gallery'=>array('width'=>190,'height'=>126,'method'=>'use_box','bgcolor'=>array(255,255,255), 'modifier'=>'check_and_rotate_left'),
+			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(240,240,240)),
 		);
 	}
 	
-	function resize($rec,$type,$ret,$no_rewrite=false) {
+	function show($type,$rec) {
+		$fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR.$type.'.jpg';
+		readfile($fname);
+	}
+	
+	function resize($rec,$type,$no_rewrite=false) {
 		$fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR;
 		$sname=$fname.'File_data';
+		$gd=new vpa_gd($sname);
 		foreach ($this->config as $key => $data) {
-			$gd=new vpa_gd($sname);
+			
 			$iname=$fname.$key.'.jpg';
-			if ($data['width']>0  && ($data['width']<$rec->first()->File_width || $data['height']<$rec->first()->File_height)) {
-				if ($data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);
-				if ($data['modifier']) $gd->modifier($data['width'],$data['height'],$data['modifier']);
-
-				$gd->resize($data['width'],$data['height'],$data['method']);
-			}
 			if (!file_exists($iname) || ($no_rewrite==false && file_exists($iname))) {
 				if (isset($data['method']) && $data['method']=='copy') {
 					copy($sname,$iname);
 				} else {
+					if ($data['width']>0  && ($data['width']<$rec->first()->File_width || $data['height']<$rec->first()->File_height)) {
+						if ($data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);
+						$gd->resize($data['width'],$data['height'],$data['method']);
+					}
 					$gd->save($iname,100);
 				}
 			}

@@ -11,7 +11,7 @@
 		<tr class="{cycle values='odd,even'}">
 			<td><input type="checkbox" name="act[]" value="{$e.id}" class="ch1"></td>
 			<td>{$e.id}</td>
-			<td>{$e->img('admin')|reset}</td>
+			<td>{$e}</td>
 			{*<td>{$e.File->first()->File_filename}</td>*}
 			{*<td>{$e->img('small')|implode}</td>*}
 			<td class="cnt"><a href="/admin/many2one/{$url}/{$e.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
@@ -26,16 +26,12 @@
 </table>
 </form>
 {handler gspgid="/admin/form/`$_gsdata.gspgid_va.0`/edit/`$_gsdata.gspgid_va.5|default:''`" _params=$params}
-
-<br><br>
-<input type="submit" onClick="window.close()" value="Close file loader">
-
 <script type="text/javascript">
 var o=opener.window.document.getElementById('gallery_{$_gsdata.gspgid_va[3]}');
 var s='';
 {if count($list)}
 {foreach from=$list item="im"}
-s+='<li>{$im->img('admin')|reset}</li>';
+s+='<li><img src="/img/s/{$_gsdata.gspgid_va.0}/h/100/100/{$im.id}.jpg" title="{$im.name}"></li>';
 {/foreach}
 s+='</ul>';
 s+='<div class="clear"></div>';
