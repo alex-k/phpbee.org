@@ -105,7 +105,7 @@ class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 		parent::config_previews();
 		$this->config=array_merge($this->config,array(
 		<*foreach from=$rs->Resizes item=r*>
-			'<*$r.name*>'=>array('width'=><*$r.width*>,'height'=><*$r.height*>,'method'=>'<*$r.method*>','bgcolor'=>array(<*$r.bgcolor*>)),
+			'<*$r.name*>'=>array('width'=><*$r.width*>,'height'=><*$r.height*>,'method'=>'<*$r.method*>','bgcolor'=>array(<*$r.bgcolor*>)<*if $r.modifier*>, 'modifier'=>'<*$r.modifier*>'<*/if*>),
 		<*/foreach*>
 		));
 	}
