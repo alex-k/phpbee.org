@@ -46,13 +46,8 @@ class module extends gs_base_module implements gs_module {
 			'get_post'=>array(
 				''=>'gs_base_handler.show:{name:index.html}',
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
-				'img/show'=>'images_handler.show',
-				'img/s'=>'images_handler.s',
 				'/admin/window_form'=>'admin_handler.many2one:{name:window_form.html}',
 				'/admin/many2one'=>'admin_handler.many2one:{name:many2one.html}',
-				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
-				'a'=>'gs_base_handler.show',
-				'b'=>'gs_base_handler.show',
 				'*'=>'gs_base_handler.show404:{name:404.html}',
 			),
 			'handler'=>array(
@@ -77,61 +72,6 @@ class module extends gs_base_module implements gs_module {
 	}
 }
 
-class images_handler extends gs_base_handler {
-	
-	function resize($data=null) {
-		$c=cfg('gs_connectors');
-		$cinfo=$c[$this->params['key']];
-		$d=$this->data['gspgid_va'];
-		$rs=reset($d);
-		$t=pathinfo(array_pop($d));
-		$type=$t['filename'];
-		$key=array_pop($d);
-		$o=new $rs;
-		$c=new gs_dbdriver_file($cinfo);
-		$id=$c->id2int($key);
-		$rec=$o->get_by_id($id);
-		if (!$rec) {
-			header ('HTTP/1.1 404 Not Found');
-			die();
-		}
-		$o->resize($rec,'');
-		$result=$o->show($type,$rec);
-	}
-	
-	function show($data=null) {
-		if (count($this->data['gspgid_va'])<5) {
-			$data=base64_decode($this->data['gspgid_va'][0]);
-			
-			$data=preg_replace("|\..+|is","",$data);
-			$data=explode("/",$data);
-		}
-		$method=array(
-			'w'=>'use_width',
-			'h'=>'use_height',
-			'b'=>'use_box',
-			'f'=>'use_fields',
-			'c'=>'use_crop',
-		);
-		$data[4]=preg_replace("|\..+|is","",$data[4]);
-		$rec=new $data[0]();
-		$rec=$rec->get_by_id($data[4]);
-		$file=$rec->File->first();
-		$txt=get_output();
-		$gd=new vpa_gd($file->File_data,false);
-		if ($data[2]>0  && ($data[2]<$file->File_width || $data[3]<$file->File_height)) {
-			$gd->set_bg_color(255,255,255);
-			$gd->resize($data[2],$data[3],$method[$data[1]]);
-		}
-		$gd->show();
-		//gs_logger::dump();
-		exit();
-	}
-	function s() {
-		return ($this->show($this->data['gspgid_va']));
-	}
-
-}
 
 
 class admin_handler extends gs_base_handler {
