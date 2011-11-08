@@ -39,6 +39,12 @@ $(document).ready (function (){
 				tabMode: "shift"
 			});
 	});
+	
+	$('.ch_all').click(
+		function() {
+			$('.ch1').attr('checked',this.checked);
+		}
+	);
 
 
 	/*
@@ -48,7 +54,8 @@ $(document).ready (function (){
 		        ]
 			 } );
 	*/
-	$('.fDateTimeFilter').daterangepicker(
+	$('.fDateTimeFilter').each(function() {
+		$(this).daterangepicker(
 		{
 			dateFormat: $.datepicker.ATOM,
 			onOpen: function(){ 
@@ -56,5 +63,6 @@ $(document).ready (function (){
 			} 
 		}
 	);
+	});
 
 });
