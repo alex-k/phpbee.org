@@ -38,5 +38,7 @@
 	//$this->languages=array('ru'=>'RUS','en'=>'ENG');
 	//$this->languages='tw_languages';
 
+	$this->admin_ip_access=explode(',','127.0.0.1,192.168.1.102');
+
 	DEFINE ('DEBUG',1);
 ?>
