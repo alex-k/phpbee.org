@@ -1,10 +1,5 @@
 <?php
-gs_dict::append (array(
-		'FORM_VALIDATE_ERROR'=>'Ошибка',
-		'gs_validate_isLength'=>'Введенное значение слишком короткое',
-		'gs_validate_notEmpty'=>'Поле должно быть заполнено',
-	)
-);
+
 abstract class gs_base_module {
 	static function add_subdir($data,$dir) {
 		$subdir=trim(str_replace(cfg('lib_modules_dir'),'',clean_path($dir).'/'),'/');
@@ -23,20 +18,21 @@ abstract class gs_base_module {
 	
 	static function admin_auth($data,$params) {
 		if (strpos($data['gspgid'],'admin')===0) {
-			$init=new gs_init('auto');
-			$init->load_modules();
-			if(in_array($_SERVER['REMOTE_ADDR'],array('127.0.0.1','192.168.1.102','178.130.7.124','94.25.113.3','94.25.102.89','10.10.13.47','94.25.102.91','80.254.53.98','176.97.96.4','176.97.99.16'))) return true;
+
+			return true;  // FREE ACCESS!!!!!!!
+
+			if(in_array($_SERVER['REMOTE_ADDR'],array('127.0.0.1','192.168.1.102'))) return true;
 			$o=new admin_handler($data,array('name'=>'auth_error.html'));
 			$o->show();
 			return false;
 		}
 		return true;
 	}
+
 }
 
 class module extends gs_base_module implements gs_module {
-	function __construct() {
-	}
+	function __construct() {}
 	
 	function install() {
 		$n=new tw_handlers;
@@ -52,7 +48,6 @@ class module extends gs_base_module implements gs_module {
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
 				'img/show'=>'images_handler.show',
 				'img/s'=>'images_handler.s',
-				'info'=>'gs_base_handler.show',
 				'/admin/window_form'=>'admin_handler.many2one:{name:window_form.html}',
 				'/admin/many2one'=>'admin_handler.many2one:{name:many2one.html}',
 				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
@@ -66,21 +61,19 @@ class module extends gs_base_module implements gs_module {
 				'/filter/show'=>'gs_filters_handler.show',
 			),
 		);
-		
-		$ckey=$path=false;
-		$c=cfg('gs_connectors');
-		foreach ($c as $key => $v) {
-			if ($v['db_type']=='file') {
-				$path=$v['www_root'];
-				$ckey=$key;
-				break;
-			}
-		}
-		if ($path) {
-			$data['get'][$path]='images_handler.resize:{key:'.$ckey.'}';
-		}
-		
 		return self::add_subdir($data,dirname(__file__));
+	}
+	static function gl($name,$record,$data) {
+		switch ($name) {
+			case 'save_cancel':
+				return $data['handler_key_root'];
+			case 'save_continue':
+				return $data['gspgid_root'];
+			case 'save_return':
+				return $data['handler_key_root'];
+			break;
+			}
+		return null;
 	}
 }
 
@@ -143,13 +136,17 @@ class images_handler extends gs_base_handler {
 
 class admin_handler extends gs_base_handler {
 	function show_menu () {
+		$init=new gs_init('auto');
+		$init->load_modules();
+
 		$cfg=gs_config::get_instance();
 		$modules=$cfg->get_registered_modules();
 		$menu=array();
 		if (is_array($modules)) foreach ($modules as $m) {
 			$mod=new $m;
-			if (method_exists($mod,'get_menu') && $mod->get_menu()) {
-				$menu[]=$mod->get_menu();
+			if (method_exists($mod,'get_menu') && $menuitem=$mod->get_menu()) {
+				if (!is_array($menuitem)) $menuitem=array($menuitem);
+				$menu=array_merge($menu,$menuitem);
 			}
 		}
 		$tpl=gs_tpl::get_instance();
@@ -174,7 +171,7 @@ class admin_handler extends gs_base_handler {
 		return html_redirect($res,$query);
 	}
 	
-	function many2one() {
+	function many2one($ret) {
 		if (isset($this->data['gspgid_va'][5]) && $this->data['gspgid_va'][5]=='delete') {
 			$rid=intval($this->data['gspgid_va'][6]);
 			$rs_name=$this->data['gspgid_va'][0];
@@ -182,21 +179,21 @@ class admin_handler extends gs_base_handler {
 			$rec=$rs->get_by_id($rid);
 			if ($rec) {
 				$rec->delete();
+				$rec->commit();
 			}
-			$rs->commit();
 			$res=preg_replace("|/delete/\d+|is","//",$this->data['gspgid']);
 			return html_redirect($res);
 		}
 		
-		if (isset($this->data['action']) && $this->data['action']=='delete') {
+		if ($this->data['action']=='delete') {
 			$ids=$this->data['act'];
 			$rs_name=$this->data['gspgid_va'][0];
 			$rs=new $rs_name;
 			$recs=$rs->find_records(array('id'=>$ids));
 			foreach ($recs as $rec) {
 				$rec->delete();
+				$rec->commit();
 			}
-			$rs->commit();
 			return html_redirect($this->data['gspgid']);
 		}
 		
@@ -212,9 +209,7 @@ class admin_handler extends gs_base_handler {
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('url',$url);
 		$tpl->assign('params',$params);
-		var_dump($this->data['gspgid_va']);
-
-		parent::show();
+		parent::show($ret);
 	}
 }
 
@@ -233,4 +228,4 @@ class form_table extends  g_forms_html {
 		$this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
 	}
 }
-
+?>
