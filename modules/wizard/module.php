@@ -180,6 +180,10 @@ class module_wizard extends gs_base_module implements gs_module {
                                         'gs_base_handler.delete:{classname:wz_urls}',
                                         'gs_base_handler.redirect',
                                         ),
+			'/admin/wizard/urls/clone'=>array(
+					'gs_base_handler.xml_clone:{classname:wz_urls}',
+					'gs_base_handler.redirect',
+			),
 			'/admin/wizard/forms'=>'gs_base_handler.show',
 			'/admin/wizard/form_fields'=>'gs_base_handler.show',
 			'/admin/wizard/form_fields_validators'=>'gs_base_handler.show',

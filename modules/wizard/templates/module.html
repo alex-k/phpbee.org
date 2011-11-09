@@ -23,6 +23,7 @@
 						{$url.type}
 				
 				<a href="/admin/wizard/urls/{$module.id}/modify/{$url.id}#form">{$url.gspgid_value|default:"_DEFAULT_"}</a>
+				<a href="/admin/wizard/urls/clone/{$url.id}"><img src="/i/admin/ico_copy.png" alt="копировать" title="копировать" class="icon"></a>
 				
 				<ul>
 				{foreach from=$url.Handlers->orderby('cnt') item=h}
