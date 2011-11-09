@@ -123,8 +123,8 @@ class gs_parser {
 		$handler_array=$this->current_handler;
 		reset($handler_array);
 		while($handler=current($handler_array)) {
-			$h_key=key($handler_array);
-			$handler=$this->parse_val($handler);
+			$h_key=trim(key($handler_array));
+			$handler=$this->parse_val(trim($handler));
 			if ($handler['name']=='end') return $ret['last'];
 			if (!class_exists($handler['class_name'],TRUE)) {
 				load_file($config->lib_handlers_dir.$handler['class_name'].'.class.php');

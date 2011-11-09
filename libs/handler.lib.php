@@ -651,7 +651,7 @@ class gs_base_handler extends gs_handler {
 		$subj=$tpl->fetch(str_replace(".html","_title.html",$this->params['template']));
 		$txt=$tpl->fetch($this->params['template']);
 		bee_mail($to,$subj,$txt);
-		return true;
+		return $rec;
 	}
 
 	function test_id($data) {
@@ -699,6 +699,7 @@ class gs_base_handler extends gs_handler {
 		}
 
 		$rec=$rs->find_records($d)->first();
+
 
 		if (!$rec) return $this->showform();
 
