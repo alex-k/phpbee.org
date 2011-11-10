@@ -230,7 +230,7 @@ class gs_record implements arrayaccess {
 		$structure=$this->gs_recordset->structure['recordsets'][$name];
 		$id=$this->is_set($rs->local_field_name) ? $this->__get($rs->local_field_name) : NULL;
 		$links=array();
-		foreach ($rs->structure['recordsets'] as $s) {
+		if (isset($rs->structure['recordsets'])) foreach ($rs->structure['recordsets'] as $s) {
 			$links[]=$s['local_field_name'];
 		}
 		$links[]=$rs->foreign_field_name;

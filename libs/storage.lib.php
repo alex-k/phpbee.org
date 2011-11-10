@@ -139,7 +139,19 @@ abstract class gs_recordset_base extends gs_iterator {
 
 
 	function find($options,$linkname=null) {
-		 $options=$this->string2options($options);
+		$options=$this->string2options($options);
+		foreach ($options as $k=>$o) {
+			switch($o['field']) {
+				case 'orderby':
+					$options[$k]['type']='orderby';
+					$options[$k]['value']=str_replace(':',' ',$options[$k]['value']);
+					unset($options[$k]['field']);
+					unset($options[$k]['case']);
+				break;
+				default:
+				break;
+			}
+		}
 		if (!$this->first()) return new gs_null(GS_NULL_XML);
 		$ids=array();
 		if ($linkname!==null) {
@@ -237,7 +249,8 @@ abstract class gs_recordset_base extends gs_iterator {
 		if ($fields && !is_array($fields)) {
 			$fields=array_filter(explode(',',$fields));
 		}
-		foreach ($this->structure['recordsets'] as $link) {
+
+        if (isset($this->structure['recordsets'])) foreach ($this->structure['recordsets'] as $link) {
 			$fields[]=$link['local_field_name'];
 		}
 		if (is_array($fields)) $fields=array_unique($fields);
@@ -475,7 +488,7 @@ abstract class gs_recordset_base extends gs_iterator {
 
 
 abstract class gs_recordset extends gs_recordset_base {}
-abstract class _gs_recordset extends gs_recordset_base { // кеширование
+abstract class _gs_recordset extends gs_recordset_base { // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
 		if (($ret=$this->load_cache($options))) return $ret;
 		$ret=parent::find_records($options,$fields,$index_field_name);
