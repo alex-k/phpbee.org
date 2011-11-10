@@ -5,7 +5,7 @@ interface g_forms_interface {
 	function as_list();
 	function as_labels();
 	function clean();
-	function get_data($name=null);
+	function get_data($name=NULL);
 }
 class gs_glyph {
 	private $tagName;

@@ -22,6 +22,17 @@ function gs_controller_paging($firstitemname, $type,$total_items,$itemsperpage,$
 			$ret=implode(" | ",$ret);
 			return $ret;
 			break;
+		case "list" :
+			$cp=floor($first_item/$itemsperpage)+1;
+			$tp=ceil($total_items/$itemsperpage);
+			for ($i=1; $i<=$tp; $i++) {
+				$fi=($i-1)*$itemsperpage;
+				$ret[$i]="<li><a href=\"$href$firstitemname=$fi\">$i</a></li>";
+			}
+			$ret[$cp]="<li><a id=\"curr\" href=\"$href$firstitemname=$first_item\">$cp</a></li>";
+			$ret='<ul class="pager">'.implode("",$ret).'</ul>';
+			return $ret;
+			break;
 		case "itemsnav" :
 			$skip=2;
 			$cp=max(1,floor($first_item/$itemsperpage)+1);

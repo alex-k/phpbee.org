@@ -110,7 +110,7 @@ class gs_widget_wysiwyg extends gs_widget {
 			$config = array('indent' => TRUE,
 							'show-body-only' => TRUE,
 							'output-xhtml' => TRUE,
-						   );
+						);
 			$tidy = tidy_parse_string($this->value, $config, 'UTF8');
 			$tidy->cleanRepair();
 			$this->value=trim($tidy);
@@ -131,13 +131,12 @@ class gs_widget_file extends gs_widget {
 	}
 	function clean() {
 		if (!isset($this->value['tmp_name'])) return array();
-
 		$ret=array(
-				 $this->fieldname.'_data'=>file_get_contents($this->value['tmp_name']),
-				 $this->fieldname.'_filename'=>$this->value['name'],
-				 $this->fieldname.'_mimetype'=>$this->value['type'],
-				 $this->fieldname.'_size'=>$this->value['size'],
-				 //$this->fieldname=>$this->get_id(),
+				$this->fieldname.'_data'=>file_get_contents($this->value['tmp_name']),
+				$this->fieldname.'_filename'=>$this->value['name'],
+				$this->fieldname.'_mimetype'=>$this->value['type'],
+				$this->fieldname.'_size'=>$this->value['size'],
+				//$this->fieldname=>$this->get_id(),
 			 );
 		if (stripos($this->value['type'],'image')===0) {
 			list($ret[$this->fieldname.'_width'],$ret[$this->fieldname.'_height'])=getimagesize($this->value['tmp_name']);
@@ -519,7 +518,7 @@ class gs_widget_121_radio extends gs_widget_lOne2One {
 	function html() {
 		$ret="";
 		foreach ($this->params['variants'] as $k=>$v) {
-			$ret.=sprintf("<label class=\"radio_121\"><input type=\"radio\" name=\"%s\" value=\"%d\" %s>%s</label>\n",$this->fieldname, $k, ($this->value==$k) ? 'checked="checked"' : '',$v);
+			$ret.=sprintf("<label class=\"radio_121\"><span><input type=\"radio\" name=\"%s\" value=\"%d\" %s>%s</span></label>\n",$this->fieldname, $k, ($this->value==$k) ? 'checked="checked"' : '',$v);
 		}
 		$ret.='<div class="radio_121_end"></div>';
 		return $ret;

@@ -16,5 +16,7 @@ class gs_dict {
 	}
 }
 
-
+if (file_exists(cfg('root_dir').'words.cfg.php')) {
+	require_once(cfg('root_dir').'words.cfg.php');
+}
 ?>
