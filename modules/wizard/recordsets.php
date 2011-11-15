@@ -20,7 +20,7 @@ class wz_recordsets extends gs_recordset_short {
 		'name'=> "fString name",
 		'title'=> "fString 'название'",
 		'extends'=>"fString 'extends' required=false",
-		'Module'=>'lOne2One wz_modules',
+		'Module'=>'lOne2One wz_modules Module widget=parent_list',
 		'Fields'=>"lMany2One wz_recordset_fields:Recordset",
 		'Resizes'=>"lMany2One wz_recordset_resizes:Recordset",
 		'Links'=>"lMany2One wz_recordset_links:Recordset",
@@ -193,7 +193,7 @@ class wz_urls extends gs_recordset_short {
 	function __construct($init_opts=false) { parent::__construct(array(
 		'gspgid_value'=> "fString gspgid required=false unique=true",
 		'type'=>'fSelect type values="get,handler,post"',
-		'Module'=>'lOne2One wz_modules',
+		'Module'=>'lOne2One wz_modules Module widget="parent_list"',
 		'Handlers'=>"lMany2One wz_handlers:Url",
 		),$init_opts);
 	}

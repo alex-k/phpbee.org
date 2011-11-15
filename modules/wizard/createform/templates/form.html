@@ -2,37 +2,48 @@
 		<input type=hidden name="root" value="{$pid_id}">
 		<input type=hidden name="gspgid_form" value="{$gspgid_form}">
 
-		{$form->get_input('classname')}<br>
-		{$form->get_input('extends')}<br>
-		{$form->get_input('template')}<br>
-		{$form->get_input('template_name')}<br>
-		{$form->get_input('gspgid_name')}<br>
+		<table>
+		{$form->get_tr('classname')}
+		{$form->get_tr('extends')}
+		{$form->get_tr('template')}
+		{$form->get_tr('template_name')}
+		{$form->get_tr('template_path')}
+		{$form->get_tr('gspgid_name')}
+		</table>
 
-		<div id=inputs>
 
 
 		{$id=0}
 		{foreach $form->get_inputs() as $name=>$f}
-			{$id=explode(':',$name)}
-			{$id=$id[1]}
-			{*
-			{if strpos($name,'enabled')===FALSE}{$fields[$id][$name]=$f}{/if}
-			*}
-			{if $id}
+			{$ids=explode(':',$name)}
+			{$id=$ids[1]}
+			{if $id && $ids[0]!='enabled'}
 			{$fields[$id][$name]=$f}
 			{/if}
 		{/foreach}
+		<table>
+		<tr>
+		<td><input type=checkbox checked onChange="$('[name^=enabled]',$(this).parents('form')).attr('checked',this.checked);"></td>
+		<td></td>
+		<td></td>
+		</tr>
 		{foreach $fields as $i=>$field}
-			<div><a href="#">{$form->get_data(key($field))}</a>
+			<tr >
+			<td>
+				{$form->get_input("enabled:`$i`")}
+			</td>
+			<td class="toggle_head" id="field_{$i}">
+			<a href="#">{$form->get_data(key($field))}</a>
+			</td>
+			<td class="toggle_head" id="field_{$i}">
 			{foreach $field as $name=>$f}
 				{$d=$form->get_data($name)}
 				{if is_array($d)}{implode(',',$d)}{else}{$d}{/if}
+
 			{/foreach}
-			{*
-			{$form->get_input("enabled:`$i`")}
-			*}
-			</div>
-			<div>
+			</td>
+			</tr>
+			<tr class="toggle_item" id="toggle_field_{$i}"><td colspan=10>
 			<table>
 			{foreach $field as $name=>$f}
 			<tr>
@@ -45,13 +56,10 @@
 			</tr>
 			{/foreach}
 			</table>
-			</div>
+			</td></tr>
 		{/foreach}
-		</div>
+		</table>
 
 		</div>
 		<input type="submit">
 	</form>
-<script>
-jQuery("#inputs").accordion();
-</script>

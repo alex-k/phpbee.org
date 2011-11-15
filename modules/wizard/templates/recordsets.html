@@ -40,6 +40,10 @@
 	{if $_gsdata.gspgid_va.1=='form1'}
 	<hr><br>
 	<a name="form"></a>
-	{handler gspgid="/admin/form/wz_recordsets/edit/`$_gsdata.gspgid_va.2`" Module_id=$module.id}
+		{if $_gsdata.gspgid_va.2}
+		{handler gspgid="/admin/form/wz_recordsets/edit/`$_gsdata.gspgid_va.2`"}
+		{else}
+		{handler gspgid="/admin/form/wz_recordsets/edit/`$_gsdata.gspgid_va.2`" Module_id=$module.id}
+		{/if}
 	{/if}
 {/block}

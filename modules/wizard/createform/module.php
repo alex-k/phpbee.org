@@ -129,10 +129,11 @@ class gs_strategy_createform_handler extends gs_handler {
 
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$d['template']);
 
-
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$d['template_name'];
+		if ($d['template_path']=='html') {
+			$filename=cfg('tpl_data_dir').DIRECTORY_SEPARATOR.$d['template_name'];
+		}
 		file_put_contents($filename,$out);
-
 		md($out,1);
 		die();
 
@@ -160,6 +161,7 @@ class form_createform extends form_admin{
 			'verbose_name'=>
 				array(
 				'widget'=>'input',
+				'validate'=>'dummyValid',
 				) ,
 			'cssclass'=>
 				array(
@@ -221,6 +223,12 @@ class form_createform extends form_admin{
 			'template_name'=>array(
 				'widget'=>'input',
 				'default'=>"form_".$module->name."_".$rs->name.'.html',
+			),
+			'template_path'=>array(
+				'verbose_name'=>'template store path',
+				'widget'=>'radio',
+				'options'=>array('html'=>'html','module'=>'module'),
+				'default'=>'module',
 			),
 			'gspgid_name'=>array(
 				'widget'=>'input',

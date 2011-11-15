@@ -70,7 +70,7 @@
 						<a href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать"  class="icon" title="Редактировать"></a>
 					</li>
 				{/foreach}
-				{if $rs.Links->count()}<li></li>{/if}
+				{if $rs.Links->count()}<div style="border-top: 1px dotted #9BC6DE; margin-top:8px;"></div>{/if}
 				{foreach from=$rs.Links item=link}
 					<li -data-href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}">
 						{$link->text()}

@@ -49,6 +49,10 @@
 	<a name="form">
 	<br>
 	{if $_gsdata.gspgid_va.1=='modify'}
-	{handler gspgid="/admin/form/wz_urls/edit/`$_gsdata.gspgid_va.2`" Module_id=$_gsdata.gspgid_va.0}
+	{if $_gsdata.gspgid_va.2}
+		{handler gspgid="/admin/form/wz_urls/edit/`$_gsdata.gspgid_va.2`"}
+	{else}
+		{handler gspgid="/admin/form/wz_urls/edit/`$_gsdata.gspgid_va.2`" Module_id=$_gsdata.gspgid_va.0}
+	{/if}
 	{/if}
 {/block}
