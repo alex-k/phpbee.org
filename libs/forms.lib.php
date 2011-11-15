@@ -209,13 +209,18 @@ abstract class g_forms implements g_forms_interface{
 		}
 		return($inputs);
 	}
-	/*
-	function get_input($field,$suffix=null) {
-		$inputs=$this->_prepare_inputs();
-		$v=$inputs[$field];
-		return sprintf('<label>%s%s %s</label>', $v['label'],trim($v['label']) ? $suffix : null ,$v['input']);
+	function get_row($field) {
+		$ret=sprintf('<label>%s %s</label>',$this->get_label($field), $this->get_input($field));
+		if ($this->get_error($field)) $ret.=sprintf('<span class="error">%s</span>',implode($this->get_error($field)));
+		return $ret;
 	}
-	*/
+	function get_tr($field) {
+		$e='';
+		if ($this->get_error($field)) $e=sprintf('<span class="error">%s</span>',implode($this->get_error($field)));
+		$ret=sprintf('<tr><td>%s</td><td>%s%s</td></tr>',$this->get_label($field), $this->get_input($field),$e);
+		return $ret;
+	}
+	
 	function get_input($name) {
 		return (isset($this->_inputs[$name])) ? $this->_inputs[$name]['input'] : null;
 	}

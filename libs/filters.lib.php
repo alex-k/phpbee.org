@@ -339,7 +339,7 @@ class gs_filter_select_records extends gs_filter {
 
 	}
 	function current() {
-		return $this->value ? $this->recordset[$this->value] : $this->recordset->first();
+		return $this->value &&  $this->recordset[$this->value] ? $this->recordset[$this->value] : $this->recordset->first();
 	}
 	function applyFilter($options,$rs) {
 		$options[]=array(
@@ -360,6 +360,7 @@ class gs_filter_select_records extends gs_filter {
 		foreach($this->recordset as $rec) {
 			$links[$rec->get_id()]=$rec;
 		}
+		$tpl->assign('filter',$this);
 		$tpl->assign('links',$links);
 		$tpl->assign('current',$this->value);
 		$tpl->assign('keyname',$this->name);
