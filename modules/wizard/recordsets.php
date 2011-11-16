@@ -26,7 +26,7 @@ class wz_recordsets extends gs_recordset_short {
 		'Links'=>"lMany2One wz_recordset_links:Recordset",
 		'Submodules'=>"lMany2One wz_recordset_submodules:Recordset",
 		'showadmin'=>"fCheckbox 'show in admin'",
-		'no_urlkey'=>"fCheckbox 'No URL key'",
+		'no_urlkey'=>"fCheckbox 'No URL key' default=1",
 		),$init_opts);
 	}
 }
@@ -61,6 +61,7 @@ class wz_recordset_fields extends gs_recordset_short {
 		'extra_options'=>"fString extra_options required=false",
 		'widget'=>"fSelect widget required=false widget=select",
 		'default_value'=>"fString default required=false",
+		'make_index'=>"fCheckbox index",
 		'required'=>"fCheckbox verbose_name=required",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
