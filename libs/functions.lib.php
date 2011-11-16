@@ -1,15 +1,14 @@
 <?php
 function html_redirect($gspgid=null,$data=array(),$type='302', $clean_get=false) {
-	$config=gs_config::get_instance();
 	$query=array();
 	if($gspgid===null) {
-		$url=$config->referer_path;
-		if (!$clean_get) parse_str(parse_url($config->referer,PHP_URL_QUERY),$query);
+		$url=cfg('referer_path');
+		if (!$clean_get) parse_str(parse_url(cfg('referer'),PHP_URL_QUERY),$query);
 	} else {
 		$scheme=parse_url($gspgid,PHP_URL_SCHEME);
-		$url=$scheme ? $gspgid : $config->www_dir.$gspgid;
+		$url=($scheme || substr($gspgid,0,1)=='/') ? $gspgid : cfg('www_dir').$gspgid;
 	}
-	$url=cfg('www_dir').$url;
+	//$url=cfg('www_dir').$url;
 	$url='/'.ltrim($url,'/');
 	$data=array_merge($query,$data);
 	$datastr='';

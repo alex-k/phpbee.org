@@ -28,6 +28,11 @@ function smarty_function_beehandler($params, &$smarty) {
 	$smarty->assign('_gsdata',cfg('init_data'));
 	$params['gspgtype'] = $_SERVER['REQUEST_METHOD']=='POST' ? 'post' : 'get';
 	$ret=gs_base_handler::process_handler($params,$smarty);
+
+		if (DEBUG) {
+			$g=gs_logger::get_instance();
+			$g->console();
+		}
 	return $ret;
 
 }
