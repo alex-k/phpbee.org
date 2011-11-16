@@ -192,7 +192,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 						//$que=sprintf('ALTER TABLE %s DROP %s KEY',$tablename,$old_keys[$name]);
 						//$this->query($que);
 					} else {
-						$que=sprintf('CREATE %s INDEX %s ON %s(%s%s)',$this->_index_types[$index['type']],$name,$tablename,$name,isset($index['options'])?$index['options']:'');
+						$que=sprintf('CREATE %s INDEX `%s` ON %s(`%s%s`)',$this->_index_types[$index['type']],$name,$tablename,$name,isset($index['options'])?$index['options']:'');
 						$this->query($que);
 					}
 				}
@@ -257,7 +257,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 				$values[]=$this->escape_value($record->$fieldname);
 			}
 		}
-		$que=sprintf('INSERT INTO %s (%s) VALUES  (%s)',$rset->db_tablename,implode(',',$fields),implode(',',$values));
+		$que=sprintf('INSERT INTO %s (`%s`) VALUES  (%s)',$rset->db_tablename,implode('`,`',$fields),implode(',',$values));
 		$this->query($que);
 		return $this->get_insert_id();
 
@@ -268,12 +268,12 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$fields=array();
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
 			if ($record->is_modified($fieldname)) {
-				$fields[]=sprintf('%s=%s',$fieldname,$this->escape_value($record->$fieldname));
+				$fields[]=sprintf('`%s`=%s',$fieldname,$this->escape_value($record->$fieldname));
 			}
 		}
 		if (sizeof($fields)==0) return;
 		$idname=$rset->id_field_name;
-		$que=sprintf('UPDATE %s SET %s WHERE %s=%s',$rset->db_tablename,implode(',',$fields),$idname,$this->escape_value($record->get_old_value($idname)));
+		$que=sprintf('UPDATE %s SET %s WHERE `%s`=%s',$rset->db_tablename,implode(',',$fields),$idname,$this->escape_value($record->get_old_value($idname)));
 		return $this->query($que);
 
 	}
@@ -306,7 +306,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$where=$this->construct_where($options);
 		//md($rset->structure['fields'],1);
 		$fields = is_array($fields) ? array_filter($fields) : array_keys($rset->structure['fields']);
-		$que=sprintf("SELECT %s FROM %s ", implode(',',$fields), $rset->db_tablename);
+		$que=sprintf("SELECT `%s` FROM %s ", implode('`,`',$fields), $rset->db_tablename);
 		if (is_array($options)) foreach($options as $o) {
 			if (isset($o['type'])) switch($o['type']) {
 				case 'limit':

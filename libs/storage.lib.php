@@ -56,6 +56,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 
 	public function attache_record($rec) {
+		throw new gs_exception('attache_record: works only in gs_recordset_view!');
 		return false;
 	}
 	
@@ -602,15 +603,15 @@ abstract class gs_prepare_sql {
 		                           'bool'=>'BOOL',
 		                         );
 		$this->_escape_case=array(
-		                        '='=>array('FLOAT'=>'{f} = {v}','NUMERIC'=>'{f} = {v}','STRING'=>'{f} = {v}','NULL'=>'{f} IS NULL','ARRAY'=>'{f} IN {v}'),
-		                        '!='=>array('FLOAT'=>'{f} != {v}','NUMERIC'=>'{f} != {v}','STRING'=>'{f} != {v}','NULL'=>'{f} IS NOT NULL','ARRAY'=>'{f} NOT IN {v}'),
-		                        '>'=>array('FLOAT'=>'{f} > {v}','NUMERIC'=>'{f} > {v}','STRING'=>'{f} > {v}','NULL'=>'{f} IS NOT NULL'),
-		                        '>='=>array('FLOAT'=>'{f} >= {v}','NUMERIC'=>'{f} >= {v}','STRING'=>'{f} >= {v}','NULL'=>'{f} IS NOT NULL'),
-		                        '<'=>array('FLOAT'=>'{f} < {v}','NUMERIC'=>'{f} < {v}','STRING'=>'{f} < {v}','NULL'=>'{f} IS NOT NULL}'),
-		                        '<='=>array('FLOAT'=>'{f} <= {v}','NUMERIC'=>'{f} <= {v}','STRING'=>'{f} <= {v}','NULL'=>'{f} IS NOT NULL'),
-		                        'LIKE'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>"{f} LIKE '%%{v}%%'",'NULL'=>'FALSE'),
-		                        'FULLTEXT'=>array('FLOAT'=>'{f}={v}','NUMERIC'=>'{f}={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})",'NULL'=>'FALSE'),
-		                        'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'({f} BETWEEN {v0} AND {v1})'),
+		                        '='=>array('FLOAT'=>'`{f}` = {v}','NUMERIC'=>'`{f}` = {v}','STRING'=>'`{f}` = {v}','NULL'=>'`{f}` IS NULL','ARRAY'=>'`{f}` IN {v}'),
+		                        '!='=>array('FLOAT'=>'`{f}` != {v}','NUMERIC'=>'`{f}` != {v}','STRING'=>'`{f}` != {v}','NULL'=>'`{f}` IS NOT NULL','ARRAY'=>'`{f}` NOT IN {v}'),
+		                        '>'=>array('FLOAT'=>'`{f}` > {v}','NUMERIC'=>'`{f}` > {v}','STRING'=>'`{f}` > {v}','NULL'=>'`{f}` IS NOT NULL'),
+		                        '>='=>array('FLOAT'=>'`{f}` >= {v}','NUMERIC'=>'`{f}` >= {v}','STRING'=>'`{f}` >= {v}','NULL'=>'`{f}` IS NOT NULL'),
+		                        '<'=>array('FLOAT'=>'`{f}` < {v}','NUMERIC'=>'`{f}` < {v}','STRING'=>'`{f}` < {v}','NULL'=>'`{f}` IS NOT NULL}'),
+		                        '<='=>array('FLOAT'=>'`{f}` <= {v}','NUMERIC'=>'`{f}` <= {v}','STRING'=>'`{f}` <= {v}','NULL'=>'`{f}` IS NOT NULL'),
+		                        'LIKE'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}%%'",'NULL'=>'FALSE'),
+		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH (`{f}`) AGAINST  ({v})",'NULL'=>'FALSE'),
+		                        'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'(`{f}` BETWEEN {v0} AND {v1})'),
 		                    );
 	}
 	protected function construct_table_fields($options) {
@@ -624,7 +625,7 @@ abstract class gs_prepare_sql {
 				$k=$this->replace_pattern($k,$field['options']);
 			}
 			$name=!isset($field['name'])?$key:$field['name'];
-			$table_fields[$name]=trim(sprintf("%s %s %s",$name, $k, isset($field['default']) ? 'NOT NULL DEFAULT '.$this->escape_value($field['default']) : ''));
+			$table_fields[$name]=trim(sprintf("`%s` %s %s",$name, $k, isset($field['default']) ? 'NOT NULL DEFAULT '.$this->escape_value($field['default']) : ''));
 
 		}
 		return $table_fields;
@@ -656,7 +657,7 @@ abstract class gs_prepare_sql {
 					$txt=$this->escape($value['field'],$value['case'],$value['value']);
 					break;
 				case 'field':
-					$txt=sprintf("%s %s %s",$value['field'],$value['case'],$value['value']);
+					$txt=sprintf("`%s` %s `%s`",$value['field'],$value['case'],$value['value']);
 					break;
 				}
 

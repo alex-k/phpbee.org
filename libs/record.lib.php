@@ -311,7 +311,7 @@ class gs_record implements arrayaccess {
 		$ret=NULL;
 
 
-		if ($this->recordstate!=RECORD_UNCHANGED) {
+		if ($this->recordstate!=RECORD_UNCHANGED && is_a($this->gs_recordset,'gs_recordset_view')) {
 			$ret=$this->gs_recordset->attache_record($this); // works only for gs_recordset_view !!
 			if ($ret===TRUE) return;
 		}

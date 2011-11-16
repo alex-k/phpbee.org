@@ -326,4 +326,8 @@ function languages() {
 	return $langs;
 }
 
+function rs($name) {
+	return new $name;
+}
+
 ?>
