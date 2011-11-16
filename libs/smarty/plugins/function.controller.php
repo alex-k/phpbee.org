@@ -53,9 +53,9 @@ function smarty_function_controller($params, &$smarty)
 			$options[]=array('type'=>'value', 'field'=>$k,'case'=>'>=','value'=>$matches[2]);
 			$options[]=array('type'=>'value', 'field'=>$k,'case'=>'<=','value'=>$matches[3]);
 		*/	
-		} elseif (preg_match('/^(SET)(.*)/',$v,$matches)) {
+		} elseif (!is_array($v) && preg_match('/^(SET)(.*)/',$v,$matches)) {
 					$options[]=array('type'=>'value', 'field'=>$k,'case'=>'=','value'=>explode(':',$matches[2]));
-		} elseif (preg_match('/^(!SET)(.*)/',$v,$matches)) {
+		} elseif (!is_array($v) && preg_match('/^(!SET)(.*)/',$v,$matches)) {
 					$options[]=array('type'=>'value', 'field'=>$k,'case'=>'!=','value'=>explode(':',$matches[2]));
 		} else {
 			$options[]=array('type'=>'value','field'=>$k,'value'=>$v);
