@@ -140,7 +140,7 @@ class gs_base_handler extends gs_handler {
 		ob_end_clean();
 		$html=$tpl->fetch($tplname);
 		echo $html;
-		mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
+		if (function_exists('memory_get_peak_usage')) mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
 		if (DEBUG && !$nodebug) {
 			$g=gs_logger::get_instance();
 			$g->console();
