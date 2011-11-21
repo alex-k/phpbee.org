@@ -298,6 +298,16 @@ class gs_dbdriver_sqlite extends gs_prepare_sql implements gs_dbdriver_interface
 		$res=$this->_res->fetchArray(SQLITE3_ASSOC);
 		return $res;
 	}
+	function count($rset,$options) {
+		$where=$this->construct_where($options);
+		$que=sprintf("SELECT count(*) as count  FROM %s ",$rset->db_tablename);
+		if (!empty($where)) $que.=sprintf(" WHERE %s", $where);
+		$this->_que=md5($que);
+		if(isset($this->_cache[$this->_que])) {
+			return true;
+		}
+		return $this->query($que);
+	}
 	function select($rset,$options,$fields=NULL) {
 		$where=$this->construct_where($options);
 		//md($rset->structure['fields'],1);

@@ -315,7 +315,8 @@ abstract class gs_recordset_base extends gs_iterator {
 		foreach($options as $k=>$o) {
 			if (in_array(strtolower($o['type']),array('limit','offset','orderby'))) unset($options[$k]);
 		}
-		$this->get_connector()->select($this,$options,array('count(*) as count'));
+		//$this->get_connector()->select($this,$options,array('count(*) as count'));
+		$this->get_connector()->count($this,$options);
 		$res=reset($this->get_connector()->fetchall());
 		return $res['count'];
 	}

@@ -394,6 +394,14 @@ class gs_base_handler extends gs_handler {
 		}
 		return $rec;
 	}
+	function set_value($data) {
+		$rec=$this->hpar($data);
+		if (!$rec) return $rec;
+		$name=$this->params['name'];
+		$rec->$name=$this->data['gspgid_va'][0];
+		$rec->commit();
+		return $rec;
+	}
 	function copy() {
 		$id=$this->data['gspgid_va'][0];
 		$rs=new $this->params['classname'];
@@ -678,6 +686,9 @@ class gs_base_handler extends gs_handler {
 		return $rec;
 	}
 	function post_logout($data) {
+		$h=new handler_registry;
+		$rec=$this->check_login();
+		if($rec) $h->before_logout($rec);
 		gs_session::clear('login_'.$this->params['classname']);
 		return true;
 	}
@@ -703,8 +714,9 @@ class gs_base_handler extends gs_handler {
 		if (!$rec) return $this->showform();
 
 		gs_session::save($rec->get_id(),'login_'.$rsname);
+		$h=new handler_registry;
+		$h->after_login($rec);
 		return $rec;
-
 	}
 
 }
