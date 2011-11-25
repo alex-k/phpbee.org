@@ -1,5 +1,6 @@
 	var params = {  
-		BGColor: "#FFFFFF"
+		BGColor: "#FFFFFF",
+		wmode: "opaque"
 	};
 	
 	var attributes = {  
@@ -13,6 +14,7 @@
 	  "serialNumber": "0081661701492178151138183160131275818427540204",
 	  "uploadUrl": "/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true&",
 	  "customPostFields":params_str,
+	  "removeUploadedFilesFromList": "true",
 	  //"uploadUrl": "http://demo.element-it.com/Examples/multipow/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",
 	  "fileFilter.types":"Images|*.jpg:*.jpeg:*.gif:*.png:*.bmp",
 	  "sendThumbnails": "true",
@@ -33,8 +35,10 @@
 	  "thumbnailView.allowRotate": "true",
 	  "thumbnailView.cropRectKeepAspectRatio": "NO",
 	  "thumbnailView.showCropRectDimensions": "true",
+	  "thumbnailView.thumbnailWidth": "180",
+	  "thumbnailView.thumbnailHeight": "180",
 
-	  "thumbnail.watermark.enabled":"true",
+	  "thumbnail.watermark.enabled":"false",
 	  //"thumbnail.watermark.imageUrl":"images/element-it.jpg",
 		//Center.Left Bottom.Left
 	  "thumbnail.watermark.position":"bottom.right",
@@ -47,7 +51,9 @@
 
 	};
 	//Default MultiPowUpload should have minimum width=400 and minimum height=180
-	swfobject.embedSWF("/widgets/MultiPowUpload/ElementITMultiPowUpload.swf", "MultiPowUpload_holder", "900", "350", "10.0.0", "/widgets/MultiPowUpload/Extra/expressInstall.swf", flashvars, params, attributes);
+	var so=swfobject.embedSWF("/widgets/MultiPowUpload/ElementITMultiPowUpload.swf", "MultiPowUpload_holder", "900", "450", "10.0.0", "/widgets/MultiPowUpload/Extra/expressInstall.swf", flashvars, params, attributes);
+	//so.addParam("wmode", "opaque");
+
 
 
 	var path_to_file = "";

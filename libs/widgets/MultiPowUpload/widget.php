@@ -67,5 +67,8 @@ class gs_widget_MultiPowUpload extends gs_widget{
 		return $s;
 
 	}
+	function clean() {
+		return array();
+	}
 }
 
