@@ -1,0 +1,15 @@
+<div id="MultiPowUpload_holder"></div>
+<script>
+	var params_str={$params|http_build_query|replace:'&':'|'|replace:'=':';'|json_encode}
+{foreach $params as $k=>$v}
+	var {$k}={$v|json_encode};
+{/foreach}
+</script>
+<script type="text/javascript" src="/widgets/MultiPowUpload/Extra/swfobject.js"></script>
+<script type="text/javascript" src="/widgets/MultiPowUpload/include.js"></script>
+<!--
+<script type="text/javascript" src="/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?reset_session=true"></script>
+-->
+
+
+
