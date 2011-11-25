@@ -237,6 +237,8 @@ class gs_init {
 		load_file($this->config->lib_dir.'tpl.lib.php');
 		load_file($this->config->lib_dir.'forms.lib.php');
 		load_file($this->config->lib_dir.'widgets.lib.php');
+		$widgets=glob($this->config->lib_dir.'widgets'.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'widget.php');
+		foreach($widgets as $w) load_file($w);
 		load_file($this->config->lib_dir.'helpers.lib.php');
 		load_file($this->config->lib_dir.'dict.lib.php');
 		load_file($this->config->lib_dir.'filters.lib.php');
