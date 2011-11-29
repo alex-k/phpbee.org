@@ -27,6 +27,7 @@ class wz_recordsets extends gs_recordset_short {
 		'Submodules'=>"lMany2One wz_recordset_submodules:Recordset",
 		'showadmin'=>"fCheckbox 'show in admin'",
 		'no_urlkey'=>"fCheckbox 'No URL key' default=1",
+		'orderby'=>"fString 'order by' required=false default='id'",
 		),$init_opts);
 	}
 }
@@ -40,7 +41,7 @@ class wz_recordset_resizes extends gs_recordset_short {
 		'height'=> "fInt 'Высота'",
 		'method'=>"fSelect 'Метод' values='use_width,use_height,use_box,use_space,use_fields,use_crop'",
 		'bgcolor'=> "fString 'Цвет фона R,G,B' default='0,0,0'",
-		'modifier'=>"fSelect 'Модификатор' values=',check_and_rotate_left' required=false",
+		'modifier'=>"fSelect 'Модификатор' values=',check_and_rotate_left,check_and_rotate_right' required=false",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
 		$this->structure['fkeys']=array(

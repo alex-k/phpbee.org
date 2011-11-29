@@ -68,6 +68,7 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 
 class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 	<*if $rs->no_urlkey*>public $no_urlkey=true; <*/if*>
+	<*if $rs->orderby*>public $orderby="<*$rs->orderby*>";<*/if*> 
 	function __construct($init_opts=false) { parent::__construct(array(
 
 		<*foreach from=$rs->Fields item=f*>
@@ -77,7 +78,7 @@ class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 		<*/foreach*>
 		<*foreach from=$rs->Links item=f*>
 
-			'<*$f->name*>'=>'<*$f->type*> <*$f->classname*><*if $f->linkname*>:<*$f->linkname*><*/if*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->options*>options="<*$f->options*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*> required=<*if $f->required*>true<*else*>false<*/if*>   <*$f->extra_options*>  ',
+			'<*$f->name*>'=>'<*$f->type*> <*$f->classname*><*if $f->linkname*>:<*$f->linkname*><*/if*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->options*>options="<*$f->options*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*> required=<*if $f->required*>true<*else*>false<*/if*>  <*$f->extra_options*>  ',
 
 		<*/foreach*>
 		<*if $rs->Submodules->count()*>

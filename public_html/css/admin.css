@@ -431,3 +431,6 @@ textarea.big_text {
 .frm_fCheckbox {
 	text-align:center;
 }
+.fMultiSelect {
+	height:50px;
+}

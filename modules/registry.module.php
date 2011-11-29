@@ -18,10 +18,6 @@ class module_registry extends gs_base_module implements gs_module {
     }
 
 }
-class handler_registry extends gs_base_handler {
-
-}
-
 interface interface_registry {
 	function __construct($type,$key);
 	static function &i($rec=null);
@@ -66,13 +62,25 @@ class registry implements interface_registry {
 	function rs_reg() {
 		return $this->rs_reg;
 	}
-	static function get($name) {
-		$r=self::i();
+	static function get($name,$rec=null) {
+		$r=self::i($rec);
 		return $r->$name;
 	}
-	static function set($name,$value) {
-		$r=self::i();
+	static function set($name,$value,$rec=null) {
+		$r=self::i($rec);
 		$r->$name=$value;
+	}
+
+	function import($old_r) {
+		foreach($old_r->rs_reg()->Objects as $o) {
+			$this->__set($o->name,unserialize($o->object));
+		}
+	}
+	function clean() {
+		foreach ($this->rs_reg->Objects as $o) {
+			$o->delete();
+		}
+		$this->rs_reg->commit();
 	}
 }
 
@@ -108,6 +116,43 @@ class rs_registry_objects extends gs_recordset_short {
 
     }
 
+
+}
+
+class handler_registry extends gs_base_handler {
+	function array_push($data) {
+		$rec=$this->hpar($data);
+		$name=$this->params['name'];
+		$value=$this->data['gspgid_va'][0];
+		$r=registry::i($rec);
+		$a=$r->$name;
+		if (!$a) $a=array();
+		$a[$value]=$value;
+		$r->$name=$a;
+		return $rec;
+	}
+	function array_pop($data) {
+		$rec=$this->hpar($data);
+		$name=$this->params['name'];
+		$value=$this->data['gspgid_va'][0];
+		$r=registry::i($rec);
+		$a=$r->$name;
+		if ($a && isset($a[$value])) unset($a[$value]);
+		if ($a) $r->$name=$a;
+		return $rec;
+	}
+
+	function after_login($rec) {
+		$old_r=registry::i();
+		$r=registry::i($rec);
+		$r->import($old_r);
+		return $rec;
+	}
+	function before_logout($rec) {
+		$r=registry::i();
+		$r->clean();
+		return $rec;
+	}
 
 }
 

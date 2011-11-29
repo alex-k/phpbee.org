@@ -15,7 +15,8 @@
 	<tr><th>#</th>
 	<th>name</th>
 	<th>Название</th>
-	<th>show admin</th>
+	<th>Order by</th>
+	<th>admin</th>
 	<th></th>
 	<th></th>
 	<th></th>
@@ -28,6 +29,7 @@
 			<td>{$e.id}</td>
 			<td>{$e.name}</td>
 			<td>{$e.title}</td>
+			<td>{$e.orderby}</td>
 			<td>{if $e.showadmin}+{/if}</td>
 			<td class="cnt"><a href="/admin/wizard/recordset_fields/{$e.id}">fields</a></td>
 			<td class="cnt"><a href="/admin/wizard/recordsets/{$e.Module_id}/form1/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
