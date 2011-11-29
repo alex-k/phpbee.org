@@ -168,6 +168,15 @@ class gs_iterator implements Iterator, arrayaccess {
     function next() {
 	    return next($this->array);
     }
+    function prev($cnt=null) {
+	    if ($cnt===null) return prev($this->array);
+	    $ret=$this->current();
+	    for($i=0;$i<$cnt;$i++) {
+		    $r=$this->prev();
+		    if ($r!==FALSE) $ret=$r;
+	    }
+	    return $ret;
+    }
     function end() {
 	    return end($this->array);
     }

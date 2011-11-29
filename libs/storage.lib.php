@@ -138,6 +138,16 @@ abstract class gs_recordset_base extends gs_iterator {
 
 	}
 
+	function position($rec) {
+		$this->rewind();
+		$r=$this->current();
+		while ($r) {
+			if ($r->get_id()==$rec->get_id()) break;
+			$r=$this->next();
+		}
+		return $this;
+	}
+
 
 	function find($options,$linkname=null) {
 		$options=$this->string2options($options);

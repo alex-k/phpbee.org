@@ -165,7 +165,8 @@ class gs_record implements arrayaccess {
 		if ($fields==null) {
 			$fields=array_keys($this->get_recordset()->structure['fields']);
 			$this->get_recordset()->query_options['late_load_fields']=$fields;
-			$this->get_recordset()->late_load_records();
+			//$this->get_recordset()->late_load_records();
+			$this->get_recordset()->preload();
 		}
 		if ($fields !==null) {
 			$values=array();

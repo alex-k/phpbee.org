@@ -27,23 +27,25 @@ class gs_filter {
 		$this->name=$this->params['name'];
 		$this->loadValues();
 	}
+	function get_data_get() {
+		$ds=new gs_data_driver_get();
+		$arr=$ds->import();
+		unset($arr['gspgtype']);
+		return $arr;
+	}
 	function loadValues() {
 		$arr=array();
 		switch ($this->data['handler_params']['urltype']) {
 			case 'get': 
-				$ds=new gs_data_driver_get();
-				$arr=$ds->import();
-				unset($arr['gspgtype']);
+				$arr=$this->get_data_get();
 				break;
 			case 'session': 
-				$ds=new gs_data_driver_get();
-				$arr=$ds->import();
+				$arr=$this->get_data_get();
 				if(isset($arr[$this->name])) {
 					gs_session::save($arr[$this->name],'filter_'.$this->name);
 				} else {
 					$arr[$this->name]=gs_session::load('filter_'.$this->name);
 				}
-				unset($arr['gspgtype']);
 				break;
 			default:
 				$d=$this->data['gspgid_handler_va'];
@@ -99,6 +101,83 @@ class gs_filter_like extends gs_filter {
 		}
 		$options[$this->name]=$to;
 		return $options;
+	}
+}
+class gs_filter_var extends gs_filter {
+	function __construct($data) {
+		parent::__construct($data);
+		$this->tpl=gs_tpl::get_instance();
+	}
+	function getHtmlBlock($ps) {
+		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
+		return $this->getHtmlBlockNonExlusive($ps);
+	}
+	function getHtmlBlockNonExlusive($ps) {
+		$this->tpl->assign('current',$this->value);
+		$this->tpl->assign('keyname',$this->name);
+		$this->tpl->assign($ps);
+		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
+		$out=$this->tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
+		return $out;
+	}
+}
+class gs_filter_limit extends gs_filter_var {
+	function __construct($data) {
+		parent::__construct($data);
+		$this->values=explode(',',$this->params['values']);
+		$this->default_value=isset($this->params['default_value']) ? $this->params['default_value'] : reset($this->values);
+		if(!$this->value) $this->value=$this->default_value;
+		if ($this->values && !in_array($this->value,$this->values)) $this->value=$this->default_value;
+	}
+	function applyFilter($options,$rs) {
+		if (empty($this->value)) return $options;
+		$options[]=array('type'=>'limit','value'=>$this->value);
+		return $options;
+	}
+	function getHtmlBlockNonExlusive($ps) {
+		$this->tpl->assign('values',$this->values);
+		return parent::getHtmlBlockNonExlusive($ps);
+	}
+}
+class gs_filter_offset extends gs_filter_var {
+	function __construct($data) {
+		$filter=gs_filters_handler::get($data['handler_params']['limit']);
+		$limit=$filter ? $filter->value : (int)($data['handler_params']['limit']);
+		if (!$limit) $limit=1;
+		$this->limit=$limit;
+		parent::__construct($data);
+		if(!$this->value) $this->value=0;
+	}
+	function applyFilter($options,$rs) {
+		if (empty($this->value)) return $options;
+		$options[]=array('type'=>'offset','value'=>$this->value);
+		return $options;
+	}
+	function get_data_get() {
+		$ds=new gs_data_driver_get();
+		$arr=$ds->import();
+		if (isset($arr[$this->name.'_page'])) {
+			$cp=$arr[$this->name.'_page'];
+			$cp=max((int)($cp),1);
+			$arr[$this->name]=($cp-1)*$this->limit;
+		}
+		return $arr;
+	}
+	function getHtmlBlockNonExlusive($ps) {
+		$limit=$this->limit;
+		$count=$ps['recordset']->count_records();
+
+		$pages=ceil($count/$limit);
+		$current_page=floor($this->value/$limit)+1;
+
+
+		$this->tpl->assign('count',$count);
+		$this->tpl->assign('limit',$limit);
+		$this->tpl->assign('pages',$pages);
+		$this->tpl->assign('current_page',max(min($current_page,$pages),1));
+		$this->tpl->assign('previous_page',max($current_page-1,1));
+		$this->tpl->assign('next_page',min($current_page+1,$pages));
+		return parent::getHtmlBlockNonExlusive($ps);
 	}
 }
 

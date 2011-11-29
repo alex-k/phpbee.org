@@ -3,12 +3,12 @@
 	<input type=hidden name="{$k}" value="{$v|htmlentities}">
 {/foreach}
 <div  class="MultiPowUploadGallery" id="gallery_{$params.hash}">
-	{foreach $g_images as $images}
-		<div class=MultiPowUploadGalleryGroup>
+	{foreach $g_images as $g_key=>$images}
+		{if $g_key && $g_key!="nogrp"}<div class=MultiPowUploadGalleryGroup>{/if}
 		{foreach $images as $i}
 		{include file="li_image.html" i=$i}
 		{/foreach}
-		</div>
+		{if $g_key && $g_key!="nogrp"}</div>{/if}
 	{/foreach}
 </div>
 <div class="clear"></div>

@@ -1,4 +1,16 @@
 <?php
+function href_get_push($array,$url=null) {
+	if ($url===null) $url=$_SERVER['REQUEST_URI'];
+	if(!is_array($array)) parse_str($array,$array);
+
+	$d=parse_url($url);
+	$d_query=parse_str($d['query']);
+	foreach ($array as $k=>$v) $d_query[$k]=$v;
+	$d['query']=http_build_query($d_query);
+	$url=http_build_url($d);
+	return $url;
+
+}
 function html_redirect($gspgid=null,$data=array(),$type='302', $clean_get=false) {
 	$query=array();
 	if($gspgid===null) {
@@ -227,29 +239,7 @@ function xml_print($xml) {
 	return $dom->saveXML();
 }
 
-/**
-* Compatible functions
-**/
 
-if (PHP_VERSION_ID>=50300 && !function_exists('mb_split')) {
-	function mb_split($pattern, $string , $limit = -1) {
-		return preg_split(sprintf("/%s/",preg_quote($pattern)), $string , $limit);
-	}
-}
-
-if (PHP_VERSION_ID>=50300 && !function_exists('mb_strlen')) {
-	/*function mb_strlen($string) {
-	    return strlen($string);
-	}
-
-	function mb_detect_encoding($string,$encoding_list = null ,$strict = false) {
-	    return 'UTF-8';
-	}
-
-	function mb_substr($string,$start,$length, $encoding='UTF-8') {
-	    return substr($string,$start,$length);
-	}*/
-}
 
 
 

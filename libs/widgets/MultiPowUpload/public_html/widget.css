@@ -8,18 +8,28 @@
 
 .MultiPowUploadGalleryGroup{
 	float: left;
-	border: 2px;
-	background: #DDD;
-	padding:4px;
-	margin:10px;
-
+	background: #DDf;
+	margin-right: 12px;
+	margin-bottom: 6px;
+	/*border: 1px solid #666;*/
 }
 .MultiPowUploadGalleryItem{
 	float: left;
-	padding: 3px;
-	margin-right:1px;
+	padding: 6px;
+	margin:0px;
 }
 .MultiPowUploadCheckedElement {
 	/*border: 5px solid #FF0;*/
 	background: #900000;
 }
+
+
+#preview{
+	position:absolute;
+	border:1px solid #ccc;
+	background:#333;
+	padding:5px;
+	display:none;
+	color:#fff;
+	}
+

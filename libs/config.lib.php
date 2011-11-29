@@ -248,6 +248,7 @@ class gs_init {
 	{
 		//load_file($this->config->lib_dir.'__all.php'); return;
 
+		load_file($this->config->lib_dir.'compat.lib.php');
 		load_file($this->config->lib_dir.'core.lib.php');
 		load_file($this->config->lib_dir.'parser.lib.php');
 		load_file($this->config->lib_dir.'module.lib.php');
