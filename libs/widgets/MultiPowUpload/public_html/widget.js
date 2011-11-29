@@ -50,9 +50,10 @@
 	  "thumbnail.watermark.textStyle.style":"bold"
 
 	};
-	//Default MultiPowUpload should have minimum width=400 and minimum height=180
-	var so=swfobject.embedSWF("/widgets/MultiPowUpload/ElementITMultiPowUpload.swf", "MultiPowUpload_holder", "900", "450", "10.0.0", "/widgets/MultiPowUpload/Extra/expressInstall.swf", flashvars, params, attributes);
-	//so.addParam("wmode", "opaque");
+
+	function MultiPowUpload_Start() {
+		var so=swfobject.embedSWF("/widgets/MultiPowUpload/ElementITMultiPowUpload.swf", "MultiPowUpload_holder", "900", "450", "10.0.0", "/widgets/MultiPowUpload/Extra/expressInstall.swf", flashvars, params, attributes);
+	}
 
 
 
@@ -63,18 +64,30 @@
 			addThumbnail(response);
 	}
 	
-	function addThumbnail(source)
+	function addThumbnail(response)
 	{
-		/*
-		var Img = document.createElement("img");
-		Img.style.margin = "5px";
-		Img.src = path_to_file+source+"?"+(new Date()).getTime();;
-		document.getElementById("gallery_"+hash).appendChild(Img);
-		*/
-		var g=document.getElementById("gallery_"+hash);
-		var s=g.innerHTML;
-		s+="<li><img src=\""+source+"\"></li>";
-		g.innerHTML=s;
+		$("#gallery_"+hash).append(response);
 	}
+
+
+
+	$(document).ready(function() {
+		$("#gallery_"+hash+" div.MultiPowUploadGalleryItem").live("click",function(){
+			var li=$(this);
+			var inp=$("input",li);
+			inp.attr('checked',!(inp.attr('checked')));
+			li.removeClass('MultiPowUploadCheckedElement');
+			if(inp.attr('checked')) li.addClass('MultiPowUploadCheckedElement');
+		});
+
+		$("#checked_items_submit").click(function(){
+			var form=$(this).closest('form');
+			//var action=$(':radio[name=checked_items_action]',form).filter(":checked").val();
+			var gspgid="widgets/MultiPowUpload/action";
+			$('input[name=gspgid_form]',form).val(gspgid);
+			form.get(0).submit();
+		});
+	});
+
 
 

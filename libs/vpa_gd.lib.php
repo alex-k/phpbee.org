@@ -85,6 +85,9 @@ class vpa_gd {
 			case 'check_and_rotate_left':
 				$this->check_and_rotate_left();
 			break;
+			case 'check_and_rotate_right':
+				$this->check_and_rotate_right();
+			break;
 		}
 	}
 	function resize($width,$height,$type)
@@ -127,6 +130,20 @@ class vpa_gd {
 	}
 	function rotate_left() {
 		$this->old_img=imagerotate($this->old_img,90,0);
+		list($this->old_width,$this->old_height)=array($this->old_height,$this->old_width);
+	}
+	function check_and_rotate_right() {
+		$k=$this->old_width/$this->old_height;
+		$k1=$this->new_width/$this->new_height;
+		if ( ($k>1&& $k1<1) 
+			|| ($k<1 && $k1>1)) {
+
+			$this->rotate_right();
+		}
+
+	}
+	function rotate_right() {
+		$this->old_img=imagerotate($this->old_img,270,0);
 		list($this->old_width,$this->old_height)=array($this->old_height,$this->old_width);
 	}
 	

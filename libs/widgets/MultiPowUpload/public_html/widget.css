@@ -1,0 +1,25 @@
+.MultiPowUploadStartButton {
+	border: 2px;
+}
+.MultiPowUploadGallery input{
+	display:none;
+}
+
+
+.MultiPowUploadGalleryGroup{
+	float: left;
+	border: 2px;
+	background: #DDD;
+	padding:4px;
+	margin:10px;
+
+}
+.MultiPowUploadGalleryItem{
+	float: left;
+	padding: 3px;
+	margin-right:1px;
+}
+.MultiPowUploadCheckedElement {
+	/*border: 5px solid #FF0;*/
+	background: #900000;
+}

@@ -37,6 +37,12 @@ if(isset($_FILES['Filedata'])) {
 	$ff=$f->File->new_record($ret);
 
 	$f->commit();
+
+	$tpl=gs_tpl::get_instance();
+	$tpl->template_dir=dirname(__FILE__).DIRECTORY_SEPARATOR.'../../../templates';
+	$tpl->assign('i',$f);
+	echo $tpl->fetch('li_image.html');
+	die();
 	
 	echo $f->src1('admin');
 }

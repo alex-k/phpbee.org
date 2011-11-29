@@ -22,6 +22,8 @@ class gs_widget_MultiPowUpload extends gs_widget{
 			$find[$this->params['options']['foreign_field_name'].'_hash']=$hash;
 		}
 			
+		$tpl=gs_tpl::get_instance();
+		$tpl->template_dir[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
 
 		$params=array();
 		$params['recordset']=$this->params['options']['recordset'];
@@ -30,41 +32,20 @@ class gs_widget_MultiPowUpload extends gs_widget{
 		$params['rid']=$rid;
 		$params['hash']=$hash;
 
-
-		$images=$r->find_records($find);
-		$s='<ul class="many2one_gallery" id="gallery_'.$hash.'">';
-			foreach($images as $i) {
-				$s.=sprintf('<li><a href="/admin/many2one/%s/%s/%d/%s/as_gallery/delete/%d"
-					onClick="return confirm(\'delete?\');">
-				<img src="%s"></a></li>',
-				$params['recordset'],
-				$params['foreign_field_name'],
-				$params['rid'],
-				$params['hash'],
-				$i->get_id(),
-				$i->src1('admin')
-				);
-			}
-		$s.='</ul><div class="clear"></div>';
-
-
-		/*
-		$s.=sprintf('<a href="/admin/many2one/%s/%s/%d/%s/as_gallery" target="_blank" onclick="window.open(this.href,\'_blank\',\'width=800,height=400,scrollbars=yes, resizable=yes\'); return false;" id="lMany2One_%s">%s</a>',$this->params['options']['recordset'],$this->params['options']['foreign_field_name'],$rid,$hash,$this->params['linkname'],gs_dict::get('LOAD_RECORDS'));
-		$s.=sprintf('<input type="hidden" name="%s" value="%s">', $this->params['linkname'].'_hash',$hash);
-		*/
-
-		$filename=dirname(__FILE__).DIRECTORY_SEPARATOR.'public_html'.DIRECTORY_SEPARATOR.'include.html';
-
-		$tpl=gs_tpl::get_instance();
 		$tpl->assign('params',$params);
-		//$tpl->force_compile=true;
-		//$out=$tpl->fetch('string:'.file_get_contents($filename));
-		$out=$tpl->fetch($filename);
-
-		$s.=$out;
 
 
-		return $s;
+		$images=$r->find_records($find)->orderby('group_key');
+		$g_images=array();
+		foreach($images as $i) {
+			$key=$i->group_key;
+			if (!$key) $key='nogrp';
+			$g_images[$key][]=$i;
+		}
+		$tpl->assign('images',$images);
+		$tpl->assign('g_images',$g_images);
+
+		return $tpl->fetch('widget.html');
 
 	}
 	function clean() {
@@ -72,3 +53,47 @@ class gs_widget_MultiPowUpload extends gs_widget{
 	}
 }
 
+class gs_widget_MultiPowUpload_module extends gs_base_module implements gs_module {
+	function __construct() {}
+	function install() {}
+	function get_menu() {}
+	static function get_handlers() {
+		$data=array(
+		'handler'=>array(
+			'/widgets/MultiPowUpload/action'=>array(
+				'gs_widget_MultiPowUpload_handler.action',
+				'gs_base_handler.redirect',
+			),
+		),
+		);
+		return self::add_subdir($data,dirname(__file__));
+	}
+}
+
+class gs_widget_MultiPowUpload_handler extends gs_handler {
+	function action() {
+		$this->handler_params=$this->data['handler_params'];
+		if ($this->data['gspgtype']!==GS_DATA_POST) return '';
+
+		$rs=new$this->handler_params['recordset'];
+		$options=array(
+			$this->handler_params['foreign_field_name']=>$this->handler_params['rid'],
+			'id'=>$this->data['checked_items'],
+		);
+		$this->recs=$rs->find_records($options);
+		if ($this->data['checked_items_action']=='group') $this->action_group();
+		if ($this->data['checked_items_action']=='delete') $this->action_delete();
+		return $this->recs->first();
+	}
+	function action_group() {
+		$id=array_keys($this->recs->get_values());
+		asort($id);
+		$key=implode('-',$id);
+		foreach ($this->recs as $rec) $rec->group_key=$key;
+		$this->recs->commit();
+	}
+	function action_delete() {
+		foreach ($this->recs as $rec) $rec->delete();
+		$this->recs->commit();
+	}
+}

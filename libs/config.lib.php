@@ -66,6 +66,7 @@ class gs_init {
 			uksort($h,array($this,'h_sort'));
 			$handlers[$k]=$h;
 		}
+		
 		md($handlers);
 		gs_cacher::save($handlers,'config','handlers');
 
@@ -249,6 +250,7 @@ class gs_init {
 
 		load_file($this->config->lib_dir.'core.lib.php');
 		load_file($this->config->lib_dir.'parser.lib.php');
+		load_file($this->config->lib_dir.'module.lib.php');
 		load_file($this->config->lib_dir.'handler.lib.php');
 		load_file($this->config->lib_dir.'functions.lib.php');
 	}

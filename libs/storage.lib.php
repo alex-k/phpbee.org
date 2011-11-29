@@ -272,9 +272,11 @@ abstract class gs_recordset_base extends gs_iterator {
 			return $this;
 		}
 		$options=$this->query_options['options'];
-		$index_field_name=$this->query_options['index_field_name'];
-		//$fields=$fields ? array_merge($fields,array($index_field_name)) : $this->query_options['fields'];
+		if (!isset($options['orderby']) && isset($this->orderby) && $this->orderby) {
+			$options['orderby']=array('type'=>'orderby','value'=>$this->orderby);
+		}
 
+		$index_field_name=$this->query_options['index_field_name'];
 		if (!$fields) $fields=$this->query_options['fields'];
 		if (!$fields) $fields=array();
 		$fields=array_unique(array_merge($fields,array($index_field_name)));

@@ -1,0 +1,40 @@
+{handler gspgid="widgets/MultiPowUpload/action" recordset=$params.recordset hash=$params.hash foreign_field_name=$params.foreign_field_name rid=$params.rid }
+{foreach $params as $k=>$v}
+	<input type=hidden name="{$k}" value="{$v|htmlentities}">
+{/foreach}
+<div  class="MultiPowUploadGallery" id="gallery_{$params.hash}">
+	{foreach $g_images as $images}
+		<div class=MultiPowUploadGalleryGroup>
+		{foreach $images as $i}
+		{include file="li_image.html" i=$i}
+		{/foreach}
+		</div>
+	{/foreach}
+</div>
+<div class="clear"></div>
+{if $images}
+<label><input type=radio name="checked_items_action" value="delete">Delete</label>
+<label><input type=radio name="checked_items_action" value="rotate_cw">Rotete CW</label>
+<label><input type=radio name="checked_items_action" value="rotate_ccw">Rotete CCW</label>
+<label><input type=radio name="checked_items_action" value="group">Group</label>
+<input type=button id="checked_items_submit" value="apply">
+{/if}
+
+<div id="MultiPowUpload_holder">
+<input type="button" class="MultiPowUploadStartButton" onClick="MultiPowUpload_Start();" value="UPLOAD FILES">
+</div>
+<script>
+	var params_str={$params|http_build_query|replace:'&':'|'|replace:'=':';'|json_encode}
+{foreach $params as $k=>$v}
+	var {$k}={$v|json_encode};
+{/foreach}
+</script>
+<script type="text/javascript" src="/widgets/MultiPowUpload/Extra/swfobject.js"></script>
+<script type="text/javascript" src="/widgets/MultiPowUpload/widget.js"></script>
+<link href="/widgets/MultiPowUpload/widget.css" rel="stylesheet" type="text/css">
+<!--
+<script type="text/javascript" src="/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?reset_session=true"></script>
+-->
+
+
+
