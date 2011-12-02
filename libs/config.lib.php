@@ -407,7 +407,7 @@ function cfg($name) {
 	return NULL ;
 }
 function mlog($data,$debug_level=255) {
-	if ($debug_level & DEBUG_LEVEL) {
+	if (DEBUG && ($debug_level & DEBUG_LEVEL)) {
 		$log=gs_logger::get_instance();
 		$log->log($data);
 	}
@@ -425,6 +425,7 @@ function md($output,$type=false)
 class gs_logger {
 	
 	private $messages=array();	
+	private $gmessages=array();
 	private $t,$tt;
 	function __construct() {
 		$this->tt=$this->time_start=microtime(true);
@@ -439,6 +440,10 @@ class gs_logger {
 		return $instance;
 	}
 	function log($data) {
+		$backtrace = debug_backtrace();
+		foreach ($backtrace as $trace) {
+			if ($trace['file']!==__FILE__ && isset($trace['class'])) break;
+		}
 
 			ob_start();
 			print_r($data);
@@ -446,7 +451,10 @@ class gs_logger {
 			ob_end_clean();
 
 		$t=microtime(true);
-		$this->messages[]=sprintf("%.3f/%.4f > ",$t-$this->time_start,$t-$this->tt).$txt;
+		$txt_time=sprintf("%.3f/%.4f",$t-$this->time_start,$t-$this->tt);
+		$txt_class=sprintf("%s.%s",$trace['class'],$trace['function']);
+		$this->messages[]=sprintf("%s [%s] > %s",$txt_time,$txt_class,$txt);
+		$this->gmessages[$trace['class']][$trace['function']][]=sprintf("%s > %s",$txt_time,$txt);
 		$this->tt=$t;
 		$this->log_to_file($data);
 	}
@@ -485,6 +493,9 @@ class gs_logger {
 			echo htmlentities($txt)."\n";
 		}
 		echo "\n<pre>";
+	}
+	function gmessages() {
+		return $this->gmessages;
 	}
 	static function console() {
 		$log=gs_logger::get_instance();

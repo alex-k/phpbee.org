@@ -135,7 +135,7 @@ class gs_parser {
 			if (!method_exists($handler['class_name'],$handler['method_name'])) throw new gs_exception('gs_parser.process: Handler class method not exists '.$handler['class_name'].'.'.$handler['method_name']);
 			$module_name=$handler['params']['module_name'];
 
-
+			$s_data=$this->data;
 			// --------------------- 
 			if (call_user_func(array($module_name, 'admin_auth'),$this->data,$handler['params'])===false) return false;
 			if (method_exists($handler['params']['module_name'],'auth')) {
@@ -148,6 +148,8 @@ class gs_parser {
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
 
 			$ret['last']=$ret[$h_key]=$o_h->{$handler['method_name']}($ret);
+
+			$this->data=$s_data;
 
 			$condition=isset($handler['params']['return']) ? $handler['params']['return'] : 'gs_record';
 			preg_match('/([^\&\^]+)([\&]([^\&\^]+))?([\^]([^\&\^]+))?/',$condition,$cond);
@@ -236,6 +238,7 @@ class gs_parser {
 		krsort ($data['post']);
 		return $data;
 	}
+
 	
 	
 	private function parse_handlers_data($data)

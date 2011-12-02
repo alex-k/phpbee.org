@@ -192,6 +192,7 @@ abstract class g_forms implements g_forms_interface{
 		}
 		if(is_array($ret['STATUS'])) $ret['STATUS']=!in_array(FALSE,$ret['STATUS']);
 		$this->validate_errors=$ret;
+		mlog($ret);
 		return $ret;
 
 	}

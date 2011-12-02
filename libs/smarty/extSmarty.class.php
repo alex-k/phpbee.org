@@ -6,6 +6,7 @@ if (!class_exists('Smarty',FALSE)) load_file($config->lib_tpl_dir.'Smarty.class.
 class gs_Smarty extends Smarty {
 	function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false) {
 		if(!is_string($template)) return parent::fetch($template, $cache_id , $compile_id , $parent);
+		mlog($template);
 		$id=md5($template);
 		if (!isset($this->_tpl_arr[$id])) {
 			if (!$this->templateExists($template)) {

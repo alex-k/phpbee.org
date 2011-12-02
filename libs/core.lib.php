@@ -168,12 +168,20 @@ class gs_iterator implements Iterator, arrayaccess {
     function next() {
 	    return next($this->array);
     }
+    function rand() {
+	    $rnd=rand(0,$this->count()-1);
+	    $this->rewind();
+	    for ($i=0;$i<$rnd;$i++) $this->next();
+	    return $this->current();
+    }
     function prev($cnt=null) {
 	    if ($cnt===null) return prev($this->array);
 	    $ret=$this->current();
 	    for($i=0;$i<$cnt;$i++) {
-		    $r=$this->prev();
-		    if ($r!==FALSE) $ret=$r;
+		    $ret=$this->prev();
+		    if ($ret===FALSE) {
+			    return $this->first();
+		    }
 	    }
 	    return $ret;
     }

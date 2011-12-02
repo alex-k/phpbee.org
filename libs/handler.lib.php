@@ -68,6 +68,7 @@ class gs_base_handler extends gs_handler {
 		$tpl->assign('_gsparams',$this->params);
 		if(isset($this->params['hkey'])) $tpl->assign('hdata',$data[$this->params['hkey']]);
 		if (!$tpl->templateExists($tplname)) throw new gs_exception('gs_base_handler.fetch: can not find template file for '.$tplname);
+		mlog($tplname);
 		return $tpl->fetch($tplname);
 	}
 
@@ -127,6 +128,7 @@ class gs_base_handler extends gs_handler {
 
 		if (isset($this->data['handler_params'])) {
 			try {
+				mlog($tplname);
 				$html=$tpl->fetch($tplname);
 				echo $html;
 				return;
@@ -138,6 +140,7 @@ class gs_base_handler extends gs_handler {
 		}
 		$txt=ob_get_contents();
 		ob_end_clean();
+		mlog($tplname);
 		$html=$tpl->fetch($tplname);
 		echo $html;
 		if (function_exists('memory_get_peak_usage')) mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
@@ -291,11 +294,11 @@ class gs_base_handler extends gs_handler {
 		*/
 		$tpl->assign('form',$f);
 		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
+		mlog($tplname);
 		$ret=$tpl->fetch($tplname);
 		return $ret;
 	}
 	function validate() {
-		//if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
 		if(isset($this->data['handler_params']['form_class'])) {
 			$this->params['form_class']=$this->data['handler_params']['form_class'];
 		}
@@ -310,6 +313,7 @@ class gs_base_handler extends gs_handler {
 			return $f;
 		}
 		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
+		mlog($tplname);
 		$ret=$tpl->fetch($tplname);
 		return $ret;
 	}
@@ -322,7 +326,6 @@ class gs_base_handler extends gs_handler {
 	}
 
 	function postform() {
-		//if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
 		if ($this->data['gspgtype']==GS_DATA_GET) return $this->showform();
 
 		$tpl=gs_tpl::get_instance();
@@ -346,6 +349,7 @@ class gs_base_handler extends gs_handler {
 		$tpl->assign('formfields',$f->show($validate));
 		$tpl->assign('form',$f);
 		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
+		mlog($tplname);
 		return $tpl->fetch($tplname);
 	}
 	function displayform() {
@@ -356,7 +360,6 @@ class gs_base_handler extends gs_handler {
 	}
 	function deleteform() {
 		
-		//if (!isset($this->data['gspgid_form']) || $this->data['gspgid_form']!=$this->data['gspgid']) return $this->showform();
 		if ($this->data['gspgtype']==GS_DATA_GET) return $this->showform();
 		$f=$this->get_form();
 		$f->rec->delete();
@@ -441,8 +444,6 @@ class gs_base_handler extends gs_handler {
 	}
 	function redirect_if($ret) {
 		if (!isset($this->data[$this->params['gl']])) return true;
-
-
 		$this->params['href']=call_user_func('module::gl',$this->params['gl'],$ret['last'],$this->data);
 		$this->redirect();
 		return false;
@@ -536,6 +537,7 @@ class gs_base_handler extends gs_handler {
 	static function process_handler($params,$smarty) {
 		$params['gspgid']=trim($params['gspgid'],'/');
 		$s_data=$data=$smarty->getTemplateVars('_gsdata');
+		$s_gspgid_form=$smarty->getTemplateVars('gspgid_form');
 		$s_gspgid=cfg('s_gspgid');
 		cfg_set('s_gspgid',$params['gspgid']);
 
@@ -603,8 +605,8 @@ class gs_base_handler extends gs_handler {
 		}
 		$ret_ob=ob_get_contents();
 		ob_end_clean();
-
 		$smarty->assign('_gsdata',$s_data);
+		$tpl->assign('gspgid_form',$s_gspgid_form);
 		cfg_set('s_gspgid',$s_gspgid);
 		$ret=$ret_ob.$ret;
 
