@@ -24,6 +24,7 @@ class module extends gs_base_module implements gs_module {
 				'/admin/menu'=>'admin_handler.show_menu',
 				'/filter'=>'gs_filters_handler.init',
 				'/filter/show'=>'gs_filters_handler.show',
+				'/debug'=>'debug_handler.show',
 			),
 		);
 		return self::add_subdir($data,dirname(__file__));
@@ -136,6 +137,16 @@ class form_table extends  g_forms_html {
 		parent::__construct($h,$data,$rec);
 		$this->view = new gs_glyph('helper',array('class'=>'table_submit'));
 		$this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
+	}
+}
+
+
+class debug_handler extends gs_handler {
+	function show() {
+		$tpl=gs_tpl::get_instance();
+		$log=gs_logger::get_instance();
+		$tpl->assign('gmessages',$log->gmessages());
+		return $tpl->fetch('debug.html');
 	}
 }
 ?>
