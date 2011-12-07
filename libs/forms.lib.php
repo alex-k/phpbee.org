@@ -270,11 +270,15 @@ abstract class g_forms implements g_forms_interface{
 		'|\.display|s'=>'->display',
 		);
 
-	function interact($interact) {
+	function interact($interact,$old_ret=array()) {
 		$actions=$this->interact[$interact];
 		$actions=preg_replace(array_keys($this->interact_regexps),$this->interact_regexps,$actions);
 		$interact=new form_interact($this,$interact,$actions);
-		$ret=$interact->i();
+		$ret=$interact->i($old_ret);
+		foreach ($ret as $r) {
+			$i_ret=json_decode($this->interact($r['field'],$ret));
+			$ret=array_merge($ret,$i_ret);
+		}
 		return json_encode($ret);
 	}
 }

@@ -10,7 +10,8 @@ class form_interact {
 		$this->data=$form->clean();
 		$this->value=$form->clean($interact);
 	}
-	function i() {
+	function i($ret) {
+		$this->old_ret=$ret;
 		eval($this->code);
 		return $this->actions;
 	}
@@ -20,6 +21,12 @@ class form_interact {
 		return $this;
 	}
 	function display_if($condition) {
+		foreach ($this->old_ret as $or) {
+			if ($or['field']==$this->interactname && $or['action']=='hide') {
+				$this->actions[]=array('field'=>$this->fieldname,'action'=>'hide');
+				return;
+			}
+		}
 		$this->actions[]=array('field'=>$this->fieldname,'action'=>($condition==$this->value) ? 'show' : 'hide');
 	}
 }
