@@ -28,7 +28,7 @@ class helper_label{
 	function show($label,$txt,$errors=array(),$field=array()) {
 		//$e = $errors ? '<span class="error">'.gs_dict::get('FORM_VALIDATE_ERROR').': '.implode(',',gs_dict::get($errors)).'</span>' : '';
 		$e = $errors ? '<span class="error">*</span>' : '';
-		return sprintf('<label>%s&nbsp;%s%s</label>',$label,$e,$txt);
+		return sprintf('<label class="interact_box">%s&nbsp;%s%s</label>',$label,$e,$txt);
 	}
 }
 class helper_label_br{
@@ -36,7 +36,7 @@ class helper_label_br{
 		//$e = $errors ? '<span class="error">*</span>' : '';
 		$e = $errors ? '<div class="error">'.implode(',',gs_dict::get($errors)).'</div>' : '';
 		$req= ($field['validate']=='dummyValid'  ) ? '' : '<i>*</i>';
-		return sprintf('<label>%s%s</label>%s%s',$label,$req,$txt,$e);
+		return sprintf('<span class="interact_box"><label>%s%s</label>%s%s</span>',$label,$req,$txt,$e);
 	}
 }
 class helper_dl {
@@ -47,7 +47,7 @@ class helper_dl {
 class helper_dt {
 	function show($label,$txt,$errors=array(),$field=array()) {
 		$e = $errors ? '<div class="error">Error: '.implode(',',$errors).'</div>' : '';
-		return sprintf('<dt>%s</dt><dd>%s%s</dd>',$label,$txt,$e);
+		return sprintf('<dt class="interact_box">%s</dt><dd>%s%s</dd>',$label,$txt,$e);
 	}
 }
 
@@ -68,14 +68,14 @@ class helper_empty {
 class helper_divbox{
 	function show($label,$txt,$errors=array(),$field=array()) {
 		$e = $errors ? '<span class="error">*</span>' : '';
-		return sprintf('<div class="divbox"><label>%s%s<br>%s</label></div>',$label,$e,$txt);
+		return sprintf('<div class="divbox interact_box"><label>%s%s<br>%s</label></div>',$label,$e,$txt);
 	}
 }
 
 class helper_inline {
 	function show($label,$txt,$errors=array(),$field=array()) {
 		$e = $errors ? '<span class="error">*</span>' : '';
-		return sprintf('<span class="inline"><label>%s%s%s</label></span>',$label,$txt,$e);
+		return sprintf('<span class="inline interact_box"><label>%s%s%s</label></span>',$label,$txt,$e);
 	}
 }
 
@@ -108,7 +108,7 @@ class helper_submit{
 class helper_tr {
 	function show($label,$txt,$errors=array(),$field=array()) {
 		$e = $errors ? '<div class="error">'.gs_dict::get('FORM_VALIDATE_ERROR').': '.implode(',',gs_dict::get($errors)).'</div>' : '';
-		return sprintf('<tr class="helper_tr"><td class="helper_tr_title">%s</td><td class="helper_tr_field">%s%s</td></tr>',$label,$txt,$e);
+		return sprintf('<tr class="helper_tr interact_box"><td class="helper_tr_title">%s</td><td class="helper_tr_field">%s%s</td></tr>',$label,$txt,$e);
 	}
 }
 ?>

@@ -237,6 +237,7 @@ class gs_init {
 	{
 		load_file($this->config->lib_dir.'tpl.lib.php');
 		load_file($this->config->lib_dir.'forms.lib.php');
+		load_file($this->config->lib_dir.'forms_interact.lib.php');
 		load_file($this->config->lib_dir.'widgets.lib.php');
 		$widgets=glob($this->config->lib_dir.'widgets'.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'widget.php');
 		foreach($widgets as $w) load_file($w);

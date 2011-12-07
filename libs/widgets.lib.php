@@ -16,6 +16,7 @@ abstract class gs_widget implements gs_widget_interface {
 		$this->params=$params;
 		$this->data=$data;
 		$this->tpl=gs_tpl::get_instance();
+		$this->interact=$this->params['interact'] ? ' fInteract' : '';
 	}
 	function clean() {
 		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
@@ -197,8 +198,9 @@ class gs_widget_select extends gs_widget {
 		return $ret;
 	}
 	function html($multi=false) {
-		$ret=sprintf('<select class="%s"  name="%s%s" %s>',
+		$ret=sprintf('<select class="%s %s"  name="%s%s" %s>',
 					 isset($this->params['cssclass']) ? $this->params['cssclass'] : ($multi ? 'fMultiSelect' : 'fSelect'),
+					 $this->interact,
 					 $this->fieldname,
 					 ($multi ? '[]' : ''),
 					 ($multi ? 'multiple="on"' : '')
@@ -323,8 +325,8 @@ class gs_widget_checkboxes extends gs_widget_multiselect {
 class gs_widget_checkbox extends gs_widget {
 	function html() {
 		$s=sprintf('<input type="hidden" name="%s" value="0">', $this->fieldname);
-		$s.=sprintf('<input class="%s" type="checkbox" name="%s" value="1" %s>',
-					isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fCheckbox',
+		$s.=sprintf('<input class="%s %s" type="checkbox" name="%s" value="1" %s>',
+					isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fCheckbox', $this->interact,
 					$this->fieldname,trim($this->value) ? 'checked="checked"' : '');
 		return $s;
 	}
@@ -338,7 +340,7 @@ class gs_widget_radio extends gs_widget {
 	function html() {
 		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 		foreach ($this->params['options'] as $v=>$l) {
-			$s.=sprintf('<label><input class="fRadio" type="radio" name="%s" value="%s" %s> %s </label>', $this->fieldname,htmlspecialchars($v), trim($this->value)==$v || (isset($this->params['default']) && $v==$this->params['default']) ? 'checked="checked"' : '', $l);
+			$s.=sprintf('<label><input class="fRadio %s" type="radio" name="%s" value="%s" %s> %s </label>', $this->interact, $this->fieldname,htmlspecialchars($v), trim($this->value)==$v || (isset($this->params['default']) && $v==$this->params['default']) ? 'checked="checked"' : '', $l);
 		}
 		return $s;
 	}

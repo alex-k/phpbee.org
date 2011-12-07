@@ -84,6 +84,12 @@ class gs_base_handler extends gs_handler {
 		return $this->show($ret);
 		return false;
 	}
+
+	function flush($str) {
+		while (ob_get_level()) ob_end_clean();
+		echo $str;
+		die();
+	}
 	
 	function show($ret,$nodebug=FALSE) {
 		$tpl=gs_tpl::get_instance();
@@ -306,6 +312,9 @@ class gs_base_handler extends gs_handler {
 
 		$tpl=gs_tpl::get_instance();
 		$f=$this->get_form();
+		if (isset($this->data['gsform_interact'])) {
+			$this->flush($f->interact($this->data['gsform_interact']));
+		}
 		$validate=$f->validate();
 		$tpl->assign('formfields',$f->show($validate));
 		$tpl->assign('form',$f);

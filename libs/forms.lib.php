@@ -265,6 +265,18 @@ abstract class g_forms implements g_forms_interface{
 	}
 
 
+	var $interact_regexps=array(
+		'|#(\w+)|s'=>'$this->field(\'\1\')',
+		'|\.display|s'=>'->display',
+		);
+
+	function interact($interact) {
+		$actions=$this->interact[$interact];
+		$actions=preg_replace(array_keys($this->interact_regexps),$this->interact_regexps,$actions);
+		$interact=new form_interact($this,$interact,$actions);
+		$ret=$interact->i();
+		return json_encode($ret);
+	}
 }
 
 class g_forms_html extends g_forms {
@@ -275,6 +287,7 @@ class g_forms_html extends g_forms {
 			if (!$wclass) continue;
 			$wclass="gs_widget_$wclass";
 			$v['gs_form_params']=$this->params;
+			$v['interact']=isset($this->interact[$field]);
 			$w =new $wclass($field,$this->data,$v);
 			if($v['type']=='label') {
 				$arr[$field]=array('input'=>$v['verbose_name']);
