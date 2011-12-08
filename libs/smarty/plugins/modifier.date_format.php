@@ -25,8 +25,13 @@
  * @return string |void
  * @uses smarty_make_timestamp()
  */
-function smarty_modifier_date_format($string, $format = SMARTY_RESOURCE_DATE_FORMAT, $default_date = '',$formatter='auto')
+//function smarty_modifier_date_format($string, $format = SMARTY_RESOURCE_DATE_FORMAT, $default_date = '',$formatter='auto')
+function smarty_modifier_date_format($string, $format = NULL , $default_date = '',$formatter='auto')
 {
+
+	if ($format===NULL) $format=gs_var_storage::load('multilanguage_date_format');
+	if ($format===NULL) $format=SMARTY_RESOURCE_DATE_FORMAT;
+
     /**
     * Include the {@link shared.make_timestamp.php} plugin
     */
@@ -52,10 +57,11 @@ function smarty_modifier_date_format($string, $format = SMARTY_RESOURCE_DATE_FOR
             } 
             $format = str_replace($_win_from, $_win_to, $format);
         } 
-        return strftime($format, $timestamp);
+        $ret=strftime($format, $timestamp);
     } else {
-        return date($format, $timestamp);
+        $ret=date($format, $timestamp);
     }
+    return $ret;
 } 
 
 ?>

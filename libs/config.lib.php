@@ -412,6 +412,7 @@ function mlog($data,$debug_level=255) {
 		$log=gs_logger::get_instance();
 		$log->log($data);
 	}
+	return $data;
 }
 function md($output,$type=false)
 {

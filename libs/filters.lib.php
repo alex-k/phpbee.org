@@ -19,6 +19,10 @@ class gs_filters_handler extends gs_handler {
 		$filters=gs_var_storage::load('filters');
 		return $filters[$name];
 	}
+	static function value($name) {
+		$f=self::get($name);
+		return $f ? $f->value : NULL;
+	}
 }
 class gs_filter {
 	function __construct($data) {
@@ -55,7 +59,7 @@ class gs_filter {
 				}
 		}
 		$this->va=$arr;
-		$this->value=isset($arr[$this->name]) ? $arr[$this->name] : null;
+		$this->value=isset($arr[$this->name]) ? $arr[$this->name] :(isset($this->params['default']) ? $this->params['default'] : null);
 	}
 	function applyFilter($options) {
 		return $options;

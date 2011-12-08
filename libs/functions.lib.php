@@ -27,7 +27,9 @@ function html_redirect($gspgid=null,$data=array(),$type='302', $clean_get=false)
 	if ($data) $datastr='?'.http_build_query($data);
 	switch ($type) {
 	case '302':
-		header(sprintf('Location: %s%s',$url,$datastr));
+		$ret=sprintf('Location: %s%s',$url,$datastr);
+		header($ret);
+		die();
 		break;
 	}
 }

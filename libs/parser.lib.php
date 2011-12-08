@@ -119,6 +119,7 @@ class gs_parser {
 	}
 
 	function process() {
+		mlog($this->data['gspgid']);
 		$config=gs_config::get_instance();
 		$ret=array();
 		$ret['last']= new gs_null(GS_NULL_XML);
@@ -144,7 +145,7 @@ class gs_parser {
 				if ($ret['last']===false) return false;
 			}
 			// ----------------------
-
+			mlog($handler['params']['module_name'].':'.$handler['name']);
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
 
 			$ret['last']=$ret[$h_key]=$o_h->{$handler['method_name']}($ret);
