@@ -88,13 +88,3 @@ function toggle_complex(target,items) {
 	$(items+' .toggle_item').hide();
 	return $(target);
 }
-function toggle(target,def) {
-	$(target+' .head').click(function() {
-	window['last_opened_'+target]=$(this).attr('id');
-	$(this).next().toggle();
-	return false;
-	}).next().hide();
-	$(def).show();
-	$("#"+window['last_opened_'+target]).next().show();
-	//$($(target).get(0).getAttribute('last_opened')).next().show();
-}
