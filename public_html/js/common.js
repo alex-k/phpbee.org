@@ -1,5 +1,5 @@
 jQuery(document).ready(function() { 
-	$("form").interaction();
+	$("form").interaction({startfield:'package'});
 });
 
 

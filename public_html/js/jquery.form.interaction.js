@@ -1,6 +1,8 @@
 (function($) {
 
-	var options = {};
+	var options = {
+		'startfield':false
+		};
 
 	var events = {
 		'.fRadio':'change',	
@@ -61,6 +63,10 @@
 				}
 
 			});
+	
+			if (options.startfield) {
+				$('[name='+options.startfield+']',this).each(postform);
+			}
 
 		});
 
