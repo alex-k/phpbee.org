@@ -100,6 +100,20 @@ abstract class g_forms implements g_forms_interface{
 		$this->view = new gs_glyph('helper',array('class'=>'dl'));
 		$this->view->addNode('helper',array('class'=>'dt'),array_keys($h));
 	}
+	function add_field($name,$params) {
+		if (isset($this->field_options[$name])) $params=array_merge_recursive($this->field_options[$name],$params);
+		$this->htmlforms[$name]=$params;
+		$this->view->addNode('helper',array('class'=>'dt'),array($name));
+	}
+	function set_values($arr) {
+		foreach ($arr as $name=>$value) $this->set_value($name,$value);
+	}
+	function set_value($name,$value) {
+		if (isset($this->htmlforms[$name])) $this->data[$name]=$value;
+	}
+	function set_variants($name,$variants) {
+		if (isset($this->htmlforms[$name])) $this->htmlforms[$name]['variants']=$variants;
+	}
 	function get_data($name=null) {
 		if ($name===NULL) return $this->data;
 		return isset($this->data[$name]) ? $this->data[$name] : NULL;
@@ -267,7 +281,9 @@ abstract class g_forms implements g_forms_interface{
 
 	var $interact_regexps=array(
 		'|#(\w+)|s'=>'$this->field(\'\1\')',
-		'|\.display|s'=>'->display',
+		'|\.display_if|s'=>'->display_if',
+		'|\.hide_if|s'=>'->hide_if',
+		'|\.link_values|s'=>'->link_values',
 		);
 
 	function interact($interact,$old_ret=array()) {

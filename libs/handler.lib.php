@@ -180,7 +180,132 @@ class gs_base_handler extends gs_handler {
 		$f=new $form_class_name(array(),$params,$data);
 		return $f;
 	}
+
+	static function minus_fields($hh_fields,$params,$data) {
+		$custom_fields=NULL;
+		if (isset($data['handler_params']['fields'])) $custom_fields=$data['handler_params']['fields'];
+		if (isset($params['fields'])) $custom_fields=$params['fields'];
+		if ($custom_fields) $custom_fields=explode(',',$custom_fields);
+		if (count($custom_fields)) {
+			$fields_minus=array_filter($custom_fields,create_function('$a','return substr($a,0,1)=="-";'));
+			$fields_plus=array_diff($custom_fields,$fields_minus);
+			if(count($fields_plus)) $hh_fields=$fields_plus;
+			foreach ($fields_minus as $name) unset($hh_fields[$name]);
+		}
+		return $hh_fields;
+	}
+
+	static function apply_data_widgets($f,$hh,$params,$data) {
+		$rec=$f->rec;
+		foreach ($f->htmlforms as $k=>$v) {
+			$v=$hh[$k];
+			$hhh=array($k=>$v);
+			switch($v['type']) {
+			case 'lMany2Many':
+				if (method_exists($rec->get_recordset(),'form_variants_'.$k)) {
+					$vrecs=call_user_func(array($rec->get_recordset(),'form_variants_'.$k),$rec,$data);
+				} else {
+					$rsl=$rec->init_linked_recordset($k);
+					$rsname=$rsl->structure['recordsets']['childs']['recordset'];
+					$rs=new $rsname();
+					$vrecs=$rs->find_records(array());
+				}
+				$variants=array();
+				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
+				$hh[$k]['variants']=$variants;
+				if (isset($data[$k])) {
+					unset($fields[$k]);
+					$data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
+					$rec->$k->flush($data[$k]);
+				}
+				break;
+			case 'lOne2One':
+				if ($hh[$k]['hidden']!='false' && $hh[$k]['hidden']) break;
+				if (isset($v['widget'])) {
+					$dclass='gs_data_widget_'.$v['widget'];
+					if (class_exists($dclass)) {
+						$d=new $dclass();
+						$hhh=$d->gd($rec,$k,$hhh,$params,$data);
+					}
+				}
+				break;
+			case 'lMany2One':
+				if ($v['hidden']=='true') break;
+				if (isset($v['widget'])) {
+					$dclass='gs_data_widget_'.$v['widget'];
+					if (class_exists($dclass)) {
+						$d=new $dclass();
+						$hhh=$d->gd($rec,$k,$hhh,$params,$data);
+					}
+				}
+				if (!empty($v['widget'])) {
+					break;
+				}
+				$nrs=$rec->$k;
+				$nrs->new_record();
+
+				foreach($nrs as $nobj) {
+					$f=self::get_form_for_record($nobj,$params,$data);
+					$forms=$f->htmlforms;
+					$i=intval($nobj->get_id());
+					foreach($forms as $fk=>$fv) {
+						$pfx_key="$k:$i:$fk";
+						$key="$k:$fk";
+						$f->add_field($pfx_key,$fv);
+						//$hh[$pfx_key]=$fv;
+						if(isset($data['handler_params'][$key])) {
+							$f->set_value($pfx_key,$data['handler_params'][$key]);
+							//$data['handler_params'][$pfx_key]=$data['handler_params'][$key];
+						}
+					}
+				}
+				unset($hh[$k]);
+				break;
+			default:
+				break;
+			}
+			if (isset($v['widget'])) {
+				$dclass='gs_data_widget_'.$v['widget'];
+				if (class_exists($dclass)) {
+					$d=new $dclass();
+					$hhh=$d->gd($rec,$k,$hhh,$params,$data);
+				}
+			}
+			if (isset($hhh[$k]['variants']))  $f->set_variants($k,$hhh[$k]['variants']);
+		}
+	}
+
 	static function get_form_for_record($rec,$params,$data) {
+		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
+		$f=new $form_class_name(array());
+		$f->rec=$rec;
+
+
+		$hh=$rec->get_recordset()->structure['htmlforms'];
+		$hh_fields=array_keys($hh);
+		$hh_fields=self::minus_fields($hh_fields,$params,$data);
+
+		if (!count($f->htmlforms)) foreach ($hh_fields as $name) {
+			$params=$hh[$name];
+			if (!$params['hidden']) {
+				$f->add_field($name,$params);
+			}
+		}
+
+		self::apply_data_widgets($f,$hh,$params,$data);
+
+		if(isset($data['handler_params']['_default'])) {
+			$f->set_values(string_to_params($data['handler_params']['_default']));
+		}
+		$f->set_values($rec->get_values($fields));
+		$f->set_values($data);
+
+		return $f;
+
+	}
+
+
+	static function __get_form_for_record($rec,$params,$data) {
 		$h=$rec->get_recordset()->structure['htmlforms'];
 		$hh=$h;
 		if (!isset($params['fields']) && isset($data['handler_params']['fields'])) $params['fields']=$data['handler_params']['fields'];
@@ -286,6 +411,7 @@ class gs_base_handler extends gs_handler {
 			$data=array_merge($default,$data);
 		}
 		$params['rec_id']=$rec->get_id();
+		mlog($hh);
 		$f=new $form_class_name($hh,$params,array_merge(self::implode_data($rec->get_values($fields)),$data));
 		$f->rec=$rec;
 		return $f;
