@@ -1,23 +1,29 @@
 (function($) {
 
 	var options = {
-		'startfield':false
+		'start_field':false,
+		'start_pattern':false
 		};
 
 	var events = {
 		'.fRadio':'change',	
 		'.fCheckbox':'change',	
 		'.fSelect':'change',	
+		'.lOne2One':'change',	
 		};
 	
 	$.fn.interaction= function(params) {
 		options = $.extend({}, $.fn.interaction.defaults, params);
 
-		show = function(obj) {
+		show = function(obj,d) {
 			obj.show();
 		}
-		hide= function(obj) {
+		hide= function(obj,d) {
 			obj.hide();
+		}
+
+		replace_element = function (obj,d) {
+			$('[name='+d.field+']',obj).replaceWith(d.html);
 		}
 				
 		answer = function(data) {
@@ -26,7 +32,7 @@
 				var obj=$('[name='+d.field+']');
 				var i_box=obj.closest('.interact_box');
 				if (i_box.size()) obj=i_box;
-				self[d.action](obj);
+				self[d.action](obj,d);
 			}
 		}
 		postform=function() {
@@ -64,8 +70,11 @@
 
 			});
 	
-			if (options.startfield) {
-				$('[name='+options.startfield+']',this).each(postform);
+			if (options.start_field) {
+				$('[name='+options.start_field+']',this).each(postform);
+			}
+			if (options.start_pattern) {
+				$(options.start_pattern,this).each(postform);
 			}
 
 		});
