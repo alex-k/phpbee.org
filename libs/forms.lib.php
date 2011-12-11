@@ -82,7 +82,6 @@ class gs_glyph {
 
 abstract class g_forms implements g_forms_interface{
 	function __construct($h,$params=array(),$data=array()) {
-		//md($h,1);
 		if (!is_array($data)) $data=array();
 		$this->params=$params;
 		$this->clean_data=array();
@@ -110,6 +109,9 @@ abstract class g_forms implements g_forms_interface{
 	}
 	function set_value($name,$value) {
 		if (isset($this->htmlforms[$name])) $this->data[$name]=$value;
+	}
+	function force_set_value($name,$value) {
+		$this->data[$name]=$value;
 	}
 	function set_variants($name,$variants) {
 		if (isset($this->htmlforms[$name])) $this->htmlforms[$name]['variants']=$variants;
@@ -194,7 +196,8 @@ abstract class g_forms implements g_forms_interface{
 			}
 			if (!isset($h['validate'])) $h['validate']='notEmpty';
 			$validate=is_array($h['validate']) ? $h['validate'] : array($h['validate']);
-			$h['validate_params']['rec_id']=$this->params['rec_id'];
+			//$h['validate_params']['rec_id']=$this->params['rec_id'];
+			$h['validate_params']['rec_id']= ($this->rec) ? $this->rec->get_id() : null; 
 			foreach ($validate as $v) {
 				$vname='gs_validate_'.$v;
 				$val=new $vname();

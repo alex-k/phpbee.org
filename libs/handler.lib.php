@@ -105,8 +105,8 @@ class gs_base_handler extends gs_handler {
 
 
 		$language=false;
-		if (!$lang) $language=gs_var_storage::load('multilanguage_lang');
-		if (!$lang) $language=gs_session::load('multilanguage_lang');
+		if (!$language) $language=gs_var_storage::load('multilanguage_lang');
+		if (!$language) $language=gs_session::load('multilanguage_lang');
 
 		if ($language) {
 			$langs=languages();
@@ -117,7 +117,7 @@ class gs_base_handler extends gs_handler {
 					$newtplname=dirname($tplname).DIRECTORY_SEPARATOR.$language.DIRECTORY_SEPARATOR.(basename($tplname));
 					if (file_exists($newtplname)) {
 						$tplname=$newtplname;
-						$dir=$tpl->getTemplateDir();
+						$old_tpl_dir=$dir=$tpl->getTemplateDir();
 						if (!is_array($dir)) $dir=array($dir);
 						array_unshift($dir,'.',dirname($newtplname));
 						$tpl->setTemplateDir($dir);
@@ -149,6 +149,7 @@ class gs_base_handler extends gs_handler {
 		mlog($tplname);
 		$html=$tpl->fetch($tplname);
 		echo $html;
+		//if (isset($old_tpl_dir)) $tpl->setTemplateDir($old_tpl_dir);
 		if (function_exists('memory_get_peak_usage')) mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
 		if (DEBUG && !$nodebug) {
 			$g=gs_logger::get_instance();
@@ -189,8 +190,10 @@ class gs_base_handler extends gs_handler {
 		if (count($custom_fields)) {
 			$fields_minus=array_filter($custom_fields,create_function('$a','return substr($a,0,1)=="-";'));
 			$fields_plus=array_diff($custom_fields,$fields_minus);
+			$fields_minus=array_map(create_function('$a','return substr($a,1);'),$fields_minus);
 			if(count($fields_plus)) $hh_fields=$fields_plus;
-			foreach ($fields_minus as $name) unset($hh_fields[$name]);
+			//if ($fields_minus) foreach ($hh_fields as $k=>$v)  if (in_array($v,$fields_minus)) unset($hh_fields[$k]);
+			foreach ($fields_minus as $name) unset($hh_fields[array_search($name,$hh_fields)]);
 		}
 		return $hh_fields;
 	}
@@ -276,10 +279,17 @@ class gs_base_handler extends gs_handler {
 	}
 
 	static function get_form_for_record($rec,$params,$data) {
+
+		$default_values=array();
+		if(isset($data['handler_params']['_default'])) {
+			$default_values=string_to_params($data['handler_params']['_default']);
+		}
+		$rec->fill_values($default_values);
+
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
 		$f=new $form_class_name(array());
 		$f->rec=$rec;
-
+		$f->force_set_value($rec->get_recordset()->id_field_name,$rec->get_id());
 
 		$hh=$rec->get_recordset()->structure['htmlforms'];
 		$hh_fields=array_keys($hh);
@@ -292,12 +302,14 @@ class gs_base_handler extends gs_handler {
 			}
 		}
 
+
+
 		self::apply_data_widgets($f,$hh,$params,$data);
 
-		if(isset($data['handler_params']['_default'])) {
-			$f->set_values(string_to_params($data['handler_params']['_default']));
-		}
-		$f->set_values($rec->get_values($fields));
+		$fields=$rec->get_recordset()->id_field_name.','.implode(',',$hh_fields);
+
+		$f->set_values($default_values);
+		$f->set_values(self::implode_data($rec->get_values($fields)));
 		$f->set_values($data);
 
 		return $f;
