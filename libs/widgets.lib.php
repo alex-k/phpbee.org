@@ -9,7 +9,8 @@ interface gs_widget_interface {
 	function validate();
 }
 abstract class gs_widget implements gs_widget_interface {
-	function __construct($fieldname,$data,$params=array()) {
+	function __construct($fieldname,$data,$params=array(),$form=NULL) {
+		$this->form=$form;
 		$this->validate_errors=NULL;
 		$this->fieldname=$fieldname;
 		$this->value=is_string($fieldname) && isset($data[$fieldname]) ? $data[$fieldname] : NULL;
@@ -32,6 +33,7 @@ abstract class gs_widget implements gs_widget_interface {
 		return sprintf('<input class="gs_widget" type="text" name="%s" value="%s"%s>', $this->fieldname,trim($this->value),(isset($this->params['readonly']) && $this->params['readonly']) ? 'disabled="disabled"' : '');
 	}
 }
+
 class gs_widget_label extends gs_widget {
 	function html() {
 		return $this->value;

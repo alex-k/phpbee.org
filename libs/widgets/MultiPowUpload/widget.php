@@ -31,6 +31,7 @@ class gs_widget_MultiPowUpload extends gs_widget{
 		$params['foreign_field_name']=$this->params['options']['foreign_field_name'];
 		$params['rid']=$rid;
 		$params['hash']=$hash;
+		$params[$params['linkname'].'_hash']=$hash;
 
 		$tpl->assign('params',$params);
 

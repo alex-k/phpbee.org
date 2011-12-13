@@ -7,78 +7,6 @@ interface g_forms_interface {
 	function clean();
 	function get_data($name=NULL);
 }
-class gs_glyph {
-	private $tagName;
-	private $parent=NULL;
-	private $children=array();
-	private $attributes=array();
-	function __construct($name='',$attributes=array()) {
-		$this->tagName=$name;
-		foreach ($attributes as $k=>$v) {
-			$this->addAttribute($k,$v);
-		}
-	}
-	function setParent($obj) {
-		$this->parent=$obj;
-	}
-	function addNode($name,$attributes=array(),$childs=array()) {
-		$node=$this->addChild($name);
-		foreach ($attributes as $k=>$v) {
-			$node->addAttribute($k,$v);
-		}
-		foreach ($childs as $k=>$v) {
-			$node->addNode('field',array('name'=>$v));
-		}
-		return $node;
-	}
-	function addAttribute($k,$v) {
-		$this->attributes[$k]=$v;
-	}
-	function addChild($name) {
-		$c= is_object($name) && is_a($name,'gs_glyph') ? $name :  new gs_glyph($name);
-		$c->setParent($this);
-		$this->children[]=$c;
-		return $c;
-	}
-	function replaceNode($new) {
-		$this->parent->replaceChild($this,$new);
-	}
-	function replaceChild($old,$new) {
-		$k=array_search($old,$this->children);
-		if ($k) {
-			$this->children[$k]=$new;
-			$new->setParent($this);
-		}
-	}
-	function removeNode(&$nodes) {
-		if (!is_array($nodes)) $nodes=array($nodes);
-		foreach ($this->children as $k=>$c) {
-			$c->removeNode($nodes);
-			if (in_array($c,$nodes)) {
-				$c->setParent(NULL);
-				unset($this->children[$k]);
-			}
-		}
-		return $nodes;
-	}
-	function __get($name) {
-		return isset($this->attributes[$name]) ? $this->attributes[$name] : NULL;
-	}
-	function getName() {
-		return $this->tagName;
-	}
-	function children() {
-		return $this->children;
-	}
-	function find($name,$value) {
-		$ret=array();
-		if (strpos($this->$name,$value)===0) $ret[]=&$this;
-		foreach ($this->children as $c) {
-			$ret=array_merge($ret,$c->find($name,$value));
-		}
-		return $ret;
-	}
-}
 
 abstract class g_forms implements g_forms_interface{
 	function __construct($h,$params=array(),$data=array()) {
@@ -180,7 +108,7 @@ abstract class g_forms implements g_forms_interface{
 			if(empty($wclass)) continue;
 			$wclass='gs_widget_'.$wclass;
 			$h['gs_form_params']=$this->params;
-			$w =new $wclass($k,$this->data,$h);
+			$w =new $wclass($k,$this->data,$h,$this);
 			$value=null;
 			try {
 				$value=$w->clean();
@@ -311,7 +239,7 @@ class g_forms_html extends g_forms {
 			$wclass="gs_widget_$wclass";
 			$v['gs_form_params']=$this->params;
 			$v['interact']=isset($this->interact[$field]);
-			$w =new $wclass($field,$this->data,$v);
+			$w =new $wclass($field,$this->data,$v,$this);
 			if($v['type']=='label') {
 				$arr[$field]=array('input'=>$v['verbose_name']);
 				continue;
@@ -442,4 +370,76 @@ class g_forms_label extends  g_forms_html {
 }
 
 
+class gs_glyph {
+	private $tagName;
+	private $parent=NULL;
+	private $children=array();
+	private $attributes=array();
+	function __construct($name='',$attributes=array()) {
+		$this->tagName=$name;
+		foreach ($attributes as $k=>$v) {
+			$this->addAttribute($k,$v);
+		}
+	}
+	function setParent($obj) {
+		$this->parent=$obj;
+	}
+	function addNode($name,$attributes=array(),$childs=array()) {
+		$node=$this->addChild($name);
+		foreach ($attributes as $k=>$v) {
+			$node->addAttribute($k,$v);
+		}
+		foreach ($childs as $k=>$v) {
+			$node->addNode('field',array('name'=>$v));
+		}
+		return $node;
+	}
+	function addAttribute($k,$v) {
+		$this->attributes[$k]=$v;
+	}
+	function addChild($name) {
+		$c= is_object($name) && is_a($name,'gs_glyph') ? $name :  new gs_glyph($name);
+		$c->setParent($this);
+		$this->children[]=$c;
+		return $c;
+	}
+	function replaceNode($new) {
+		$this->parent->replaceChild($this,$new);
+	}
+	function replaceChild($old,$new) {
+		$k=array_search($old,$this->children);
+		if ($k) {
+			$this->children[$k]=$new;
+			$new->setParent($this);
+		}
+	}
+	function removeNode(&$nodes) {
+		if (!is_array($nodes)) $nodes=array($nodes);
+		foreach ($this->children as $k=>$c) {
+			$c->removeNode($nodes);
+			if (in_array($c,$nodes)) {
+				$c->setParent(NULL);
+				unset($this->children[$k]);
+			}
+		}
+		return $nodes;
+	}
+	function __get($name) {
+		return isset($this->attributes[$name]) ? $this->attributes[$name] : NULL;
+	}
+	function getName() {
+		return $this->tagName;
+	}
+	function children() {
+		return $this->children;
+	}
+	function find($name,$value) {
+		$ret=array();
+		if (strpos($this->$name,$value)===0) $ret[]=&$this;
+		foreach ($this->children as $c) {
+			$ret=array_merge($ret,$c->find($name,$value));
+		}
+		return $ret;
+	}
+}
 ?>

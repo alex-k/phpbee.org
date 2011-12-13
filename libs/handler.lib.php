@@ -164,17 +164,20 @@ class gs_base_handler extends gs_handler {
 			$classname=$params['classname'];
 			$obj=new $classname;
 			$fields=array_keys($obj->structure['fields']);
+
+			$options=array();
+			foreach($data['handler_params'] as $hk=>$hv) {
+				if (isset($obj->structure['fields'][$hk])) $options[$hk]=$hv;
+			}
+
 			if ($id && is_numeric($id)) {
-				$options=array();
 				$options[$obj->id_field_name]=$id;
-				foreach($data['handler_params'] as $hk=>$hv) {
-					if (isset($obj->structure['fields'][$hk])) $options[$hk]=$hv;
-				}
 				//$rec=$obj->get_by_id($id,$fields);
 				$rec=$obj->find_records($options,$fields)->first(true);
 			} else {
 				$rec=$obj->new_record();
 			}
+			$rec->fill_values($options);
 			return self::get_form_for_record($rec,$this->params,$this->data);
 		}
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
@@ -182,7 +185,7 @@ class gs_base_handler extends gs_handler {
 		return $f;
 	}
 
-	static function minus_fields($hh_fields,$params,$data) {
+	static function minus_fields($hh_fields,$params,$data,$hh) {
 		$custom_fields=NULL;
 		if (isset($data['handler_params']['fields'])) $custom_fields=$data['handler_params']['fields'];
 		if (isset($params['fields'])) $custom_fields=$params['fields'];
@@ -194,6 +197,16 @@ class gs_base_handler extends gs_handler {
 			if(count($fields_plus)) $hh_fields=$fields_plus;
 			//if ($fields_minus) foreach ($hh_fields as $k=>$v)  if (in_array($v,$fields_minus)) unset($hh_fields[$k]);
 			foreach ($fields_minus as $name) unset($hh_fields[array_search($name,$hh_fields)]);
+		}
+		foreach ($hh as $key=>$hh_f) {
+			//if ($hh_f['type']=='private') $hh_fields[$key]=$key;
+			if (strpos($key,':')!==FALSE) {
+				$n=explode(':',$key);
+				if ($n[0]=='Lang' && isset($n[2]) && ($k=array_search($n[2],$hh_fields))) {
+					array_splice($hh_fields,$k,1,array($hh_fields[$k],$key));
+				}
+			}
+
 		}
 		return $hh_fields;
 	}
@@ -241,6 +254,9 @@ class gs_base_handler extends gs_handler {
 						$hhh=$d->gd($rec,$k,$hhh,$params,$data);
 					}
 				}
+				if (isset($v['options']['mode']) && $v['options']['mode']=='link') {
+					$f->add_field($v['linkname'].'_hash', array('type'=>'private','validate'=>'dummyValid'));
+				}
 				if (!empty($v['widget'])) {
 					break;
 				}
@@ -271,7 +287,7 @@ class gs_base_handler extends gs_handler {
 				$dclass='gs_data_widget_'.$v['widget'];
 				if (class_exists($dclass)) {
 					$d=new $dclass();
-					$hhh=$d->gd($rec,$k,$hhh,$params,$data);
+					$hhh=$d->gd($rec,$k,$hhh,$params,$data,$f);
 				}
 			}
 			if (isset($hhh[$k]['variants']))  $f->set_variants($k,$hhh[$k]['variants']);
@@ -293,7 +309,8 @@ class gs_base_handler extends gs_handler {
 
 		$hh=$rec->get_recordset()->structure['htmlforms'];
 		$hh_fields=array_keys($hh);
-		$hh_fields=self::minus_fields($hh_fields,$params,$data);
+		$hh_fields=self::minus_fields($hh_fields,$params,$data,$hh);
+
 
 		if (!count($f->htmlforms)) foreach ($hh_fields as $name) {
 			$params=$hh[$name];

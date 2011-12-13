@@ -226,6 +226,7 @@ class field_interface {
 			$structure['fields'][$fname.'_hash']=array('type'=>'varchar','options'=>16);
 			$structure['htmlforms'][$fname.'_hash']=array(
 			'type'=>'hidden',
+			'widget'=>'private',
 			'validate'=>'dummyValid'
 		);
 		}
@@ -272,6 +273,7 @@ class field_interface {
 		if (isset($opts['index_field_name'])) $structure['recordsets'][$field]['index_field_name']=$opts['index_field_name'];
 		$structure['htmlforms'][$field.'_hash']=array(
 			'type'=>'hidden',
+			'widget'=>'private',
 			'validate'=>'dummyValid'
 		);
 		if($opts['counter']) {
@@ -339,9 +341,9 @@ class field_interface {
 }
 
 class gs_rs_links extends gs_recordset{
-		public $handler_cache_status=2;
+	public $handler_cache_status=2;
         public $id_field_name='id';
-		private $links=array();
+	private $links=array();
         public $structure=array(
                 'fields'=>array(
                         'id'=>array('type'=>'serial'),
@@ -620,6 +622,7 @@ class %s extends gs_recordset_i18n {
 				$id_name=$st['foreign_field_name'];
 				$root_name=$l.'_hash';
 				$hash_name=$st['foreign_field_name'].'_hash';
+
 				/*foreach ($this as $record) {
 					$ret=$record->find_childs($l,array($hash_name=>$record->$root_name,$id_name=>0));
 				}*/
