@@ -30,11 +30,11 @@ class module_wizard extends gs_base_module implements gs_module {
 		$data=array(
 		'handler'=>array(
 			'/admin/form/wz_modules'=>array(
-				'gs_base_handler.post:{name:form.html:classname:wz_modules:form_class:form_admin}',
+				'gs_base_handler.post:{name:admin_form.html:classname:wz_modules:form_class:g_forms_table}',
 				'gs_base_handler.redirect_up',
 			),
 			'/admin/form/wz_recordsets'=>array(
-				'gs_base_handler.post:{name:form.html:classname:wz_recordsets:form_class:form_admin}',
+				'gs_base_handler.post:{name:admin_form.html:classname:wz_recordsets:form_class:g_forms_table}',
 				'gs_base_handler.redirect_up:level:2',
 			),
 			'/admin/form/wz_recordset_links'=>array(
@@ -56,7 +56,7 @@ class module_wizard extends gs_base_module implements gs_module {
 				'gs_base_handler.redirect_up:level:1',
 			),
 			'/admin/form/wz_recordset_submodules'=>array(
-				'gs_base_handler.post:{name:form.html:classname:wz_recordset_submodules:form_class:form_admin}',
+				'gs_base_handler.post:{name:admin_form.html:classname:wz_recordset_submodules:form_class:g_forms_table}',
 				'gs_base_handler.redirect_up',
 			),
 			'/admin/form/wz_urls'=>array(
@@ -66,7 +66,7 @@ class module_wizard extends gs_base_module implements gs_module {
 				'gs_base_handler.redirect_up',
 			),
 			'/admin/form/wz_handlers'=>array(
-				'gs_base_handler.post:{name:form.html:classname:wz_handlers:form_class:form_admin}',
+				'gs_base_handler.post:{name:admin_form.html:classname:wz_handlers:form_class:g_forms_table}',
 				'gs_base_handler.redirect_up',
 			),
 			'/admin/wizard/templates'=>array(

@@ -3,7 +3,7 @@ require_once('module.php');
 abstract class tw_images extends gs_recordset_handler {
 	var $no_urlkey=1;
 	function src1($params,$record=null) {
-		return reset($this->src($params,$record));
+		return trim(reset($this->src($params,$record)));
 	}
 	function src($params,$record=null) {
 		$records=$record ? array($record) : $this;

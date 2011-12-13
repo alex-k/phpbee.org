@@ -138,7 +138,7 @@ class handler_registry extends gs_base_handler {
 		$r=registry::i($rec);
 		$a=$r->$name;
 		if ($a && isset($a[$value])) unset($a[$value]);
-		if ($a) $r->$name=$a;
+		$r->$name=$a;
 		return $rec;
 	}
 
