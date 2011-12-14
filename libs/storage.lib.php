@@ -406,6 +406,15 @@ abstract class gs_recordset_base extends gs_iterator {
 		return $r;
 	}
 
+	public function remove($ids=array()) {
+		foreach ($this as $key=>$rec) {
+			if (in_array($rec->get_id(),$ids)) {
+				$this->remove_element($rec);
+			}
+		}
+		return $this;
+	}
+
 	public function install() {
 		if (isset($this->structure['type']) && $this->structure['type']=='view') {
 			foreach($this->structure['recordsets'] as $rs_name) {

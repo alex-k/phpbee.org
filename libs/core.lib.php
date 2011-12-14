@@ -114,6 +114,22 @@ class gs_iterator implements Iterator, arrayaccess {
 		return $this;	
     }
 
+    function remove_element($element) {
+	    if (get_class($element)=='gs_record') {
+		    foreach ($this->array as $k=>$el) {
+			    if ($el===$element) {
+				    unset($this->array[$k]);
+				    break;
+			    }
+		    }
+	    } else {
+		    if (isset($this->array[$element])) {
+			    unset($this->array[$element]);
+		    }
+	    }
+	    return $this;
+    }
+
     function add($elements,$id=NULL) {
 	    if (is_subclass_of($elements,'gs_iterator') || is_array($elements)) {
 		    foreach($elements as $e) {
