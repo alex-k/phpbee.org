@@ -18,10 +18,24 @@ class module extends gs_base_module implements gs_module {
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
 				'/admin/window_form'=>'admin_handler.many2one:{name:window_form.html}',
 				'/admin/many2one'=>'admin_handler.many2one:{name:many2one.html}',
+				'/admin/logout'=>array(
+					  'admin_handler.post_logout:return:true',
+					  'gs_base_handler.redirect',
+					),
 				'*'=>'gs_base_handler.show404:{name:404.html}',
 			),
 			'handler'=>array(
 				'/admin/menu'=>'admin_handler.show_menu',
+				'/admin/login'=>array(        
+					  'admin_handler.check_login:return:true^show', 
+					  'show'=> 'gs_base_handler.show:name:admin_login.html', 
+				  ),              
+				 '/admin/form/login'=>array(
+					  'admin_handler.post_login:return:true:form_class:form_admin_login',
+					  'gs_base_handler.redirect',
+				  ),
+
+
 				'/filter'=>'gs_filters_handler.init',
 				'/filter/show'=>'gs_filters_handler.show',
 				'/debug'=>'debug_handler.show',
@@ -44,8 +58,59 @@ class module extends gs_base_module implements gs_module {
 }
 
 
+class form_admin_login extends g_forms_html {
+	function __construct($hh,$params=array(),$data=array()) {
+		$hh=array(
+			'admin_user_name' => Array
+				(
+					'type' => 'input',
+					'verbose_name'=>'login',
+				),
+			'admin_password' => Array
+				(
+					'type' => 'password',
+					'verbose_name'=>'password',
+				),
+
+		 );
+		 return parent::__construct($hh,$params,$data);
+	}
+}
+
+
 
 class admin_handler extends gs_base_handler {
+	function check_login($data) {
+		$rec=gs_session::load('login_gs_admin');
+		if(isset($this->data['handler_params']['assign'])) {
+			gs_var_storage::save($this->data['handler_params']['assign'],$rec);
+		}
+		if(isset($this->params['assign'])) {
+			gs_var_storage::save($this->params['assign'],$rec);
+		}
+		return $rec;
+	}
+	function post_logout($data) {
+		$rec=$this->check_login();
+		gs_session::clear('login_gs_admin');
+		return true;
+	}
+
+	function post_login($data) {
+		$bh=new gs_base_handler($this->data,$this->params);
+		$f=$bh->validate();
+		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+
+		$rec=FALSE;
+
+		$d=$f->clean();
+		if (cfg('admin_user_name')==$d['admin_user_name'] && cfg('admin_password')==$d['admin_password']) {
+			$rec=$d;
+		}
+		if (!$rec) return $this->showform();
+		gs_session::save($rec,'login_gs_admin');
+		return true;
+	}
 	function show_menu () {
 		$init=new gs_init('auto');
 		$init->load_modules();

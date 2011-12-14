@@ -1,0 +1,9 @@
+{$manager=$_gsstack.last}
+{if $manager}
+<a href="/admin/logout">logout</a>
+{else}
+<form method=post>
+{handler gspgid="/admin/form/login" }
+<input type=submit value="login">
+</form>
+{/if}

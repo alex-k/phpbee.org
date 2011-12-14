@@ -39,6 +39,8 @@
 	//$this->languages='tw_languages';
 
 	$this->admin_ip_access=explode(',','127.0.0.1,192.168.1.102');
+	$this->admin_user_name='admin';
+	$this->admin_password='admin';
 
 	DEFINE ('DEBUG',1);
 ?>
