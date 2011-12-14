@@ -562,7 +562,14 @@ class gs_data_widget_include_form {
 					$data['handler_params'][$pfx_key]=$data['handler_params'][$key];
 				}
 
+				if ($params['form']) {
+					$params['form']->add_field($pfx_key,$fv);
+				}
+
 			}
+		}
+		if ($params['form']) {
+			$params['form']->remove_field($k);
 		}
 		unset($hh[$k]);
 		return $hh;

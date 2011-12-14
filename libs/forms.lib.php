@@ -32,6 +32,9 @@ abstract class g_forms implements g_forms_interface{
 		$this->htmlforms[$name]=$params;
 		$this->view->addNode('helper',array('class'=>'dt'),array($name));
 	}
+	function remove_field($name) {
+		unset($this->htmlforms[$name]);
+	}
 	function set_values($arr) {
 		foreach ($arr as $name=>$value) $this->set_value($name,$value);
 	}

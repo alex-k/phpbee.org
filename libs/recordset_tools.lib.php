@@ -233,7 +233,7 @@ class field_interface {
 		$structure['htmlforms'][$fname]=array(
 			'type'=>'lOne2One',
 			'linkname'=>$field,
-			'hidden'=>$opts['hidden'],
+			'hidden'=>$opts['hidden'] && strtolower($opts['hidden'])!='false',
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
 			'nulloption'=>(isset($opts['nulloption']) && $opts['nulloption'] && strtolower($opts['nulloption'])!='false') ? explode(':',$opts['nulloption']) : false ,

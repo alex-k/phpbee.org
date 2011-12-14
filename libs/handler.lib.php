@@ -212,6 +212,7 @@ class gs_base_handler extends gs_handler {
 	}
 
 	static function apply_data_widgets($f,$hh,$params,$data) {
+		$params['form']=$f;
 		$rec=$f->rec;
 		foreach ($f->htmlforms as $k=>$v) {
 			$v=$hh[$k];
@@ -291,6 +292,13 @@ class gs_base_handler extends gs_handler {
 				}
 			}
 			if (isset($hhh[$k]['variants']))  $f->set_variants($k,$hhh[$k]['variants']);
+			/*
+			foreach ($hhh as $k=>$p) {
+				if (!isset($hh[$k])) {
+					$f->add_field($k,$p);
+				}
+			}
+			*/
 		}
 	}
 
@@ -312,6 +320,8 @@ class gs_base_handler extends gs_handler {
 		$hh_fields=self::minus_fields($hh_fields,$params,$data,$hh);
 
 
+
+		
 		if (!count($f->htmlforms)) foreach ($hh_fields as $name) {
 			$params=$hh[$name];
 			if (!$params['hidden']) {
