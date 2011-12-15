@@ -1,4 +1,13 @@
 <?php
+	$this->install_key=''; // run site.com/install.php?install_key=12345
+	$this->admin_ip_access='127.0.0.1, 192.168.1.102';
+	$this->admin_user_name='admin';
+	$this->admin_password='admin';
+
+	DEFINE ('DEBUG',0);
+	
+	$this->admin_ip_access=array_map('trim',explode(',',$this->admin_ip_access));
+
 	$this->gs_connectors=array (
 			'mysql'=>array( 
 				'db_type'=>'mysql',
@@ -38,9 +47,5 @@
 	//$this->languages=array('ru'=>'RUS','en'=>'ENG');
 	//$this->languages='tw_languages';
 
-	$this->admin_ip_access=explode(',','127.0.0.1,192.168.1.102');
-	$this->admin_user_name='admin';
-	$this->admin_password='admin';
 
-	DEFINE ('DEBUG',1);
 ?>
