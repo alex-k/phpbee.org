@@ -375,7 +375,7 @@ class gs_config {
 	}
 
 	function check_install_key() {
-		if (!isset($this->install_key) || $this->install_key!=$_REQUEST['install_key'])
+		if (!isset($this->install_key) || empty($this->install_key) || $this->install_key!=$_REQUEST['install_key'])
 			throw new gs_exception('Incorrect install_key. Check config.php and run '.$this->host.'/install.php?install_key=12345 to continue.');
 	}
 
