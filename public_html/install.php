@@ -6,6 +6,8 @@ if (class_exists('Phar',0) && file_exists(dirname(__FILE__).'/../gs_libs.phar.gz
 }
 $gs_node_id=1;
 $init=new gs_init('user');
+$cfg=gs_config::get_instance();
+$cfg->check_install_key();
 $init->init(LOAD_CORE | LOAD_STORAGE | LOAD_TEMPLATES | LOAD_EXTRAS);
 
 $init->clear_cache();
