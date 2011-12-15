@@ -194,14 +194,20 @@ class form_admin extends  g_forms_html {
 	function __construct($h,$data=array(),$rec=null)  {
 		parent::__construct($h,$data,$rec);
 		$this->view = new gs_glyph('helper',array('class'=>'table_admin'));
-		$this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
+		$this->addNode(array_keys($h));
+	}
+	function addNode($name) {
+		$this->view->addNode('helper',array('class'=>'tr'),$name);
 	}
 }
 class form_table extends  g_forms_html {
 	function __construct($h,$data=array(),$rec=null)  {
 		parent::__construct($h,$data,$rec);
 		$this->view = new gs_glyph('helper',array('class'=>'table_submit'));
-		$this->view->addNode('helper',array('class'=>'tr'),array_keys($h));
+		$this->addNode(array_keys($h));
+	}
+	function addNode($name) {
+		$this->view->addNode('helper',array('class'=>'tr'),$name);
 	}
 }
 
