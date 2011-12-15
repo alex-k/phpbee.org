@@ -67,8 +67,10 @@ class gs_init {
 			$handlers[$k]=$h;
 		}
 		
-		md($handlers);
+		$txt=md($handlers);
 		gs_cacher::save($handlers,'config','handlers');
+		file_put_contents(cfg('var_dir').DIRECTORY_SEPARATOR.'urls_handlers.txt',$txt);
+
 
 		$cl_array=array();
 
@@ -367,6 +369,9 @@ class gs_config {
 		error_reporting(E_ALL ^E_NOTICE);
 		}
 
+		if (!isset($this->install_key) || $this->install_key!=$_REQUEST['install_key'])
+			throw new gs_exception('Incorrect install_key. Check config.php and run '.$this->host.'/install.php?install_key=12345 to continue.');
+
 	}
 
 	function register_module($name) {
@@ -410,7 +415,8 @@ function cfg($name) {
 function mlog($data,$debug_level=255) {
 	if (DEBUG && ($debug_level & DEBUG_LEVEL)) {
 		$log=gs_logger::get_instance();
-		$log->log($data);
+		$txt=$log->log($data);
+		return $txt;
 	}
 	return $data;
 }
@@ -420,8 +426,7 @@ function md($output,$type=false)
 		$txt=htmlentities(print_r($output,true));
 		echo "<pre>\n".$txt."</pre>\n";
 	} else {
-		$log=gs_logger::get_instance();
-		mlog($output);
+		return mlog($output);
 	}
 }
 class gs_logger {
@@ -459,6 +464,7 @@ class gs_logger {
 		$this->gmessages[$trace['class']][$trace['function']][]=sprintf("%s > %s",$txt_time,$txt);
 		$this->tt=$t;
 		$this->log_to_file($data);
+		return $txt;
 	}
 	private function log_to_file($data) {
 		if (cfg('log_file')) {

@@ -250,7 +250,7 @@ class gs_iterator implements Iterator, arrayaccess {
 class gs_cacher {
 
 	static function save($data,$subdir='.',$id=NULL) {
-		$dirname=cfg('cache_dir').'/'.$subdir.'/';
+		$dirname=cfg('cache_dir').DIRECTORY_SEPARATOR.$subdir.DIRECTORY_SEPARATOR;
 		check_and_create_dir($dirname);
 		if (!$id) {
 			$fn=tempnam($dirname,'');
@@ -262,19 +262,19 @@ class gs_cacher {
 		return $id;
 	}
 	static function load($id,$subdir='.') {
-		$dirname=cfg('cache_dir').'/'.$subdir.'/'.$id;
+		$dirname=cfg('cache_dir').DIRECTORY_SEPARATOR.$subdir.DIRECTORY_SEPARATOR.$id;
 		if (!file_exists($dirname)) return NULL;
 		$ret=unserialize(file_get_contents($dirname));
 		return $ret;
 	}
 	static function clear($id,$subdir='.') {
-		$dirname=cfg('cache_dir').'/'.$subdir.'/'.$id;
+		$dirname=cfg('cache_dir').DIRECTORY_SEPARATOR.$subdir.DIRECTORY_SEPARATOR.$id;
 		return file_exists($dirname) && unlink($dirname);
 	}
 	static function cleardir($subdir=false) {
 		if (!$subdir) return false;
-		$dirname=cfg('cache_dir').'/'.$subdir;
-		foreach (glob("$dirname/*") as $filename) {
+		$dirname=cfg('cache_dir').DIRECTORY_SEPARATOR.$subdir;
+		foreach (glob($dirname.DIRECTORY_SEPARATOR."*") as $filename) {
 			unlink($filename);
 		}
 		return file_exists($dirname) && is_dir($dirname) && rmdir($dirname);
