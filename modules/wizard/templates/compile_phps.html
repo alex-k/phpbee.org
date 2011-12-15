@@ -131,7 +131,8 @@ class <*$form->classname*> extends <*$form->extends*>{
 			    <*if $f->cssclass*>     'cssclass'=>'<*$f->cssclass*>',<*/if*>
 			    <*if $f->default_value*>    'default'=>'<*$f->default_value*>',<*/if*>
 			    <*if $f->readonly_field*>     'readonly'=>'<*$f->readonly_field*>',<*/if*>
-			    <*if $f->options*>     'options'=>'<*$f->options*>',<*/if*>
+			    <*if $f->options*>     'options'=>'<*$f->options|escape:quotes*>',<*/if*>
+			    <*if $f->extra_options*>     <*$f->extra_options*>,<*/if*>
 			    'validate' => Array 
 			    	(
 				<*foreach $f->Validators as $v*>
@@ -149,6 +150,13 @@ class <*$form->classname*> extends <*$form->extends*>{
 			),
 			<*/foreach*>
 		);
+
+
+		    <*foreach $form->Fields->orderby('cnt') as $f*>
+			    <*if $f->interact*>
+			    $this->interact["<*$f->name*>"]='<*$f->interact|escape:quotes*>';
+			    <*/if*>
+		    <*/foreach*>
 		return parent::__construct($hh,$params,$data);
 	}
 

@@ -517,16 +517,16 @@ class gs_wizard_strategy_form extends g_forms_inline{
 }
 class gs_wizard_forms_form extends g_forms_table {
 	function __construct($hh,$params=array(),$data=array()) {
-		$hh['extends']['options']=class_members('g_forms');
-		$hh['extends']['default']='g_forms_label';
+		$this->field_options['extends']['options']=class_members('g_forms');
+		$this->field_options['extends']['default']='g_forms_label';
 		return parent::__construct($hh,$params,$data);
 	}
 }
 class gs_wizard_form_fields_form extends g_forms_table {
 	function __construct($hh,$params=array(),$data=array()) {
 		$widgets=str_replace('gs_widget_','',class_members('gs_widget'));
-		$hh['widget']['options']=array_combine($widgets,$widgets);
-		$hh['widget']['default']='input';
+		$this->field_options['widget']['options']=array_combine($widgets,$widgets);
+		$this->field_options['widget']['default']='input';
 		return parent::__construct($hh,$params,$data);
 	}
 }
@@ -538,8 +538,8 @@ class gs_wizard_form_fields_validators_form extends g_forms_table {
 			$o=new $v;
 			$options[$o->get_name()]=$o->description();
 		}
-		$hh['class']['options']=$options;
-		$hh['class']['default']='notEmpty';
+		$this->field_options['class']['options']=$options;
+		$this->field_options['class']['default']='notEmpty';
 		return parent::__construct($hh,$params,$data);
 	}
 }

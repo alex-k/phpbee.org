@@ -29,6 +29,9 @@ class wz_recordsets extends gs_recordset_short {
 		'no_urlkey'=>"fCheckbox 'No URL key' default=1",
 		'orderby'=>"fString 'order by' required=false default='id'",
 		),$init_opts);
+		$this->structure['fkeys']=array(
+			array('link'=>'Module','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
+		);
 	}
 }
 
@@ -198,6 +201,9 @@ class wz_urls extends gs_recordset_short {
 		'Module'=>'lOne2One wz_modules Module widget="parent_list"',
 		'Handlers'=>"lMany2One wz_handlers:Url",
 		),$init_opts);
+		$this->structure['fkeys']=array(
+			array('link'=>'Module','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
+		);
 	}
         function check_unique($field,$value,$params,$record=null) {
 		$recs=$this->find_records(array($field=>$value));
@@ -248,9 +254,11 @@ class wz_form_fields extends gs_recordset_short {
 		'default_value'=>"fString default required=false",
 		'readonly_field'=>"fCheckbox readonly",
 		'options'=>"fString options required=false",
+		'extra_options'=>"fString extra_options required=false",
 		'cnt'=> "fInt cnt required=false",
 		'Form'=>'lOne2One wz_forms',
 		'Validators'=>"lMany2One wz_form_fields_validators:Field",
+		'interact'=>'fText "interactive" required=false',
 		),$init_opts);
 		$this->structure['fkeys']=array(
 			array('link'=>'Form','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
