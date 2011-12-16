@@ -249,8 +249,12 @@ h5 {
 	width:100%;
 }
 
-input[type=submit] {
+input[type=submit], input[type=button] {
 	border:1px solid #a0a0a0;
+	background: -webkit-gradient(linear, left top, left bottom, from(#f0f0f0), to(#e0e0e0));   
+	background: -moz-linear-gradient(top,  #f0f0f0,  #e0e0e0); 
+	background: -o-linear-gradient(top,  #f0f0f0,  #e0e0e0); 
+	box-shadow: 0 0 3px #e0e0e0;
 	cursor:pointer;
 }
 
@@ -269,7 +273,7 @@ input[type=submit] {
 	text-align:right;
 }
 
-input.fString {
+input.fString, input.fPassword {
 	width:90%;
 	border:1px solid #a0a0a0;
 }
@@ -433,4 +437,12 @@ textarea.big_text {
 }
 .fMultiSelect {
 	height:50px;
+}
+.admin-login-form {
+	width: 300px;
+	padding: 20px;
+	margin: auto;
+	margin-top: 200px;
+	border: 1px solid #e0e0e0;
+	box-shadow: 0 0 10px #e0e0e0;
 }

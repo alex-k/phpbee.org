@@ -21,6 +21,9 @@
 		hide= function(obj,d) {
 			obj.hide();
 		}
+		set_value= function(obj,d) {
+			$('[name='+d.field+']',obj).val(d.value);
+		}
 
 		replace_element = function (obj,d) {
 			$('[name='+d.field+']',obj).replaceWith(d.html);

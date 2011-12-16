@@ -1,4 +1,5 @@
 $(document).ready (function () {
+	$("form").interaction();
 	$(".lMany2Many").gs_multiselect();
 	$(".fMultiSelect").gs_multiselect();
 $(".lOne2One").sel_filter( {slide_width: 150, min_options: 1, crop: false});

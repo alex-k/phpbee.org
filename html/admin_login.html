@@ -2,8 +2,11 @@
 {if $manager}
 <a href="/admin/logout">logout</a>
 {else}
+<div class="admin-login-form">
+<h3>Please login</h3>
 <form method=post>
 {handler gspgid="/admin/form/login" }
 <input type=submit value="login">
 </form>
+</div>
 {/if}

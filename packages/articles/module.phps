@@ -38,7 +38,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 			'last'=>'gs_base_handler.show',
 			'short_list'=>'gs_base_handler.show:{name:news_short_list.html}',
 			'/admin/form/tw{%$MODULE_NAME%}'=>array(
-					'gs_base_handler.post:{name:form.html:form_class:g_forms_table:classname:tw{%$MODULE_NAME%}:form_class:form_admin:return:gs_record}',
+					'gs_base_handler.post:{name:admin_form.html:form_class:g_forms_table:classname:tw{%$MODULE_NAME%}}',
 					'gs_base_handler.redirect',
 					),
 		),
