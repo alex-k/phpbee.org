@@ -27,8 +27,6 @@ class form_interact {
 				return;
 			}
 		}
-		var_dump($condition);
-		var_dump($this->value);
 		$str='$res= ($condition '.$eq.' $this->value );';
 		eval($str);
 		$this->actions[]=array('field'=>$this->fieldname,'action'=>$res ? 'show' : 'hide');
@@ -47,6 +45,9 @@ class form_interact {
 		$html=($this->form->get_input($this->fieldname));
 		//$html=$this->form->get_inputs();
 		$this->actions[]=array('field'=>$this->fieldname,'action'=>'replace_element','html'=>$html);
+	}
+	function copy_value($condition) {
+		$this->actions[]=array('field'=>$this->fieldname,'action'=>'set_value','value'=>$this->value);
 	}
 }
 

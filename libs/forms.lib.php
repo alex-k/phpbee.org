@@ -221,6 +221,7 @@ abstract class g_forms implements g_forms_interface{
 		'|\.display_if|s'=>'->display_if',
 		'|\.hide_if|s'=>'->hide_if',
 		'|\.link_values|s'=>'->link_values',
+		'|\.copy_value|s'=>'->copy_value',
 		);
 
 	function interact($interact,$old_ret=array()) {
