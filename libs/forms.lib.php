@@ -48,7 +48,24 @@ abstract class g_forms implements g_forms_interface{
 		$this->data[$name]=$value;
 	}
 	function set_variants($name,$variants) {
-		if (isset($this->htmlforms[$name])) $this->htmlforms[$name]['variants']=$variants;
+		$this->set_option($name,'variants',$variants);
+	}
+	function set_option($name,$option,$value) {
+		if (isset($this->htmlforms[$name])) $this->htmlforms[$name][$option]=$value;
+	}
+	function set_option_allfields($option,$value) {
+		foreach ($this->htmlforms as $field=>$h) {
+			$this->set_option($field,$option,$value);
+		}
+	}
+	function set_error_template($str) {
+		$this->error_template=$str;
+	}
+	function set_error_message_field($field,$type,$message) {
+		$this->error_field_messages[$field][$type]=$message;
+	}
+	function set_error_message($type,$message) {
+		$this->error_messages[$type]=$message;
 	}
 	function get_data($name=null) {
 		if ($name===NULL) return $this->data;
@@ -57,7 +74,7 @@ abstract class g_forms implements g_forms_interface{
 	function show_arr($validate=array(),$view=NULL) {
 		if (!$validate) $validate=$this->validate_errors;
 		$arr=array();
-		$inputs=$this->_prepare_inputs();
+		$this->_prepare_inputs();
 		if($view===NULL) $view=$this->view;
 		$hclass='helper_'.$view->class;
 		$helper=new $hclass();
@@ -70,7 +87,7 @@ abstract class g_forms implements g_forms_interface{
 				$name=(string)$e->name;
 				if (!isset($this->htmlforms[$name])) continue;
 				$field=$this->htmlforms[$name];
-				$value=$inputs[$name];
+				$value=$this->_inputs[$name];
 				if ($field['type']=='private') continue;
 
 				if ($field['type']=='hidden' || (isset($field['widget']) && $field['widget']=='hidden')) {
@@ -155,7 +172,8 @@ abstract class g_forms implements g_forms_interface{
 		return http_build_query($arr);
 	}
 	function get_inputs() {
-		$inputs=$this->_prepare_inputs();
+		$this->_prepare_inputs();
+		$inputs=$this->_inputs;
 		if (isset($this->validate_errors['FIELDS'])) foreach ($this->validate_errors['FIELDS'] as $f=>$e) {
 			$inputs[$f]['errors']=$e;
 		}
@@ -181,6 +199,24 @@ abstract class g_forms implements g_forms_interface{
 	}
 	function get_error($field) {
 		return isset($this->validate_errors['FIELDS'][$field]) ? $this->validate_errors['FIELDS'][$field] :array();
+	}
+	function get_error_template($field, $only_first_error=TRUE) {
+		$e=$this->get_error($field);
+		$ret='';
+		if ($e && $this->error_template) {
+
+			if ($only_first_error) $e=array(reset($e));
+
+			foreach($e as $t) {
+				$ret.=' ';
+				if (isset($this->error_field_messages[$field][$t])) { $ret.=$this->error_field_messages[$field][$t]; continue;}
+				if (isset($this->error_messages[$t])) { $ret.=$this->error_messages[$t]; continue;}
+				$ret.=$t;
+			}
+
+			return sprintf($this->error_template,$ret);
+		}
+		return implode($e);
 	}
 	function add_helper_clone($fieldname) {
 		$posts=$this->view->find("name",$fieldname);
@@ -256,11 +292,14 @@ class g_forms_html extends g_forms {
 						);
 		}
 		$this->_inputs=$arr;
-		return $arr;
+		//return $arr;
 	}
 	function as_dl($delimiter="\n",$validate=array(),$inputs=null,$outstr='<dl class="row"><dt><label for="%s">%s%s</label></dt> <dd><div>%s</div>%s</dd> </dl>'){
 		$arr=array();
-		if($inputs===null) $inputs=$this->_prepare_inputs();
+		if($inputs===null) {
+			$this->_prepare_inputs();
+			$inputs=$this->_inputs();
+		}
 		foreach($inputs as $field=>$v)  {
 			$e="";
 			if (isset($validate['FIELDS'][$field])) {
@@ -286,8 +325,8 @@ class g_forms_html extends g_forms {
 	}
 	function as_table($delimiter="\n"){
 		$arr=array();
-		$inputs=$this->_prepare_inputs();
-		foreach($inputs as $field=>$v) 
+		$this->_prepare_inputs();
+		foreach($this->_inputs as $field=>$v) 
 			$arr[]=sprintf('<tr><td><label for="%s">%s</label></td><td>%s</td></tr>',$field, $v['label'],$v['input']);
 
 		return implode($delimiter,$arr);
@@ -295,8 +334,8 @@ class g_forms_html extends g_forms {
 	function as_list(){}
 	function as_labels($delimiter="<br/>\n",$suffix=':',$validate=array()){
 		$arr=array();
-		$inputs=$this->_prepare_inputs();
-		foreach($inputs as $field=>$v) {
+		$this->_prepare_inputs();
+		foreach($this->_inputs as $field=>$v) {
 			$e="";
 			if (isset($validate['FIELDS'][$field])) {
 				$e='<div class="error">Поле '.$v['label'].' не может быть пустым.</div>';
@@ -309,8 +348,8 @@ class g_forms_html extends g_forms {
 	
 	function as_inline($delimiter=" \n",$validate=array()){
 		$arr=array();
-		$inputs=$this->_prepare_inputs();
-		foreach($inputs as $field=>$v) 
+		$this->_prepare_inputs();
+		foreach($this->_inputs as $field=>$v) 
 			$arr[]=sprintf('<div class="inline"><div>%s</div>%s</div>',$v['label'],$v['input']);
 
 		return implode($delimiter,$arr);
@@ -329,7 +368,8 @@ class g_forms_jstpl extends g_forms_html {
 						'input'=>$w->js()
 						);
 		}
-		return $arr;
+		$this->_inputs=$arr;
+		//return $arr;
 	}
 }
 

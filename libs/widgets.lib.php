@@ -18,6 +18,7 @@ abstract class gs_widget implements gs_widget_interface {
 		$this->data=$data;
 		$this->tpl=gs_tpl::get_instance();
 		$this->interact=$this->params['interact'] ? ' fInteract' : '';
+		$this->placeholder=isset($this->params['placeholder']) ? 'placeholder="'.$this->params['placeholder'].'"' : '';
 	}
 	function clean() {
 		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
@@ -30,7 +31,9 @@ abstract class gs_widget implements gs_widget_interface {
 		return $this->html();
 	}
 	function html() {
-		return sprintf('<input class="gs_widget" type="text" name="%s" value="%s"%s>', $this->fieldname,trim($this->value),(isset($this->params['readonly']) && $this->params['readonly']) ? 'disabled="disabled"' : '');
+		return sprintf('<input class="%s" type="text" name="%s" value="%s" %s  %s>', 
+			isset($this->params['cssclass']) ? $this->params['cssclass'] : 'widget',
+			$this->fieldname,trim($this->value),(isset($this->params['readonly']) && $this->params['readonly']) ? 'disabled="disabled"' : '', $this->placeholder);
 	}
 }
 
@@ -46,9 +49,10 @@ class gs_widget_input extends gs_widget {
 	function html() {
 		$value=$this->value;
 		if (is_string($this->value)) $value=htmlspecialchars(trim($this->value));
-		return sprintf('<input class="%s" type="text" name="%s" value="%s">',
+		return sprintf('<input class="%s" type="text" name="%s" value="%s" %s>',
 					   isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fString',
-					   $this->fieldname,$value);
+					   $this->fieldname,$value, $this->placeholder
+					   );
 	}
 }
 class gs_widget_number extends gs_widget {
@@ -69,7 +73,19 @@ class gs_widget_password2 extends gs_widget {
 	function html() {
 		$f2=$this->fieldname.'_repeat';
 		$v2=isset($this->data[$f2]) ? $this->data[$f2] : '';
-		return sprintf('<input class="fPassword" type="password" name="%s" value="%s"%s></td><td class="helper_tr_error"></td></tr><tr class="helper_tr"><td class="helper_tr_title">%s</td><td class="helper_tr_field"><input class="fPassword" type="password" name="%s_repeat" value="%s"%s>', $this->fieldname,trim($this->value),$this->params['readonly'] ? 'disabled="disabled"' : '',gs_dict::get('REPEAT_PASSWORD'),$this->fieldname,($this->value==$v2) ? $this->value : '',$this->params['readonly'] ? 'disabled="disabled"' : '');
+		return sprintf('<input class="fPassword %s" type="password" name="%s" value="%s" %s %s></td><td class="helper_tr_error"></td></tr><tr class="helper_tr"><td class="helper_tr_title">%s</td><td class="helper_tr_field"><input class="fPassword %s" type="password" name="%s_repeat" value="%s" %s %s>',
+		isset($this->params['cssclass']) ? $this->params['cssclass'] : '',
+		$this->fieldname,
+		trim($this->value),
+		$this->params['readonly'] ? 'disabled="disabled"' : '',
+		$this->placeholder,
+		$this->params['verbose_name2']? $this->params['verbose_name2'] : gs_dict::get('REPEAT_PASSWORD'),
+		isset($this->params['cssclass']) ? $this->params['cssclass'] : '',
+		$this->fieldname,
+		($this->value==$v2) ? $this->value : '',
+		$this->params['readonly'] ? 'disabled="disabled"' : '',
+		$this->params['placeholder2'] ? 'placeholder="'.$this->params['placeholder2'].'"' : ''
+		);
 	}
 
 	function validate() {
@@ -82,7 +98,9 @@ class gs_widget_password2 extends gs_widget {
 
 class gs_widget_password extends gs_widget {
 	function html() {
-		return sprintf('<input class="fPassword" type="password" name="%s" value="%s">', $this->fieldname,htmlspecialchars(trim($this->value)));
+		return sprintf('<input class="fPassword %s" type="password" name="%s" value="%s" %s>',
+			isset($this->params['cssclass']) ? $this->params['cssclass'] : '',
+			$this->fieldname,htmlspecialchars(trim($this->value)), $this->placeholder);
 	}
 }
 class gs_widget_hidden extends gs_widget {
@@ -176,7 +194,9 @@ class gs_widget_image extends gs_widget_file {
 
 class gs_widget_datetime extends gs_widget {
 	function html() {
-		return sprintf('<input class="fDateTime" type="text" name="%s" value="%s">', $this->fieldname,htmlspecialchars(trim($this->value)));
+		return sprintf('<input class="%s fDateTime" type="text" name="%s" value="%s" %s>',
+			isset($this->params['cssclass']) ? $this->params['cssclass'] : ' ',
+			$this->fieldname,htmlspecialchars(trim($this->value)), $this->placeholder);
 	}
 	function clean() {
 		return date('Y-m-d H:i:s',strtotime(!empty($this->value) ? $this->value : 'now' ));

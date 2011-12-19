@@ -73,11 +73,16 @@ class gs_base_handler extends gs_handler {
 	}
 
 	function validate_gl() {
-		$url=trim(call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v']),'/');
-		/*md($this->data,1);
+		$ret=call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v']);
+		/*
+		var_dump($ret);
+		$url=trim($ret,'/');
+		md($this->data,1);
 		var_dump($url);
-		md($_SERVER,1);*/
-		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/'));
+		md($_SERVER,1);
+		die();
+		*/
+		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/') || $ret===TRUE);
 	}
 	function show404($ret) {
 		header("HTTP/1.0 404 Not Found");
@@ -310,8 +315,9 @@ class gs_base_handler extends gs_handler {
 		}
 		$rec->fill_values($default_values);
 
+
 		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
-		$f=new $form_class_name(array());
+		$f=new $form_class_name(array(),$params,$data);
 		$f->rec=$rec;
 		$f->force_set_value($rec->get_recordset()->id_field_name,$rec->get_id());
 
@@ -328,6 +334,7 @@ class gs_base_handler extends gs_handler {
 				$f->add_field($name,$params);
 			}
 		}
+
 
 
 
