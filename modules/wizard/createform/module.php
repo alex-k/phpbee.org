@@ -238,6 +238,9 @@ class form_createform extends form_admin{
 		);
 		
 		$i=0;
+
+		$rset=new $rs->name;
+		$hh=$rset->structure['htmlforms'];
 		foreach ($hh as $key=>$h) {
 			$i++;
 			$arr=$farr;

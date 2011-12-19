@@ -26,11 +26,11 @@
 				<a href="/admin/wizard/urls/clone/{$url.id}"><img src="/i/admin/ico_copy.png" alt="копировать" title="копировать" class="icon"></a>
 				<a href="/admin/wizard/urls/{$module.id}/modify/{$url.id}#form"><img src="/i/admin/ico_edit.png" class="icon"></a>
 				
-				<ul>
+				<ul style="dispaly: block; width:500px; overflow: auto;">
 				{foreach from=$url.Handlers->orderby('cnt') item=h}
-					<li -data-href="/admin/wizard/handlers/{$url.id}/handlers/{$h.id}#form">
+					<li -data-href="/admin/wizard/handlers/{$url.id}/handlers/{$h.id}#form" >
 						{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}
-						{$h.handler_value|wordwrap:80:' ':1}
+						{$h.handler_value}
 						{*
 						<a href="/admin/wizard/module/{$module.id}/tpl/{$h.id}">tpl</a>
 						*}

@@ -43,6 +43,14 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 		return self::add_subdir($data,dirname(__file__));
 	}
 
+	static function gl($alias,$rec) {
+		$fname=dirname(__FILE__).DIRECTORY_SEPARATOR.'gl.php';
+		if (file_exists($fname)) {
+			$x=include($fname);
+			return $x;
+		}
+	}
+
 	/*
 	static function gl($alias,$rec) {
 		if(!is_object($rec)) {
