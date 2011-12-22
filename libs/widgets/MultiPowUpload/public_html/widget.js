@@ -8,12 +8,14 @@
 		name: "MultiPowUpload"
 	};
 
-	
+
 	var flashvars = {
-      "language.autoDetect": "true",
-	  "serialNumber": "0081661701492178151138183160131275818427540204",
-	  "uploadUrl": "/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true&",
+	  "language.autoDetect": "true",
+	  //"serialNumber": "0081661701492178151138183160131275818427540204",
+	  //"serialNumber": "put your serial number here",
+	  "uploadUrl": "/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",//&"+params_url,
 	  "customPostFields":params_str,
+	  //"customPostFields": "paramname1;paramvalue1|paramname2;paramvalue2",
 	  "removeUploadedFilesFromList": "true",
 	  //"uploadUrl": "http://demo.element-it.com/Examples/multipow/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",
 	  "fileFilter.types":"Images|*.jpg:*.jpeg:*.gif:*.png:*.bmp",

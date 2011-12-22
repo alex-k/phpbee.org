@@ -23,8 +23,9 @@
 <div id="MultiPowUpload_holder">
 <input type="button" class="MultiPowUploadStartButton" onClick="MultiPowUpload_Start();" value="UPLOAD FILES">
 </div>
+{$params.str}
 <script>
-	var params_str={$params|http_build_query|replace:'&':'|'|replace:'=':';'|json_encode}
+	var params_str={$params_str}
 {foreach $params as $k=>$v}
 	var {$k}={$v|json_encode};
 {/foreach}

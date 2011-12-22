@@ -11,16 +11,30 @@ if (!class_exists('gs_base_handler',0)) {
 
 
 if(isset($_FILES['Filedata'])) {
-	$rs_name=$_REQUEST['recordset'];
-	$f_name=$_REQUEST['foreign_field_name'];
+	/*
+	$params=gs_session::load('MultiPowUpload_params');
+	*/
+
+	$params=$_REQUEST;
+
+	/*
+	$params=array_merge($params,$_REQUEST);
+	md($params,1);
+	md($_REQUEST,1);
+	md($_GET,1);
+	md($_POST,1);
+	die();
+	*/
+	$rs_name=$params['recordset'];
+	$f_name=$params['foreign_field_name'];
 	$f_hash_name=$f_name.'_hash';
 	
 
 	$f=new $rs_name;
 	$f=$f->new_record();
 
-	$f->$f_hash_name=$_REQUEST['hash'];
-	$f->$f_name=$_REQUEST['rid'];
+	$f->$f_hash_name=$params['hash'];
+	$f->$f_name=$params['rid'];
 
 	$values=$_FILES['Filedata'];
 

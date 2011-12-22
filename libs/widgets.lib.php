@@ -675,7 +675,7 @@ class gs_widget_lMany2Many_checkboxes extends gs_widget {
 		}
 		$ret="<input type=\"hidden\" name=\"".$this->fieldname."\" value=\"0\">";
 		$ret.="<span>";
-		foreach ($this->params['variants'] as $k=>$v) {
+		if (isset($this->params['variants'])) foreach ($this->params['variants'] as $k=>$v) {
 			$ret.=sprintf("<label class=\"lMany2Many_checkbox\"><input type=\"checkbox\" name=\"%s[]\" value=\"%d\" %s>%s</label>\n",$this->fieldname,$k, (is_array($this->value) && (in_array($k,$this->value) || array_key_exists($k,$this->value))) ? 'checked="checked"' : '',$v);
 		}
 		$ret.="</span>";

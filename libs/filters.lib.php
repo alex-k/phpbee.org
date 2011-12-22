@@ -422,7 +422,8 @@ class gs_filter_select_records extends gs_filter {
 
 	}
 	function current() {
-		return $this->value &&  $this->recordset[$this->value] ? $this->recordset[$this->value] : $this->recordset->first();
+		$ret=$this->value &&  $this->recordset[$this->value] ? $this->recordset[$this->value] : $this->recordset->first();
+		return $ret;
 	}
 	function applyFilter($options,$rs) {
 		$options[]=array(

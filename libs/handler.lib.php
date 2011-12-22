@@ -97,6 +97,7 @@ class gs_base_handler extends gs_handler {
 	}
 	
 	function show($ret,$nodebug=FALSE) {
+
 		$tpl=gs_tpl::get_instance();
 
 		if (empty($this->params['name'])) {
@@ -203,6 +204,7 @@ class gs_base_handler extends gs_handler {
 			//if ($fields_minus) foreach ($hh_fields as $k=>$v)  if (in_array($v,$fields_minus)) unset($hh_fields[$k]);
 			foreach ($fields_minus as $name) unset($hh_fields[array_search($name,$hh_fields)]);
 		}
+		/*
 		foreach ($hh as $key=>$hh_f) {
 			//if ($hh_f['type']=='private') $hh_fields[$key]=$key;
 			if (strpos($key,':')!==FALSE) {
@@ -213,6 +215,7 @@ class gs_base_handler extends gs_handler {
 			}
 
 		}
+		*/
 		return $hh_fields;
 	}
 
@@ -309,6 +312,7 @@ class gs_base_handler extends gs_handler {
 
 	static function get_form_for_record($rec,$params,$data) {
 
+
 		$default_values=array();
 		if(isset($data['handler_params']['_default'])) {
 			$default_values=string_to_params($data['handler_params']['_default']);
@@ -326,11 +330,10 @@ class gs_base_handler extends gs_handler {
 		$hh_fields=self::minus_fields($hh_fields,$params,$data,$hh);
 
 
-
 		
 		if (!count($f->htmlforms)) foreach ($hh_fields as $name) {
 			$params=$hh[$name];
-			if (!$params['hidden']) {
+			if (!$params['hidden'] && !isset($data['handler_params'][$name])) {
 				$f->add_field($name,$params);
 			}
 		}
@@ -777,7 +780,9 @@ class gs_base_handler extends gs_handler {
 		$o_p=gs_parser::get_instance($data,isset($params['gspgtype']) ? $params['gspgtype'] : 'handler');
 		if (isset($params['scope'])) {
 			$hndl=$o_p->get_current_handler();
-			if ($hndl['params']['module_name']!=$params['scope']) return '';
+			if ($hndl['params']['module_name']!=$params['scope']) {
+				return '';
+			}
 		}
 		ob_start();
 		try {

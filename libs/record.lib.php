@@ -258,6 +258,8 @@ class gs_record implements arrayaccess {
 					$default_lang=key($langs);
 					array_shift($langs);
 					if ($langs && $language!=$default_lang) {
+						//return ('11');
+
 						$l=$this->__get('Lang');
 						if ($l[$language]) return $l[$language]->$name;
 					}

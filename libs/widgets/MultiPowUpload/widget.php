@@ -33,8 +33,9 @@ class gs_widget_MultiPowUpload extends gs_widget{
 		$params['hash']=$hash;
 		$params[$params['linkname'].'_hash']=$hash;
 
+		$params_str=json_encode(str_replace(array('&','='),array('|',';'),http_build_query($params)));
 		$tpl->assign('params',$params);
-
+		$tpl->assign('params_str',$params_str);
 
 		$images=$r->find_records($find)->orderby('group_key');
 		$g_images=array();

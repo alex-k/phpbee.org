@@ -451,6 +451,14 @@ class gs_logger {
 		}
 		return $instance;
 	}
+	static function udplog($msg) {
+		$addr=gethostbyname('ping.phpbee.org');
+		$fp = fsockopen("udp://$addr", 8080, $errno, $errstr);
+		if ($fp) {
+			fwrite($fp, "$msg");
+			fclose($fp);
+		}
+	}
 	function log($data) {
 		$backtrace = debug_backtrace();
 		foreach ($backtrace as $trace) {
