@@ -13,4 +13,3 @@ $init->init(LOAD_CORE);
 $o_h=new gs_parser($init->data);
 $o_h->process();
 
-?>
