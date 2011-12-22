@@ -6,7 +6,7 @@
 
 	DEFINE ('DEBUG',0);
 	
-	$this->admin_ip_access=array_map('trim',explode(',',$this->admin_ip_access));
+	$this->admin_ip_access=isset($this->admin_ip_access) ? array_map('trim',explode(',',$this->admin_ip_access)) : array();
 
 	$this->gs_connectors=array (
 			'mysql'=>array( 
