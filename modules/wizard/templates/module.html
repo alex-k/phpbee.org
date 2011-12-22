@@ -86,7 +86,10 @@
 		<h3><a href="/admin/wizard/forms/{$module.id}">forms</a>  </h3>
 		<ul>
 		{foreach from=$module.forms->orderby('classname') item=rs}
-			<li><a href="/admin/wizard/form_fields/{$rs.id}">{$rs.classname}</a> </li>
+			<li>
+			<a href="/admin/wizard/form_fields/{$rs.id}">{$rs.classname}</a> 
+			<a href="/admin/wizard/forms/{$module.id}/form1/{$rs.id}"><img src="/i/admin/ico_edit.png" alt="Редактировать"  class="icon" title="Редактировать"></a>
+			</li>
 		{/foreach}
 		</ul>
 	</td>
