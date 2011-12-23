@@ -1,4 +1,4 @@
-<?
+<?php
 
 class gs_widget_MultiPowUpload extends gs_widget{
 	function html() {
