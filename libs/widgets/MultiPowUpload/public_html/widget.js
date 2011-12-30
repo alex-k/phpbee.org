@@ -11,7 +11,7 @@
 
 	var flashvars = {
 	  "language.autoDetect": "true",
-	  //"serialNumber": "0081661701492178151138183160131275818427540204",
+	  "serialNumber": "00823632444116221712318214925491291871610181",
 	  //"serialNumber": "put your serial number here",
 	  "uploadUrl": "/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",//&"+params_url,
 	  "customPostFields":params_str,
