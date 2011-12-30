@@ -465,9 +465,9 @@ class gs_base_handler extends gs_handler {
 		$f->rec=$rec;
 		return $f;
 	}
-	function showform() {
+	function showform($f=null) {
 		$tpl=gs_tpl::get_instance();
-		$f=$this->get_form();
+		if (!$f) $f=$this->get_form();
 		$tpl->assign('formfields',$f->show());
 		/*
 		$tpl->assign('forminputs',$f->get_inputs());
@@ -884,6 +884,15 @@ class gs_base_handler extends gs_handler {
 	}
 
 	function post_login($data) {
+		$rec=$this->post_find_record($data);
+		if (!is_object($rec) || !is_a($rec,'gs_record')) return $rec;
+
+		gs_session::save($rec->get_id(),'login_'.$this->params['classname']);
+		$h=new handler_registry;
+		$h->after_login($rec);
+		return $rec;
+	}
+	function post_find_record($data) {
 		$bh=new gs_base_handler($this->data,$this->params);
 		$f=$bh->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
@@ -901,11 +910,11 @@ class gs_base_handler extends gs_handler {
 		$rec=$rs->find_records($d)->first();
 
 
-		if (!$rec) return $this->showform();
+		if (!$rec) {
+			$f->trigger_error('FORM_ERROR','REC_NOTFOUND');
+			return $this->showform($f);
+		}
 
-		gs_session::save($rec->get_id(),'login_'.$rsname);
-		$h=new handler_registry;
-		$h->after_login($rec);
 		return $rec;
 	}
 

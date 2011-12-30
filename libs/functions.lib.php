@@ -158,7 +158,9 @@ if (!function_exists('pmail')) {
 
 function bee_mail($to,$subj,$text,$from='') {
 	$mail=new html_mime_mail();
-	$mail->headers = $mail->headers.sprintf("From: support@%s\r\n",$_SERVER['HTTP_HOST']);
+	$from=cfg('support_email_address');
+	if (!$from) $from="support@".$_SERVER['HTTP_HOST'];
+	$mail->headers = $mail->headers.sprintf("From: %s\r\n",$from );
 	//$subj=iconv( 'UTF-8', 'KOI8-R', $subject );
 	$mail->add_html($text);
 	$mail->build_message('koi8');

@@ -110,9 +110,12 @@ class gs_widget_hidden extends gs_widget {
 }
 class gs_widget_text extends gs_widget {
 	function html() {
-		return sprintf('<textarea class="%s" name="%s">%s</textarea>',
+		return sprintf('<textarea class="%s" name="%s" %s>%s</textarea>',
 					   isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fText',
-					   $this->fieldname,trim($this->value));
+					   $this->fieldname,
+					   $this->placeholder,
+					   trim($this->value)
+					   );
 	}
 }
 

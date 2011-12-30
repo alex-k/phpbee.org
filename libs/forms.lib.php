@@ -35,6 +35,9 @@ abstract class g_forms implements g_forms_interface{
 		$this->htmlforms[$name]=$params;
 		$this->addNode(array($name));
 	}
+	function get_fields() {
+		return $this->htmlforms;
+	}
 	function remove_field($name) {
 		unset($this->htmlforms[$name]);
 	}
@@ -50,8 +53,12 @@ abstract class g_forms implements g_forms_interface{
 	function set_variants($name,$variants) {
 		$this->set_option($name,'variants',$variants);
 	}
-	function set_option($name,$option,$value) {
-		if (isset($this->htmlforms[$name])) $this->htmlforms[$name][$option]=$value;
+	function get_option($field,$option) {
+		return (isset($this->htmlforms[$field][$option])) ? $this->htmlforms[$field][$option] : NULL;
+	}
+
+	function set_option($field,$option,$value) {
+		if (isset($this->htmlforms[$field])) $this->htmlforms[$field][$option]=$value;
 	}
 	function set_option_allfields($option,$value) {
 		foreach ($this->htmlforms as $field=>$h) {
@@ -199,6 +206,9 @@ abstract class g_forms implements g_forms_interface{
 	}
 	function get_error($field) {
 		return isset($this->validate_errors['FIELDS'][$field]) ? $this->validate_errors['FIELDS'][$field] :array();
+	}
+	function trigger_error($field,$error) {
+		$this->error($this->validate_errors,$field,$error);
 	}
 	function get_error_template($field, $only_first_error=TRUE) {
 		$e=$this->get_error($field);
