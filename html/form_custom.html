@@ -1,4 +1,4 @@
-	<form enctype="multipart/form-data" action="" class="form_login" method="post">
+	<form enctype="multipart/form-data" action="" class="form_login form_wide" method="post">
 		<input type=hidden name="root" value="{$pid_id}">
 		<input type=hidden name="gspgid_form" value="{$gspgid_form}">
 		{if $_gsdata.dialog}<input type=hidden name="dialog" value="{$_gsdata.dialog}">{/if}
@@ -23,8 +23,11 @@
 
 		{foreach $form->get_fields() as $field=>$op} 
 			{if $op.verbose_name}
-			{$form->get_input($field)}
-			{$form->get_error_template($field)}
+				{block name="field"}
+					{$op.verbose_name}<br>
+					{$form->get_input($field)}
+					{$form->get_error_template($field)}
+				{/block}
 			{/if}
 		{/foreach}
 	
