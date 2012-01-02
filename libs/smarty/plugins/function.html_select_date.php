@@ -211,6 +211,7 @@ function smarty_function_html_select_date($params, $template)
         } 
         $month_result .= $extra_attrs . '>' . "\n";
 
+
         $month_result .= smarty_function_html_options(array('output' => $month_names,
                 'values' => $month_values,
                 'selected' => (int)$time[1] ? strftime($month_value_format, mktime(0, 0, 0, (int)$time[1], 1, 2000)) : '',
@@ -323,7 +324,6 @@ function smarty_function_html_select_date($params, $template)
             $html_result .= $field_separator;
         } 
     } 
-
     return $html_result;
 }
 
