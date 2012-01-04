@@ -1,7 +1,8 @@
 <?php
-class metatags {
-	static function save($url,$title,$keywords,$description) {
-		$rs=new tw_{%$PARENT_MODULE%};
+abstract class metatags {
+	const parent_rsname=null;
+	static function save($rsname,$url,$title,$keywords,$description) {
+		$rs=new $rsname;
 		$rec=$rs->find_records(array('url'=>$url))->limit(1)->first(true);
 		$rec->title=$title;
 		$rec->keywords=$keywords;
@@ -9,8 +10,8 @@ class metatags {
 		$rec->commit();
 	}
 	
-	static function delete($url) {
-		$rs=new tw_{%$PARENT_MODULE%};
+	static function delete($rsname,$url) {
+		$rs=new $rsname;
 		$rec=$rs->find_records(array('url'=>$url))->limit(1)->first();
 		$rec->delete();
 		$rec->commit();

@@ -88,12 +88,13 @@ class tw{%$MODULE_NAME%} extends gs_recordset_handler {
 			$keywords=metatags::get_keywords($rec);
 			$description=str_replace("\n"," ",substr(strip_tags($rec->description),0,254));
 			$title=strip_tags($rec->name);
-			metatags::save($url,$title,$keywords,$description);
+			metatags::save('tw{%$MODULE_NAME%}',$url,$title,$keywords,$description);
 		}elseif ($type=='before_delete') {
-			metatags::delete($url);
+			metatags::delete('tw{%$MODULE_NAME%}',$url);
 		}
 	}
 	
 }
+
 
 ?>
