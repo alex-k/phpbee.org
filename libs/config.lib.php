@@ -66,9 +66,21 @@ class gs_init {
 			uksort($h,array($this,'h_sort'));
 			$handlers[$k]=$h;
 		}
+
 		
-		$txt=md($handlers);
 		gs_cacher::save($handlers,'config','handlers');
+
+		//$txt=md($handlers);
+		$txt="\n";
+		foreach ($handlers as $type=>$h) {
+			foreach ($h as $key=>$arr) {
+				$prefix="\n\t";
+				$txt.=sprintf("%s:%s => $prefix%s\n",
+						$type,$key,
+						implode($prefix,$arr));
+			}
+		}
+		md($txt);
 		file_put_contents(cfg('var_dir').DIRECTORY_SEPARATOR.'urls_handlers.txt',$txt);
 
 
@@ -81,6 +93,7 @@ class gs_init {
 		}
 		mlog($cl_array);
 		gs_cacher::save($cl_array,'config','classes');
+		file_put_contents(cfg('var_dir').DIRECTORY_SEPARATOR.'classes.txt',md($cl_array));
 	}
 
 	function check_compile_modules($path='') {
@@ -376,7 +389,7 @@ class gs_config {
 
 	function check_install_key() {
 		if (!isset($this->install_key) || empty($this->install_key) || $this->install_key!=$_REQUEST['install_key'])
-			throw new gs_exception('Incorrect install_key. Check config.php and run '.$this->host.'/install.php?install_key=12345 to continue.');
+			throw new gs_exception('Incorrect install_key. Check config.php and run '.$this->host.'/install.php?install_key=12345 to continue. Install key could be found in the config.php file');
 	}
 
 	function register_module($name) {
