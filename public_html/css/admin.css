@@ -438,11 +438,47 @@ textarea.big_text {
 .fMultiSelect {
 	height:50px;
 }
-.admin-login-form {
-	width: 300px;
-	padding: 20px;
-	margin: auto;
-	margin-top: 200px;
+
+.div-border {
 	border: 1px solid #e0e0e0;
 	box-shadow: 0 0 10px #e0e0e0;
+	padding: 20px;
+}
+.admin-login-form {
+	width: 300px;
+	margin: auto;
+	margin-top: 200px;
+}
+
+.form_error{
+	background-color:#c4180f;
+	position: relative;
+	margin-top:5px;
+	max-width:200px;
+	padding:5px 10px;
+	border-radius:6px;
+	box-shadow:2px 2px 2px #484848;
+	color:white;
+	font-weight:bold;
+	font-size:13px;
+}
+.form_error i{
+	position:absolute;
+	top:-5px;
+	width:19px;
+	height:8px;
+	left:10px;
+	background:red;
+	display:block;
+	background:url(/i/admin/ang5.png) no-repeat left top;
+}
+
+.admin_form_custom td {
+	vertical-align: top;
+}
+.admin_form_custom .field_title {
+	font-weight:bold;
+}
+.admin_form_custom table {
+	width:90%;
 }
