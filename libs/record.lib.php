@@ -242,7 +242,8 @@ class gs_record implements arrayaccess {
 		$this->values[$name]=$this->recordsets_array[$name]=$rs;
 		return $this->__get($name);
 	}
-
+	var $messages=array();
+	var $gmessages=array();
 
 	public function __get($name) {
 
@@ -259,9 +260,11 @@ class gs_record implements arrayaccess {
 					array_shift($langs);
 					if ($langs && $language!=$default_lang) {
 						//return ('11');
-
 						$l=$this->__get('Lang');
-						if ($l[$language]) return $l[$language]->$name;
+						//mlog($l[$language]); // needed for correct work in Chrome!
+						if ($l[$language]) {
+							return $l[$language]->$name;
+						}
 					}
 				}
 			}
