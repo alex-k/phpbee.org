@@ -117,6 +117,14 @@ class admin_handler extends gs_base_handler {
 
 		$cfg=gs_config::get_instance();
 		$modules=$cfg->get_registered_modules();
+		$pr_modules=array();
+		if (cfg('modules_priority')) foreach (explode(',',cfg('modules_priority')) as $pm) {
+			$pm='module_'.$pm;
+			if (in_array($pm,$modules)) {
+				$pr_modules[$pm]=$pm;
+			}
+		}
+		$modules=array_merge($pr_modules,$modules);
 		$menu=array();
 		if (is_array($modules)) foreach ($modules as $m) {
 			$mod=new $m;

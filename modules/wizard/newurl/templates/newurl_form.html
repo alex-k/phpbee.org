@@ -1,0 +1,40 @@
+{extends file="admin_form_custom.html"}
+{block name="form_header"}
+<script>
+function putMe(txt,target) {
+	$(target).val(txt);
+}
+$(document).ready(function(){
+	$(".dl_handlers").click(function(){
+		putMe($(this).html(),'[name=handlers]');
+		});
+
+	toggle_complex(".div-border",".div-border");
+});
+onClick="putMe($(this).html(),'[name=handlers]');"
+</script>
+<div style="float:right; min-height:500px; width: 300px; overflow: auto;" class="div-border">
+	<dl>
+	{foreach gs_parser::get_handlers() as $k=>$h}
+		<dt >
+		<a class="toggle_head" id="type_{$k}" herf="">{$k}</a>
+		<dl class="toggle_item" id="toggle_type_{$k}">
+		{foreach $h as $kk=>$hh}
+			<dt>{$kk}</dt>
+			<dl class="dl_handlers">{implode("\n",$hh)}</dl>
+		{/foreach}
+		</dl>
+		</dt>
+
+	{/foreach}
+	</dl>
+</div>
+{/block}
+{block name="form_content"}
+	<div style="width:500px;">
+	{$smarty.block.parent}
+	</div>
+{/block}
+{block name="form_footer"}
+<div class="clear"></div>
+{/block}
