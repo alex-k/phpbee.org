@@ -71,6 +71,7 @@ class tw{%$MODULE_NAME%} extends gs_recordset_handler {
 		'pid'=> "lOne2One tw{%$MODULE_NAME%}",
 		'Childs'=>"lMany2One tw{%$MODULE_NAME%}:pid counter=false",
 		'text_id'=> "fString 'Идентификатор статьи' required=false",
+		'url'=>"fString required=false",
 		{%foreach from=$SUBMODULES_DATA.LINKS key=K item=L%}
 			'{%$K%}'=>"{%$L%}",
 		{%/foreach%}

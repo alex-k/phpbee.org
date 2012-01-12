@@ -5,6 +5,7 @@
 	$this->admin_password='admin';
 
 	DEFINE ('DEBUG',0);
+	DEFINE ('UDP_DEBUG',0);
 	
 	$this->admin_ip_access=isset($this->admin_ip_access) ? array_map('trim',explode(',',$this->admin_ip_access)) : array();
 
@@ -32,6 +33,8 @@
 				'db_root'=>$this->var_dir.'handlers_cache/',
 				),
 			);
+
+	$this->modules_priority='wizard,packagemanager';
 
 	date_default_timezone_set('Europe/Moscow');
 	setlocale(LC_ALL,'ru_RU.UTF-8');

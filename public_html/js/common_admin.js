@@ -13,7 +13,7 @@ controls_html: html_toolbar
 
 	$(".widget_TextLines").sortable();
 	$(".widget_TextLines" ).disableSelection();
-	$(".widget_TextLines_line").children('input').keypress(function(e) {
+	$(".widget_TextLines_line input").live('keypress',function(e) {
 		    if(e.keyCode == 13) {
 			    var parentnode= $(this).closest(".widget_TextLines_line");
 			    var newnode=parentnode.clone();

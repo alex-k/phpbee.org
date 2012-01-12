@@ -15,11 +15,12 @@ class bee_logger_daemon extends vpa_daemon_base {
 	
 	function __construct($name,$config) {
 		$this->config=$config;
+		$this->logfile=dirname(__FILE__).DIRECTORY_SEPARATOR.'sites.log';
 		parent::__construct($name);
 	}
 	
 	function init() {
-			file_put_contents('sites.log','bee_logger_daemon::init'.PHP_EOL,FILE_APPEND);
+			file_put_contents($this->logfile,'bee_logger_daemon::init'.PHP_EOL,FILE_APPEND);
 	}
 	
 	function main() {
@@ -31,7 +32,7 @@ class bee_logger_daemon extends vpa_daemon_base {
 		while (true) {
 			socket_recvfrom($socket, $buf, 128, 0, $from, $port);
 			//echo $buf.PHP_EOL;
-			file_put_contents('sites.log',$buf.PHP_EOL,FILE_APPEND);
+			file_put_contents($this->logfile,$buf.PHP_EOL,FILE_APPEND);
 		}
 	}
 	
