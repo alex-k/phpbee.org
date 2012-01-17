@@ -11,13 +11,10 @@
 
 	var flashvars = {
 	  "language.autoDetect": "true",
-	  "serialNumber": "00823632444116221712318214925491291871610181",
-	  //"serialNumber": "put your serial number here",
-	  "uploadUrl": "/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",//&"+params_url,
+	  "serialNumber": widget_MultiPowUpload_license ,
+	  "uploadUrl": "/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",
 	  "customPostFields":params_str,
-	  //"customPostFields": "paramname1;paramvalue1|paramname2;paramvalue2",
 	  "removeUploadedFilesFromList": "true",
-	  //"uploadUrl": "http://demo.element-it.com/Examples/multipow/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",
 	  "fileFilter.types":"Images|*.jpg:*.jpeg:*.gif:*.png:*.bmp",
 	  "sendThumbnails": "true",
 	  "sendOriginalImages": "false",
@@ -40,16 +37,6 @@
 	  "thumbnailView.thumbnailWidth": "180",
 	  "thumbnailView.thumbnailHeight": "180",
 
-	  "thumbnail.watermark.enabled":"false",
-	  //"thumbnail.watermark.imageUrl":"images/element-it.jpg",
-		//Center.Left Bottom.Left
-	  "thumbnail.watermark.position":"bottom.right",
-	  "thumbnail.watermark.alpha":"0.5",
-	  "thumbnail.watermark.text":"www.bandw.ru",
-	  "thumbnail.watermark.textStyle.size":"22",
-	  "thumbnail.watermark.textStyle.color":"#FF0000",
-	  "thumbnail.watermark.textStyle.font":"_sans",
-	  "thumbnail.watermark.textStyle.style":"bold"
 
 	};
 
