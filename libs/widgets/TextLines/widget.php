@@ -5,7 +5,7 @@ class gs_widget_TextLines extends gs_widget{
 		parent::__construct($fieldname,$data,$params,$form);
 		if(!is_array($this->value)) $this->value=explode("\n",$this->value);
 		$this->value=array_filter($this->value);
-		if (!count($this->value)) $this->value[]='';
+		$this->value[]='';
 	}
 	function html() {
 		$tpl=gs_tpl::get_instance();

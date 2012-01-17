@@ -537,6 +537,7 @@ class gs_data_widget_parent_list {
 			$vrecs=$vro->find_records($options);
 		}
 		$variants=array();
+		$variants[0]='';
 		foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
 		$hh[$k]['variants']=$variants;
 		return $hh;

@@ -99,7 +99,13 @@ class gs_init {
 	function check_compile_modules($path='') {
 		$modified=false;
 		$dir=$this->config->lib_modules_dir;
+		$subdirs=array();
+		if (cfg('modules_priority')) $subdirs=glob($dir.$path.sprintf('{%s}',cfg('modules_priority')),GLOB_BRACE+GLOB_ONLYDIR);
+		$subdirs=array_unique(array_merge($subdirs,glob($dir.$path.'*',GLOB_ONLYDIR)));
+		/*
 		$subdirs=glob($dir.$path.'*',GLOB_ONLYDIR);
+		*/
+		//md($subdirs,1);
 		$dir=rtrim($dir,DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 		$path=trim($path,DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 		foreach ($subdirs as $s) {
@@ -388,7 +394,10 @@ class gs_config {
 	}
 
 	function check_install_key() {
-		if (!isset($this->install_key) || empty($this->install_key) || $this->install_key!=$_REQUEST['install_key'])
+		if (!isset($this->install_key) || empty($this->install_key) || (
+			$this->install_key!=$_REQUEST['install_key'] && PHP_SAPI!='cli'
+			))
+
 			throw new gs_exception('Incorrect install_key. Check config.php and run '.$this->host.'/install.php?install_key=12345 to continue. Install key could be found in the config.php file');
 	}
 
@@ -443,15 +452,15 @@ function md($output,$type=false)
 	if ($type) {
 		$txt=htmlentities(print_r($output,true));
 		echo "<pre>\n".$txt."</pre>\n";
-	} else {
-		return mlog($output);
 	}
+	return mlog($output);
 }
 class gs_logger {
 	
 	private $messages=array();	
 	private $gmessages=array();
 	private $t,$tt;
+	static $udplog_addr=NULL;
 	function __construct() {
 		$this->tt=$this->time_start=microtime(true);
 	}
@@ -465,8 +474,8 @@ class gs_logger {
 		return $instance;
 	}
 	static function udplog($msg) {
-		$addr=gethostbyname('ping.phpbee.org');
-		$fp = fsockopen("udp://$addr", 8080, $errno, $errstr);
+		if (! self::$udplog_addr) self::$udplog_addr=gethostbyname('ping.phpbee.org');
+		$fp = fsockopen("udp://".self::$udplog_addr, 8080, $errno, $errstr);
 		if ($fp) {
 			fwrite($fp, "$msg");
 			fclose($fp);
@@ -490,6 +499,7 @@ class gs_logger {
 		$this->gmessages[$trace['class']][$trace['function']][]=sprintf("%s > %s",$txt_time,$txt);
 		$this->tt=$t;
 		$this->log_to_file($data);
+		if (UDP_DEBUG) self::udplog($txt);
 		return $txt;
 	}
 	private function log_to_file($data) {

@@ -209,7 +209,7 @@ class gs_parser {
 		return false;
 	}
 	
-	private function get_handlers()
+	static function get_handlers()
 	{
 		$config=gs_config::get_instance();
 		$data=array();

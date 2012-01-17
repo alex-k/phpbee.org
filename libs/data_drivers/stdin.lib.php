@@ -4,6 +4,7 @@ class gs_data_driver_stdin implements gs_data_driver {
 	
 	function test_type()
 	{
+		return PHP_SAPI=='cli';
 		return isset($_SERVER['argc']) && $_SERVER['argc']>1;
 	}
 	
