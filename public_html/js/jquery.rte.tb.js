@@ -38,7 +38,7 @@ var	rte_toolbar = {
 	<option value="<h6>">Header 6</options>\
 </select>\
 	', tag_cmp: lwrte_block_compare, tags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']},
-	/*font			: {command: 'fontname', select: '\
+	font			: {command: 'fontname', select: '\
 <select>\
 	<option value="">- font -</option>\
 	<option value="arial">Arial</option>\
@@ -63,11 +63,10 @@ var	rte_toolbar = {
 	<option value="6">6 (18pt)</option>\
 	<option value="7">7 (20pt)</options>\
 </select>\
-	', tags: ['font']},*/
+	', tags: ['font']},
 	style			: {exec: lwrte_style, init: lwrte_style_init},
 	color			: {exec: lwrte_color},
 	image			: {exec: lwrte_image, tags: ['img'] },
-	file			: {exec: lwrte_file, tags: ['img'] },
 	link			: {exec: lwrte_link, tags: ['a'] },
 	unlink			: {command: 'unlink'},
 	s8				: {separator : true },
@@ -183,9 +182,7 @@ function lwrte_color(){
 				if(self.iframe_doc.selection) //IE fix for lost focus
 					self.range.select();
 
-				//self.editor_cmd('foreColor', value);
-				var ht=self.get_selected_html();
-				self.selection_insert('<span style="color:'+value+'">'+ht+'</span>');
+				self.editor_cmd('foreColor', value);
 			}
 					
 			panel.remove(); 
@@ -261,6 +258,11 @@ function lwrte_color(){
 function lwrte_image() {
 	var self = this;
 	var panel = self.create_panel('Insert image', 385);
+	/*panel.append('\
+<p><label>URL</label><input type="text" id="url" size="30" value=""><button id="file">Upload</button><button id="view">View</button></p>\
+<div class="clear"></div>\
+<p class="submit"><button id="ok">Ok</button><button id="cancel">Cancel</button></p>'
+).show();*/
 	panel.append('\
 	<p><input type="text" id="url" value="" style="width:90%"><input type="hidden" id="url_align" value="">\
 	<table width="100%"><tr><td width="20">\
@@ -277,6 +279,30 @@ function lwrte_image() {
 
 	var url = $('#url', panel);
 	var url_align = $('#url_align', panel);
+	/*var upload = $('#file', panel).upload( {
+		autoSubmit: false,
+		action: 'uploader.php',
+		onSelect: function() {
+			var file = this.filename();
+			var ext = (/[.]/.exec(file)) ? /[^.]+$/.exec(file.toLowerCase()) : '';
+			if(!(ext && /^(jpg|png|jpeg|gif)$/.test(ext))){
+				alert('Invalid file extension');
+				return;
+			}
+
+			this.submit();
+		},
+		onComplete: function(response) { 
+			if(response.length <= 0)
+				return;
+
+			response	= eval("(" + response + ")");
+			if(response.error && response.error.length > 0)
+				alert(response.error);
+			else
+				url.val((response.file && response.file.length > 0) ? response.file : '');
+		}
+	});*/
 
 	$('#view', panel).click( function() {
 			(url.val().length >0 ) ? window.open(url.val()) : alert("Enter URL of image to view");
@@ -299,43 +325,6 @@ function lwrte_image() {
 		}
 	)
 }
-
-function lwrte_file() {
-	var self = this;
-	var panel = self.create_panel('Insert file', 385);
-	panel.append('\
-	<p><input type="text" id="url" value="" style="width:90%"><input type="hidden" id="url_align" value="">\
-	<table width="100%"><tr><td><iframe src="'+self.files_link+'" frameborder="0" width="100%" height="200"></iframe></td></tr></table>\
-	</p>\
-	<div class="clear"></div>\
-	<p class="submit"><button id="ok">Ok</button><button id="cancel">Cancel</button></p>'
-).show();
-
-	var url = $('#url', panel);
-	var url_align = $('#url_align', panel);
-
-	$('#view', panel).click( function() {
-			(url.val().length >0 ) ? window.open(url.val()) : alert("Enter URL of image to view");
-			return false;
-		}
-	);
-			
-	$('#cancel', panel).click( function() { panel.remove(); return false;} );
-	$('#ok', panel).click( 
-		function() {
-			var file = url.val();
-			var align = url_align.val();
-			//self.editor_cmd('insertImage', file);
-			if (file) {
-				html=self.get_selected_html();
-				self.selection_insert('<a href="'+file+'">'+html+'</a>');
-				panel.remove(); 
-			}
-			return false;
-		}
-	)
-}
-
 
 function lwrte_unformat() {
 	this.editor_cmd('removeFormat');
@@ -469,7 +458,7 @@ function lwrte_link() {
 	var panel = self.create_panel("Create link / Attach file", 385);
 
 	panel.append('\
-<p><label>URL</label><input type="text" id="url" size="30" value=""><!--button id="file">Attach File</button><button id="view">View</button--></p>\
+<p><label>URL</label><input type="text" id="url" size="30" value=""><button id="file">Attach File</button><button id="view">View</button></p>\
 <div class="clear"></div>\
 <p><label>Title</label><input type="text" id="title" size="30" value=""><label>Target</label><select id="target"><option value="">default</option><option value="_blank">new</option></select></p>\
 <div class="clear"></div>\
@@ -479,7 +468,7 @@ function lwrte_link() {
 	$('#cancel', panel).click( function() { panel.remove(); return false; } );
 
 	var url = $('#url', panel);
-	/*var upload = $('#file', panel).upload( {
+	var upload = $('#file', panel).upload( {
 		autoSubmit: true,
 		action: 'uploader.php',
 		onComplete: function(response) { 
@@ -493,12 +482,13 @@ function lwrte_link() {
 			else
 				url.val((response.file && response.file.length > 0) ? response.file : '');
 		}
-	});*/
+	});
 
-	/*$('#view', panel).click( function() {
+	$('#view', panel).click( function() {
 		(url.val().length >0 ) ? window.open(url.val()) : alert("Enter URL to view");
 		return false;
-	});*/
+	}
+	);
 
 	$('#ok', panel).click( 
 		function() {
@@ -518,13 +508,6 @@ function lwrte_link() {
 
 			self.editor_cmd('unlink');
 
-			if (url) {
-				//str=(target!='no') ? 'align="'+align+'"' : '';
-				html=self.get_selected_html();
-				self.selection_insert('<a href="'+url+'" target="'+target+'" title="'+title+'">'+html+'</a>');
-				panel.remove(); 
-				return false;
-			}
 			// we wanna well-formed linkage (<p>,<h1> and other block types can't be inside of link due to WC3)
 			self.editor_cmd('createLink', rte_tag);
 			var tmp = $('<span></span>').append(self.get_selected_html());
