@@ -598,7 +598,7 @@ class %s extends gs_recordset_i18n {
 
 		$fname=cfg('lib_modules_dir').'i18n'.DIRECTORY_SEPARATOR.$classname.'.module.php';
 		check_and_create_dir(dirname($fname));
-		file_put_contents($fname,$classstr);
+		file_put_contents_perm($fname,$classstr);
 		include_once($fname);
 		$rs=new $classname;
 		$rs->install();

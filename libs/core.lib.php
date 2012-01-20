@@ -258,7 +258,7 @@ class gs_cacher {
 		} else {
 			$fn=$dirname.$id;
 		}
-		file_put_contents($fn,serialize($data));
+		file_put_contents_perm($fn,serialize($data));
 		return $id;
 	}
 	static function load($id,$subdir='.') {

@@ -1,22 +1,154 @@
 <?php
-/*test22*/
-set_time_limit(2);
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
 DEFINE ('LOAD_TEMPLATES',4);
 DEFINE ('LOAD_EXTRAS',8);
-
 DEFINE ('DEBUG_LOAD_FILE',1);
 DEFINE ('DEBUG_SQL',2);
 
 if (defined('DEBUG') && DEBUG) {
-ini_set('display_errors','On');
-error_reporting(E_ALL ^E_NOTICE);
+	ini_set('display_errors','On');
+	error_reporting(E_ALL ^E_NOTICE);
 }
 
 if (!defined('PHP_VERSION_ID')) {
     $version = explode('.', PHP_VERSION);
     define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+}
+
+class gs_config {
+	public $root_dir;
+	public $host;
+	public $www_dir;
+	public $www_admin_dir;
+	public $index_filename;
+	public $data_dir;
+	public $script_dir;
+	public $var_dir;
+	public $cache_dir;
+	public $lib_dir;
+	public $lib_tpl_dir;
+	public $lib_data_drivers_dir;
+	public $lib_handlers_dir;
+	public $lib_modules_dir;
+	public $lib_distpackages_dir;
+	public $lib_dbdrivers_dir;
+	public $tpl_blocks;
+	public $class_files=array();
+	private $view;
+	private $registered_gs_modules;
+	
+	
+	function __construct()
+	{
+		if (!isset($_SERVER['REQUEST_METHOD'])) $_SERVER['REQUEST_METHOD']='UNKNOWN';
+		if (!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST']='localhost';
+		if (!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI']=clean_path(__FILE__);
+
+		$this->host=$_SERVER['HTTP_HOST'];
+		$this->root_dir=__FILE__;
+		$this->root_dir=str_replace('phar://','',$this->root_dir);
+		$this->root_dir=clean_path(dirname(dirname($this->root_dir))).'/';
+		$this->root_dir=str_replace('\\','/',$this->root_dir);
+		$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
+		$this->document_root=$_document_root;
+
+		if ($this->root_dir>$_document_root) {
+			$this->www_dir='/'.trim(str_replace($_document_root,'',$this->root_dir),'/');
+		} else {
+			$this->www_dir='/';
+		}
+
+		$this->created_files_perm=0666;
+		$this->created_dirs_perm=0777;
+
+		if (posix_getuid()==fileowner(__FILE__)) {
+			$this->created_files_perm=0600;
+			$this->created_dirs_perm=0700;
+		}
+
+		$this->www_admin_dir=$this->www_dir.'admin/';
+		$this->www_image_dir=$this->www_dir.'img/';
+		$this->script_dir=rtrim(dirname($_SERVER['PHP_SELF']),'/').'/';
+		$this->index_filename=$_SERVER['SCRIPT_NAME'];
+		$this->referer= isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+		$this->referer_path= isset($_SERVER['HTTP_REFERER']) ?  preg_replace("|^$this->www_dir|",'',parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH)) : '';
+		$this->lib_dir=strpos(__FILE__,'phar://')==0  ? pathinfo(__FILE__,PATHINFO_DIRNAME).'/' : $this->root_dir.'libs/';
+		$this->var_dir=$this->root_dir.'var/';
+		$this->img_dir=$this->root_dir.$this->www_image_dir;
+		$this->log_dir=$this->var_dir.'log/';
+		$this->log_file=NULL;//'gs.log';
+		$this->cache_dir=$this->var_dir.'cache/';
+		$this->session_lifetime='2 hours';
+		$this->tmp_dir=$this->var_dir.'tmp/';
+		/*
+		$this->data_dir=$this->root_dir.'data/';
+		$this->tpl_data_dir_default=$this->data_dir.'templates/';
+		$this->tpl_data_dir=$this->tpl_data_dir_default;
+		*/
+		$this->tpl_data_dir=$this->root_dir.'html';
+		$this->tpl_var_dir=$this->var_dir.'templates_c/';
+		$this->lib_tpl_dir=$this->lib_dir.'smarty/';
+		$this->tpl_plugins_dir=$this->lib_tpl_dir.'plugins/';
+		$this->controllers_dir=$this->lib_dir.'controllers/';
+		$this->lib_data_drivers_dir=$this->lib_dir.'data_drivers/';
+		$this->lib_handlers_dir=$this->root_dir.'handlers/';
+		$this->lib_modules_dir=$this->root_dir.'modules/';
+		$this->lib_distpackages_dir=$this->root_dir.'packages/';
+		$this->lib_distsubmodules_dir=$this->root_dir.'packages/SUBMODULES/';
+		$this->lib_dbdrivers_dir=$this->lib_dir.'dbdrivers/';
+
+		$this->use_handler_cache=FALSE;
+		$this->s_handler_cnt=0;
+
+		foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {
+			if (file_exists($cfg_filename)) require_once($cfg_filename);
+		}
+
+		if (!defined('DEBUG')) define('DEBUG',FALSE);
+		if (!defined('DEBUG_LEVEL')) define('DEBUG_LEVEL',65537);
+		if (DEBUG) {
+		ini_set('display_errors','On');
+		error_reporting(E_ALL ^E_NOTICE);
+		}
+
+
+		if ($_SERVER['REQUEST_URI']=='/install.php') $this->check_install_key();
+
+	}
+
+	function check_install_key() {
+		if (!isset($this->install_key) || empty($this->install_key) || (
+			$this->install_key!=$_REQUEST['install_key'] && PHP_SAPI!='cli'
+			))
+
+			throw new gs_exception('Incorrect install_key. Check config.php and run '.$this->host.'/install.php?install_key=12345 to continue. Install key could be found in the config.php file');
+	}
+
+	function register_module($name) {
+		$this->registered_gs_modules[$name]=$name;
+	}
+	function get_registered_modules() {
+		return $this->registered_gs_modules;
+	}
+
+	function set_view($view) {
+		/*
+		if ($this->tpl_data_dir==$this->tpl_data_dir_default) {
+			$this->tpl_data_dir=$this->data_dir.'templates/'.$view;
+			$this->tpl_var_dir=$this->var_dir.'templates_c/'.$view;
+		}
+		cfg_set('_gs_view',$view);
+		*/
+	}
+
+	
+	static function &get_instance()
+	{
+		static $instance;
+		if (!isset($instance)) $instance = new gs_config;
+		return $instance;
+	}
 }
 
 class gs_init {
@@ -81,7 +213,7 @@ class gs_init {
 			}
 		}
 		md($txt);
-		file_put_contents(cfg('var_dir').DIRECTORY_SEPARATOR.'urls_handlers.txt',$txt);
+		file_put_contents_perm(cfg('var_dir').DIRECTORY_SEPARATOR.'urls_handlers.txt',$txt);
 
 
 		$cl_array=array();
@@ -93,7 +225,7 @@ class gs_init {
 		}
 		mlog($cl_array);
 		gs_cacher::save($cl_array,'config','classes');
-		file_put_contents(cfg('var_dir').DIRECTORY_SEPARATOR.'classes.txt',md($cl_array));
+		file_put_contents_perm(cfg('var_dir').DIRECTORY_SEPARATOR.'classes.txt',md($cl_array));
 	}
 
 	function check_compile_modules($path='') {
@@ -186,7 +318,7 @@ class gs_init {
 					$ret['MODULE'][$module_dir_name][$r[1][$k]][$r[2][$k]]=trim($r[3][$k]);
 				}
 			}
-			file_put_contents($pf,$s);
+			file_put_contents_perm($pf,$s);
 		}
 		$tpldir=$dir.$path.'templates';
 		$tplcdir=$dir.$path.'___templates';
@@ -199,7 +331,7 @@ class gs_init {
 				$s=$tpl->fetch('string:'.$s);*/
 				$s=$tpl->fetch($f);
 				$pf=$tplcdir.DIRECTORY_SEPARATOR.basename($f);
-				if(file_put_contents($pf,$s)===FALSE) {
+				if(file_put_contents_perm($pf,$s)===FALSE) {
 					throw new gs_exception('Can`t copy template '.$f.' into '.$pf);
 				}
 			}
@@ -299,133 +431,6 @@ class gs_init {
 	
 }
 
-class gs_config {
-	
-	public $root_dir;
-	public $host;
-	public $www_dir;
-	public $www_admin_dir;
-	public $index_filename;
-	public $data_dir;
-	public $script_dir;
-	public $var_dir;
-	public $cache_dir;
-	public $lib_dir;
-	public $lib_tpl_dir;
-	public $lib_data_drivers_dir;
-	public $lib_handlers_dir;
-	public $lib_modules_dir;
-	public $lib_distpackages_dir;
-	public $lib_dbdrivers_dir;
-	public $tpl_blocks;
-	public $class_files=array();
-	private $view;
-	private $registered_gs_modules;
-	
-	
-	function __construct()
-	{
-		if (!isset($_SERVER['REQUEST_METHOD'])) $_SERVER['REQUEST_METHOD']='UNKNOWN';
-		if (!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST']='localhost';
-		if (!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI']=clean_path(__FILE__);
-
-		$this->host=$_SERVER['HTTP_HOST'];
-		$this->root_dir=__FILE__;
-		$this->root_dir=str_replace('phar://','',$this->root_dir);
-		$this->root_dir=clean_path(dirname(dirname($this->root_dir))).'/';
-		$this->root_dir=str_replace('\\','/',$this->root_dir);
-		$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
-		$this->document_root=$_document_root;
-
-		if ($this->root_dir>$_document_root) {
-			$this->www_dir='/'.trim(str_replace($_document_root,'',$this->root_dir),'/');
-		} else {
-			$this->www_dir='/';
-		}
-
-		$this->www_admin_dir=$this->www_dir.'admin/';
-		$this->www_image_dir=$this->www_dir.'img/';
-		$this->script_dir=rtrim(dirname($_SERVER['PHP_SELF']),'/').'/';
-		$this->index_filename=$_SERVER['SCRIPT_NAME'];
-		$this->referer= isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
-		$this->referer_path= isset($_SERVER['HTTP_REFERER']) ?  preg_replace("|^$this->www_dir|",'',parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH)) : '';
-		$this->lib_dir=strpos(__FILE__,'phar://')==0  ? pathinfo(__FILE__,PATHINFO_DIRNAME).'/' : $this->root_dir.'libs/';
-		$this->var_dir=$this->root_dir.'var/';
-		$this->img_dir=$this->root_dir.$this->www_image_dir;
-		$this->log_dir=$this->var_dir.'log/';
-		$this->log_file=NULL;//'gs.log';
-		$this->cache_dir=$this->var_dir.'cache/';
-		$this->session_lifetime='2 hours';
-		$this->tmp_dir=$this->var_dir.'tmp/';
-		/*
-		$this->data_dir=$this->root_dir.'data/';
-		$this->tpl_data_dir_default=$this->data_dir.'templates/';
-		$this->tpl_data_dir=$this->tpl_data_dir_default;
-		*/
-		$this->tpl_data_dir=$this->root_dir.'html';
-		$this->tpl_var_dir=$this->var_dir.'templates_c/';
-		$this->lib_tpl_dir=$this->lib_dir.'smarty/';
-		$this->tpl_plugins_dir=$this->lib_tpl_dir.'plugins/';
-		$this->controllers_dir=$this->lib_dir.'controllers/';
-		$this->lib_data_drivers_dir=$this->lib_dir.'data_drivers/';
-		$this->lib_handlers_dir=$this->root_dir.'handlers/';
-		$this->lib_modules_dir=$this->root_dir.'modules/';
-		$this->lib_distpackages_dir=$this->root_dir.'packages/';
-		$this->lib_distsubmodules_dir=$this->root_dir.'packages/SUBMODULES/';
-		$this->lib_dbdrivers_dir=$this->lib_dir.'dbdrivers/';
-
-		$this->use_handler_cache=FALSE;
-		$this->s_handler_cnt=0;
-
-		foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {
-			if (file_exists($cfg_filename)) require_once($cfg_filename);
-		}
-
-		if (!defined('DEBUG')) define('DEBUG',FALSE);
-		if (!defined('DEBUG_LEVEL')) define('DEBUG_LEVEL',65537);
-		if (DEBUG) {
-		ini_set('display_errors','On');
-		error_reporting(E_ALL ^E_NOTICE);
-		}
-
-
-		if ($_SERVER['REQUEST_URI']=='/install.php') $this->check_install_key();
-
-	}
-
-	function check_install_key() {
-		if (!isset($this->install_key) || empty($this->install_key) || (
-			$this->install_key!=$_REQUEST['install_key'] && PHP_SAPI!='cli'
-			))
-
-			throw new gs_exception('Incorrect install_key. Check config.php and run '.$this->host.'/install.php?install_key=12345 to continue. Install key could be found in the config.php file');
-	}
-
-	function register_module($name) {
-		$this->registered_gs_modules[$name]=$name;
-	}
-	function get_registered_modules() {
-		return $this->registered_gs_modules;
-	}
-
-	function set_view($view) {
-		/*
-		if ($this->tpl_data_dir==$this->tpl_data_dir_default) {
-			$this->tpl_data_dir=$this->data_dir.'templates/'.$view;
-			$this->tpl_var_dir=$this->var_dir.'templates_c/'.$view;
-		}
-		cfg_set('_gs_view',$view);
-		*/
-	}
-
-	
-	static function &get_instance()
-	{
-		static $instance;
-		if (!isset($instance)) $instance = new gs_config;
-		return $instance;
-	}
-}
 
 function cfg_set($name,$value) {
 	$config=gs_config::get_instance();
@@ -509,7 +514,7 @@ class gs_logger {
 			print_r($data);
 			$txt=ob_get_contents();
 			ob_end_clean();
-			file_put_contents(cfg('log_dir').cfg('log_file'),$txt."\n\n",FILE_APPEND);
+			file_put_contents_perm(cfg('log_dir').cfg('log_file'),$txt."\n\n",FILE_APPEND);
 		}
 	}
 	function show() {
@@ -580,6 +585,7 @@ function check_and_create_dir($dir) {
 			if (!mkdir($dir,0777,TRUE)) {
 				throw new gs_exception('check_and_create_dir: '.$dir.'  can not create directory');
 			}
+			chmod($dir,cfg('created_dirs_perm'));
 
 		} else if (!is_writable($dir)) {
 			if (!is_dir($dir)) {
@@ -588,6 +594,12 @@ function check_and_create_dir($dir) {
 			throw new gs_exception('check_and_create_dir: '.$dir.'   not writeble');
 		}
 		return $dir;
+}
+
+function file_put_contents_perm($filename,$data,$flags = 0, $context = NULL) {
+	$ret= ($context===NULL) ? file_put_contents($filename,$data,$flags) : file_put_contents($filename,$data,$flags = 0, $context );
+	chmod($filename,cfg('created_files_perm'));
+
 }
 
 function load_file($file,$return_contents=FALSE,$return_file=FALSE)

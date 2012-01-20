@@ -128,7 +128,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			$table_fields=$this->construct_table_fields($structure);
 			$this->construct_indexes($tablename,$structure);
 			$fname=$this->root.DIRECTORY_SEPARATOR.$tablename;
-			file_put_contents($fname.DIRECTORY_SEPARATOR.'fields',serialize($table_fields));
+			file_put_contents_perm($fname.DIRECTORY_SEPARATOR.'fields',serialize($table_fields));
 		}
 	}
 	public function construct_createtable($tablename,$structure) {
@@ -140,7 +140,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			$fname=$this->root.DIRECTORY_SEPARATOR.$tablename;
 			check_and_create_dir($fname);
 			$table_fields=$this->construct_table_fields($structure);
-			file_put_contents($fname.DIRECTORY_SEPARATOR.'fields',serialize($table_fields));
+			file_put_contents_perm($fname.DIRECTORY_SEPARATOR.'fields',serialize($table_fields));
 			break;
 		}
 	}
@@ -154,7 +154,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			$counter++;
 			$r_id=$this->_get_id($tablename,$counter);
 		}
-		file_put_contents($cname,$counter);
+		file_put_contents_perm($cname,$counter);
 		return $r_id;
 	}
 
@@ -207,7 +207,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			if ( $st['type']!='serial' && $record->is_modified($fieldname)) {
 				//$fields[]=$fieldname;
 				//$values[]=$this->escape_value($record->$fieldname);
-				file_put_contents($id.DIRECTORY_SEPARATOR.escapeshellcmd($fieldname),$record->$fieldname);
+				file_put_contents_perm($id.DIRECTORY_SEPARATOR.escapeshellcmd($fieldname),$record->$fieldname);
 			}
 		}
 		
@@ -247,7 +247,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		$fields=array();
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
 			if ($record->is_modified($fieldname)) {
-				file_put_contents($id.DIRECTORY_SEPARATOR.escapeshellcmd($fieldname),$record->$fieldname);
+				file_put_contents_perm($id.DIRECTORY_SEPARATOR.escapeshellcmd($fieldname),$record->$fieldname);
 			}
 		}
 	}

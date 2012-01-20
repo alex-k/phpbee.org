@@ -74,7 +74,7 @@ class b_tree {
 			$a=array_flip(file($path));
 			unset($a[$value]);
 			unset($a['!'.$value]);
-			file_put_contents($path,implode("",array_keys($a)));
+			file_put_contents_perm($path,implode("",array_keys($a)));
 		}
 	}
 	

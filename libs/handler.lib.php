@@ -237,7 +237,7 @@ class gs_base_handler extends gs_handler {
 				}
 				$variants=array();
 				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
-				$hh[$k]['variants']=$variants;
+				$hhh[$k]['variants']=$variants;
 				if (isset($data[$k])) {
 					unset($fields[$k]);
 					$data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();

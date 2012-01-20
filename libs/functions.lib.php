@@ -255,7 +255,7 @@ function load_submodules($parent_name,$dirname) {
 		if (!file_exists($pf) || filemtime($pf) < filemtime($f)) {
 			$s=file_get_contents($f);
 			$s=str_replace('{PARENT_MODULE}',$parent_name.'_',$s);
-			file_put_contents($pf,$s);
+			file_put_contents_perm($pf,$s);
 		}
 		load_file($pf);
 	}
