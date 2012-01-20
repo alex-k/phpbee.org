@@ -55,5 +55,8 @@
 	//$this->languages=array('ru'=>'RUS','en'=>'ENG');
 	//$this->languages='tw_languages';
 
+	$this->widget_MultiPowUpload_license='put your key here';
+	$this->widget_MultiPowUpload_watermark='/libs/widgets/MultiPowUpload/watermark.png';
+
 
 ?>
