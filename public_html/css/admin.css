@@ -474,3 +474,6 @@ textarea.big_text {
 .admin_form_custom table {
 	width:90%;
 }
+.fSelect {
+	min-width: 150px;
+}

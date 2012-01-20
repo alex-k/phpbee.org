@@ -241,7 +241,7 @@ class gs_wizard_handler extends gs_handler {
 			  foreach($files as $fname) {
 				  $txt=file_get_contents($fname);
 				  $txt=str_replace('{%$PARENT_RECORDSET%}',$rs->name,$txt);
-				  file_put_contents($fname,$txt);
+				  file_put_contents_perm($fname,$txt);
 			  }
 		}
 
@@ -262,7 +262,7 @@ class gs_wizard_handler extends gs_handler {
 
 		//md($out,1); die();
 
-		return file_put_contents($dirname.'module.phps',$out)!==FALSE;
+		return file_put_contents_perm($dirname.'module.phps',$out)!==FALSE;
 
 
 	}
@@ -330,7 +330,7 @@ class gs_wizard_handler extends gs_handler {
 			$template=preg_replace("|{block name=\"".$this->data['gspgid_va'][2]."\"}.*?{/block}|is",'',$template);
 			$template.='{block name="'.$this->data['gspgid_va'][2].'"}'.$this->data['block_content'].'{/block}'.PHP_EOL;
 		}
-		file_put_contents($filename,$template);
+		file_put_contents_perm($filename,$template);
 		return true;
 	}
 
@@ -373,7 +373,7 @@ class gs_wizard_handler extends gs_handler {
 
 		$text="";
 		if (!empty($d['extends'])) $text='{extends file="'.$this->data['extends'].'"}'.PHP_EOL;
-		file_put_contents($filename,$text);
+		file_put_contents_perm($filename,$text);
 
 		if (empty($d['url'])) return true;	
 

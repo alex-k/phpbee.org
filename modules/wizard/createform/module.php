@@ -133,7 +133,7 @@ class gs_strategy_createform_handler extends gs_handler {
 		if ($d['template_path']=='html') {
 			$filename=cfg('tpl_data_dir').DIRECTORY_SEPARATOR.$d['template_name'];
 		}
-		file_put_contents($filename,$out);
+		file_put_contents_perm($filename,$out);
 		md($out,1);
 		die();
 

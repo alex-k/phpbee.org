@@ -71,7 +71,7 @@ class gs_strategy_createmanager_handler extends gs_handler {
 
 
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'manage_'.$rs->name.'.html';
-		file_put_contents($filename,$out);
+		file_put_contents_perm($filename,$out);
 
 		$rs->showadmin=1;
 

@@ -60,10 +60,10 @@ class gs_strategy_createlogin_handler extends gs_handler {
 
 
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'login_'.$rs->name.'.html';
-		file_put_contents($filename,$out);
+		file_put_contents_perm($filename,$out);
 
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'login_form_'.$rs->name.'.html';
-		file_put_contents($filename,$out_form);
+		file_put_contents_perm($filename,$out_form);
 
 
 		$rs->showadmin=1;
