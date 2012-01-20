@@ -12,3 +12,14 @@ a.filter_current {
 	border:20px solid #000;
 }
 
+
+.gs_exception{
+	border:1px solid #a0a0a0;
+	box-shadow: 0 0 3px #e0e0e0;
+	padding:5px;
+	margin:auto;
+	width:50%;
+	min-width:350px;
+	margin-top:20px;
+	background-color:#234F32;
+}

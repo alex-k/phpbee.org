@@ -20,4 +20,6 @@ gs_fkey::update_fkeys();
 
 gs_logger::dump();
 
+echo "install done";
+
 ?>
