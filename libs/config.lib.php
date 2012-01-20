@@ -561,13 +561,19 @@ TXT;
 	*/
 }
 
-function gs_exception_handler($ex)
+function gs_exception_handler($ex,$return=false)
 {
-	md('');
-	md("EXCEPTION ".get_class($ex));
-	md($ex->getMessage());
-	md($ex->getTrace());
-	gs_logger::dump();
+	if (DEBUG) {
+		if (in_array('xdebug',get_loaded_extensions())) throw $ex;
+		md('');
+		md("EXCEPTION ".get_class($ex));
+		md($ex->getMessage());
+		md($ex->getTrace());
+		gs_logger::dump();
+	} else {
+		echo '<div class="gs_exception">'.$ex->getMessage().'</div>';
+	}
+	die();
 }
 
 function load_dbdriver($name) {
@@ -664,12 +670,13 @@ function __class_filename($class_name) {
 function __gs_autoload($class_name) {
 	$filename=__class_filename($class_name);
 	if($filename) load_file($filename);
+	//if (!class_exists($class_name)) gs_logger::udplog(new exception( "$class_name not loaded"));
 }
 
 spl_autoload_register('__gs_autoload');
 
 
-//set_exception_handler('gs_exception_handler');
+set_exception_handler('gs_exception_handler');
 
 
 ?>
