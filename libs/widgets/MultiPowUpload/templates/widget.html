@@ -23,7 +23,6 @@
 <div id="MultiPowUpload_holder">
 <input type="button" class="MultiPowUploadStartButton" onClick="MultiPowUpload_Start();" value="UPLOAD FILES">
 </div>
-{$params.str}
 <script>
 	var params_str={$params_str}
 {foreach $params as $k=>$v}
@@ -32,13 +31,11 @@
 </script>
 <script type="text/javascript">
 	var widget_MultiPowUpload_license='{cfg('widget_MultiPowUpload_license')}';
+	var widget_MultiPowUpload_watermark='{cfg('widget_MultiPowUpload_watermark')}';
 </script>
-<script type="text/javascript" src="/widgets/MultiPowUpload/Extra/swfobject.js"></script>
-<script type="text/javascript" src="/widgets/MultiPowUpload/widget.js"></script>
-<link href="/widgets/MultiPowUpload/widget.css" rel="stylesheet" type="text/css">
-<!--
-<script type="text/javascript" src="/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?reset_session=true"></script>
--->
+<script type="text/javascript" src="/libs/widgets/MultiPowUpload/Extra/swfobject.js"></script>
+<script type="text/javascript" src="/libs/widgets/MultiPowUpload/widget.js"></script>
+<link href="/libs/widgets/MultiPowUpload/widget.css" rel="stylesheet" type="text/css">
 
 
 

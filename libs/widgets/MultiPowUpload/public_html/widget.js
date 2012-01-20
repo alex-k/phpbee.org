@@ -12,7 +12,7 @@
 	var flashvars = {
 	  "language.autoDetect": "true",
 	  "serialNumber": widget_MultiPowUpload_license ,
-	  "uploadUrl": "/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",
+	  "uploadUrl": "/libs/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",
 	  "customPostFields":params_str,
 	  "removeUploadedFilesFromList": "true",
 	  "fileFilter.types":"Images|*.jpg:*.jpeg:*.gif:*.png:*.bmp",
@@ -36,12 +36,15 @@
 	  "thumbnailView.showCropRectDimensions": "true",
 	  "thumbnailView.thumbnailWidth": "180",
 	  "thumbnailView.thumbnailHeight": "180",
+	  "thumbnail.watermark.enabled": "true",
+	  "thumbnail.watermark.position": "bottom.center",
+	  "thumbnail.watermark.imageUrl": widget_MultiPowUpload_watermark
 
 
 	};
 
 	function MultiPowUpload_Start() {
-		var so=swfobject.embedSWF("/widgets/MultiPowUpload/ElementITMultiPowUpload.swf", "MultiPowUpload_holder", "900", "450", "10.0.0", "/widgets/MultiPowUpload/Extra/expressInstall.swf", flashvars, params, attributes);
+		var so=swfobject.embedSWF("/libs/widgets/MultiPowUpload/ElementITMultiPowUpload.swf", "MultiPowUpload_holder", "900", "450", "10.0.0", "/widgets/MultiPowUpload/Extra/expressInstall.swf", flashvars, params, attributes);
 	}
 
 
