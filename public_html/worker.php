@@ -17,7 +17,7 @@ function fatal_error_handler($buffer){
         $error=error_get_last();
 	        if(!DEBUG && $error['type'] == 1){
 
-			$str='<link rel="stylesheet" type="text/css" href="/css/style.css" media="screen" />';
+			$str='<link rel="stylesheet" type="text/css" href="/css/main.css" media="screen" />';
 			$str.=sprintf('<div class="gs_exception">%s on line %s in file %s</div>',$error['message'],$error['line'],$error['file']);
 			if (preg_match('/^Class .* not found/',$error['message'])) {
 				$url=$_SERVER['HTTPS'] ? 'https://':'http://';
