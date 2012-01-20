@@ -571,6 +571,7 @@ function gs_exception_handler($ex,$return=false)
 		md($ex->getTrace());
 		gs_logger::dump();
 	} else {
+		echo '<link rel="stylesheet" type="text/css" href="/css/main.css" media="screen" />';
 		echo '<div class="gs_exception">'.$ex->getMessage().'</div>';
 	}
 	die();
