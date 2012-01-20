@@ -62,10 +62,6 @@ class gs_config {
 		$this->created_files_perm=0666;
 		$this->created_dirs_perm=0777;
 
-		if (posix_getuid()==fileowner(__FILE__)) {
-			$this->created_files_perm=0600;
-			$this->created_dirs_perm=0700;
-		}
 
 		$this->www_admin_dir=$this->www_dir.'admin/';
 		$this->www_image_dir=$this->www_dir.'img/';
