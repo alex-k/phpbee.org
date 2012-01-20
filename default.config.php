@@ -34,6 +34,11 @@
 				),
 			);
 
+	if (function_exists('posix_getuid') && posix_getuid()==fileowner(__FILE__)) {
+		$this->created_files_perm=0600;
+		$this->created_dirs_perm=0700;
+	}
+
 	$this->modules_priority='wizard,packagemanager';
 
 	date_default_timezone_set('Europe/Moscow');
