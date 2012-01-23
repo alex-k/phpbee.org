@@ -324,4 +324,8 @@ function rs($name) {
 	return new $name;
 }
 
+function require_fullpath($from_filename,$filename) {
+	require_once(rtrim(dirname($from_filename),DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$filename);
+}
+
 ?>
