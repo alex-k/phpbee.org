@@ -477,3 +477,7 @@ textarea.big_text {
 .fSelect {
 	min-width: 150px;
 }
+
+.widget_TextLines {
+	padding:5px 10px;
+}

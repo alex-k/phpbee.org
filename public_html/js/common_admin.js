@@ -11,19 +11,6 @@ controls_rte: rte_toolbar,
 controls_html: html_toolbar
 	});
 
-	$(".widget_TextLines").sortable();
-	$(".widget_TextLines" ).disableSelection();
-	$(".widget_TextLines_line input").live('keypress',function(e) {
-		    if(e.keyCode == 13) {
-			    var parentnode= $(this).closest(".widget_TextLines_line");
-			    var newnode=parentnode.clone();
-			    newnode.children('input').val('');
-			    newnode.insertAfter(parentnode);
-
-			    return false;
-		    }
-	});
-
 	$("[-data-href]").dblclick(function() {
 		window.document.location.href=$(this).attr('-data-href');
 		return false;

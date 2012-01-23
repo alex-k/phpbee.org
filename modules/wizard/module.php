@@ -1,6 +1,6 @@
 <?php
 
-require_once('recordsets.php');
+require_fullpath(__FILE__,'recordsets.php');
 
 abstract class gs_wizard_strategy_module extends gs_base_module {}
 
@@ -561,7 +561,7 @@ class wz_handler_mc extends gs_handler {
 
 }
 
-require('macros.php');
-require('links.php');
+require_fullpath(__FILE__,'macros.php');
+require_fullpath(__FILE__,'links.php');
 
 ?>
