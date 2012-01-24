@@ -1,5 +1,5 @@
 <?php
-require_once('module.php');
+require_fullpath(__FiLE__,'module.php');
 abstract class tw_images extends gs_recordset_handler {
 	var $no_urlkey=1;
 	function src1($params,$record=null) {
