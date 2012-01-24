@@ -241,7 +241,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		default:
 			$construct_fields=$this->construct_createtable_fields($structure);
 			$this->construct_droptable($tablename);
-			$que=sprintf('CREATE TABLE  %s %s ENGINE=MyISAM',$tablename, $construct_fields);
+			$que=sprintf('CREATE TABLE  %s %s ENGINE=MyISAM CHARACTER SET=%s',$tablename, $construct_fields,$this->cinfo['codepage']);
 			$this->query($que);
 			$this->construct_indexes($tablename,$structure);
 			break;
