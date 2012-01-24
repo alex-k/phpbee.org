@@ -10,6 +10,17 @@ echo $FNAME
 
 mkdir build
 cd build
+
+
+PHPUNIT=`cd tests && phpunit run.php`
+if [ "$?" -ne "0" ]
+then	
+	echo $PHPUNIT | mail -s 'phpbee build failed' alex@kochetov.com
+	echo $PHPUNIT
+	exit 1;
+fi
+
+
 svn log -r '{'$LASTDATE'}':'{'`date -v +1d "+%Y-%m-%d"`'}' --xml --verbose $REPO > Changelog.xml
 xsltproc ../svn2cl.xsl Changelog.xml  > Changelog.txt
 xsltproc ../svn2html.xsl Changelog.xml  > Changelog.html

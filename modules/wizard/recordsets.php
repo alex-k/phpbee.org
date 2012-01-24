@@ -1,7 +1,6 @@
 <?php
 
 class wz_modules extends gs_recordset_short {
-
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",

@@ -428,31 +428,23 @@ abstract class gs_recordset_base extends gs_iterator {
 				$obj->install();
 			}
 		}
-		/*
-		if (isset($this->structure['recordsets'])) foreach ($this->structure['recordsets'] as $r) {
-			$rs=new $r['recordset'];
-			$rs->install();
-		}
-		*/
 
 		if (!$this->get_connector()->table_exists($this->table_name)) {
-			$this->createtable();
-			//$this->commit();
+			return $this->createtable();
 		} else {
-			$this->altertable();
-			//$this->commit();
+			return $this->altertable();
 		}
 	}
 
 	public function altertable() {
-		md($this->get_connector()->construct_altertable($this->table_name,$this->structure));
+		return $this->get_connector()->construct_altertable($this->table_name,$this->structure);
 	}
 
 	public function createtable() {
-		md($this->get_connector()->construct_createtable($this->table_name,$this->structure));
+		return $this->get_connector()->construct_createtable($this->table_name,$this->structure);
 	}
 	public function droptable() {
-		md($this->get_connector()->construct_droptable($this->table_name));
+		return $this->get_connector()->construct_droptable($this->table_name);
 	}
 	public function fill_values($obj,$data) {
 	}
