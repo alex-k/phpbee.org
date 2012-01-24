@@ -19,10 +19,10 @@ cp public_html/worker.php public_html/index.php
 php public_html/install.php install_key=12345
 cd tests
 
-PHPUNIT=`cd tests && phpunit run.php`
+PHPUNIT=`phpunit run.php`
 if [ "$?" -ne "0" ]
 then	
-	echo $PHPUNIT | mail -s 'phpbee build failed' alex@kochetov.com
+	echo $PHPUNIT | mail -s 'phpbee build failed' alex@kochetov.com andrey.pahomov@gmail.com
 	echo $PHPUNIT
 	exit 1;
 fi
@@ -54,3 +54,6 @@ rm -fr build
 
 cp phpbee.zip public_html/download/$FNAME
 echo $FNAME > html/last_build.html
+
+echo "Build $FNAME created and uploaded" 
+echo "Build $FNAME created and uploaded" | mail -s 'phpbee build completed' alex@kochetov.com andrey.pahomov@gmail.com
