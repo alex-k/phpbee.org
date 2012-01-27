@@ -62,6 +62,10 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		return is_dir($fname);
 	}
 
+	public function get_table_names() {
+		return array();
+	}
+
 	public function get_table_fields($tablename) {
 		$r=array();
 		$fname=$this->root.DIRECTORY_SEPARATOR.$tablename.DIRECTORY_SEPARATOR.'fields';

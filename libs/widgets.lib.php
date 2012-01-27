@@ -367,7 +367,14 @@ class gs_widget_radio extends gs_widget {
 	function html() {
 		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 		foreach ($this->params['options'] as $v=>$l) {
-			$s.=sprintf('<label><input class="fRadio %s" type="radio" name="%s" value="%s" %s> %s </label>', $this->interact, $this->fieldname,htmlspecialchars($v), trim($this->value)==$v || (isset($this->params['default']) && $v==$this->params['default']) ? 'checked="checked"' : '', $l);
+			$s.=sprintf('<label><input class="fRadio %s" type="radio" name="%s" value="%s" %s> %s </label>%s',
+				 $this->interact,
+				 $this->fieldname,
+				 htmlspecialchars($v),
+				 trim($this->value)==$v || (isset($this->params['default']) && $v==$this->params['default']) ? 'checked="checked"' : '',
+				 $l,
+				 isset($this->params['delimiter']) ? $this->params['delimiter'] : ''
+				 );
 		}
 		return $s;
 	}

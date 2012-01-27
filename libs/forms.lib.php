@@ -262,17 +262,10 @@ abstract class g_forms implements g_forms_interface{
 	}
 
 
-	var $interact_regexps=array(
-		'|#(\w+)|s'=>'$this->field(\'\1\')',
-		'|\.display_if|s'=>'->display_if',
-		'|\.hide_if|s'=>'->hide_if',
-		'|\.link_values|s'=>'->link_values',
-		'|\.copy_value|s'=>'->copy_value',
-		);
 
 	function interact($interact,$old_ret=array()) {
 		$actions=$this->interact[$interact];
-		$actions=preg_replace(array_keys($this->interact_regexps),$this->interact_regexps,$actions);
+		$actions=preg_replace(array_keys(form_interact::$interact_regexps),form_interact::$interact_regexps,$actions);
 		$interact=new form_interact($this,$interact,$actions);
 		$ret=$interact->i($old_ret);
 		foreach ($ret as $r) {

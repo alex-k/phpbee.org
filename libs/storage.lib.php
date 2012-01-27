@@ -715,6 +715,7 @@ interface gs_dbdriver_interface {
 	function select($rset,$options,$fields=NULL);
 	function table_exists($tablename);
 	function get_table_fields($tablename);
+	function get_table_names();
 }
 
 

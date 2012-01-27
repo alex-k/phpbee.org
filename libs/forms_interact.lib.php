@@ -1,6 +1,14 @@
 <?php
 
 class form_interact {
+	static $interact_regexps=array(
+		'|#(\w+)|s'=>'$this->field(\'\1\')',
+		'|\.display_if|s'=>'->display_if',
+		'|\.hide_if|s'=>'->hide_if',
+		'|\.link_values|s'=>'->link_values',
+		'|\.copy_value|s'=>'->copy_value',
+		'|\.select_values|s'=>'->select_values',
+		);
 	var $actions=array();
 	function __construct($form,$interact,$str) {
 		$this->interactname=$interact;
@@ -12,7 +20,13 @@ class form_interact {
 	}
 	function i($ret) {
 		$this->old_ret=$ret;
-		eval($this->code);
+		if (!$this->code) return $this->actions;
+		ob_start();
+		$ret_status=eval($this->code);
+		$ret_msg=ob_get_clean();
+		if ($ret_status===FALSE) {
+			$this->actions[]=array('field'=>$this->fieldname,'action'=>'error','message'=>strip_tags($ret_msg).' '.$this->code,'debug'=>DEBUG);
+		}
 		return $this->actions;
 	}
 
@@ -35,11 +49,15 @@ class form_interact {
 		$this->display_if($condition,'!=');
 	}
 	function link_values($condition) {
-		list($rsname,$linkname)=explode('.',$condition);
-		$rec=record_by_id($this->value,$rsname);
-		foreach ($rec->$linkname as $r) {
-			$data[$r->get_id()]=trim($r);
-		}
+		if(is_array($condition)) {
+			$data=$condition;
+		} else {
+			list($rsname,$linkname)=explode('.',$condition);
+			$rec=record_by_id($this->value,$rsname);
+			foreach ($rec->$linkname as $r) {
+				$data[$r->get_id()]=trim($r);
+			}
+		} 
 		$this->form->set_variants($this->fieldname,$data);
 		$this->form->_prepare_inputs();
 		$html=($this->form->get_input($this->fieldname));
@@ -48,6 +66,11 @@ class form_interact {
 	}
 	function copy_value($condition) {
 		$this->actions[]=array('field'=>$this->fieldname,'action'=>'set_value','value'=>$this->value);
+	}
+
+	function select_values($condition) {
+		$data=call_user_func($condition,$this->fieldname,$this->value);
+		$this->link_values($data);
 	}
 }
 
