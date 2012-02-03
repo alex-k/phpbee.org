@@ -328,4 +328,12 @@ function require_fullpath($from_filename,$filename) {
 	require_once(rtrim(dirname($from_filename),DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$filename);
 }
 
+function array_group($arr,$field) {
+	$ret=array();
+	foreach($arr as $a) {
+		$ret[$a->$field][$a->get_id()]=$a;
+	}
+	return $ret;
+}
+
 ?>
