@@ -1,7 +1,7 @@
 <?php
-class module_wizard_createform extends gs_wizard_strategy_module implements gs_module {
+class module_wizard_createform_tpl extends gs_wizard_strategy_module implements gs_module {
 	static function _desc() {
-		return "создать форму";
+		return "создать шаблон формы";
 	}
 	function __construct() {
 	}
@@ -10,14 +10,13 @@ class module_wizard_createform extends gs_wizard_strategy_module implements gs_m
 	static function get_handlers() {
 		$data=array(
 		'handler'=>array(
-			'/admin/wizard/createform/form'=>array(
-				'gs_strategy_createform_handler.createform:name:form.html:form_class:form_createform:return:gs_record',
-				//'gs_wizard_handler.commit:return:true',
+			'/admin/wizard/createform_tpl/form'=>array(
+				'gs_strategy_createform_tpl_handler.createform:name:form.html:form_class:form_createform_tpl:return:gs_record',
 				'gs_base_handler.redirect_gl:gl:back',
 				),
 			),
 		'get'=>array(
-			'/admin/wizard/createform'=>'gs_base_handler.show:name:create.html',
+			'/admin/wizard/createform_tpl'=>'gs_base_handler.show:name:create_tpl.html',
 			),
 		);
 		return self::add_subdir($data,dirname(__file__));
@@ -30,7 +29,7 @@ class module_wizard_createform extends gs_wizard_strategy_module implements gs_m
 		}
 	}
 }
-class gs_strategy_createform_handler extends gs_handler {
+class gs_strategy_createform_tpl_handler extends gs_handler {
 	function createform() {
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
 		$module=record_by_id($this->data['handler_params']['Module_id'],'wz_modules');
@@ -42,8 +41,6 @@ class gs_strategy_createform_handler extends gs_handler {
 		$d=gs_base_handler::explode_data($f->clean());
 
 
-		$f=$module->forms->find_records(array('classname'=>$d['classname']));
-		$f->delete();
 		$form=$module->forms->new_record($d);
 		$cnt=0;
 		$fields=array();
@@ -62,55 +59,10 @@ class gs_strategy_createform_handler extends gs_handler {
 
 			$fields[]=$f;
 
-			foreach ($d['validate'][$k] as $v) {
-				$validate=$f->Validators->new_record();
-				$validate->class=$v;
-				$validate->options=$d['validate_params'][$k];
-			}
 
 		}
 
 
-		$modulename=$module->name;
-		$recordsetname=$rs->name;
-
-		$template=array(
-			"handler"=>array(
-				$d['gspgid_name']=>array(
-					//"gs_base_handler.redirect_if:gl:save_cancel:return:true",
-					"gs_base_handler.post:{name:".$d['template_name'].":classname:$recordsetname:form_class:".$d['classname']."}",
-					//"gs_base_handler.redirect_if:gl:save_continue:return:true",
-					//"gs_base_handler.redirect_if:gl:save_return:return:true",
-					//"gs_base_handler.redirect_up:level:2",
-					"gs_base_handler.redirect",
-					),
-				),
-		);
-
-		foreach ($template as $type=>$urls) {
-			foreach ($urls as $url=>$handlers) {
-				$f=$module->urls->find_records(array('gspgid_value'=>$url));
-				$f->delete();
-
-				$wz_url=$module->urls->new_record();
-				$wz_url->gspgid_value=$url;
-				$wz_url->type=$type;
-				$cnt=0;
-				foreach ($handlers as $key=>$value) {
-					$cnt++;
-					$wz_h=$wz_url->Handlers->new_record();
-					$wz_h->cnt=$cnt;
-					$wz_h->handler_keyname=$key;
-					$wz_h->handler_value=$value;
-					//$wz_h->commit();
-				}
-				$module->commit();
-			}
-		}
-
-
-
-		$module->commit();
 
 
 		$tpl=new gs_tpl();
@@ -134,14 +86,14 @@ class gs_strategy_createform_handler extends gs_handler {
 			$filename=cfg('tpl_data_dir').DIRECTORY_SEPARATOR.$d['template_name'];
 		}
 		file_put_contents($filename,$out);
-		md($out,1);
-		die();
+
+		return $filename;
 
 
 		return $module;
 	}
 }
-class form_createform extends form_admin{
+class form_createform_tpl extends form_admin{
 	function __construct($hh,$params=array(),$data=array()) {
 		$rs=record_by_id($data['handler_params']['Recordset_id'],'wz_recordsets');
 		$module=record_by_id($data['handler_params']['Module_id'],'wz_modules');
@@ -206,6 +158,7 @@ class form_createform extends form_admin{
 		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
 		$extends=array_map(basename,glob($dirname."*"));
 		$options=array(
+			/*
 			'classname'=>array(
 				'widget'=>'input',
 				'default'=>"form_".$module->name."_".$rs->name,
@@ -215,6 +168,7 @@ class form_createform extends form_admin{
 				'options'=>class_members('g_forms'),
 				'default'=>'g_forms_label',
 			),
+			*/
 			'template'=>array(
 				'widget'=>'select',
 				'options' => array_combine($extends,$extends),
@@ -230,11 +184,13 @@ class form_createform extends form_admin{
 				'options'=>array('html'=>'html','module'=>'module'),
 				'default'=>'module',
 			),
+			/*
 			'gspgid_name'=>array(
 				'widget'=>'input',
 				'default'=>"form/".$rs->name,
 				'validate'=>'dummyValid',
 			),
+			*/
 		);
 		
 		$i=0;

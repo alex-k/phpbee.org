@@ -1,0 +1,31 @@
+	<form enctype="multipart/form-data" action="" class="form_login form_wide" method="post">
+		<input type=hidden name="root" value="{$pid_id}">
+		<input type=hidden name="gspgid_form" value="{$gspgid_form}">
+		{if $_gsdata.dialog}<input type=hidden name="dialog" value="{$_gsdata.dialog}">{/if}
+
+		{include file="form_error_messages.html"}
+		{$form->set_error_template('<div class="form_error" id="err" style="display: block; "><i></i>%s</div>')}
+
+
+		{%foreach $fields as $f%} 
+			{$form->set_option('{%$f->name%}','placeholder','{%$f->verbose_name%}')}
+		{%/foreach%}
+
+		{$form->set_option_allfields('cssclass','field3')}
+		
+
+
+		{$form->_prepare_inputs()}
+
+		{$form->get_error_template('FORM_ERROR')}
+
+
+	{%foreach $fields as $f%} 
+		{$form->get_input('{%$f->name%}')}
+		{$form->get_error_template('{%$f->name%}')}
+	{%/foreach%}
+
+
+         <br /> <br />
+		<input type="submit" class="button" value="продолжить" />
+	</form>
