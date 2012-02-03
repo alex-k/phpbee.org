@@ -17,18 +17,30 @@
 		{handler gspgid="/admin/wizard/templates/{$module.id}"}
 
 		<h3><a href="/admin/wizard/urls/{$module.id}">urls</a></h3>
-		<ul>
-		{foreach from=$module->urls->orderby('type desc, gspgid_value') item=url}
-			<li>
-						{$url.type}
-				
-				<a href="/admin/wizard/handlers/{$url.id}">{$url.gspgid_value|default:"_DEFAULT_"}</a>
+		<table class="wz_urls">
+			<col style="width: 5em;"></col>
+			<col></col>
+		{$urls=$module->urls->orderby('type desc, gspgid_value')}
+		{$urls=array_group($urls,'type')}
+		{foreach $urls as $type=>$hurls}
+			<tr>
+			<th colspan=2>{$type}</th>
+			</tr>
+			{foreach $hurls as $url}
+			<tr>
+			<td nowrap>
 				<a href="/admin/wizard/urls/clone/{$url.id}"><img src="/i/admin/ico_copy.png" alt="копировать" title="копировать" class="icon"></a>
 				<a href="/admin/wizard/urls/{$module.id}/modify/{$url.id}#form"><img src="/i/admin/ico_edit.png" class="icon"></a>
-				
-				<ul style="dispaly: block; width:500px; overflow: auto;">
+			</td>	
+			<td>
+				<a href="/admin/wizard/handlers/{$url.id}">{$url.gspgid_value|default:"_DEFAULT_"}</a>
+			</td>
+			</tr>
 				{foreach from=$url.Handlers->orderby('cnt') item=h}
-					<li -data-href="/admin/wizard/handlers/{$url.id}/handlers/{$h.id}#form" >
+			<tr>
+			<td></td>
+			<td nowrap>
+			<div class="owf_h">
 						{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}
 						{$h.handler_value}
 						{*
@@ -37,12 +49,14 @@
 						{if $_gsdata.gspgid_va.1=='tpl' && $_gsdata.gspgid_va.2==$h.id}
 							{handler gspgid="/admin/wizard/choosetpl" Handler_id=$h.id Module_id=$module.id}
 						{/if}
-					</li>
+						<br>
+			</div>			
+			</td>			
+			</tr>
 				{/foreach}
-				</ul>
-			</li>
 		{/foreach}
-		</ul>
+		{/foreach}
+		</table>
 
 
 
@@ -64,6 +78,9 @@
 				<a href="/admin/wizard/recordsets/clone/{$rs.id}"><img src="/i/admin/ico_copy.png" alt="копировать" title="копировать" class="icon"></a>
 
 				{if $rs.Submodules->count()}({$rs.Submodules}){/if}
+
+
+				{*
 				<ul>
 				{foreach from=$rs.Fields item=field}
 					<li -data-href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}">
@@ -79,6 +96,18 @@
 					</li>
 				{/foreach}
 				</ul>
+				*}
+
+				<div>
+				{foreach $rs.Fields as $field}
+					<span -data-href="/admin/wizard/recordset_fields/{$rs.id}/fields/{$field.id}">{$field->name}</span> 
+				{/foreach}
+				</div>
+				<div>
+				{foreach $rs.Links as $link}
+					<span -data-href="/admin/wizard/recordset_fields/{$rs.id}/links/{$link.id}">{$link->name}</span> 
+				{/foreach}
+				</div>
 			</li>
 		{/foreach}
 		</ul>
