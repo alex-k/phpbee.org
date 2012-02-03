@@ -12,9 +12,9 @@
 	$this->gs_connectors=array (
 			'mysql'=>array( 
 				'db_type'=>'mysql',
-				'db_hostname'=>'127.0.0.1',
+				'db_hostname'=>'',
 				'db_port'=>'3306',
-				'db_username'=>'phpbee',
+				'db_username'=>'phpbee_build',
 				'db_password'=>'',
 				'db_database'=>'phpbee_build',
 				'codepage'=>'utf8',
