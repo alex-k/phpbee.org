@@ -39,7 +39,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 					'show'=>'gs_base_handler.fetch:name:banners_bottom.html:hkey:get',
 			),
 			'/admin/form/tw{%$MODULE_NAME%}'=>array(
-					'gs_base_handler.post:return:gs_record:{name:form.html:form_class:g_forms_table:classname:tw{%$MODULE_NAME%}:href:/admin/banners:form_class:form_admin}',
+					'gs_base_handler.post:return:gs_record:{name:admin_form.html:form_class:g_forms_table:classname:tw{%$MODULE_NAME%}:href:/admin/banners}',
 					'gs_base_handler.redirect:{href:/admin/banners}',
 			),
 		),
