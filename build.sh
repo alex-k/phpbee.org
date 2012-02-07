@@ -41,16 +41,24 @@ xsltproc ../svn2html.xsl Changelog.xml  > Changelog.html
 mv default.config.php config.php
 chmod 777 config.php var
 mv html/index_page_default.html html/index.html
-php phar.php
+mv html/404_default.html html/404.html
+#php phar.php
 find . -name public_html -mindepth 2 -exec sh -c "L=\`dirname {}\`; mkdir -p public_html/\$L; cp -r {}/* public_html/\$L ; " \;
-rm -fr libs
+#rm -fr libs
 cp public_html/worker.php public_html/index.php
-zip -r phpbee.zip config.php gs_libs.phar.gz html modules packages public_html Changelog.txt
+phpdoc -d libs -i smarty/ -t public_html/phpdoc
+
+
+
+zip -r phpbee.zip config.php html modules packages public_html Changelog.txt
+#zip -r phpbee.zip gs_libs.phar.gz 
+zip -r phpbee.zip libs 
 zip phpbee.zip var
 mv phpbee.zip ..
 cd ..
 cp build/Changelog.html public_html/download/Changelog-$FNAME.html
 rm -fr build
+rm -fr build_test
 
 
 cp phpbee.zip public_html/download/$FNAME
