@@ -40,7 +40,7 @@ class handler_wizard_newurl extends gs_handler {
 		$cnt=0;
 		foreach(explode("\n",$d['handlers']) as $h) {
 			$cnt+=10;
-			$url->Handlers->new_record(array('cnt'=>$cnt,'handler_value'=>$h));
+			if($h) $url->Handlers->new_record(array('cnt'=>$cnt,'handler_value'=>$h));
 		}
 		$url->commit();
 		return $url;
