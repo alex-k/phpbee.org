@@ -1,6 +1,6 @@
 <?php
 
-require_fullpath(__FILE__,'recordsets.php');
+require_once('recordsets.php');
 
 abstract class gs_wizard_strategy_module extends gs_base_module {}
 
@@ -16,14 +16,13 @@ class module_wizard extends gs_base_module implements gs_module {
 	}
 	
 	function get_menu() {
-		$ret[2][]='<a href="/admin/wizard/install">Install</a>';
-		$ret[3][]='<a href="/admin/wizard/newurl">Add page</a>';
-		$ret[1][]='<a href="/admin/wizard/">Modules wizard</a>';
+		$ret[1][]='<a href="/admin/wizard/">Wizard</a>';
 		$modules=new wz_modules();
 		$modules->find_records(array());
 		foreach($modules as $m) {
 			$ret[1][]='<a href="/admin/wizard/module/'.$m->id.'">'.$m->title.'</a>';
 		}
+		$ret[1][]='<a href="/admin/wizard/install">Install</a>';
 		return $ret;
 	}
 	
@@ -241,7 +240,7 @@ class gs_wizard_handler extends gs_handler {
 			  foreach($files as $fname) {
 				  $txt=file_get_contents($fname);
 				  $txt=str_replace('{%$PARENT_RECORDSET%}',$rs->name,$txt);
-				  file_put_contents_perm($fname,$txt);
+				  file_put_contents($fname,$txt);
 			  }
 		}
 
@@ -262,7 +261,7 @@ class gs_wizard_handler extends gs_handler {
 
 		//md($out,1); die();
 
-		return file_put_contents_perm($dirname.'module.phps',$out)!==FALSE;
+		return file_put_contents($dirname.'module.phps',$out)!==FALSE;
 
 
 	}
@@ -330,7 +329,7 @@ class gs_wizard_handler extends gs_handler {
 			$template=preg_replace("|{block name=\"".$this->data['gspgid_va'][2]."\"}.*?{/block}|is",'',$template);
 			$template.='{block name="'.$this->data['gspgid_va'][2].'"}'.$this->data['block_content'].'{/block}'.PHP_EOL;
 		}
-		file_put_contents_perm($filename,$template);
+		file_put_contents($filename,$template);
 		return true;
 	}
 
@@ -373,7 +372,7 @@ class gs_wizard_handler extends gs_handler {
 
 		$text="";
 		if (!empty($d['extends'])) $text='{extends file="'.$this->data['extends'].'"}'.PHP_EOL;
-		file_put_contents_perm($filename,$text);
+		file_put_contents($filename,$text);
 
 		if (empty($d['url'])) return true;	
 
@@ -426,7 +425,8 @@ class gs_wizard_handler extends gs_handler {
 		$f=$bh->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 		$d=$f->clean();
-		$filename=basename(dirname(__class_filename($d['strategy'])));	
+		//$filename=basename(dirname(__class_filename($d['strategy'])));	
+		$filename=str_replace('module_wizard_','',$d['strategy']);
 		$href="/admin/wizard/".$filename."/".$d['recordset']."/".$this->data['handler_params']['Module_id'];
 		return html_redirect($href);
 	}
@@ -561,7 +561,7 @@ class wz_handler_mc extends gs_handler {
 
 }
 
-require_fullpath(__FILE__,'macros.php');
-require_fullpath(__FILE__,'links.php');
+require('macros.php');
+require('links.php');
 
 ?>

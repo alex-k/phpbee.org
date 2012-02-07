@@ -36,11 +36,11 @@
 				<a href="/admin/wizard/handlers/{$url.id}">{$url.gspgid_value|default:"_DEFAULT_"}</a>
 			</td>
 			</tr>
-				{foreach from=$url.Handlers->orderby('cnt') item=h}
 			<tr>
 			<td></td>
 			<td nowrap>
-			<div class="owf_h">
+				{foreach from=$url.Handlers->orderby('cnt') item=h}
+			<div class="owf_h" -data-href="/admin/wizard/handlers/{$url.id}/handlers/{$h.id}#form">
 						{if $h.handler_keyname!="" && !is_numeric($h.handler_keyname)}{$h.handler_keyname}:{/if}
 						{$h.handler_value}
 						{*
@@ -51,9 +51,9 @@
 						{/if}
 						<br>
 			</div>			
+				{/foreach}
 			</td>			
 			</tr>
-				{/foreach}
 		{/foreach}
 		{/foreach}
 		</table>
