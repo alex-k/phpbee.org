@@ -351,14 +351,14 @@ class gs_base_handler extends gs_handler {
 		$ret=$tpl->fetch($tplname);
 		return $ret;
 	}
-	function validate() {
+	function validate($f=NULL) {
 		if(isset($this->data['handler_params']['form_class'])) {
 			$this->params['form_class']=$this->data['handler_params']['form_class'];
 		}
 		if (!$this->is_post()) return $this->showform();
 
 		$tpl=gs_tpl::get_instance();
-		$f=$this->get_form();
+		if (!$f) $f=$this->get_form();
 		if (isset($this->data['gsform_interact'])) {
 			$this->flush($f->interact($this->data['gsform_interact']));
 		}
@@ -764,7 +764,12 @@ class gs_base_handler extends gs_handler {
 	}
 	function post_find_record($data) {
 		$bh=new gs_base_handler($this->data,$this->params);
-		$f=$bh->validate();
+		$f=$bh->get_form();
+		foreach($f->htmlforms as $k=>$v) {
+			$u=array_search('checkUnique',$v['validate']);
+			if ($u!==FALSE) unset($f->htmlforms[$k]['validate'][$u]);
+		}
+		$f=$bh->validate($f);
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 		$d=$f->clean();
 

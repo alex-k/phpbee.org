@@ -2,26 +2,36 @@
 {foreach $params as $k=>$v}
 	<input type=hidden name="{$k}" value="{$v|htmlentities}">
 {/foreach}
-<div  class="MultiPowUploadGallery" id="gallery_{$params.hash}">
+
 	{foreach $g_images as $g_key=>$images}
+    <div class="photos_gall">
+    <div  class="MultiPowUploadGallery" id="gallery_{$params.hash}">
 		{if $g_key && $g_key!="nogrp"}<div class=MultiPowUploadGalleryGroup>{/if}
 		{foreach $images as $i}
 		{include file="li_image.html" i=$i}
 		{/foreach}
 		{if $g_key && $g_key!="nogrp"}</div>{/if}
+
+        <div class="clear"></div>
+        </div>
+        </div>
 	{/foreach}
-</div>
+
 <div class="clear"></div>
 {if $images}
+<div class="images_manager">
 <label><input type=radio name="checked_items_action" value="delete">Delete</label>
+{*
 <label><input type=radio name="checked_items_action" value="rotate_cw">Rotete CW</label>
 <label><input type=radio name="checked_items_action" value="rotate_ccw">Rotete CCW</label>
+*}
 <label><input type=radio name="checked_items_action" value="group">Group</label>
 <input type=button id="checked_items_submit" value="apply">
+</div>
 {/if}
 
 <div id="MultiPowUpload_holder">
-<input type="button" class="MultiPowUploadStartButton" onClick="MultiPowUpload_Start();" value="UPLOAD FILES">
+<input type="button" class="MultiPowUploadStartButton" onClick="left_heightWid(); MultiPowUpload_Start();" value="UPLOAD PHOTOS">
 </div>
 <script>
 	var params_str={$params_str}

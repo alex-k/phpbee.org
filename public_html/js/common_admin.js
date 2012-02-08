@@ -2,8 +2,8 @@ $(document).ready (function () {
 	$("form").interaction();
 	$(".lMany2Many").gs_multiselect();
 	$(".fMultiSelect").gs_multiselect();
-	$(".lOne2One").sel_filter( {slide_width: 50, min_options: 1, crop: false});
-	$(".fSelect").sel_filter( {slide_width: 50, min_options: 1, crop: true});
+$(".lOne2One").sel_filter( {slide_width: 150, min_options: 1, crop: false});
+	$(".fSelect").sel_filter();
 	$(".fDateTime").datepicker();
 	$('.fWysiwyg').rte( {
 		//css: ['default.css'],
@@ -57,6 +57,19 @@ onOpen: function() {
 		}
 		);
 	});
+
+	$('.form_help_over').mouseover(function() {
+		var spoiler=$(this).closest('.form_help_container').find('.form_help');
+		spoiler.delay(1500).show();
+	});
+	$('.form_help_over').mouseout(function() {
+		var spoiler=$(this).closest('.form_help_container').find('.form_help');
+		spoiler.hide();
+	});
+
+	
+
+	
 
 });
 
