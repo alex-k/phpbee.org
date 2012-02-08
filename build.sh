@@ -12,11 +12,11 @@ rm -fr build_test
 mkdir build_test
 cd build_test
 svn export $REPO . --force
+
+./build_copy.sh
+
 cp build.config.php config.php
-chmod 777 config.php var
-mv html/index_page_default.html html/index.html
-mv html/404_default.html html/404.html
-cp public_html/worker.php public_html/index.php
+
 php public_html/install.php install_key=12345
 cd tests
 
@@ -38,14 +38,14 @@ svn export $REPO . --force
 svn log -r '{'$LASTDATE'}':'{'`date -v +1d "+%Y-%m-%d"`'}' --xml --verbose $REPO > Changelog.xml
 xsltproc ../svn2cl.xsl Changelog.xml  > Changelog.txt
 xsltproc ../svn2html.xsl Changelog.xml  > Changelog.html
-mv default.config.php config.php
-chmod 777 config.php var
-mv html/index_page_default.html html/index.html
-mv html/404_default.html html/404.html
+
+
+./build_copy.sh
+
+
 #php phar.php
 find . -name public_html -mindepth 2 -exec sh -c "L=\`dirname {}\`; mkdir -p public_html/\$L; cp -r {}/* public_html/\$L ; " \;
 #rm -fr libs
-cp public_html/worker.php public_html/index.php
 phpdoc -d libs -i smarty/ -t public_html/phpdoc
 
 
