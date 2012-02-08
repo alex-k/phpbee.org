@@ -64,6 +64,7 @@ class wz_recordset_fields extends gs_recordset_short {
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'verbose_name'=> "fString verbose_name required=false",
+		'helper_text'=> "fString helper_text required=false",
 		'type'=>"fSelect type values='fString,fText,fInt' widget=select",
 		'multilang'=>"fCheckbox multilang",
 		'options'=>"fString options required=false",

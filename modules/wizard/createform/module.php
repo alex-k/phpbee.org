@@ -54,6 +54,7 @@ class gs_strategy_createform_handler extends gs_handler {
 			$f->name=$d['name'][$k];
 			$f->verbose_name=$d['verbose_name'][$k];
 			$f->cssclass=$d['cssclass'][$k];
+			$f->helper_text=$d['helper_text'][$k];
 			$f->widget=$d['widget'][$k];
 			$f->cnt=$cnt;
 			$f->default_value=$d['default_value'][$k];
@@ -168,6 +169,11 @@ class form_createform extends form_admin{
 				'widget'=>'input',
 				'validate'=>'dummyValid',
 				) ,
+			'helper_text'=>
+				array(
+				'widget'=>'input',
+				'validate'=>'dummyValid',
+				) ,
 			'widget'=>array(
 				'widget'=>'select',
 				'options'=>array_combine($widgets,$widgets),
@@ -218,7 +224,7 @@ class form_createform extends form_admin{
 			'template'=>array(
 				'widget'=>'select',
 				'options' => array_combine($extends,$extends),
-				'default'=>"form.html",
+				'default'=>"custom_form_separate_fields.html",
 			),
 			'template_name'=>array(
 				'widget'=>'input',
@@ -246,6 +252,8 @@ class form_createform extends form_admin{
 			$arr=$farr;
 			$arr['name']['default']=$key;
 			$arr['verbose_name']['default']=$h['verbose_name'];
+			$arr['helper_text']['default']=$h['helper_text'];
+			$arr['cssclass']['default']=$h['cssclass'];
 			$arr['widget']['default']=isset($h['widget']) ? $h['widget'] : $h['type'];
 			$arr['default_value']['default']=$h['default'];
 			$arr['readonly_field']['default']=isset($h['readonly']) ? $h['readonly'] : 0;
