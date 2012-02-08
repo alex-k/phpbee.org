@@ -41,11 +41,19 @@ class wz_link_images extends wz_link {
 			'no_urlkey'=>1,
 			));
 
+		$rec_images->Fields->new_record(array(
+				'name'=>'group_key',
+				'type'=>'fString',
+				'options'=>32,
+				'make_index'=>true,
+				));
+
 		$rec_images->Links->new_record(array(
 				 'name'=>'Parent',
 				 'type'=>'lOne2One',
 				 'classname'=>$rec->Recordset->first()->name,
 				 'linkname'=>'',
+				 'extra_options'=>'mode=link',
 				 'fkey_on_delete'=>'CASCADE',
 				 'fkey_on_update'=>'CASCADE',
 				 'fkey_name'=>$rec->Recordset->first()->name.'.'.$rec->name,
@@ -87,7 +95,6 @@ class wz_link_images extends wz_link {
 		$rec->fill_values(array(
 			'classname'=>$name_rs_images,
 			'linkname'=>$l121? '' : 'Parent',
-			'extra_options'=>'mode=link',
 			));
 
 		$rec_images->commit();

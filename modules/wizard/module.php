@@ -16,13 +16,14 @@ class module_wizard extends gs_base_module implements gs_module {
 	}
 	
 	function get_menu() {
-		$ret[1][]='<a href="/admin/wizard/">Wizard</a>';
+		$ret[1]='<a href="/admin/wizard/install">Install</a>';
+		$ret[2]='<a href="/admin/wizard/newurl">New page</a>';
+		$ret[3][]='<a href="/admin/wizard/">Modules</a>';
 		$modules=new wz_modules();
 		$modules->find_records(array());
 		foreach($modules as $m) {
-			$ret[1][]='<a href="/admin/wizard/module/'.$m->id.'">'.$m->title.'</a>';
+			$ret[3][]='<a href="/admin/wizard/module/'.$m->id.'">'.$m->title.'</a>';
 		}
-		$ret[1][]='<a href="/admin/wizard/install">Install</a>';
 		return $ret;
 	}
 	

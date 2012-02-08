@@ -288,6 +288,7 @@ class gs_widget_select_enter extends gs_widget_select {
 	function html() {
 		if (!is_array($this->value)) $this->value=array('select'=>trim($this->value),'enter'=>trim($this->value));
 		$ret="<select onChange=\"$('input[selname=".$this->fieldname."]').val(this.value);\" class=\"fSelect\"  name=\"".$this->fieldname."[select]\"><option></option>\n";
+		if (($this->params['variants'])) $this->params['options']=$this->params['variants'];
 		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 		foreach ($this->params['options'] as $v=>$l) {
 			if (is_array($l)) {

@@ -31,6 +31,12 @@ class wz_recordsets extends gs_recordset_short {
 		$this->structure['fkeys']=array(
 			array('link'=>'Module','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
 		);
+		$this->structure['triggers']['before_delete'][]='before_delete';
+	}
+	function before_delete($rec,$type) {
+		$rs=new wz_recordset_links;
+		$rs->find_records(array('classname'=>$rec->name))->delete();
+		$rs->commit();
 	}
 }
 
@@ -110,7 +116,7 @@ class wz_recordset_links extends gs_recordset_short {
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'verbose_name'=> "fString verbose_name required=false",
-		'type'=>"fSelect type values='lOne2One,lMany2One,lMany2Many'",
+		'type'=>"fSelect type values='lOne2One,lMany2One,lMany2Many' widget=radio",
 		'classname'=>"fSelect classname widget=select_enter",
 		'linkname'=>"fString linkname required=false",
 		'options'=>"fString options required=false",
@@ -143,7 +149,6 @@ class wz_recordset_links extends gs_recordset_short {
 	function gs_data_widget_select($rec,$field) {
 		switch($field) {
 			case 'classname':
-
 				$rs=new wz_recordsets();
 				$rsets=$rs->find_records(array())->recordset_as_string_array();
 				$rsets=array_combine($rsets,$rsets);

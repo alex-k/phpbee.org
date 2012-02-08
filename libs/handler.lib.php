@@ -326,6 +326,7 @@ class gs_base_handler extends gs_handler {
 		$fields=$rec->get_recordset()->id_field_name.','.implode(',',$hh_fields);
 
 		$f->set_values($default_values);
+		$f->set_values($rec->get_values($fields));
 		$f->set_values(self::implode_data($rec->get_values($fields)));
 		$f->set_values($data);
 

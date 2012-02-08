@@ -71,7 +71,8 @@ abstract class tw_file_images extends gs_recordset_short{
 	function config_previews() {
 		$this->config=array(
 			'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
-			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(240,240,240)),
+			'admin'=>array('width'=>100,'height'=>100,'method'=>'use_fields','bgcolor'=>array(255,255,255)),
+			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(255,255,255)),
 		);
 	}
 	
