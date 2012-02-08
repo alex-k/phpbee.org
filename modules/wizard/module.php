@@ -110,6 +110,12 @@ class module_wizard extends gs_base_module implements gs_module {
 			'/admin/form/strategy'=>array(
 				'gs_wizard_handler.strategy:return:true:name:form_submit.html:form_class:gs_wizard_strategy_form',
 			),
+			'/admin/wizard/form/templates/copy'=>array(
+				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+				'gs_wizard_handler.templatescopy:{name:admin_form.html:form_class:gs_wizard_form_templates_copy}',
+				'gs_base_handler.redirect_if:gl:save_continue:return:true',
+				'gs_base_handler.redirect_up',
+				),
 		),
 		'post'=>array(
 			'/admin/wizard/iddqdblocksubmit'=>array(
@@ -203,6 +209,9 @@ class module_wizard extends gs_base_module implements gs_module {
                         '/admin/wizard/templates/delete'=>array(
                                         'gs_wizard_handler.deletetemplate:return:true',
                                         'gs_base_handler.redirect',
+                                        ),
+                        '/admin/wizard/templates/copy'=>array(
+                                        'gs_base_handler.show:name:templates_copy.html',
                                         ),
 
 		),
@@ -406,6 +415,22 @@ class gs_wizard_handler extends gs_handler {
 
 		return true;
 	}
+	function templatescopy() {
+		$bh=new gs_base_handler($this->data,$this->params);
+		$f=$bh->validate();
+		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+		$d=$f->clean();
+		$module=record_by_id($d['from_Module_id'],'wz_modules');
+
+		$from_filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.basename($d['from_name']);
+		if (!file_exists($from_filename))  return false;
+
+		$module=record_by_id($d['Module_id'],'wz_modules');
+		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.basename($d['name']);
+		
+		return copy($from_filename,$filename);
+		
+	}
 	function choosetpl() {
 		$bh=new gs_base_handler($this->data,$this->params);
 		$f=$bh->validate();
@@ -542,6 +567,33 @@ class gs_wizard_form_fields_validators_form extends g_forms_table {
 		}
 		$this->field_options['class']['options']=$options;
 		$this->field_options['class']['default']='notEmpty';
+		return parent::__construct($hh,$params,$data);
+	}
+}
+class gs_wizard_form_templates_copy extends g_forms_table {
+	function __construct($hh,$params=array(),$data=array()) {
+		$default=string_to_params($data['handler_params']['_default']);
+		$modules=new wz_modules;
+		$modules->find_records(array());
+		$hh=array(
+			'Module_id'=>array(
+				'widget'=>'radio',
+				'options'=>$modules->recordset_as_string_array(),
+				'default'=>$default['Module_id'],
+				),
+			'name'=>array(
+				'widget'=>'input',
+				'default'=>$default['name'],
+				) ,
+			'from_Module_id'=>array(
+				'widget'=>'hidden',
+				'default'=>$data['handler_params']['from_Module_id'],
+				) ,
+			'from_name'=>array(
+				'widget'=>'hidden',
+				'default'=>$data['handler_params']['from_name'],
+				) ,
+		);
 		return parent::__construct($hh,$params,$data);
 	}
 }
