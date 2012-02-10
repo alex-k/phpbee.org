@@ -22,36 +22,39 @@ class handler_multilang_base  extends gs_base_handler {
 		$filter=gs_filters_handler::get($name);
 		if (!$filter) return;
 		$f=$filter->current();
-		gs_var_storage::save('multilanguage_lang',$f->lang);
-		setlocale(LC_ALL,$f->locale);
+		self::set_locale($f);
 	}
-	function __setlocale($ret) {
-		$name=$this->params['name'];
-		if (isset($this->data[$name])) {
-			$value=$this->data[$name];
-			$langs=languages();
-			if(isset($langs[$value])) {
-				gs_session::save($value,'multilanguage_lang');
-				if (class_exists('sys_languages')) {
-					$rs=new sys_languages();
-					$r=$rs->find_records(array('lang'=>$value))->first();
-					if ($r) {
-						gs_session::save($r->locale,'multilanguage_locale');
-						//gs_session::save($r->id,'filter_'.$name);
-						return $r;
-					}
-				}
-			}
+	static function set_locale($f) {
+		gs_var_storage::save('multilanguage_lang',$f->lang);
+		gs_var_storage::save('multilanguage_locale',$f->locale);
+		gs_var_storage::save('multilanguage_date_format',$f->locale_date_format);
+		gs_var_storage::save('multilanguage',$f);
+		setlocale(LC_ALL,$f->locale);
+		setlocale(LC_NUMERIC,'C');
+	}
 
-				
-		}
-		$s_lang=gs_session::load('multilanguage_lang');
-		if ($s_lang) gs_var_storage::save('multilanguage_lang',$s_lang);
-		//if (!$s_lang) $s_lang=key(languages());
-		//gs_var_storage::save('multilanguage_lang',$s_lang);
 
-		$s_locale=gs_session::load('multilanguage_locale');
-		if ($s_locale) setlocale(LC_ALL,$s_locale);
+	static function multilang_start() {
+		$data=array(
+			    'handler_params' => Array
+				(
+				    'gspgid' => 'filter',
+				    'class' => 'select_records',
+				    'recordset' => 'sys_languages',
+				    'name' => 'Lang',
+				    'default_value' => cfg('multilang_default_language_id'),
+				    'urltype' => 'session',
+				)
+		);
+		$params=array(
+			'module_name'=>'module',
+		);
+		$h=new gs_filters_handler($data,$params);
+		$h->init();
+		$filter=gs_filters_handler::get('Lang');
+		if (!$filter) return;
+		$f=$filter->current();
+		if ($f) self::set_locale($f);
 	}
 }
 ?>

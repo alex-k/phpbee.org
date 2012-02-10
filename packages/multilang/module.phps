@@ -58,6 +58,14 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 		return self::add_subdir($data,dirname(__file__));
 	}
 
+	static function gl($alias,$rec) {
+		$fname=dirname(__FILE__).DIRECTORY_SEPARATOR.'gl.php';
+		if (file_exists($fname)) {
+			$x=include($fname);
+			return $x;
+		}
+	}
+
 	/*
 	static function gl($alias,$rec) {
 		if(!is_object($rec)) {
@@ -74,25 +82,33 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 	}
 	*/
 }
-
+/*
 class handler{%$MODULE_NAME%} extends gs_base_handler {
 }
+*/
 
 
 class sys_languages extends gs_recordset_short {
-		function __construct($init_opts=false) { parent::__construct(array(
+		public $orderby="id"; 
+	function __construct($init_opts=false) { parent::__construct(array(
 
 		
-			'name'=>'fString verbose_name="name"     required=true   ',
+			'name'=>'fString verbose_name="name"     required=true       ',
 
 		
-			'lang'=>'fString verbose_name="lang"     required=true   ',
+			'lang'=>'fString verbose_name="lang"     required=true       ',
 
 		
-			'locale'=>'fString verbose_name="locale"     required=true   ',
+			'locale'=>'fString verbose_name="locale"     required=true       ',
+
+		
+			'locale_date_format'=>'fString verbose_name="locale_date_format"   default="%Y-%m-%d"   required=false       ',
+
+		
+			'jquery_date_format'=>'fString   default="dd-mm-yy"   required=false       ',
 
 				
-			'Flag'=>'lOne2One sys_languages_images verbose_name="Flag"   widget="include_form"  required=false   mode=link required=false  ',
+			'Flag'=>'lOne2One sys_languages_images verbose_name="Flag"   widget="include_form"  required=false  mode=link required=false  ',
 
 						),$init_opts);
 
@@ -101,18 +117,20 @@ class sys_languages extends gs_recordset_short {
 				     );
 				
 	}
-
+	
+	
 }
 
 
 class sys_languages_images extends tw_images {
-		function __construct($init_opts=false) { parent::__construct(array(
+		public $orderby="id"; 
+	function __construct($init_opts=false) { parent::__construct(array(
 
 				
-			'Parent'=>'lOne2One sys_languages    required=false     ',
+			'Parent'=>'lOne2One sys_languages    required=false    ',
 
 		
-			'File'=>'lOne2One sys_languages_images_files verbose_name="File"   widget="include_form"  required=false   hidden=false  ',
+			'File'=>'lOne2One sys_languages_images_files verbose_name="File"   widget="include_form"  required=false  hidden=false  ',
 
 						),$init_opts);
 
@@ -123,15 +141,17 @@ class sys_languages_images extends tw_images {
 				     );
 				
 	}
-
+	
+	
 }
 
 
 class sys_languages_images_files extends tw_file_images {
-		function __construct($init_opts=false) { parent::__construct(array(
+		public $orderby="id"; 
+	function __construct($init_opts=false) { parent::__construct(array(
 
 				
-			'Parent'=>'lOne2One sys_languages_images    required=false     ',
+			'Parent'=>'lOne2One sys_languages_images    required=false    ',
 
 						),$init_opts);
 
@@ -141,7 +161,14 @@ class sys_languages_images_files extends tw_file_images {
 				     );
 				
 	}
-
+	
+		function config_previews() {
+		parent::config_previews();
+		$this->config=array_merge($this->config,array(
+					'ico'=>array('width'=>20,'height'=>20,'method'=>'use_width','bgcolor'=>array(0,0,0)),
+				));
+	}
+	
 }
 
 
