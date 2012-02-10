@@ -21,13 +21,17 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 		$data=array(
 		'get_post'=>array(
 			''=>'gs_base_handler.show:{name:news.html}',
+			'archive/*/*'=>array(
+					'gs_base_handler.validate_gl:{name:no_record:return:true^e404}',
+					'gs_base_handler.show:{name:news.html}',
+					'end',
+					'e404'=>'gs_base_handler.show404:return:true',
+					),
 			'show/*/*'=>array(
-					//'s'=>'gs_base_handler.validate_gl:{name:show:return:true&e404^555}',
 					'gs_base_handler.validate_gl:{name:show:return:true^e404}',
 					'gs_base_handler.show:{name:news_show.html}',
 					'end',
 					'e404'=>'gs_base_handler.show404:return:true',
-					'555'=>'gs_base_handler.show:{name:555.html:return:true}',
 					),
 			'/admin/news'=>'gs_base_handler.show:{name:adm_news.html:classname:tw{%$MODULE_NAME%}}',
 			'/admin/news/delete'=>'admin_handler.deleteform:{classname:tw{%$MODULE_NAME%}}',
@@ -47,16 +51,32 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 	return self::add_subdir($data,dirname(__file__));
 	}
 
-	static function gl($alias,$rec) {
-		if(!is_object($rec)) {
-			$obj=new tw{%$MODULE_NAME%};
-			$rec=$obj->get_by_id(intval($rec));
+	static function gl($alias,$rec,$url='') {
+		if (!is_null($rec) && !empty($rec)) {
+            if(!is_object($rec)) {
+				$obj=new tw{%$MODULE_NAME%};
+				$rec=$obj->get_by_id(intval($rec));
+		    }
+        } else {
+			$alias='no_record';
 		}
+		
 		switch ($alias) {
 			case 'show':
 				return sprintf('/{%$MODULE%}/show/%s/%d.html',
 						date('Y/m',strtotime($rec->date)),
 						$rec->get_id());
+			break;
+            case 'stat':
+				return sprintf('/{%$MODULE%}/archive/%d/%d',
+						$rec->year,
+						$rec->month);
+			break;
+			case 'no_record':
+				list($year,$month)=sscanf($url,'news/archive/%d/%d');
+				$rs=new tw_news_stats;
+				$rec_num=$rs->find_records(array('year'=>$year,'month'=>$month))->first()->num;
+				return intval($rec_num)>0 ? sprintf('/news/archive/%d/%d',$year,$month) : false;
 			break;
 		}
 	}
@@ -67,6 +87,7 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 
 class tw{%$MODULE_NAME%} extends gs_recordset_handler {
 	const superadmin=1;
+    var $no_urlkey=true;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'date'=>"fDatetime дата",
 		'subject'=>"fString 'Заголовок' keywords=1",

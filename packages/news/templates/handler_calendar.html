@@ -3,14 +3,14 @@
 {assign var="month" value=$smarty.now|date_format:"%m"}
 {assign var="month" value=$_gsdata.gspgid_va.1|default:$month}
 {assign var="mnames" value=" "|explode:"Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь Декабрь"}
-{controller _class="tw_news_stats" year=$year _assign="news_counts" _index_field_name="month" _fields="month,num"}
-{assign var="news_counts" value=$news_counts->get_values()}
+{controller _class="tw_news_stats" year=$year _assign="news_counts" _index_field_name="month" _fields="year,month,num"}
 <div class="date_pager">
 	<ul class="months">
 		{assign var="last_month" value=1}
 		{foreach from=$mnames key="key" item="name"}
+		{$a=$news_counts[$key+1]}
 		<li>
-		{if isset($news_counts[$key+1]) && $news_counts[$key+1].num>0}<a href="/news/{$year}/{$key+1|str_pad:2:'0':0}" {if $key+1==$month}class="current"{/if}>{$name}</a>{else}{$name}{/if}
+		{if isset($news_counts[$key+1]) && $news_counts[$key+1].num>0}<a href="{gl stat=$a}" {if $key+1==$month}class="current"{/if}>{$name}</a>{else}{$name}{/if}
 		</li>
 		{/foreach}
 	</ul>
@@ -19,7 +19,7 @@
 			<ul class="years">
 				{for $var=$smarty.now|date_format:"%Y" to $min_year->first()->year step -1}
 				{controller _class="tw_news_stats" _assign="y" year=$var num=">0" _fields='id,month' _orderby="month desc" _limit=1}
-				<li>{assign var="r" value=$y->first()}{if $r->month}<a href="/news/{$var}/{$r->month}" {if $var==$year}class="current"{/if}>{$var}</a>{else}{$var}{/if}</li>
+				<li>{assign var="r" value=$y->first()}{if $r->month}<a href="{gl stat=$r}" {if $var==$year}class="current"{/if}>{$var}</a>{else}{$var}{/if}</li>
 				{/for}
 			</ul>
 	<div class="clear"></div>

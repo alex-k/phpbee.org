@@ -35,7 +35,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 		'handler'=>array(
 			''=>'gs_base_handler.show:{name:articles_show.html}',
 			'list'=>'gs_base_handler.show:{name:articles_list.html}',
-			'last'=>'gs_base_handler.show',
+			'last'=>'gs_base_handler.show:{name:articles_last.html}',
 			'short_list'=>'gs_base_handler.show:{name:news_short_list.html}',
 			'/admin/form/tw{%$MODULE_NAME%}'=>array(
 					'gs_base_handler.post:{name:admin_form.html:form_class:g_forms_table:classname:tw{%$MODULE_NAME%}}',
@@ -65,6 +65,7 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 
 class tw{%$MODULE_NAME%} extends gs_recordset_handler {
 	const superadmin=1;
+    var $no_urlkey=true;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString 'Название' keywords=1",
 		'description'=> "fText 'Содержание' widget=wysiwyg images_key=Images required=false keywords=1",
@@ -84,14 +85,14 @@ class tw{%$MODULE_NAME%} extends gs_recordset_handler {
 	}
 	
 	function keywords($rec,$type) {
-		$url=module{%$MODULE_NAME%}::gl('show',$rec);
+        $url=module{%$MODULE_NAME%}::gl('show',$rec);
 		if ($type=='before_update' || $type=='after_insert') {
 			$keywords=metatags::get_keywords($rec);
 			$description=str_replace("\n"," ",substr(strip_tags($rec->description),0,254));
 			$title=strip_tags($rec->name);
-			metatags::save('tw{%$MODULE_NAME%}',$url,$title,$keywords,$description);
+			metatags::save($url,$title,$keywords,$description);
 		}elseif ($type=='before_delete') {
-			metatags::delete('tw{%$MODULE_NAME%}',$url);
+			metatags::delete($url);
 		}
 	}
 	
