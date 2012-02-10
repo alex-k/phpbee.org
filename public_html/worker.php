@@ -11,6 +11,7 @@ mlog('1');//starts time counter in debug
 $init=new gs_init();
 $init->init(LOAD_CORE);
 $o_h=new gs_parser($init->data);
+handler_multilang_base::multilang_start();
 $o_h->process();
 
 function fatal_error_handler($buffer){

@@ -250,7 +250,10 @@ class gs_record implements arrayaccess {
 		if (isset($this->gs_recordset->structure['fields'][$name]['multilang'])
 			&& $this->gs_recordset->structure['fields'][$name]['multilang']
 			) {
-			$language=gs_var_storage::load('multilanguage_lang');
+			$language=false;
+			if (!$language) $language=gs_var_storage::load('multilanguage_lang');
+			if (!$language) $language=gs_session::load('multilanguage_lang');
+
 			if ($this->disable_multilang) {
 				$this->disable_multilang=0;
 			} else if ($language) {
