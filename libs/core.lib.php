@@ -114,6 +114,10 @@ class gs_iterator implements Iterator, arrayaccess {
 		return $this;	
     }
 
+    function shuffle() {
+        shuffle($this->array);
+    }
+
     function remove_element($element) {
 	    if (get_class($element)=='gs_record') {
 		    foreach ($this->array as $k=>$el) {
