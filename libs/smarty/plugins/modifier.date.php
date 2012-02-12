@@ -56,19 +56,26 @@ class vpa_tpl_date {
 		if (strtotime($date)) {
 			$date=strtotime($date);
 		}
+        if (intval($date)<13) {
+            $year=date('Y');
+            $month=$date;
+            $day=date('d');
+        } else {
+            $year=date('Y',$date);
+            $month=date('m',$date);
+            $day=date('d',$date);
+
+        }
 		//preg_match_all("|(\d{4})(\d{2})(\d{2})|is",$date,$out);
 		// тут мы реализуем аналогичные методы форматирования дат, как в доке по функции date
 		// реализованы далеко не все, а только те, что надо.
 		// используется ручное форматирование, чтобы можно было реально называть месяца и дни недели в независомости от настроек локали на сервере.
 		// можно выдумывать свои модификаторы, только тогда - документируйте плиз :)
-		$year=date('Y',$date);
-		$month=date('m',$date);
-		$day=date('d',$date);
 		$date=$format;
 		$date=str_replace("%Y",$year,$date);
 		$date=str_replace("%m",$month,$date);
-		$date=str_replace("%F",$this->months[intval($month)],$date);
 		$date=str_replace("%FN",$this->months_nominatif[intval($month)],$date);
+        $date=str_replace("%F",$this->months[intval($month)],$date);
 		$date=str_replace("%d",$day,$date);
 		return $date;
 	}
