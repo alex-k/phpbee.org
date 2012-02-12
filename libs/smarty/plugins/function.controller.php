@@ -1,17 +1,25 @@
 <?php
 function smarty_function_controller($params, &$smarty)
 {
-	if (isset($params['_params'])) {
+	$use_find=false;
+    if (isset($params['_params'])) {
 		$params=array_merge($params,$params['_params']);
 	}
 	
-	$obj=new $params['_class'];
-	if (isset($params['_id'])) $params[$obj->id_field_name]=$params['_id'];
-	if (isset($params['_assign_type']) && $params['_assign_type']=='class') {
-		$obj->new_record(array());
-		$smarty->assign($params['_assign'],$obj->current());
-		return;
-	}
+	if (isset($params['_class'])) {
+        $obj=new $params['_class'];
+	    if (isset($params['_id'])) $params[$obj->id_field_name]=$params['_id'];
+	    if (isset($params['_assign_type']) && $params['_assign_type']=='class') {
+		    $obj->new_record(array());
+		    $smarty->assign($params['_assign'],$obj->current());
+		    return;
+	    }
+    }
+
+    if (isset($params['_object'])) {
+        $obj=$params['_object'];
+        $use_find=true;
+    }
 
 	$vars=array();
 	foreach ($params as $k=>$v) {
@@ -100,7 +108,7 @@ function smarty_function_controller($params, &$smarty)
 	
 	if (!isset($params['_count'])) {
 			if (!isset($params['_index_field_name'])) {
-				$ret=$obj->find_records($options,$fields);
+				$ret=(!$use_find) ? $obj->find_records($options,$fields) : $obj->find($options);
 			} else {
 				$ret=$obj->find_records($options,$fields,$params['_index_field_name']);
 			}
