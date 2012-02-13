@@ -73,10 +73,11 @@ class gs_base_handler extends gs_handler {
 	}
 
 	function validate_gl() {
-		$url=call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v'],$this->data['gspgid']);
-		$url=trim($url,'/');
+		$ret=call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v'],$this->data['gspgid']);
+		$url=trim($ret,'/');
 		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/') || $ret===TRUE );
 	}
+
 	function show404($ret) {
 		header("HTTP/1.0 404 Not Found");
 		return $this->show($ret);
