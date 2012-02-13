@@ -1,6 +1,6 @@
 <?php
 	$this->install_key='12345'; // run site.com/install.php?install_key=12345
-	//$this->admin_ip_access='127.0.0.1, 192.168.1.102';
+	$this->admin_ip_access='127.0.0.1, 192.168.1.102';
 	$this->admin_user_name='admin';
 	$this->admin_password='admin';
 
@@ -43,7 +43,6 @@
 
 	date_default_timezone_set('Europe/Moscow');
 	setlocale(LC_ALL,'ru_RU.UTF-8');
-	setlocale(LC_NUMERIC,'en_US.UTF-8');
 	$this->mail_smtp_host='127.0.0.1';
 	$this->mail_smtp_port='25';
 	$this->mail_smtp_username='';
@@ -55,6 +54,8 @@
 	$this->languages=NULL;
 	//$this->languages=array('ru'=>'RUS','en'=>'ENG');
 	//$this->languages='tw_languages';
+	//$this->multilang_default_language_id=2; //default record in languages recordset
+	//$this->multilang_default_language='en'; //use prior of handler_multilang_base::setlocale_handler
 
 	$this->widget_MultiPowUpload_license='put your key here';
 	$this->widget_MultiPowUpload_watermark='/libs/widgets/MultiPowUpload/watermark.png';

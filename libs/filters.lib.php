@@ -419,11 +419,12 @@ class gs_filter_select_records extends gs_filter {
 			$this->recordset= new $rs;
 			$this->recordset->find_records(array())->preload();
 		}
-
+		$this->default_value = isset($this->params['default_value']) ? $this->params['default_value'] : NULL;
 	}
 	function current() {
-		$ret=$this->value &&  $this->recordset[$this->value] ? $this->recordset[$this->value] : $this->recordset->first();
-		return $ret;
+		if ($this->value &&  $this->recordset[$this->value])  return  $this->recordset[$this->value] ;
+		if ($this->default_value &&  $this->recordset[$this->default_value])	return  $this->recordset[$this->default_value];
+		return $this->recordset->first();
 	}
 	function applyFilter($options,$rs) {
 		$options[]=array(

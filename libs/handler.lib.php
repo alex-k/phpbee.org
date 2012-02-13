@@ -75,7 +75,7 @@ class gs_base_handler extends gs_handler {
 	function validate_gl() {
 		$url=call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v'],$this->data['gspgid']);
 		$url=trim($url,'/');
-		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/'));
+		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/') || $ret===TRUE );
 	}
 	function show404($ret) {
 		header("HTTP/1.0 404 Not Found");
@@ -106,6 +106,7 @@ class gs_base_handler extends gs_handler {
 		$language=false;
 		if (!$language) $language=gs_var_storage::load('multilanguage_lang');
 		if (!$language) $language=gs_session::load('multilanguage_lang');
+		if (!$language) $language=cfg('multilang_default_language');
 
 		if ($language) {
 			$langs=languages();

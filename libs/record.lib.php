@@ -253,6 +253,7 @@ class gs_record implements arrayaccess {
 			$language=false;
 			if (!$language) $language=gs_var_storage::load('multilanguage_lang');
 			if (!$language) $language=gs_session::load('multilanguage_lang');
+			if (!$language) $language=cfg('multilang_default_language');
 
 			if ($this->disable_multilang) {
 				$this->disable_multilang=0;
