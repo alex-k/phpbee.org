@@ -1,3 +1,7 @@
+	if ( typeof left_heightWid == 'undefined' ) {
+		function left_heightWid() {};
+	}
+
 	var params = {  
 		BGColor: "#FFFFFF",
 		wmode: "opaque"
