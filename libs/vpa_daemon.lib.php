@@ -6,7 +6,7 @@ class vpa_daemon_base {
 	protected $pid;
 	protected $name;
 	private $running;
-	private $pid_dir='/var/run/';
+	protected $pid_dir='/var/run/';
 	
 	function __construct($name) {
 		$this->name=$name;

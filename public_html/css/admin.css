@@ -513,16 +513,20 @@ textarea.big_text {
 }
 
 .admin-login-form input[type="submit"]:hover {
-    background-color: black;
+	background-color: black;
 }
 
 .admin-top {
-    background: -moz-linear-gradient(#353535, #020202) repeat scroll 0 0 transparent;
-    color: #F1F0F0;
-    font-size: 16px;
-    height: 50px;
-    padding: 15px 40px 15px 30px;
+	color: #F1F0F0;
+	font-size: 16px;
+	height: 50px;
+	padding: 15px 40px 15px 30px;
 	position:relative;
+	background-color:#020202;
+	background:-moz-linear-gradient(#353535, #020202) repeat scroll 0 0 transparent;
+	background:-webkit-linear-gradient(#353535, #020202) repeat scroll 0 0 transparent;
+	background:-o-linear-gradient(#353535, #020202) repeat scroll 0 0 transparent;
+	background:linear-gradient(#353535, #020202) repeat scroll 0 0 transparent;
 }
 
 .admin-top .logo {

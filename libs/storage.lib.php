@@ -32,7 +32,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->db_scheme=$db_scheme;
 		$this->query_options['late_load_fields']=array();
 	}
-	protected function get_connector() {
+	public function get_connector() {
 		if (!$this->gs_connector) {
 			$gs_connector_pool=gs_connector_pool::get_instance();
 			$this->gs_connector=$gs_connector_pool->get_connector($this->gs_connector_id);
@@ -644,6 +644,10 @@ abstract class gs_prepare_sql {
 		}
 		return $table_fields;
 
+	}
+
+	function flush_query_cache() {
+		$this->_cache=array();
 	}
 
 	function  construct_where($options,$type='AND') {

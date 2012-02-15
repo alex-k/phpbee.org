@@ -96,6 +96,8 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 		mlog($que);
 
+
+
 		$this->_res=mysql_query($que,$this->db_connection);
 		
 		if ($this->_res===FALSE) {

@@ -1,6 +1,6 @@
 #!/usr/local/bin/php
 <?php
-require_once('vpa_daemon.lib.php');
+require_once('../libs/vpa_daemon.lib.php');
 date_default_timezone_set('Europe/Moscow');
 error_reporting(E_ALL | E_STRICT);
 $config=array(
