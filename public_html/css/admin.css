@@ -12,7 +12,7 @@ body {
 	height:100%;
 	margin:0px;
 	padding:0px;
-	background:#FFFFFF; /* url('/i/admin/bg.jpg'); */
+	background:#F6F6F6; /* url('/i/admin/bg.jpg'); */
 	color:#909090;
 	background-attachment: fixed;
 }
@@ -431,15 +431,126 @@ textarea.big_text {
 .frm_fCheckbox {
 	text-align:center;
 }
+
+.link_green {
+	text-align:center;
+	font-weight:bold;
+	color:#00e000;
+}
+
+.link_red {
+	text-align:center;
+	font-weight:bold;
+	color:#ff0000;
+}
+
+
 .div-border {
 	border: 1px solid #e0e0e0;
-	box-shadow: 0 0 10px #e0e0e0;
+	box-shadow: 0 0 10px #707070;
 	padding: 20px;
 }
 .admin-login-form {
 	width: 300px;
 	margin: auto;
 	margin-top: 200px;
+	background-color:#dde9ef;
+	border:1px solid #ffffff;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+
+.admin-login-form h3 {
+	color:#000000;
+	text-transform:uppercase;
+	text-shadow:#ffffff 1px 1px;
+	font-size:14px;
+}
+
+.admin-login-form dt {
+	font-weight:bold;
+	text-shadow:#ffffff 1px 1px;
+}
+
+.admin-login-form dt:first-letter {
+	text-transform:uppercase;
+}
+
+.admin-login-form dt,.admin-login-form dd {
+	display:block;
+	color:#000000;
+	height:25px;
+	line-height:25px;
+	padding:0px;
+	margin:0px;
+}
+
+.admin-login-form dd input {
+	height:20px;
+	line-height:20px;
+	padding-left:5px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	background-color: white;
+    border: 1px solid #C0C0C0;
+    box-shadow: 1px 1px 1px white;
+}
+
+.admin-login-form input[type="submit"] {
+	background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAFCAYAAABFA8wzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADFJREFUeNqsz8ENADAMwsDA/isHV3l0AxjghJVdZGtK82Ek1MDDmqiA+Wj1YSv5CTAAKfAa/X+4N8cAAAAASUVORK5CYII=") no-repeat scroll right 11px #066EA9;
+	border: medium none !important;
+	border-radius: 8px;
+	color: white;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: bold;
+	height: 25px;
+	margin-bottom: 5px;
+	padding: 3px 25px 3px 15px;
+	text-align: center;
+}
+
+.admin-login-form input[type="submit"]:hover {
+    background-color: black;
+}
+
+.admin-top {
+    background: -moz-linear-gradient(#353535, #020202) repeat scroll 0 0 transparent;
+    color: #F1F0F0;
+    font-size: 16px;
+    height: 50px;
+    padding: 15px 40px 15px 30px;
+	position:relative;
+}
+
+.admin-top .logo {
+	float:left;
+	height: 50px;
+	font-size:11px;
+	font-weight:bold;
+	text-align:center;
+	text-transform:lowercase;
+}
+
+.admin-top .logo h1 {
+	font-family:'Myriad Pro', Arial;
+	font-size:24px;
+	text-transform:uppercase;
+	margin:0px;
+	padding:0px;
+	display:block;
+}
+
+.admin-top a {
+	font-weight:bold;
+	color:#FFFFFF;
+	float:right;
+}
+
+.admin-top a:first-letter {
+	text-transform:uppercase;
 }
 
 .form_error{
