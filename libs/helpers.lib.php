@@ -5,7 +5,7 @@ class helper_clone {
 		%s</div>
 		<input type="button" value="+" class="button_helper_clone">
 
-		<script>
+		<script type="text/javascript">
 		$(".button_helper_clone").click(function() {
 			var fs=$($(this).siblings(".helper_clone").get(-1));
 			var newfs=fs.clone();

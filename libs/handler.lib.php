@@ -768,6 +768,7 @@ class gs_base_handler extends gs_handler {
 		$bh=new gs_base_handler($this->data,$this->params);
 		$f=$bh->get_form();
 		foreach($f->htmlforms as $k=>$v) {
+			if(!is_array($v['validate'])) continue;
 			$u=array_search('checkUnique',$v['validate']);
 			if ($u!==FALSE) unset($f->htmlforms[$k]['validate'][$u]);
 		}

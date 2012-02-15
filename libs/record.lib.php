@@ -246,14 +246,14 @@ class gs_record implements arrayaccess {
 	var $gmessages=array();
 
 	public function __get($name) {
-
 		if (isset($this->gs_recordset->structure['fields'][$name]['multilang'])
 			&& $this->gs_recordset->structure['fields'][$name]['multilang']
 			) {
-			$language=false;
+			$language=null;
 			if (!$language) $language=gs_var_storage::load('multilanguage_lang');
-			if (!$language) $language=gs_session::load('multilanguage_lang');
+			//if (!$language) $language=gs_session::load('multilanguage_lang');
 			if (!$language) $language=cfg('multilang_default_language');
+
 
 			if ($this->disable_multilang) {
 				$this->disable_multilang=0;
@@ -263,11 +263,23 @@ class gs_record implements arrayaccess {
 					$default_lang=key($langs);
 					array_shift($langs);
 					if ($langs && $language!=$default_lang) {
-						//return ('11');
-						$l=$this->__get('Lang');
-						//mlog($l[$language]); // needed for correct work in Chrome!
-						if ($l[$language]) {
-							return $l[$language]->$name;
+
+						/*
+						$a=$this->__get('Lang');
+
+						$lname='i18n_'.$this->get_recordset_name();
+						$l=new $lname;
+						$l->find_records(array('Parent_id'=>$this->get_id(),'lang'=>$language));
+
+						if ($l->first()) return $l->first()->$name;
+
+
+						*/
+
+
+						$rec_lan=$this->__get('Lang');
+						if ($rec_lan[$language]) {
+							return $rec_lan[$language]->$name;
 						}
 					}
 				}

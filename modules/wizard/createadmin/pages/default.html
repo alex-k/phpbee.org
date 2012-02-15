@@ -70,13 +70,14 @@
 			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
 	</tr>
 	{/foreach}
-	<tr class="pager"><td colspan="100">Страницы: {${%$rs.name%}_paging}</td></tr>
+	<tr class="pager"><td colspan="100">
+	<a name="form"></a>
+	Страницы: {${%$rs.name%}_paging}</td></tr>
 	</table>
 
 	<h5>Редактировать/<a href="/admin/{%$module.name%}/{%$rs.name%}/modify/0#form">создать</a>:</h5>
 	{if $_gsdata.gspgid_va.0=='modify'}
 	<hr><br>
-	<a name="form"></a>
 	{handler gspgid="/admin/form/{%$rs.name%}/edit/`$_gsdata.gspgid_va.1`"}
 	{/if}
 

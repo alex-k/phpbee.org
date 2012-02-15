@@ -42,6 +42,7 @@
 	  "thumbnailView.thumbnailHeight": "180",
 	  "thumbnail.watermark.enabled": "true",
 	  "thumbnail.watermark.position": "bottom.center",
+	  "thumbnail.watermark.text" : "",
 	  "thumbnail.watermark.imageUrl": widget_MultiPowUpload_watermark
 
 

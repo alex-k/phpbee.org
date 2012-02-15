@@ -26,11 +26,11 @@ function html_redirect($gspgid=null,$data=array(),$type='302', $clean_get=false)
 	$datastr='';
 	if ($data) $datastr='?'.http_build_query($data);
 	switch ($type) {
-	case '302':
-		$ret=sprintf('Location: %s%s',$url,$datastr);
-		header($ret);
-		die();
-		break;
+		default:
+		case '302':
+			$ret=sprintf('Location: %s%s',$url,$datastr);
+			header($ret);
+			break;
 	}
 }
 function object_to_array($obj) {

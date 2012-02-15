@@ -546,7 +546,7 @@ class gs_logger {
 		$log=gs_logger::get_instance();
 		$txt2 = $log->show();
 		echo <<<TXT
-<script>
+<script type="text/javascript">
 if (typeof console == 'object') {
 	$txt2;
 }

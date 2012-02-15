@@ -452,7 +452,7 @@ class gs_widget_form_add extends gs_widget {
 		$data=$this->fieldname;
 		$rec=new $data['gspgid_va'][1];
 		$rec=$rec->get_by_id($data['gspgid_va'][0]);
-		printf("%s<script>window.top.document.getElementById('%s').value=%d;</script>",$rec,$data['gspgid_va'][2],$data['gspgid_va'][0]);
+		printf("%s<script type=\"text/javascript\">window.top.document.getElementById('%s').value=%d;</script>",$rec,$data['gspgid_va'][2],$data['gspgid_va'][0]);
 	}
 }
 
