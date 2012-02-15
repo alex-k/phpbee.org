@@ -6,6 +6,7 @@
 		options = $.extend({}, $.fn.sel_filter.defaults, params);
 
 		return this.each(function() {
+			if (this.tagName.toUpperCase()!='SELECT') return;
 			if(options.min_options>this.options.length) return;
 			var sel=this;
 			var sw=sel.offsetWidth;
@@ -75,6 +76,8 @@
 						sel.appendChild(os[key].cloneNode(true));
 					}
 				}
+
+				$(sel).change();
 
 			}
 		});

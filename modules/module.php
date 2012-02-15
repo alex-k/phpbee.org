@@ -81,6 +81,10 @@ class form_admin_login extends g_forms_html {
 
 class admin_handler extends gs_base_handler {
 	function check_login($data) {
+		/*
+		if(cfg('multilang_default_database_lang')) cfg_set('multilang_default_language',cfg('multilang_default_database_lang'));
+		if(cfg('multilang_default_database_lang_id')) cfg_set('multilang_default_language_id',cfg('multilang_default_database_lang_id'));
+		*/
 		$rec=gs_session::load('login_gs_admin');
 		if(isset($this->data['handler_params']['assign'])) {
 			gs_var_storage::save($this->data['handler_params']['assign'],$rec);
