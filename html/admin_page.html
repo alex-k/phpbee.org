@@ -8,8 +8,8 @@
 <link href="/css/jquery-ui.css" rel="stylesheet" type="text/css" title="CSS for site" />
 <link href="/css/ui.daterangepicker.css" rel="stylesheet" type="text/css" title="CSS for site" />
 
-<link   rel="stylesheet"       href="/js/jquery.multiselect.css" type="text/css" />
-<link   rel="stylesheet"       href="/js/jquery.sel_filter.css" type="text/css" />
+<link rel="stylesheet" href="/js/jquery.multiselect.css" type="text/css" />
+<link rel="stylesheet" href="/js/jquery.sel_filter.css" type="text/css" />
 
 <script type="text/javascript" src="/js/jquery.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui.js"></script>
@@ -25,9 +25,12 @@
 <script type="text/javascript" src="/js/common_admin.js"></script>
 </head>
 <body>
-
-	{handler gspgid="/admin/login/" assign=admin}
-	{$admin=gs_var_storage::load('admin')}
+	<div class="admin-top">
+		<div class="logo"><h1>{$smarty.server.HTTP_HOST}</h1>административная зона</div>
+		{handler gspgid="/admin/login/" assign=admin}
+		{$admin=gs_var_storage::load('admin')}
+	</div>
+	
 
 	{if $admin}
 	 
