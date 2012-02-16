@@ -52,7 +52,8 @@ class gs_config {
 		$this->root_dir=str_replace('phar://','',$this->root_dir);
 		$this->root_dir=clean_path(dirname(dirname($this->root_dir))).'/';
 		$this->root_dir=str_replace('\\','/',$this->root_dir);
-		$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
+			//$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
+			$_document_root=clean_path(realpath(dirname($_SERVER['SCRIPT_FILENAME']))).'/';
 		$this->document_root=$_document_root;
 
 		if ($this->root_dir>$_document_root) {
