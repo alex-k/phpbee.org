@@ -90,7 +90,7 @@ class gs_base_handler extends gs_handler {
 		die();
 	}
 	
-	function show($ret,$nodebug=FALSE) {
+	function show($ret) {
 
 		$tpl=gs_tpl::get_instance();
 
@@ -152,7 +152,7 @@ class gs_base_handler extends gs_handler {
 		echo $html;
 		//if (isset($old_tpl_dir)) $tpl->setTemplateDir($old_tpl_dir);
 		if (function_exists('memory_get_peak_usage')) mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
-		if (DEBUG && !$nodebug) {
+		if (DEBUG) {
 			$g=gs_logger::get_instance();
 			$g->console();
 		}

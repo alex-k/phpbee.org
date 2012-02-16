@@ -6,6 +6,8 @@ DEFINE ('LOAD_EXTRAS',8);
 DEFINE ('DEBUG_LOAD_FILE',1);
 DEFINE ('DEBUG_SQL',2);
 
+date_default_timezone_set('GMT');
+
 if (defined('DEBUG') && DEBUG) {
 	ini_set('display_errors','On');
 	error_reporting(E_ALL ^E_NOTICE);
@@ -97,8 +99,12 @@ class gs_config {
 		$this->use_handler_cache=FALSE;
 		$this->s_handler_cnt=0;
 
+
 		foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {
-			if (file_exists($cfg_filename)) require_once($cfg_filename);
+			if (file_exists($cfg_filename)) {
+					
+				require_once($cfg_filename);
+			}
 		}
 
 		if (!defined('DEBUG')) define('DEBUG',FALSE);
@@ -441,7 +447,7 @@ function cfg($name) {
 	return NULL ;
 }
 function mlog($data,$debug_level=255) {
-	if (DEBUG && ($debug_level & DEBUG_LEVEL)) {
+	if (defined('DEBUG') && DEBUG && ($debug_level & DEBUG_LEVEL)) {
 		$log=gs_logger::get_instance();
 		$txt=$log->log($data);
 		return $txt;

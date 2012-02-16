@@ -203,7 +203,7 @@ class field_interface {
 	}
 	
 	static function fSelect($field,$opts,&$structure,$init_opts) {
-		$options=isset($opts['values']) ? explode(',',$opts['values']) : explode(',',$opts['options']);
+		$options=isset($opts['values']) ? explode(',',$opts['values']) : (isset($opts['options']) ? explode(',',$opts['options']) : array());
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>isset($opts['max_length']) ? $opts['max_length'] : 255);
 		$structure['htmlforms'][$field]=array(
 			'type'=>'Select',
@@ -211,7 +211,7 @@ class field_interface {
 			'index'=>isset($opts['index']) ? $opts['index'] : 0,
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
-			'options'=>array_combine($options,$options),
+			'options'=>$options ? array_combine($options,$options) : array(),
 		);
 		$structure['indexes'][$field]=$field;
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
@@ -486,6 +486,7 @@ class gs_recordset_short extends gs_recordset {
 		//if (!$s || !is_array($s)) throw new gs_exception('gs_recordset_short :: empty init values on '.get_class($this));
 		if (!$this->table_name) $this->table_name=get_class($this);
 		if (!$this->id_field_name) $this->id_field_name='id';
+		$config=gs_config::get_instance();
 		if (!$this->gs_connector_id) $this->gs_connector_id=key(cfg('gs_connectors'));
 		$this->structure['fields'][$this->id_field_name]=array('type'=>'serial');
 		$this->selfinit($s);
