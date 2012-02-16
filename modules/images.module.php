@@ -157,7 +157,7 @@ class images_handler extends gs_base_handler {
 		$o->show($type,$rec);
 	}
 	
-	function show($data=null) {
+	function show($data) {
 		if (count($this->data['gspgid_va'])<5) {
 			$data=base64_decode($this->data['gspgid_va'][0]);
 			

@@ -142,8 +142,8 @@ class admin_handler extends gs_base_handler {
 		return $tpl->fetch('admin_menu.html');
 	}
 	
-	function show() {
-		parent::show();
+	function show($ret) {
+		parent::show($ret);
 		return false;
 	}
 	
@@ -225,7 +225,7 @@ class form_table extends  g_forms_html {
 
 
 class debug_handler extends gs_handler {
-	function show() {
+	function show($ret) {
 		$tpl=gs_tpl::get_instance();
 		$log=gs_logger::get_instance();
 		$tpl->assign('gmessages',$log->gmessages());
