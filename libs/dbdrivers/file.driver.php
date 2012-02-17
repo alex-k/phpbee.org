@@ -175,6 +175,22 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		return $id;
 	}
 	
+	function count($rset,$options) {
+		$this->_que=md5(serialize($options));
+		$this->_res=array(array('count'=>0));
+		/*$where=$this->construct_where($options);
+		$que=sprintf("SELECT count(*) as count  FROM %s ",$rset->db_tablename);
+		if (!empty($where)) $que.=sprintf(" WHERE %s", $where);
+		$this->_que=md5($que);
+		if(isset($this->_cache[$this->_que])) {
+			return true;
+		}
+		return $this->query($que);
+		*/
+
+		
+	}
+	
 	function _get_id($tablename,$id) {
 		$id=trim($id);
 		//$id=$this->int2id($id);
@@ -194,6 +210,14 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			$id=str_split($id,ceil(strlen($id) / GS_DB_FILE_ID_LENGTH));
 		}
 		return implode(($no_fs==true) ? '/' : DIRECTORY_SEPARATOR,$id);
+	}
+	
+	function fid2path($id) {
+		$id=str_split($id,1);
+		for($i=1;$i<GS_DB_FILE_ID_LENGTH;$i++) {
+			$id[$i]=$id[$i-1].$id[$i];
+		}
+		return implode(DIRECTORY_SEPARATOR,$id);
 	}
 	
 	public function insert($record) {
@@ -286,6 +310,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		$t=microtime(true);
 		$this->_res=array();
 		$fields = is_array($fields) ? $fields : array_keys($rset->structure['fields']);
+		$this->root=rtrim($this->root,DIRECTORY_SEPARATOR);
 		$fname=$this->root.DIRECTORY_SEPARATOR.$rset->db_tablename;
 		$where=$this->construct_where($options);
 		$use_id=false;
@@ -310,10 +335,17 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 		if (!empty($options) && !$use_id) {
 			$construct_indexes=isset($rset->structure['indexes']) && is_array($rset->structure['indexes']) ? $rset->structure['indexes'] : array();
 			$idxs=array();
+			//mlog($options);
 			foreach ($options as $index => $value) {
+				if (is_numeric($index) && $options[$index]['type']=='value') {
+					$index=$value['field'];
+					$value=$value['value'];
+				}
 				if (isset($construct_indexes[$index])) {
+					mlog('====================');
 					$idxs[]=$index.'='.$value;
 					$iname=$this->root.DIRECTORY_SEPARATOR.($rset->db_tablename).DIRECTORY_SEPARATOR.'indx'.DIRECTORY_SEPARATOR.$index;
+					mlog($iname);
 					$bt=new b_tree($iname);
 					if (!is_array($value)) $value=array($value);
 					$ids=array();
@@ -321,7 +353,9 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 						$ids=array_merge($ids,$bt->find($val));
 					}
 					foreach ($ids as $id) {
-						$r=glob($fname.DIRECTORY_SEPARATOR.$this->split_id(trim($id)));
+						//$rid=$this->id2int($id);
+						$path=rtrim(trim($fname.DIRECTORY_SEPARATOR.$this->fid2path($id)),DIRECTORY_SEPARATOR);
+						$r=glob($path);
 						if ($r) {
 							$files=array_merge($files,$r);
 						}
@@ -347,7 +381,7 @@ class gs_dbdriver_file extends gs_prepare_sql implements gs_dbdriver_interface {
 			$this->_res[$rid]=$d;
 		}
 
-		mlog(sprintf('File query: %s fields: %s records: %s (%.06f sec)',$mask,implode(',',$fields),count($this->_res),(microtime(1)-$t)));
+		mlog(sprintf('File query on %s: %s fields: %s records: %s (%.06f sec)',$rset->db_tablename,$mask,implode(',',$fields),count($this->_res),(microtime(1)-$t)));
 		return $this->_res;
 	}
 

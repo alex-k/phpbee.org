@@ -13,12 +13,14 @@ class b_tree {
 		return is_numeric($key) ? $this->int2str($key) : $key;
 	}
 	
+	
 	public function find($key,$strong=true) {
 		$key=$this->parse_key($key);
 		$k=str_split($key,1);
 		$path=$this->dir;
 		$path.=DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR,$k);
 		$data=(file_exists($path.DIRECTORY_SEPARATOR.'idx')) ? file($path.DIRECTORY_SEPARATOR.'idx') : array();
+		mlog('Find index '.$path.' with value '.$key);
 		$res=array();
 		if ($strong) {
 			foreach ($data as $v) {
