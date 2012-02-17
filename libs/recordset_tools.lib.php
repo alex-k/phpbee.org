@@ -12,7 +12,7 @@ class field_interface {
 		foreach ($arr as $k=>$r) {
 			if(!isset($r['required'])) $r['required']='true';
 			if (!isset($r['readonly'])) $r['readonly']=false;
-			if (!isset($r['index'])) $r['index']=false;
+			if (!isset($r['index']) || $r[0]=='lOne2One') $r['index']=false;
 			if(!isset($r['multilang'])) $r['multilang']=false;
 			$r['func_name']=$r[0];
 			if (in_array($r['func_name'],array('lMany2Many','lMany2One','lOne2One'))) {
