@@ -311,7 +311,6 @@ class gs_base_handler extends gs_handler {
 		$hh_fields=array_keys($hh);
 		$hh_fields=self::minus_fields($hh_fields,$params,$data,$hh);
 
-
 		
 		if (!count($f->htmlforms)) foreach ($hh_fields as $name) {
 			$params=$hh[$name];
