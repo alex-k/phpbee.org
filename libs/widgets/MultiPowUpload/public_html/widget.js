@@ -16,7 +16,8 @@
 	var flashvars = {
 	  "language.autoDetect": "true",
 	  "serialNumber": widget_MultiPowUpload_license ,
-	  "uploadUrl": "/libs/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",
+	  /*"uploadUrl": "/libs/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",*/
+	  "uploadUrl": "/widgets/MultiPowUpload/upload",
 	  "customPostFields":params_str,
 	  "removeUploadedFilesFromList": "true",
 	  "fileFilter.types":"Images|*.jpg:*.jpeg:*.gif:*.png:*.bmp",

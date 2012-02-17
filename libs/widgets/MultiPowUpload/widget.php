@@ -67,6 +67,11 @@ class gs_widget_MultiPowUpload_module extends gs_base_module implements gs_modul
 				'gs_base_handler.redirect',
 			),
 		),
+		'post'=>array(	
+			'/widgets/MultiPowUpload/upload'=>array(
+				'gs_widget_MultiPowUpload_handler.upload',
+			),
+		),
 		);
 		return self::add_subdir($data,dirname(__file__));
 	}
@@ -97,5 +102,40 @@ class gs_widget_MultiPowUpload_handler extends gs_handler {
 	function action_delete() {
 		foreach ($this->recs as $rec) $rec->delete();
 		$this->recs->commit();
+	}
+
+	function upload() {
+		$rs_name=$this->data['recordset'];
+		$f_name=$this->data['foreign_field_name'];
+		$f_hash_name=$f_name.'_hash';
+		
+
+		$f=new $rs_name;
+		$f=$f->new_record();
+
+		$f->$f_hash_name=$this->data['hash'];
+		$f->$f_name=$this->data['rid'];
+
+		$values=$_FILES['Filedata'];
+
+
+		$ret=array(
+				'File_data'=>file_get_contents($values['tmp_name']),
+				'File_filename'=>$values['name'],
+				'File_mimetype'=>$values['type'],
+				'File_size'=>$values['size'],
+				'File_width'=>max($_REQUEST['thumbnailWidth'],$_REQUEST['imageWidth']),
+				'File_height'=>max($_REQUEST['thumbnailHeight'],$_REQUEST['imageHeight']),
+			 );
+		
+		$ff=$f->File->new_record($ret);
+
+		$f->commit();
+
+		$tpl=gs_tpl::get_instance();
+		//$tpl->template_dir=dirname(__FILE__).DIRECTORY_SEPARATOR.'../../../templates';
+		$tpl->template_dir=cfg('lib_dir').DIRECTORY_SEPARATOR.'widgets'.DIRECTORY_SEPARATOR.'MultiPowUpload'.DIRECTORY_SEPARATOR.'templates';
+		$tpl->assign('i',$f);
+		echo $tpl->fetch('li_image.html');
 	}
 }

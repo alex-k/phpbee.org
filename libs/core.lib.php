@@ -69,6 +69,7 @@ class gs_data {
 			if ($c->test_type())
 			{
 				$this->data=array_merge($this->data,$c->import());
+
 			}
 		}
 		if($this->data['gspgtype']==GS_DATA_POST && isset($this->data['gspgid_form']) 

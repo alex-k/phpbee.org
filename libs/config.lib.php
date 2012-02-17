@@ -10,7 +10,8 @@ date_default_timezone_set('GMT');
 
 if (defined('DEBUG') && DEBUG) {
 	ini_set('display_errors','On');
-	error_reporting(E_ALL ^E_NOTICE);
+	//error_reporting(E_ALL ^E_NOTICE);
+	error_reporting(E_ALL | E_STRICT);
 }
 
 if (!defined('PHP_VERSION_ID')) {
@@ -52,8 +53,9 @@ class gs_config {
 		$this->root_dir=str_replace('phar://','',$this->root_dir);
 		$this->root_dir=clean_path(dirname(dirname($this->root_dir))).'/';
 		$this->root_dir=str_replace('\\','/',$this->root_dir);
-			//$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
-			$_document_root=clean_path(realpath(dirname($_SERVER['SCRIPT_FILENAME']))).'/';
+
+		//$_document_root=clean_path(realpath($_SERVER['DOCUMENT_ROOT'])).'/';
+		$_document_root=clean_path(realpath(dirname($_SERVER['SCRIPT_FILENAME']))).'/';
 		$this->document_root=$_document_root;
 
 		if ($this->root_dir>$_document_root) {
