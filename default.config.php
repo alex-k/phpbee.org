@@ -57,8 +57,13 @@
 	//$this->multilang_default_language_id=2; //default record in languages recordset
 	//$this->multilang_default_language='en'; //use prior of handler_multilang_base::setlocale_handler
 
+	$this->widget_MultiPowUpload_upload_thubnail=true;
+	$this->widget_MultiPowUpload_thubnail_size=1600;
 	$this->widget_MultiPowUpload_license='put your key here';
-	$this->widget_MultiPowUpload_watermark='/libs/widgets/MultiPowUpload/watermark.png';
+	//$this->widget_MultiPowUpload_watermark='/i/watermark.png';
+	//$this->watermark_filename=$this->document_root.'i/watermark.png';
+	//$this->widget_MultiPowUpload_thubnail_quality=90;
+
 
 
 ?>

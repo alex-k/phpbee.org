@@ -102,6 +102,13 @@ class wz_link_images extends wz_link {
 			));
 
 		$rec_images->Fields->new_record(array(
+				'name'=>'file_uid',
+				'type'=>'fString',
+				'options'=>64,
+				'make_index'=>true,
+				));
+
+		$rec_images->Fields->new_record(array(
 				'name'=>'group_key',
 				'type'=>'fString',
 				'options'=>32,

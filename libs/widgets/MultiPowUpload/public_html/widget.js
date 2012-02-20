@@ -13,41 +13,6 @@
 	};
 
 
-	var flashvars = {
-	  "language.autoDetect": "true",
-	  "serialNumber": widget_MultiPowUpload_license ,
-	  /*"uploadUrl": "/libs/widgets/MultiPowUpload/FileProcessingScripts/PHP/uploadfiles.php?stayHere=true",*/
-	  "uploadUrl": "/widgets/MultiPowUpload/upload",
-	  "customPostFields":params_str,
-	  "removeUploadedFilesFromList": "true",
-	  "fileFilter.types":"Images|*.jpg:*.jpeg:*.gif:*.png:*.bmp",
-	  "sendThumbnails": "true",
-	  "sendOriginalImages": "false",
-	  "useExternalInterface": "true",
-	  "fileView.defaultView":"thumbnails",
-	  "thumbnail.width": "1600",
-	  "thumbnail.height": "1600",
-	  "thumbnail.resizeMode": "fit",
-	  "thumbnail.format": "AUTO",
-	  "thumbnail.jpgQuality": "85",
-	  "thumbnail.resizeSmallImages":"false",
-	  "thumbnail.backgroundColor": "#000000",
-	  "thumbnail.transparentBackground": "true",
-	  "thumbnail.autoRotate": "true",
-	  "readImageMetadata": "true",
-	  "thumbnailView.allowCrop": "true",
-	  "thumbnailView.allowRotate": "true",
-	  "thumbnailView.cropRectKeepAspectRatio": "NO",
-	  "thumbnailView.showCropRectDimensions": "true",
-	  "thumbnailView.thumbnailWidth": "180",
-	  "thumbnailView.thumbnailHeight": "180",
-	  "thumbnail.watermark.enabled": "true",
-	  "thumbnail.watermark.position": "bottom.center",
-	  "thumbnail.watermark.text" : "",
-	  "thumbnail.watermark.imageUrl": widget_MultiPowUpload_watermark
-
-
-	};
 
 	function MultiPowUpload_Start() {
 		var so=swfobject.embedSWF("/libs/widgets/MultiPowUpload/ElementITMultiPowUpload.swf", "MultiPowUpload_holder", "900", "450", "10.0.0", "/widgets/MultiPowUpload/Extra/expressInstall.swf", flashvars, params, attributes);

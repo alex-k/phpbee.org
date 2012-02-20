@@ -718,7 +718,7 @@ class gs_base_handler extends gs_handler {
 		$tpl->assign('rec',$rec);
 		$subj=$tpl->fetch(str_replace(".html","_title.html",$this->params['template']));
 		$txt=$tpl->fetch($this->params['template']);
-		bee_mail($to,$subj,$txt);
+		bee_mail($to,$subj,$txt,cfg('support_email_address'));
 		return $rec;
 	}
 

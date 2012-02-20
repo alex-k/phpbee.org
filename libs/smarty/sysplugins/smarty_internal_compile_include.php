@@ -34,6 +34,7 @@ class Smarty_Internal_Compile_Include extends Smarty_Internal_CompileBase {
         $this->compiler = $compiler;
         // check and get attributes
         $_attr = $this->_get_attributes($args); 
+	mlog($_attr);
         // save posible attributes
         $include_file = $_attr['file'];
         $has_compiled_template = false;

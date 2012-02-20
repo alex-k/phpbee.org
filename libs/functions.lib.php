@@ -162,7 +162,7 @@ function bee_mail($to,$subj,$text,$from='') {
 	//$subj=iconv( 'UTF-8', 'KOI8-R', $subject );
 	$mail->add_html($text);
 	$mail->build_message('koi8');
-	mail ($to,$subj,$mail->mime,$mail->headers);
+	return mail ($to,$subj,$mail->mime,$mail->headers);
 }
 
 function string_to_safeurl($str, $replace=array(), $delimiter='-') {
@@ -332,6 +332,14 @@ function array_group($arr,$field) {
 		$ret[$a->$field][$a->get_id()]=$a;
 	}
 	return $ret;
+}
+
+function add_quote($a,$q="'") {
+	$ret=$a;
+	if ( is_array($a)) {
+		return array_map('add_quote',$a);
+	}
+	return $q.$ret.$q;
 }
 
 ?>

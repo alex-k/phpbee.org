@@ -3,9 +3,9 @@
 	<input type=hidden name="{$k}" value="{$v|htmlentities}">
 {/foreach}
 
-	{foreach $g_images as $g_key=>$images}
     <div class="photos_gall">
     <div  class="MultiPowUploadGallery" id="gallery_{$params.hash}">
+	{foreach $g_images as $g_key=>$images}
 		{if $g_key && $g_key!="nogrp"}<div class=MultiPowUploadGalleryGroup>{/if}
 		{foreach $images as $i}
 		{include file="li_image.html" i=$i}
@@ -13,9 +13,9 @@
 		{if $g_key && $g_key!="nogrp"}</div>{/if}
 
         <div class="clear"></div>
-        </div>
-        </div>
 	{/foreach}
+        </div>
+        </div>
 
 <div class="clear"></div>
 {if $images}
@@ -42,6 +42,44 @@
 <script type="text/javascript">
 	var widget_MultiPowUpload_license='{cfg('widget_MultiPowUpload_license')}';
 	var widget_MultiPowUpload_watermark='{cfg('widget_MultiPowUpload_watermark')}';
+	var widget_MultiPowUpload_upload_thubnail='{cfg('widget_MultiPowUpload_upload_thubnail')}';
+	var widget_MultiPowUpload_thubnail_size='{cfg('widget_MultiPowUpload_thubnail_size')}';
+
+	var flashvars = {ldelim}
+	  "language.autoDetect": "true",
+	  "serialNumber": "{cfg('widget_MultiPowUpload_license')}",
+	  "uploadUrl": "/widgets/MultiPowUpload/upload/original",
+	  "customPostFields":params_str,
+	  "removeUploadedFilesFromList": "true",
+	  "fileFilter.types":"Images|*.jpg:*.jpeg:*.gif:*.png:*.bmp",
+	  "sendThumbnails": {if cfg('widget_MultiPowUpload_upload_thubnail')}"true"{else}"false"{/if},
+	  "sendOriginalImages": {if cfg('widget_MultiPowUpload_upload_thubnail') && !cfg('widget_MultiPowUpload_upload_original')}"false"{else}"true"{/if},
+	  "useExternalInterface": "true",
+	  "fileView.defaultView":"thumbnails",
+	  "thumbnail.uploadUrl": "/widgets/MultiPowUpload/upload/thubnail",
+	  "thumbnail.width": "{cfg('widget_MultiPowUpload_thubnail_size')|default:1600}",
+	  "thumbnail.height": "{cfg('widget_MultiPowUpload_thubnail_size')|default:1600}",
+	  "thumbnail.resizeMode": "fit",
+	  "thumbnail.format": "AUTO",
+	  "thumbnail.jpgQuality": "{cfg('widget_MultiPowUpload_thubnail_quality')|default:85}",
+	  "thumbnail.resizeSmallImages":"false",
+	  "thumbnail.backgroundColor": "#000000",
+	  "thumbnail.transparentBackground": "true",
+	  "thumbnail.autoRotate": "true",
+	  "readImageMetadata": "true",
+	  "thumbnailView.allowCrop": "true",
+	  "thumbnailView.allowRotate": "true",
+	  "thumbnailView.cropRectKeepAspectRatio": "NO",
+	  "thumbnailView.showCropRectDimensions": "true",
+	  "thumbnailView.thumbnailWidth": "180",
+	  "thumbnailView.thumbnailHeight": "180",
+	  "thumbnail.watermark.enabled": {if cfg('widget_MultiPowUpload_watermark')}"true"{else}"false"{/if},
+	  "thumbnail.watermark.position": "bottom.center",
+	  "thumbnail.watermark.text" : "",
+	  "thumbnail.watermark.imageUrl": "{cfg('widget_MultiPowUpload_watermark')}"
+	{rdelim};
+
+
 </script>
 <script type="text/javascript" src="/libs/widgets/MultiPowUpload/Extra/swfobject.js"></script>
 <script type="text/javascript" src="/libs/widgets/MultiPowUpload/widget.js"></script>

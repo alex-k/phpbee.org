@@ -30,7 +30,7 @@ class vpa_gd {
 	var $bg_b=255;
 	var $borders;
 	
-	function vpa_gd($filename='',$path=true)
+	function __construct($filename='',$path=true)
 	{
 		if (!empty($filename) && $path==true)
 		{
@@ -87,6 +87,9 @@ class vpa_gd {
 			break;
 			case 'check_and_rotate_right':
 				$this->check_and_rotate_right();
+			break;
+			case 'watermakr':
+				$this->watermark();
 			break;
 		}
 	}
@@ -145,6 +148,11 @@ class vpa_gd {
 	function rotate_right() {
 		$this->old_img=imagerotate($this->old_img,270,0);
 		list($this->old_width,$this->old_height)=array($this->old_height,$this->old_width);
+	}
+
+	function watermark() {
+		$wname=cfg('watermark_filename');
+		if (!file_exists('watermark_filename')) return;
 	}
 	
 	function make_width()

@@ -108,16 +108,8 @@ class gs_widget_MultiPowUpload_handler extends gs_handler {
 		$rs_name=$this->data['recordset'];
 		$f_name=$this->data['foreign_field_name'];
 		$f_hash_name=$f_name.'_hash';
-		
-
-		$f=new $rs_name;
-		$f=$f->new_record();
-
-		$f->$f_hash_name=$this->data['hash'];
-		$f->$f_name=$this->data['rid'];
 
 		$values=$_FILES['Filedata'];
-
 
 		$ret=array(
 				'File_data'=>file_get_contents($values['tmp_name']),
@@ -127,13 +119,42 @@ class gs_widget_MultiPowUpload_handler extends gs_handler {
 				'File_width'=>max($_REQUEST['thumbnailWidth'],$_REQUEST['imageWidth']),
 				'File_height'=>max($_REQUEST['thumbnailHeight'],$_REQUEST['imageHeight']),
 			 );
+
+		if ($this->data['gspgid_va'][0]=='original' && $this->data['fileId'] ) {
+			$f=new $rs_name;
+			$f=$f->find_records(array('file_uid'=>$this->data['fileId']))->first()->File->first();
+			if ($f) {
+				$f->File_data=$ret['File_data'];
+				$rs=$f->get_recordset();
+				$rs->config=array(
+				            'orig_'.$this->data['fileId']=>array('width'=>0,'height'=>0,'method'=>'copy'),
+							);
+				$rs->resize($f);
+				return $this->li($f);
+
+			}
+		}
+		
+
+		$f=new $rs_name;
+		$f=$f->new_record();
+
+		$f->$f_hash_name=$this->data['hash'];
+		$f->$f_name=$this->data['rid'];
+		if($this->data['fileId']) $f->file_uid=$this->data['fileId'];
+
+
+
 		
 		$ff=$f->File->new_record($ret);
 
 		$f->commit();
 
+		return $this->li($f);
+
+	}
+	function li($f) {
 		$tpl=gs_tpl::get_instance();
-		//$tpl->template_dir=dirname(__FILE__).DIRECTORY_SEPARATOR.'../../../templates';
 		$tpl->template_dir=cfg('lib_dir').DIRECTORY_SEPARATOR.'widgets'.DIRECTORY_SEPARATOR.'MultiPowUpload'.DIRECTORY_SEPARATOR.'templates';
 		$tpl->assign('i',$f);
 		echo $tpl->fetch('li_image.html');
