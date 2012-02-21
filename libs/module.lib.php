@@ -16,17 +16,24 @@ abstract class gs_base_module {
 	}
 	
 	static function admin_auth($data,$params) {
+		if (gs_var_storage::load('check_admin_auth')===FALSE) return true;
+		gs_var_storage::save('check_admin_auth',FALSE);
 		if (strpos($data['gspgid'],'admin')===0) {
 
 			$admin_ip_access=cfg('admin_ip_access');
-
-			if (!$admin_ip_access) return true;  // FREE ACCESS!!!!!!!
-
-			if(is_array($admin_ip_access) && in_array($_SERVER['REMOTE_ADDR'],$admin_ip_access)) return true;
-			$o=new admin_handler($data,array('name'=>'auth_error.html'));
-			$o->show();
-			return false;
+			if(is_array($admin_ip_access) && $admin_ip_access && !in_array($_SERVER['REMOTE_ADDR'],$admin_ip_access)) {
+				$o=new admin_handler($data,array('name'=>'auth_error.html'));
+				$o->show();
+				return false;
+			}
+			$rec=gs_session::load('login_gs_admin');
+			if (!$rec) {
+				$o=new gs_base_handler($data,array('name'=>'admin_login.html'));
+				$o->show(array());
+				return false;
+			}
 		}
+		gs_var_storage::save('check_admin_auth',TRUE);
 		return true;
 	}
 

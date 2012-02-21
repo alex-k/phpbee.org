@@ -12,7 +12,7 @@
 
 
 	{%foreach from=$filters item=f%}
-		{handler gspgid="/filter/" class="select_by_links" link="{%$rs.name%}.{%$f.name%}:urlkey" name="{%$f.name%}" urltype=get }
+		{handler gspgid="/filter/" class="select_by_links" link="{%$rs.name%}.{%$f.name%}:id" name="{%$f.name%}" urltype=get }
 		{%$s_filters=$s_filters|cat:$f.name|cat:","%}
 	{%/foreach%}
 
@@ -50,6 +50,9 @@
 	{%foreach from=$links item=f%}
 	<th>{%$f.verbose_name%}</th>
 	{%/foreach%}
+	{%foreach from=$extlinks item=f%}
+	<th>{%$f.verbose_name%}</th>
+	{%/foreach%}
 	<th></th>
 	<th></th>
 	<th></th>
@@ -64,6 +67,9 @@
 			{%/foreach%}
 			{%foreach from=$links item=f%}
 			<td>{$e.{%$f.name%}}</td>
+			{%/foreach%}
+			{%foreach from=$extlinks item=f%}
+			<td><a href="/admin/{%$module.name%}/{%$f.classname%}?{%$f->linkname%}={$e.id}">{%$f.verbose_name%} ({$e._{%$f.name%}_count})</a></td>
 			{%/foreach%}
 			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/modify/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
 			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/copy/{$e.id}"><img src="/i/admin/ico_copy.png" alt="Копировать" title="Копировать"></a></td>

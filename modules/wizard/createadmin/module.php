@@ -41,6 +41,8 @@ class gs_strategy_createadmin_handler extends gs_handler {
 		$fields->find_records(array('id'=>$d['fields']));
 		$links=new wz_recordset_links();
 		$links->find_records(array('id'=>$d['links']));
+		$extlinks=new wz_recordset_links();
+		$extlinks->find_records(array('id'=>$d['extlinks']));
 		$filters=new wz_recordset_links();
 		$filters->find_records(array('id'=>$d['filters']));
 
@@ -63,10 +65,12 @@ class gs_strategy_createadmin_handler extends gs_handler {
 		$tpl->assign('fields',$fields);
 		$tpl->assign('datefields',$datefields);
 		$tpl->assign('links',$links);
+		$tpl->assign('extlinks',$extlinks);
 		$tpl->assign('filters',$filters);
 
 
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$d['template_name']);
+
 
 
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'adm_'.$rs->name.'.html';
@@ -134,7 +138,9 @@ class form_createadmin extends form_admin{
 
 		$all_links=$rs->Links->recordset_as_string_array();
 		$links=$rs->Links->find(array('type'=>array('lMany2Many','lOne2One')))->recordset_as_string_array();
+		$extlinks=$rs->Links->find(array('type'=>'lMany2One'))->recordset_as_string_array();
 		if(!is_array($links)) $links=array();
+		if(!is_array($extlinks)) $extlinks=array();
 		if(!is_array($all_links)) $all_links=array();
 
 
@@ -153,10 +159,19 @@ class form_createadmin extends form_admin{
 			),
 		    'links' => Array
 			(
+			    'verbose_name'=>'show values',	
 			    'type' => 'checkboxes',
 			    'options'=>$all_links,
 			    'validate'=>'notEmpty',
 			    'default'=>array_keys($links),
+			),
+		    'extlinks' => Array
+			(
+			    'verbose_name'=>'show links',	
+			    'type' => 'checkboxes',
+			    'options'=>$all_links,
+			    'validate'=>'notEmpty',
+			    'default'=>array_keys($extlinks),
 			),
 		    'filters' => Array
 			(

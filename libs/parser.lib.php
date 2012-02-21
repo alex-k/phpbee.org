@@ -138,7 +138,10 @@ class gs_parser {
 
 			$s_data=$this->data;
 			// --------------------- 
-			if (call_user_func(array($module_name, 'admin_auth'),$this->data,$handler['params'])===false) return false;
+			if(call_user_func(array($module_name, 'admin_auth'),$this->data,$handler['params'])===false) {
+				return false;
+			}
+
 			if (method_exists($handler['params']['module_name'],'auth')) {
 				
 				$ret['last']=$ret[$h_key]=call_user_func(array($module_name, 'auth'),$this->data,$handler['params']);

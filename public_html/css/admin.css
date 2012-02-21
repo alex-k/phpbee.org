@@ -596,3 +596,23 @@ textarea.big_text {
 .widget_TextLines {
 	padding:5px 10px;
 }
+
+.admin_img_preview_frame{
+	position:absolute;
+	border:1px solid #ccc;
+	background:#333;
+	padding:5px;
+	display:none;
+	color:#fff;
+	z-index:100;
+	}
+.admin_img_preview_frame img {
+	max-width:500px;
+	max-height:350px;
+}
+.admin_img_preview img {
+	border: 3px solid #FFF;
+}
+.admin_img_preview_checked img {
+	border: 3px solid #900000;
+}

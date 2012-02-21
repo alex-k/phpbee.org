@@ -21,19 +21,21 @@
 <script type="text/javascript" src="/js/jquery.multiselect.js"></script>
 <script type="text/javascript" src="/js/jquery.sel_filter.js"></script>
 <script type="text/javascript" src="/js/jquery.form.interaction.js"></script>
+<script type="text/javascript" src="/js/jquery.preview.js"></script>
 <script type="text/javascript" src="/js/functions.js"></script>
 <script type="text/javascript" src="/js/common_admin.js"></script>
 </head>
 <body>
+
 	<div class="admin-top">
 		<div class="logo"><h1>{$smarty.server.HTTP_HOST}</h1>административная зона</div>
-		{handler gspgid="/admin/login/" assign=admin}
-		{$admin=gs_var_storage::load('admin')}
+		{block name="admin_top"}
+		<a href="/admin/logout">logout</a>
+		{/block}
 	</div>
-	
 
-	{if $admin}
-	 
+
+{block name="content"}
 
 <table class="main_tb">
 <tr>
@@ -50,7 +52,8 @@
 </tr>
 </table>
 
-	{/if}
+{/block}
+
 {if  isset($_gsdata.D)}
 {handler gspgid="/debug"}
 {/if}

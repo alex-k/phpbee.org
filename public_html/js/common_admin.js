@@ -68,9 +68,9 @@ onOpen: function() {
 	});
 
 	
+	$('.admin_img_preview').preview();
 
 	
 
 });
-
 

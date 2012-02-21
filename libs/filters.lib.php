@@ -331,6 +331,7 @@ class gs_filter_select_by_links extends gs_filter {
 		$tpl=gs_tpl::get_instance();
 		$links=array();
 		$count_all=0;
+
 		foreach ($rec_rs as $rec) {
 			$arr=$this->va;
 			$key=$rec->{$this->fieldname};
@@ -343,7 +344,6 @@ class gs_filter_select_by_links extends gs_filter {
 				$field=$this->link['local_field_name'];
 				$id=$rec->{$this->link['foreign_field_name']};
 			}
-			
 			if ($ps['recordset']) {
 				$rs=$ps['recordset'];
 				$count_array=$rs->query_options['options'];
@@ -373,6 +373,7 @@ class gs_filter_select_by_links extends gs_filter {
 		$count_all= $rs ? $rs->count_records($count_array_all) : 0;
 		
 		$current_name='';
+
 		
 		foreach($links as $key=>$l) {
 			ksort($l['va']);
