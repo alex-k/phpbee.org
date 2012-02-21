@@ -16,6 +16,7 @@ class module_wizard extends gs_base_module implements gs_module {
 	}
 	
 	function get_menu() {
+		if(strpos('/admin/wizard',$_SERVER['REQUEST_URI'])===0) {
 		$ret[1]='<a href="/admin/wizard/install">Install</a>';
 		$ret[2]='<a href="/admin/wizard/newurl">New page</a>';
 		$ret[3][]='<a href="/admin/wizard/">Modules</a>';
@@ -25,6 +26,7 @@ class module_wizard extends gs_base_module implements gs_module {
 			$ret[3][]='<a href="/admin/wizard/module/'.$m->id.'">'.$m->title.'</a>';
 		}
 		return $ret;
+		}
 	}
 	
 	static function get_handlers() {
