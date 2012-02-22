@@ -25,7 +25,7 @@ class module{%$MODULE_NAME%}  extends gs_base_module implements gs_module {
 		$data=array(
 		'handler'=>array(
 			'/admin/form/tw{%$MODULE_NAME%}'=>array(
-							'gs_base_handler.post:{name:form.html:classname:tw{%$MODULE_NAME%}:form_class:form_admin:return:gs_record}',
+							'gs_base_handler.post:{name:admin_form.html:classname:tw{%$MODULE_NAME%}:form_class:g_forms_table:return:gs_record}',
 							'gs_base_handler.redirect',
 							),
 			'list'=>'gs_base_handler.show',
