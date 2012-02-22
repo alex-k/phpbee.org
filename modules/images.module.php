@@ -45,6 +45,21 @@ abstract class tw_file_images extends gs_recordset_short{
 		$this->structure['triggers']['after_update']='resize';
 	}
 
+	function fetch_image ($url) {
+		$ret=array();
+		$is=@getimagesize($url);
+		if (!$is || strpos($is['mime'],'image')!==0) return $ret;
+		$i=file_get_contents($url);
+		if (!$i) return $ret;
+		$ret['File_mimetype']=$is['mime'];
+		$ret['File_width']=$is[0];
+		$ret['File_height']=$is[1];
+		$ret['File_filename']=basename($url);
+		$ret['File_data']=$i;
+		$ret['File_size']=strlen($ret['File_data']);
+		return $ret;
+	}
+
 	function img($params,$record=null) {
 		$ret=$this->src($params,$record);
 		foreach($ret as $k=>$v) {

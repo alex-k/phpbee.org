@@ -33,6 +33,11 @@ class vpa_daemon_base {
 	public function start() {
 		return $this->_init();
 	}
+
+	public function onestart() {
+		$this->init();
+		$this->main('onestart');
+	}
 	
 	private function _fork () {
 		$child_pid = pcntl_fork();
