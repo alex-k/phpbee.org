@@ -49,6 +49,11 @@ class gs_parser {
 		$len=count(explode('/',$result['key']));
 		$data['gspgid_v']=implode('/',array_slice(explode('/',$data['gspgid']),$len));
 		$data['gspgid_va']=explode('/',$data['gspgid_v']);
+		$data['gspgid_vp']=array();
+		for($i=0;$i<count($data['gspgid_va']);$i+=2) {
+			$data['gspgid_vp'][$data['gspgid_va'][$i]]=isset($data['gspgid_va'][$i+1]) ?  $data['gspgid_va'][$i+1] : NULL;
+		}
+
 		$data['gspgid_a']=explode('/',$data['gspgid']);
 		$this->data=$data;
 	}
