@@ -204,6 +204,33 @@ class images_handler extends gs_base_handler {
 		return ($this->show($this->data['gspgid_va']));
 	}
 
+
+	function proxy($ret) {
+		$proxy=cfg('images_handler_proxy');
+		$proxy=$proxy[$this->params['id']];
+		$filename=$this->data['gspgid_va'][0];
+		$targetname=$this->data['gspgid_va'][0];
+		if($proxy['filename_regexp']) $filename=preg_replace($proxy['filename_regexp'][0],$proxy['filename_regexp'][1],$filename);
+		$filename=$proxy['source'].$filename;
+		md($filename,1);
+
+		$targetname=$proxy['target'].$targetname;
+
+		$gd=new vpa_gd($filename);
+		$data=$proxy['resize'];
+		if ($data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);
+		if ($data['modifier']) $gd->modifier($data['width'],$data['height'],$data['modifier']);
+
+		$gd->resize($data['width'],$data['height'],$data['method']);
+		check_and_create_dir(dirname($targetname));
+		$gd->save($targetname,85);
+		//$gd->show();
+		if (file_exists($targetname)) {
+			return html_redirect($this->data['gspgid']);
+		}
+		//return html_redirect('/i/no-cover.png');
+	}
+
 }
 
 
