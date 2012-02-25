@@ -113,12 +113,12 @@ class gs_config {
 		if (!defined('DEBUG')) define('DEBUG',FALSE);
 		if (!defined('DEBUG_LEVEL')) define('DEBUG_LEVEL',65537);
 		if (DEBUG) {
-		ini_set('display_errors','On');
-		error_reporting(E_ALL ^E_NOTICE);
+			ini_set('display_errors','On');
+			error_reporting(E_ALL ^E_NOTICE);
+			set_exception_handler('gs_exception_handler_debug');
 		}
 
 
-		if ($_SERVER['REQUEST_URI']=='/install.php') $this->check_install_key();
 
 	}
 
@@ -570,20 +570,20 @@ TXT;
 	*/
 }
 
-function gs_exception_handler($ex,$return=false)
+function gs_exception_handler_debug($ex)
 {
-	if (DEBUG) {
-		if (in_array('xdebug',get_loaded_extensions())) throw $ex;
-		md('');
-		md("EXCEPTION ".get_class($ex));
-		md($ex->getMessage());
-		md($ex->getTrace());
-		gs_logger::dump();
-	} else {
+	if (in_array('xdebug',get_loaded_extensions())) throw $ex;
+	md('');
+	md("EXCEPTION ".get_class($ex));
+	md($ex->getMessage());
+	md($ex->getTrace());
+	gs_logger::dump();
+}
+function gs_exception_handler($ex)
+{
 		echo '<link rel="stylesheet" type="text/css" href="/css/main.css" media="screen" />';
 		echo '<div class="gs_exception">'.$ex->getMessage().'</div>';
-	}
-	die();
+		die();
 }
 
 function load_dbdriver($name) {
@@ -685,8 +685,8 @@ function __gs_autoload($class_name) {
 
 spl_autoload_register('__gs_autoload');
 
-
 set_exception_handler('gs_exception_handler');
+
 
 
 ?>

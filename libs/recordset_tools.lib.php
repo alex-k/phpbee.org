@@ -95,9 +95,13 @@ class field_interface {
 			'index'=>isset($opts['index']) ? $opts['index'] : 0,
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'isNumber'
 		);
+		if (isset($opts['default'])) $structure['htmlforms'][$field]['default']=(bool)$opts['default'];
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 		if (isset($opts['cssclass'])) $structure['htmlforms'][$field]['cssclass']=$opts['cssclass'];
 		if (isset($opts['helper_text'])) $structure['htmlforms'][$field]['helper_text']=$opts['helper_text'];
+	}
+	static function serial($field,$opts,&$structure,$init_opts) {
+		$structure['fields'][$field]=array('type'=>'serial');
 	}
 	static function fInt($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'int');

@@ -36,7 +36,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 				$arr[]=$this->escape_value($l);
 			}
 			return sprintf('(%s)',implode(',',$arr));
-		} else if ($c=='LIKE') {
+		} else if ($c=='LIKE' || $c=='STRONGLIKE' || $c=='STARTS' || $c=='ENDS') {
 			return sprintf('%s',mysql_real_escape_string($v));
 		} else {
 			return sprintf("'%s'",mysql_real_escape_string($v));
@@ -140,6 +140,21 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 			$r[$a['Field']]=$a['Field'];
 		}
 		return $r;
+	}
+	public function get_fields_info($tablename) {
+		$this->query(sprintf("SHOW FIELDS from %s",$tablename));
+		$ret=array();
+		while($r=$this->fetch()) {
+			$ret[$r['Field']]=array(
+				'Field'=>$r['Field'],
+				'Type'=>$r['Type'],
+				'Null'=>$r['Null'],
+				'Key'=>$r['Key'],
+				'Default'=>$r['Default'],
+				'Extra'=>$r['Extra'],
+			);
+		}
+		return $ret;
 	}
 
 	public function get_table_keys($tablename) {
@@ -359,6 +374,53 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		}
 
 		return $this->query($que);
+	}
+
+	function dbimport($table) {
+		$ret=array();
+		$fields=$this->get_fields_info($table);
+		foreach ($fields as $f) {
+			$r=array(
+				'name'=>$f['Field'],
+				'verbose_name'=>$f['Field'],
+			);
+
+			if($f['Null']=='NO') $r['required']=1;
+			if($f['Default']) $r['default_value']=$f['Default'];
+			if($f['Key']) $r['index']=1;
+
+			if ($f['Extra']=='auto_increment') {
+				$r['type']='serial';
+				$r['verbose_name']=null;
+
+			} else if(strpos($f['Type'],'int(')===0) {
+				$r['type']='fInt';
+
+			} else if($f['Type']=='float') {
+				$r['type']='fFloat';
+
+			} else if(strpos($f['Type'],'varchar(')===0) {
+				$r['type']='fString';
+				$r['options']=reset(sscanf($f['Type'],'varchar(%d)'));
+
+			} else if(strpos($f['Type'],'enum(')===0) {
+				$r['type']='fSelect';
+				preg_match('/enum\((.*)\)/',$f['Type'],$options);
+				$r['options']=$options[1];
+
+			} else if($f['Type']=='datetime') {
+				$r['type']='fDateTime';
+
+			} else if($f['Type']=='text') {
+				$r['type']='fText';
+
+			}	
+
+			$ret[]=$r;
+		}
+
+		return $ret;
+
 	}
 
 

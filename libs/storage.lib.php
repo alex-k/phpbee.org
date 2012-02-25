@@ -623,8 +623,11 @@ abstract class gs_prepare_sql {
 		                        '>='=>array('FLOAT'=>'`{f}` >= {v}','NUMERIC'=>'`{f}` >= {v}','STRING'=>'`{f}` >= {v}','NULL'=>'`{f}` IS NOT NULL'),
 		                        '<'=>array('FLOAT'=>'`{f}` < {v}','NUMERIC'=>'`{f}` < {v}','STRING'=>'`{f}` < {v}','NULL'=>'`{f}` IS NOT NULL}'),
 		                        '<='=>array('FLOAT'=>'`{f}` <= {v}','NUMERIC'=>'`{f}` <= {v}','STRING'=>'`{f}` <= {v}','NULL'=>'`{f}` IS NOT NULL'),
+		                        'STRONGLIKE'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '{v}'",'NULL'=>'FALSE'),
 		                        'LIKE'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}%%'",'NULL'=>'FALSE'),
-		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH (`{f}`) AGAINST  ({v})",'NULL'=>'FALSE'),
+		                        'STARTS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '{v}%%'",'NULL'=>'FALSE'),
+		                        'ENDS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}'",'NULL'=>'FALSE'),
+		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})>5",'NULL'=>'FALSE'), // dont add `fieldname` cause of multi-field-indexes (field1,field2,field3)
 		                        'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'(`{f}` BETWEEN {v0} AND {v1})'),
 		                    );
 	}
@@ -652,14 +655,17 @@ abstract class gs_prepare_sql {
 
 	function  construct_where($options,$type='AND') {
 		$tmpsql=array();
+		$counter_or=0;
 		if (is_array($options)) foreach ($options as $kkey=>$value) {
 			if ($kkey==="OR") {
+				$counter_or++;
 				$txt=$this->construct_where($value,'OR');
 			} else if ($kkey==="AND") {
 				$txt=$this->construct_where($value,'AND');
 			} else if (is_array($value) && isset($value['type']) && $value['type']=='condition') {
 				unset($value['type']);
 				$condition=$value['condition'];
+				if ($condition=='OR') $counter_or++;
 				unset($value['condition']);
 				$txt=$this->construct_where($value,$condition);
 			} else {
@@ -683,7 +689,7 @@ abstract class gs_prepare_sql {
 			if (!empty($txt)) $tmpsql[]=$txt;
 			$txt='';
 		}
-		$ret=sizeof($tmpsql)>0 ? sprintf ('(%s)',implode(" $type ",$tmpsql)) : '';
+		$ret=sizeof($tmpsql)>0 ? sprintf ( $counter_or ? '(%s)' : ' %s ',implode(" $type ",$tmpsql)) : '';
 		$this->_where=$ret;
 		return $ret;
 	}
@@ -720,6 +726,7 @@ interface gs_dbdriver_interface {
 	function table_exists($tablename);
 	function get_table_fields($tablename);
 	function get_table_names();
+	function get_fields_info($tablename);
 }
 
 

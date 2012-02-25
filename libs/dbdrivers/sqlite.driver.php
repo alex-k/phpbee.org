@@ -128,6 +128,9 @@ class gs_dbdriver_sqlite extends gs_prepare_sql implements gs_dbdriver_interface
 		$this->query($que);
 		return $this->fetchall();
 	}
+	public function get_fields_info ($tablename)  {
+		return array();
+	}
 	public function table_exists($tablename) {
 		$que=sprintf("SELECT name FROM sqlite_master WHERE type = 'table' and name='%s'",$tablename);
 		$this->query($que);

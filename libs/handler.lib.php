@@ -179,10 +179,12 @@ class gs_base_handler extends gs_handler {
 				$rec=$obj->new_record();
 			}
 			$rec->fill_values($options);
-			return self::get_form_for_record($rec,$this->params,$this->data);
+			$f=self::get_form_for_record($rec,$this->params,$this->data);
+		} else {
+			$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
+			$f=new $form_class_name(array(),$params,$data);
 		}
-		$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
-		$f=new $form_class_name(array(),$params,$data);
+		$this->showform($f);
 		return $f;
 	}
 
@@ -296,6 +298,7 @@ class gs_base_handler extends gs_handler {
 
 
 		$default_values=array();
+		$rec_default_values=array();
 		if(isset($data['handler_params']['_default'])) {
 			$default_values=string_to_params($data['handler_params']['_default']);
 		}
@@ -316,6 +319,7 @@ class gs_base_handler extends gs_handler {
 			$params=$hh[$name];
 			if (!$params['hidden'] && !isset($data['handler_params'][$name])) {
 				$f->add_field($name,$params);
+				if(isset($params['default'])) $rec_default_values[$name]=$params['default'];
 			}
 		}
 
@@ -326,6 +330,8 @@ class gs_base_handler extends gs_handler {
 
 		$fields=$rec->get_recordset()->id_field_name.','.implode(',',$hh_fields);
 
+
+		$f->set_values($rec_default_values);
 		$f->set_values($default_values);
 		$f->set_values($rec->get_values($fields));
 		$f->set_values(self::implode_data($rec->get_values($fields)));

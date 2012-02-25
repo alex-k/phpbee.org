@@ -335,11 +335,13 @@ class gs_widget_checkboxes extends gs_widget_multiselect {
 	}
 	function option_string($v,$l) {
 		$sel=is_array($this->value) ? in_array($v,$this->value) : trim($this->value)==$v;
-		return sprintf('<label class="%s"><input type="checkbox" name="%s[]" value="%s" %s>%s</label>'.PHP_EOL, 
+		return sprintf('<label class="%s"><input type="checkbox" name="%s[]" value="%s" %s>%s</label>%s'.PHP_EOL, 
 				isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fSelect',
 				$this->fieldname,
 				htmlspecialchars($v), 
-				$sel ? 'checked="checked"' : '', $l
+				$sel ? 'checked="checked"' : '', 
+				$l,
+				 isset($this->params['delimiter']) ? $this->params['delimiter'] : ''
 				);
 	}
 	function clean() {

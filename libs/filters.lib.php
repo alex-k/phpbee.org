@@ -31,6 +31,12 @@ class gs_filter {
 		$this->name=$this->params['name'];
 		$this->loadValues();
 	}
+	function get_data_url() {
+		$ds=new gs_data_driver_sef();
+		$arr=$ds->import();
+		unset($arr['gspgtype']);
+		return $arr;
+	}
 	function get_data_get() {
 		$ds=new gs_data_driver_get();
 		$arr=$ds->import();
@@ -52,7 +58,12 @@ class gs_filter {
 				}
 				break;
 			default:
+				/*
 				$d=$this->data['gspgid_handler_va'];
+				*/
+				$url=$this->data['gspgid_root'];
+				$url=preg_replace('|^'.$this->data['handler_key_root'].'/|','',$url);
+				$d=explode('/',$url);
 				for($i=0;$i<count($d);$i+=2) {
 					$j=$i+1;
 					if (isset($d[$j])) $arr[$d[$i]]=$d[$j];
@@ -73,6 +84,7 @@ class gs_filter_like extends gs_filter {
 	function __construct($data) {
 		parent::__construct($data);
 		$this->fields=array_map(trim,array_filter(explode(',',$this->params['fields'])));
+		$this->case=isset($this->params['case']) ? $this->params['case'] : 'LIKE';
 	}
 	function getHtmlBlock($ps) {
 		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
@@ -100,11 +112,27 @@ class gs_filter_like extends gs_filter {
 					'type'=>'value',
 					'field'=>$field,
 					'value'=>$this->value,
-					'case'=>'LIKE',
+					'case'=>$this->case,
 					);
 		}
 		$options[$this->name]=$to;
 		return $options;
+	}
+}
+
+class gs_filter_fulltext extends gs_filter_like {
+	function applyFilter($options,$rs) {
+		if (empty($this->value)) return $options;
+		$options[$this->name]=array(
+					'type'=>'value',
+					'field'=>$this->params['fields'],
+					'value'=>$this->value,
+					'case'=>$this->case,
+					);
+		return $options;
+
+
+
 	}
 }
 class gs_filter_var extends gs_filter {
@@ -155,6 +183,7 @@ class gs_filter_offset extends gs_filter_var {
 	function applyFilter($options,$rs) {
 		if (empty($this->value)) return $options;
 		$options[]=array('type'=>'offset','value'=>$this->value);
+		$options[]=array('type'=>'limit','value'=>$this->limit);
 		return $options;
 	}
 	function get_data_get() {
@@ -171,7 +200,7 @@ class gs_filter_offset extends gs_filter_var {
 		$limit=$this->limit;
 		$count=$ps['recordset']->count_records();
 
-		$pages=ceil($count/$limit);
+		$pages=max(ceil($count/$limit),1);
 		$current_page=floor($this->value/$limit)+1;
 
 
@@ -241,6 +270,48 @@ class gs_filter_calendar extends gs_filter_like {
 					'type'=>'value',
 					'field'=>$field,
 					'value'=>date(DATE_ATOM,strtotime("$date2 +1day")),
+					'case'=>'<',
+				),
+			);
+
+		}
+		$options[$this->name]=$to;
+		return $options;
+	}
+}
+class gs_filter_verbose_calendar extends gs_filter_like {
+	var $values=array (
+		'today'=>'today:today',
+		'yesterday'=>'yesterday:yesterday',
+		'week'=>'-1 week:today',
+		'month'=>'-1 month:today',
+		'all'=>'',
+		);
+	function applyFilter($options,$rs) {
+		if (empty($this->value)) return $options;
+		$dates=array_map(trim,explode(':',$this->values[$this->value]));
+		$date1=array_shift($dates);
+		$date2=$dates ? array_shift($dates) : $date1;
+
+		$to=array(
+			'type'=>'condition',
+			'condition'=>'OR',
+		);
+		foreach ($this->fields as $field) {
+			$to[]=array(
+				'type'=>'condition',
+				'condition'=>'AND',
+
+				array(
+					'type'=>'value',
+					'field'=>$field,
+					'value'=>date(DATE_ATOM,strtotime($date1)),
+					'case'=>'>=',
+				),
+				array(
+					'type'=>'value',
+					'field'=>$field,
+					'value'=>date(DATE_ATOM,strtotime($date2.' +1 day')),
 					'case'=>'<',
 				),
 			);
