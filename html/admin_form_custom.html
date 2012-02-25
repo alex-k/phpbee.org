@@ -25,7 +25,7 @@
 		<table>
 		{foreach $form->get_fields() as $field=>$op} 
 			{block name="field"}
-			<tr>
+			<tr class="interact_box">
 				<td class="field_title">
 				{$op.verbose_name|default:$field}
 				</td>
