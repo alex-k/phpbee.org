@@ -9,8 +9,7 @@
 	<a href="/admin/wizard/recordsets/{$recordset.Module->first()->id}/{$recordset.id}">{$recordset.name}</a>
 	</h3>
 
-	<h2>Manager wizard for {$recordset}</h2>
-
+	<h2>Create form for {$recordset}</h2>
 	<div id="div_createform" style="display:none">
 	{handler gspgid="/admin/wizard/createform/form" Recordset_id=$recordset.id Module_id=$module.id}
 	</div>

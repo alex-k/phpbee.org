@@ -8,7 +8,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 	function install() {
 		foreach(array(
 		<*foreach from=$module->recordsets item=rs*>
-			'<*$rs->name*>',
+			<*if $rs->install*>'<*$rs->name*>',<*/if*>
 		<*/foreach*>
 		) as $r){
 			$this->$r=new $r;
@@ -75,7 +75,9 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 <*foreach from=$module->recordsets item=rs*>
 
 class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
+	<*if $rs->id_field_name && $rs->id_field_name!='id'*>public $id_field_name='<*$rs->id_field_name*>'; <*/if*>
 	<*if $rs->no_urlkey*>public $no_urlkey=true; <*/if*>
+	<*if $rs->no_ctime*>public $no_ctime=true; <*/if*>
 	<*if $rs->orderby*>public $orderby="<*$rs->orderby*>";<*/if*> 
 	function __construct($init_opts=false) { parent::__construct(array(
 

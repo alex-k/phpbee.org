@@ -11,7 +11,7 @@ class module_wizard_createform extends gs_wizard_strategy_module implements gs_m
 		$data=array(
 		'handler'=>array(
 			'/admin/wizard/createform/form'=>array(
-				'gs_strategy_createform_handler.createform:name:form.html:form_class:form_createform:return:gs_record',
+				'gs_strategy_createform_handler.createform1:name:form.html:form_class:form_createform:return:gs_record',
 				//'gs_wizard_handler.commit:return:true',
 				'gs_base_handler.redirect_gl:gl:back',
 				),

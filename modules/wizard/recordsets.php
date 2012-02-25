@@ -26,7 +26,10 @@ class wz_recordsets extends gs_recordset_short {
 		'Submodules'=>"lMany2One wz_recordset_submodules:Recordset",
 		'showadmin'=>"fCheckbox 'show in admin'",
 		'no_urlkey'=>"fCheckbox 'No URL key' default=1",
+		'no_ctime'=>"fCheckbox 'No ctime'",
+		'install'=>"fCheckbox 'make install table' default=1",
 		'orderby'=>"fString 'order by' required=false default='id'",
+		'id_field_name'=>"fString 'id_field_name' required=false default='id'",
 		),$init_opts);
 		$this->structure['fkeys']=array(
 			array('link'=>'Module','on_delete'=>'CASCADE','on_update'=>'CASCADE'),

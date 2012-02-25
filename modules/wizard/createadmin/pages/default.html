@@ -61,7 +61,7 @@
 	
 	{foreach from=${%$rs.name%} item="e"}
 	<tr class="{cycle values='odd,even'}">
-			<td>{$e.id}</td>
+			<td>{$e->get_id()}</td>
 			{%foreach from=$fields item=f%}
 			<td class="frm_{%$f.type%}">{field_formatter value=$e.{%$f.name%} type="{%$f.type%}"}</td>
 			{%/foreach%}
@@ -69,11 +69,11 @@
 			<td>{$e.{%$f.name%}}</td>
 			{%/foreach%}
 			{%foreach from=$extlinks item=f%}
-			<td><a href="/admin/{%$module.name%}/{%$f.classname%}?{%$f->linkname%}={$e.id}">{%$f.verbose_name%} ({$e._{%$f.name%}_count})</a></td>
+			<td><a href="/admin/{%$module.name%}/{%$f.classname%}?{%$f->linkname%}={$e->get_id()}">{%$f.verbose_name%} ({$e._{%$f.name%}_count})</a></td>
 			{%/foreach%}
-			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/modify/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
-			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/copy/{$e.id}"><img src="/i/admin/ico_copy.png" alt="Копировать" title="Копировать"></a></td>
-			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
+			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/modify/{$e->get_id()}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
+			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/copy/{$e->get_id()}"><img src="/i/admin/ico_copy.png" alt="Копировать" title="Копировать"></a></td>
+			<td class="cnt"><a href="/admin/{%$module.name%}/{%$rs.name%}/delete/{$e->get_id()}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
 	</tr>
 	{/foreach}
 	<tr class="pager"><td colspan="100">
