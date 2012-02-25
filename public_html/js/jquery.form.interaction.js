@@ -15,6 +15,10 @@
 	$.fn.interaction= function(params) {
 		options = $.extend({}, $.fn.interaction.defaults, params);
 
+		error= function(obj,d) {
+			if(d.debug) alert(d.message);
+		}
+
 		show = function(obj,d) {
 			obj.show();
 		}
@@ -66,9 +70,14 @@
 
 		return this.each(function() {
 
+
 			$('.fInteract',this).each(function() {
-				for (ev in events) {
-					$(this).filter(ev).bind(events[ev],postform);
+				if (this.interact==1) {
+				} else {
+					for (ev in events) {
+						$(this).filter(ev).bind(events[ev],postform);
+					}
+					this.interact=1;
 				}
 
 			});
