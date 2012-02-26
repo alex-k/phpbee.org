@@ -48,13 +48,14 @@ function smarty_function_controller($params, &$smarty)
 	foreach ($vars as $val) {
 		list($k,$v)=$val;
 		if (isset($params['_skip_null_options']) && $params['_skip_null_options'] && empty($v)) continue;
-		if (!is_array($v) && preg_match('/^(LIKE|!=|<=|>=|<|>|IN|FULLTEXT)(.*)$/',$v,$matches) ) {
+		if (!is_array($v) && preg_match('/^(LIKE|STRONGLIKE|STARTS|ENDS|!=|<=|>=|<|>|IN|FULLTEXT|BETWEEN|REGEXP|NOTREGEXP)(.*)$/',$v,$matches) ) {
 			if (isset($params['_skip_null_options']) && $params['_skip_null_options'] && empty($matches[2])) continue;
 			if ($matches[1]=='IN') {
 				$options[]=array('type'=>'value', 'field'=>$k,'case'=>'=','value'=>explode(':',$matches[2]));
 			} else {
 				$options[]=array('type'=>'value', 'field'=>$k,'case'=>$matches[1],'value'=>$matches[2]);
 			}
+
 		
 		/*
 		} else if (!is_array($v) && preg_match('/^(BETWEEN)\s*(.*)\s+(.*)/',$v,$matches) ) {

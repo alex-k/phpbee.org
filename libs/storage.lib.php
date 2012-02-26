@@ -627,7 +627,9 @@ abstract class gs_prepare_sql {
 		                        'LIKE'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}%%'",'NULL'=>'FALSE'),
 		                        'STARTS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '{v}%%'",'NULL'=>'FALSE'),
 		                        'ENDS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}'",'NULL'=>'FALSE'),
-		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})>5",'NULL'=>'FALSE'), // dont add `fieldname` cause of multi-field-indexes (field1,field2,field3)
+		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})>5",'NULL'=>'FALSE'), // dont escape`fieldname` cause of multi-field-indexes (field1,field2,field3)
+		                        'REGEXP'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" `{f}` REGEXP {v}",'NULL'=>'FALSE'), // dont add `fieldname` cause of multi-field-indexes (field1,field2,field3)
+		                        'NOTREGEXP'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" `{f}` NOT REGEXP {v}",'NULL'=>'FALSE'), // dont add `fieldname` cause of multi-field-indexes (field1,field2,field3)
 		                        'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'(`{f}` BETWEEN {v0} AND {v1})'),
 		                    );
 	}

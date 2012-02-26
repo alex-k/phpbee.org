@@ -62,7 +62,9 @@ class gs_filter {
 				$d=$this->data['gspgid_handler_va'];
 				*/
 				$url=$this->data['gspgid_root'];
-				$url=preg_replace('|^'.$this->data['handler_key_root'].'/|','',$url);
+				$h_kr=$this->data['handler_key_root'];
+				$h_kr=str_replace('*','\*',$h_kr);
+				$url=preg_replace('|^'.$h_kr.'/|','',$url);
 				$d=explode('/',$url);
 				for($i=0;$i<count($d);$i+=2) {
 					$j=$i+1;
