@@ -548,6 +548,22 @@ class gs_base_handler extends gs_handler {
 		return html_redirect($href);
 		//return (isset($this->data['gspgid_va'][1])) ? html_redirect($href) : html_redirect();
 	}
+
+	function save_prev_url($ret) {
+		gs_session::save(cfg('referer_path'),$this->params['name']);
+		return TRUE;
+	}
+	function redirect_saved_url($ret) {
+		$url=gs_session::load($this->params['name']);
+		if ($url) {
+			$this->params['href']=$url;
+			$this->redirect($ret);
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+
 	function many2one() {
 		if (isset($this->data['gspgid_va'][4]) && $this->data['gspgid_va'][4]=='delete') {
 			$rid=intval($this->data['gspgid_va'][5]);
