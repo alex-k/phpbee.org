@@ -74,6 +74,7 @@ class gs_base_handler extends gs_handler {
 
 	function validate_gl() {
 		$ret=call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v'],$this->data['gspgid']);
+		if ($ret instanceof gs_record) return $ret;
 		$url=trim($ret,'/');
 		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/') || $ret===TRUE );
 	}
