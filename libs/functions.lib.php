@@ -15,11 +15,11 @@ function html_redirect($gspgid=null,$data=array(),$type='302', $clean_get=false)
 	$query=array();
 	if($gspgid===null) {
 		$url=cfg('referer_path');
-		if (!$clean_get) parse_str(parse_url(cfg('referer'),PHP_URL_QUERY),$query);
 	} else {
 		$scheme=parse_url($gspgid,PHP_URL_SCHEME);
 		$url=($scheme || substr($gspgid,0,1)=='/') ? $gspgid : cfg('www_dir').$gspgid;
 	}
+	if ($clean_get===false) parse_str(parse_url(cfg('referer'),PHP_URL_QUERY),$query);
 	//$url=cfg('www_dir').$url;
 	$url='/'.ltrim($url,'/');
 	$data=array_merge($query,$data);
