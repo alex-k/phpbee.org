@@ -1,0 +1,13 @@
+
+{extends file="index.html"}
+{block name=content}
+
+<h3>
+Your payment was declined.
+</h3>
+<p>
+Transaction ID: {$gw->get_transaction_number()}<br>
+Transaction message: {$gw->get_transaction_message()}<br>
+</p>
+
+{/block}

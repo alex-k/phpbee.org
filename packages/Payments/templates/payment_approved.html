@@ -1,0 +1,18 @@
+{extends file="index.html"}
+{block name=content}
+
+{$gw=gs_session::load('payments_gateway')}
+
+<h3>
+Thank you for your payment!
+</h3>
+
+<p>
+Your account was succesefully credited for ${$gw->get_transaction_amount()}.
+</p>
+<p>
+Transaction ID: {$gw->get_transaction_number()}<br>
+Transaction message: {$gw->get_transaction_message()}<br>
+</p>
+
+{/block}
