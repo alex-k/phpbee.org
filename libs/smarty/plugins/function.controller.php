@@ -90,7 +90,8 @@ function smarty_function_controller($params, &$smarty)
 		}
 
 		list($_paging_type,$_paging_itemsperpage)=sscanf($params['_paging'],"%[A-Za-z]:%d");
-		require_once('function.controller.paging.php');
+		//require_once('function.controller.paging.php');
+		require_fullpath(__FILE__,'function.controller.paging.php');
 
 		$rows_count=$obj->count_records($options);
 		$pages=gs_controller_paging($params['_assign']."_paging", $_paging_type,$rows_count,$_paging_itemsperpage,$_offset);
