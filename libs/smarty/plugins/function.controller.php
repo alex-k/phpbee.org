@@ -27,10 +27,13 @@ function smarty_function_controller($params, &$smarty)
 			if (is_array($v)) {
 				$vars[]=array($k,$v);
 			} else {
+				/*
 				$vv=explode(',',$v);
 				foreach ($vv as $val) {
 					$vars[]=array($k,$val);
 				}
+				*/
+				$vars[]=array($k,$v);
 			}
 		}
 	}

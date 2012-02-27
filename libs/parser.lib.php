@@ -179,6 +179,7 @@ class gs_parser {
 
 
 
+
 			if($this->continue_if($condition,$ret['last'])) {
 				if ($cond_true && array_key_exists($cond_true,$handler_array)) {
 					reset($handler_array);
@@ -205,6 +206,7 @@ class gs_parser {
 			case 'false': 
 				return $result===FALSE;
 			case 'not_false': 
+			case 'notfalse': 
 				return $result!==FALSE;
 			case 'gs_record':
 				return is_object($result) && is_a($result,'gs_record');

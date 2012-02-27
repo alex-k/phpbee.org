@@ -488,12 +488,22 @@ class gs_base_handler extends gs_handler {
 		$newrec->commit();
 		return $rec;
 	}
-	function xml_clone() {
+	function xml_dump($ret) {
+		md(xml_print($ret['last']->asXML()),1);
+	}
+	function xml_print($ret) {
+		header('Content-type: text/xml');
+		echo xml_print($ret['last']->asXML());
+	}
+	function xml_export() {
 		$id=$this->data['gspgid_va'][0];
 		$rs=new $this->params['classname'];
 		$rec=$rs->get_by_id($id);
 		if (!$rec) return $rec;
-		$xml=$rec->xml_export();
+		return $rec->xml_export();
+	}
+	function xml_clone() {
+		$xml=$this->xml_export();
 		//md($xml,1);
 		$newrs=xml_import($xml);
 		$newrs->commit();

@@ -435,7 +435,9 @@ class gs_record implements arrayaccess {
 		}
 		$x_values=$x->addChild('values');
 		foreach ($values as $name=>$value) {
-			$xv=$x_values->addChild($name,$value);
+			/*$xv=$x_values->addChild($name,$value);*/
+			$xv=$x_values->addChild($name);
+			$x_values->$name=$value;
 		}
 		if (isset($xml)) return $xml;
 	}
