@@ -32,6 +32,11 @@ class module_wizard extends gs_base_module implements gs_module {
 	static function get_handlers() {
 		$data=array(
 		'handler'=>array(
+			'/admin/form/wz_modules_import'=>array(
+				'gs_wizard_handler.module_xml_import:{name:admin_form.html:form_class:form_modules_import:return:true}',
+				'gs_base_handler.redirect:href:admin/wizard',
+			),
+
 			'/admin/form/wz_modules'=>array(
 				'gs_base_handler.post:{name:admin_form.html:classname:wz_modules:form_class:g_forms_table}',
 				'gs_base_handler.redirect_up',
@@ -149,6 +154,10 @@ class module_wizard extends gs_base_module implements gs_module {
 			'/admin/wizard/urls'=>'gs_base_handler.show',
 			'/admin/wizard/handlers'=>'gs_base_handler.show',
 			'/admin/wizard/macros'=>'gs_base_handler.show',
+                        '/admin/wizard/xmlexport'=>array(
+					'gs_base_handler.xml_export:{classname:wz_modules:return:notfalse}',
+                                        'gs_base_handler.xml_print',
+                                        ),
                         '/admin/wizard/delete'=>array(
                                         'gs_base_handler.delete:{classname:wz_modules}',
                                         'gs_base_handler.redirect',
@@ -235,6 +244,15 @@ class module_wizard extends gs_base_module implements gs_module {
 
 
 class gs_wizard_handler extends gs_handler {
+	function module_xml_import() {
+		$bh=new gs_base_handler($this->data,$this->params);
+		$f=$bh->validate();
+		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+		$d=$f->clean();
+		$newrs=xml_import(trim($d['xml']));
+		$newrs->commit();
+		return TRUE;
+	}
 
 	function commit($rec=null) {
 
@@ -614,6 +632,18 @@ class wz_handler_mc extends gs_handler {
 		return $tpl->fetch('macros_insert_close.html');
 	}
 
+}
+
+class form_modules_import  extends g_forms_table{
+	function __construct($hh,$params=array(),$data=array()) {
+		$hh=array(
+		    'xml' => Array
+			(
+			    'type' => 'text',
+			),
+		);
+		return parent::__construct($hh,$params,$data);
+	}
 }
 
 require_fullpath(__FILE__,'macros.php');
