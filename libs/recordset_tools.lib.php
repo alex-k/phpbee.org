@@ -271,6 +271,7 @@ class field_interface {
 	static function lMany2One($field,$opts,&$structure,$init_opts) {
 		list($rname,$linkname)=explode(':',$opts['linked_recordset']);
 				// если в init_opts такой же рекордсет что и в $opts['linked_recordset'] - то не надо создавать новый объект, иначе скрипт уходит в рекурсию
+		if(!class_exists($rname)) return;		
 		if ($init_opts['recordset']!=$rname) {
 			$obj=new $rname();
 			$obj_rs=$obj->structure['recordsets'][$linkname];
@@ -316,6 +317,11 @@ class field_interface {
 	}
 	static function lMany2Many($field,$opts,&$structure,$init_opts) {
 		@list($rname,$table_name,$foreign_field_name)=explode(':',$opts['linked_recordset']);
+		if(!$table_name) {
+			$a=array($init_opts['recordset'],$rname);
+			sort($a);
+			$table_name='m2m_'.implode('_',$a);
+		}
 		/*
 		new gs_rs_links($init_opts['recordset'],$rname,$table_name);	
 		нужно переопределить lazy_load в _short чтобы он для rs_links вызывал хитрый конструктор.
