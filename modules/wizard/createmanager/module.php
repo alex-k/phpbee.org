@@ -49,7 +49,7 @@ class gs_strategy_createmanager_handler extends gs_handler {
 
 
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
-		$module=record_by_id($this->data['handler_params']['Module_id'],'wz_modules');
+		$module=record_by_id($d['module'],'wz_modules');
 
 
 
@@ -139,7 +139,15 @@ class form_createmanager extends form_admin{
 		if(!is_array($all_links)) $all_links=array();
 
 
+		$modules=new wz_modules;
+		$modules->find_records(array());
+
+
 		$hh=array(
+			'module'=>array(
+				'widget'=>'radio',
+				'options'=>$modules->recordset_as_string_array(),
+				),
 		    'template_name' => Array
 			(
 			    'type' => 'select',
