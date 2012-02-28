@@ -21,7 +21,7 @@ function html_redirect($gspgid=null,$data=array(),$type='302', $clean_get=false)
 	}
 	if ($clean_get===false) parse_str(parse_url(cfg('referer'),PHP_URL_QUERY),$query);
 	//$url=cfg('www_dir').$url;
-	$url='/'.ltrim($url,'/');
+	if(!isset($scheme)) $url='/'.ltrim($url,'/');
 	$data=array_merge($query,$data);
 	$datastr='';
 	if ($data) $datastr='?'.http_build_query($data);

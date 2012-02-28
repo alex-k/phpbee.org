@@ -207,6 +207,7 @@ class gs_record implements arrayaccess {
 		if (isset($structure['rs1_name']) && isset($structure['rs2_name'])) 
 			$rs=new gs_rs_links($structure['rs1_name'],$structure['rs2_name'],$structure['recordset'],$structure['rs_link'],$name);
 		 else {
+			 	if (!class_exists($structure['recordset'])) return new gs_null(GS_NULL_XML);
 				$rs=new $structure['recordset'];
 			}
 

@@ -207,7 +207,6 @@ class gs_init {
 		
 		gs_cacher::save($handlers,'config','handlers');
 
-		//$txt=md($handlers);
 		$txt="\n";
 		foreach ($handlers as $type=>$h) {
 			foreach ($h as $key=>$arr) {
@@ -385,6 +384,7 @@ class gs_init {
 		$cfg=gs_config::get_instance();
 		$modules=$cfg->get_registered_modules();
 		if (is_array($modules)) foreach ($modules as $m) {
+			md($m);
 			$mod=new $m;
 			$mod->install();
 		}
