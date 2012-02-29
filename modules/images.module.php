@@ -85,7 +85,7 @@ abstract class tw_file_images extends gs_recordset_short{
 	
 	function config_previews() {
 		$this->config=array(
-			'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
+			//'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
 			'admin'=>array('width'=>100,'height'=>100,'method'=>'use_fields','bgcolor'=>array(255,255,255)),
 			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(255,255,255)),
 		);
@@ -98,11 +98,12 @@ abstract class tw_file_images extends gs_recordset_short{
 		readfile($fname);
 		die();
 	}
-	function resize($rec,$type,$ret=null,$no_rewrite=false) {
+	function resize($rec,$type=null,$ret=null,$no_rewrite=false) {
 		$fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR;
 		$sname=$fname.'File_data';
 		foreach ($this->config as $key => $data) {
-			$gd=new vpa_gd($sname);
+			//$gd=new vpa_gd($sname);
+			$gd=new vpa_gd($rec->File_data,false);
 			$iname=$fname.$key.'.jpg';
 			if ($data['width']>0  && ($data['width']<$rec->first()->File_width || $data['height']<$rec->first()->File_height)) {
 				if ($data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);
@@ -112,7 +113,8 @@ abstract class tw_file_images extends gs_recordset_short{
 			}
 			if (!file_exists($iname) || ($no_rewrite==false && file_exists($iname))) {
 				if (isset($data['method']) && $data['method']=='copy') {
-					copy($sname,$iname);
+					//copy($sname,$iname);
+					file_put_contents($iname,$rec->File_data);
 				} else {
 					$gd->save($iname,100);
 				}

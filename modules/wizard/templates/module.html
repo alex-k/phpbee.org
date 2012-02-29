@@ -65,7 +65,9 @@
 		<h3>apply strategy:</h3>
 		<dd>{handler gspgid="/admin/form/strategy" Module_id=$module.id}</dd>
 
-		<h3><a href="/admin/wizard/recordsets/{$module.id}">recordsets</a>  </h3>
+		<h3><a href="/admin/wizard/recordsets/{$module.id}">recordsets</a>  
+		<a href="/admin/wizard/recordsets/{$module.id}/form1/0#form">add</a>
+		</h3>
 		<ul>
 		{foreach from=$module.recordsets->orderby('name') item=rs}
 			<li>

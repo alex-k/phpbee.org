@@ -163,6 +163,8 @@ class form_createform_tpl extends form_admin{
 		);
 		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
 		$extends=array_map(basename,glob($dirname."*"));
+		$modules=new wz_modules;
+		$modules->find_records(array());
 		$options=array(
 			/*
 			'classname'=>array(
@@ -221,7 +223,6 @@ class form_createform_tpl extends form_admin{
 				//$options["$ak"."[$i]"]=$av;
 				$options["$ak:$i"]=$av;
 			}
-
 		}
 		return parent::__construct($options,$params,$data);
 	}
