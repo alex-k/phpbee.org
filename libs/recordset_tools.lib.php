@@ -222,6 +222,12 @@ class field_interface {
 		if (isset($opts['cssclass'])) $structure['htmlforms'][$field]['cssclass']=$opts['cssclass'];
 		if (isset($opts['helper_text'])) $structure['htmlforms'][$field]['helper_text']=$opts['helper_text'];
 	}
+	static function fSet($field,$opts,&$structure,$init_opts) {
+		self::fSelect($field,$opts,$structure,$init_opts);
+		$structure['fields'][$field]['type']='set';
+		$structure['fields'][$field]['options']=$structure['htmlforms'][$field]['options'];
+		$structure['htmlforms'][$field]['type']='Set';
+	}
 	static function f___dummy($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'varchar','options'=>255);
 		$structure['htmlforms'][$field]=array(
@@ -568,6 +574,7 @@ class gs_recordset_short extends gs_recordset {
 			'index' => 0,
 			'multilang' => 0,
 			'func_name' => 'lMany2One',
+			'local_field_name' => $this->id_field_name,
 			'linked_recordset' => $classname.':Parent',
 			'hidden' => 1,
 			'verbose_name' => false,

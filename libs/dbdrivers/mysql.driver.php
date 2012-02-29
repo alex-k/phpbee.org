@@ -30,6 +30,8 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 			return $v;
 		} else if (is_null($v)) {
 			return 'NULL';
+		} else if ($c=='SET' && is_array($v) ) {
+			return $this->escape_value(implode(',',$v));
 		} else if (is_array($v)) {
 			$arr=array();
 			foreach($v as $k=>$l) {
@@ -282,7 +284,11 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
 			if ( $st['type']!='serial' && $record->is_modified($fieldname)) {
 				$fields[]=$fieldname;
-				$values[]=$this->escape_value($record->$fieldname);
+				if ($st['type']=='set') {
+					$values[]=$this->escape_value($record->$fieldname,'SET');
+				} else {
+					$values[]=$this->escape_value($record->$fieldname);
+				}
 			}
 		}
 		$que=sprintf('INSERT INTO %s (`%s`) VALUES  (%s)',$rset->db_tablename,implode('`,`',$fields),implode(',',$values));
@@ -296,7 +302,12 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$fields=array();
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
 			if ($record->is_modified($fieldname)) {
+				if ($st['type']=='set') {
+				$fields[]=sprintf('`%s` = %s',$fieldname,$this->escape_value($record->$fieldname,'SET'));
+				} else {
 				$fields[]=sprintf('`%s`=%s',$fieldname,$this->escape_value($record->$fieldname));
+				}
+				//$fields[]=$this->escape($fieldname,'=',$record->$fieldname);
 			}
 		}
 		if (sizeof($fields)==0) return;
@@ -343,7 +354,6 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	}
 	function select($rset,$options,$fields=NULL) {
 		$where=$this->construct_where($options);
-		//md($rset->structure['fields'],1);
 		$fields = is_array($fields) ? array_filter($fields) : array_keys($rset->structure['fields']);
 		$que=sprintf("SELECT `%s` FROM %s ", implode('`,`',$fields), $rset->db_tablename);
 		if (is_array($options)) foreach($options as $o) {

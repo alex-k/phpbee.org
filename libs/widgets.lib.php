@@ -352,6 +352,14 @@ class gs_widget_checkboxes extends gs_widget_multiselect {
 		return $d;
 	}
 }
+class gs_widget_Set extends gs_widget_checkboxes {
+	function html($multi=false) {
+		if (!is_array($this->value)) $this->value=array_map('trim',explode(',',$this->value));
+		return parent::html($multi);
+	}
+}
+
+
 class gs_widget_checkbox extends gs_widget {
 	function html() {
 		$s=sprintf('<input type="hidden" name="%s" value="0">', $this->fieldname);
@@ -542,6 +550,11 @@ class gs_data_widget_parent_list {
 			$vro=new $rname;
 			$options=array();
 			foreach($data['handler_params'] as $o=>$v) {
+				if (isset($data['handler_params']['_alllinks'])) {
+					if (in_array($k,array_map('trim',explode(',',$data['handler_params']['_alllinks'])))) {
+						continue;
+					}
+				}
 				if (isset($vro->structure['fields'][$o])) $options[$o]=$v;
 			}
 			$vrecs=$vro->find_records($options);

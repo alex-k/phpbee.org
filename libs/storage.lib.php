@@ -610,7 +610,7 @@ abstract class gs_prepare_sql {
 		                           'timestamp'=>'TIMESTAMP',
 		                           'varchar'=>'VARCHAR ({v})',
 		                           'text'=>'LONGTEXT',
-		                           'set'=>'SET ({v})',
+		                           'set'=>'SET {v}',
 		                           'enum'=>'ENUM {v}',
 		                           'blob'=>'BLOB',
 		                           'longblob'=>'LONGBLOB',

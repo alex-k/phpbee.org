@@ -11,7 +11,7 @@ final class gs_tpl {
 		$tpl->template_dir=$config->tpl_data_dir;
 		$tpl->compile_dir=$config->tpl_var_dir;
 		//$tpl->plugins_dir[]=$config->lib_tpl_dir.'plugins';
-		//$tpl->force_compile=TRUE;
+		//if (cfg('tpl_force_compile')) $tpl->force_compile=TRUE;
 		$tpl->assign('base_dir',$config->www_dir);
 		$tpl->assign('http_host',$config->host);
 		return $tpl;
