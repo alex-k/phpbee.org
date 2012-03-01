@@ -7,6 +7,13 @@ class payments_gw_gspay extends payments_gateway {
 		return $this->validate_result['info']['RESULTSTATUS']=='approved';
 		
 	}
+	function get_transaction_status() {
+		if (isset($this->validate_result['ERROR'])) return 'error';
+		if ($this->validate_result['info']['TRANSACTIONSTATUS']=='approved') return 'approved';
+		if ($this->validate_result['info']['TRANSACTIONSTATUS']=='fraud') return 'fraud';
+		if ($this->validate_result['info']['TRANSACTIONSTATUS']=='declined') return 'declined';
+		return $this->validate_result['info']['TRANSACTIONSTATUS'];
+	}
 	function get_transaction_number() {
 		return $this->validate_result['info']['TRANSACTIONID'];
 
@@ -14,7 +21,7 @@ class payments_gw_gspay extends payments_gateway {
 	function get_transaction_message() {
 		return $this->validate_result['info']['TRANSACTIONMESSAGE'];
 	}
-	function get_merchant_order_id() {
+	function get_payment_id() {
 		return $this->validate_result['info']['ORDERID'];
 	}
 	function get_transaction_amount() {
@@ -76,6 +83,22 @@ class payments_gw_gspay extends payments_gateway {
 		return $ret;
 
 
+	}
+
+	function start($pmnt) {
+		$url="https://secure.redirect2pay.com/payment/pay.php";
+		$method=$pmnt->Payment_method->first();
+		$data=array(
+			'siteID'=>$method->parameter1,
+			'OrderDescription'=>$pmnt->description,
+			'OrderID'=>$pmnt->get_id(),
+			'InvoiceID'=>$pmnt->invoiceID,
+			'Amount'=>$pmnt->amount,
+			'customerEmail'=>$pmnt->Order->first()->Customer->first()->email,
+			'returnUrl'=>"http://".cfg('host')."/Payments/return/gspay",
+			'TransactionMode'=>$method->parameter2,
+			);
+		return html_redirect($url,$data);
 	}
 
 

@@ -3,7 +3,8 @@
 	gs_session::save($gateway,'payments_gateway');
 	switch($alias) {
 		case 'payment_approved':
-			return '/Payments/approved';
+			//return '/Payments/approved';
+			return '/orders/completed';
 			break;
 		case 'payment_declined':
 			return '/Payments/declined';
