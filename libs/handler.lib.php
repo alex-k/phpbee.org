@@ -492,8 +492,17 @@ class gs_base_handler extends gs_handler {
 		md(xml_print($ret['last']->asXML()),1);
 	}
 	function xml_print($ret) {
+		$x=xml_print($ret['last']->asXML());
 		header('Content-type: text/xml');
-		echo xml_print($ret['last']->asXML());
+		echo $x;
+	}
+	function xml_save_file($ret) {
+		$x=xml_print($ret['last']->asXML());
+		$filename=str_replace('/','_',$this->data['gspgid']).'.xml';
+		header('Content-type: text/xml;charset=utf8');
+		header('Content-disposition: attachment; filename='.$filename);
+		echo $x;
+
 	}
 	function xml_export() {
 		$id=$this->data['gspgid_va'][0];

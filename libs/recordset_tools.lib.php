@@ -86,7 +86,7 @@ class field_interface {
 		return self::fString($field,$opts,$structure,$init_opts);
 	}
 	static function fCheckbox($field,$opts,&$structure,$init_opts) {
-		$structure['fields'][$field]=array('type'=>'int');
+		$structure['fields'][$field]=array('type'=>'int','default'=>(int)$opts['default']);
 		$structure['fields'][$field]['multilang']=$opts['multilang'];
 		$structure['htmlforms'][$field]=array(
 			'type'=>'checkbox',
