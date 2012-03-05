@@ -3,7 +3,9 @@
 class form_interact {
 	static $interact_regexps=array(
 		'|#(\w+)|s'=>'$this->field(\'\1\')',
+		'|\.hide|s'=>'->hide',
 		'|\.display_if|s'=>'->display_if',
+		'|\.show_if|s'=>'->display_if',
 		'|\.hide_if|s'=>'->hide_if',
 		'|\.link_values|s'=>'->link_values',
 		'|\.copy_value|s'=>'->copy_value',
@@ -34,8 +36,13 @@ class form_interact {
 		$this->fieldname=$name;
 		return $this;
 	}
+
+	function hide($condition) {
+		$this->actions[]=array('field'=>$this->fieldname,'action'=> 'hide');
+	}
 	function display_if($condition, $eq='==') {
 		foreach ($this->old_ret as $or) {
+			if (is_object($or)) $or=get_object_vars($or);
 			if ($or['field']==$this->interactname && $or['action']=='hide') {
 				$this->actions[]=array('field'=>$this->fieldname,'action'=>'hide');
 				return;
@@ -52,6 +59,7 @@ class form_interact {
 		if(is_array($condition)) {
 			$data=$condition;
 		} else {
+			$data['']='';
 			list($rsname,$linkname)=explode('.',$condition);
 			$rec=record_by_id($this->value,$rsname);
 			foreach ($rec->$linkname as $r) {

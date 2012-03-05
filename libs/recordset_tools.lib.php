@@ -544,7 +544,7 @@ class gs_recordset_short extends gs_recordset {
 
 		$lng=languages();
 		if (count($lng)<2) return;
-		array_shift($lng);
+		//array_shift($lng); // all_languages_in_form
 
 
 
@@ -560,6 +560,7 @@ class gs_recordset_short extends gs_recordset {
 					$new_h['verbose_name'].="/$lname";
 					$hf['Lang:'.$l.':'.$k]=$new_h;
 				}
+				unset($hf[$k]); // all_languages_in_form
 
 
 			}

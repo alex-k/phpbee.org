@@ -331,11 +331,23 @@ class gs_base_handler extends gs_handler {
 
 		$fields=$rec->get_recordset()->id_field_name.','.implode(',',$hh_fields);
 
+		$rec_values=$rec->get_values($fields);
+		if (isset($rec_values['Lang'])) {
+			$langs=languages();
+			$default_lang=key($langs);
+			$rec_values['Lang'][$default_lang]=$rec->get_values();
+		}
+		/*
+		md($fields,1);
+		md($rec_values,1);
+		*/
+
+
 
 		$f->set_values($rec_default_values);
 		$f->set_values($default_values);
-		$f->set_values($rec->get_values($fields));
-		$f->set_values(self::implode_data($rec->get_values($fields)));
+		$f->set_values($rec_values);
+		$f->set_values(self::implode_data($rec_values));
 		$f->set_values($data);
 
 		return $f;
@@ -818,7 +830,6 @@ class gs_base_handler extends gs_handler {
 		$d=$f->clean();
 
 		$rsname=$this->params['classname'];
-
 		$rs=new $rsname;
 
 
@@ -827,6 +838,7 @@ class gs_base_handler extends gs_handler {
 		}
 
 		$rec=$rs->find_records($d)->first();
+
 
 
 		if (!$rec) {
