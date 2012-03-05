@@ -9,7 +9,7 @@ class module_wizard extends gs_base_module implements gs_module {
 	function __construct() {
 	}
 	function install() {
-		foreach(array('wz_modules','wz_recordsets','wz_recordset_fields','wz_recordset_resizes','wz_recordset_links','wz_recordset_submodules','wz_urls','wz_handlers','wz_forms','wz_form_fields','wz_form_fields_validators') as $r){
+		foreach(array('wz_modules','wz_recordsets','wz_recordset_fields','wz_recordset_resizes','wz_recordset_links','wz_recordset_triggers','wz_recordset_submodules','wz_urls','wz_handlers','wz_forms','wz_form_fields','wz_form_fields_validators') as $r){
 			$this->$r=new $r;
 			$this->$r->install();
 		}
@@ -48,6 +48,12 @@ class module_wizard extends gs_base_module implements gs_module {
 			'/admin/form/wz_recordset_links'=>array(
 				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
 				'gs_base_handler.post:{name:admin_form.html:classname:wz_recordset_links:form_class:g_forms_table}',
+				'gs_base_handler.redirect_if:gl:save_continue:return:true',
+				'gs_base_handler.redirect_up:level:1',
+			),
+			'/admin/form/wz_recordset_triggers'=>array(
+				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+				'gs_base_handler.post:{name:admin_form.html:classname:wz_recordset_triggers:form_class:g_forms_table}',
 				'gs_base_handler.redirect_if:gl:save_continue:return:true',
 				'gs_base_handler.redirect_up:level:1',
 			),
@@ -156,7 +162,7 @@ class module_wizard extends gs_base_module implements gs_module {
 			'/admin/wizard/macros'=>'gs_base_handler.show',
                         '/admin/wizard/xmlexport'=>array(
 					'gs_base_handler.xml_export:{classname:wz_modules:return:notfalse}',
-                                        'gs_base_handler.xml_print',
+                                        'gs_base_handler.xml_save_file',
                                         ),
                         '/admin/wizard/delete'=>array(
                                         'gs_base_handler.delete:{classname:wz_modules}',
@@ -184,6 +190,14 @@ class module_wizard extends gs_base_module implements gs_module {
                                         ),
                         '/admin/wizard/recordset_links/copy'=>array(
                                         'gs_base_handler.copy:{classname:wz_recordset_links}',
+                                        'gs_base_handler.redirect',
+                                        ),
+                        '/admin/wizard/recordset_triggers/delete'=>array(
+                                        'gs_base_handler.delete:{classname:wz_recordset_triggers}',
+                                        'gs_base_handler.redirect',
+                                        ),
+                        '/admin/wizard/recordset_triggers/copy'=>array(
+                                        'gs_base_handler.copy:{classname:wz_recordset_triggers}',
                                         'gs_base_handler.redirect',
                                         ),
                         '/admin/wizard/recordset_submodules/delete'=>array(
@@ -249,7 +263,9 @@ class gs_wizard_handler extends gs_handler {
 		$f=$bh->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 		$d=$f->clean();
-		$newrs=xml_import(trim($d['xml']));
+		md($d,1);
+		$xml=!empty($d['xmlfile_data']) ? $d['xmlfile_data'] : $xml;
+		$newrs=xml_import(trim($xml));
 		$newrs->commit();
 		return TRUE;
 	}
@@ -288,6 +304,21 @@ class gs_wizard_handler extends gs_handler {
 		$tpl->assign('urls',$urls);
 
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'compile_phps.html');
+
+		include_once('PHP/Beautifier.php');
+		if (class_exists('PHP_Beautifier')) {
+			$out=str_replace(array('{%','%}'),array('::tpl_ldelim::','::tpl_rdelim::'),$out);
+			$oBeautifier = new PHP_Beautifier(); 
+			$oBeautifier->addFilter('ArrayNested');
+			$oBeautifier->addFilter('Pear',array('add_header'=>'php'));
+			$oBeautifier->setIndentChar(' ');
+			$oBeautifier->setIndentNumber(4);
+			$oBeautifier->setNewLine("\n");
+			$oBeautifier->setInputString($out); 
+			$oBeautifier->process();
+			$out=$oBeautifier->get();
+			$out=str_replace(array('::tpl_ldelim::','::tpl_rdelim::'),array('{%','%}'),$out);
+		}
 
 		//md($out,1); die();
 
@@ -637,9 +668,15 @@ class wz_handler_mc extends gs_handler {
 class form_modules_import  extends g_forms_table{
 	function __construct($hh,$params=array(),$data=array()) {
 		$hh=array(
+		    'xmlfile' => Array
+			(
+			    'type' => 'file',
+				'validate' => 'dummyValid',
+			),
 		    'xml' => Array
 			(
 			    'type' => 'text',
+				'validate' => 'dummyValid',
 			),
 		);
 		return parent::__construct($hh,$params,$data);

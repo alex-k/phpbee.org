@@ -23,7 +23,7 @@
 			<td class="cnt"><a href="/admin/wizard/urls/{$e.id}">urls</a></td>
 			<td class="cnt"><a href="/admin/wizard/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
 			<td class="cnt"><a href="/admin/wizard/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
-			<td class="cnt"><a href="/admin/wizard/xmlexport/{$e.id}">xml</a></td>
+			<td class="cnt"><a href="/admin/wizard/xmlexport/{$e.id}/{$e.name}">xml</a></td>
 			<td class="cnt"><a href="/admin/wizard/commit/{$e.id}">commit</a></td>
 	</tr>
 	{/foreach}

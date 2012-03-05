@@ -108,8 +108,25 @@ class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 		<*/foreach*>
 		     );
 		<*/if*>
+
+		<*foreach $rs->Triggers as $t*>
+			<*if $t->on_insert*>
+				$this->structure['triggers']['<*$t->on_insert*>_insert'][]='trigger_<*$t->get_id()*>';
+			<*/if*>	
+			<*if $t->on_update*>
+				$this->structure['triggers']['<*$t->on_update*>_update'][]='trigger_<*$t->get_id()*>';
+			<*/if*>	
+			<*if $t->on_delete*>
+				$this->structure['triggers']['<*$t->on_delete*>_delete'][]='trigger_<*$t->get_id()*>';
+			<*/if*>	
+		<*/foreach*>	
 		
 	}
+		<*foreach $rs->Triggers as $t*>
+			function trigger_<*$t->get_id()*>($rec,$type,$options=array()) {
+				<*$t->code*>
+			}
+		<*/foreach*>	
 	
 	<*if $rs->Resizes->count()*>
 	function config_previews() {

@@ -95,6 +95,50 @@
 	{handler gspgid="/admin/form/wz_recordset_links/edit/`$_gsdata.gspgid_va.2`" Recordset_id=$recordset.id}
 	{/if}
 
+	<h4>triggers</h4>
+
+	<table class="tb">
+	<thead>
+	<tr><th>#</th>
+	<th>field</th>
+	<th>on_insert</th>
+	<th>on_update</th>
+	<th>on_delete</th>
+	<th></th>
+	<th></th>
+	<th></th>
+	</thead>
+	{foreach from=$recordset.Triggers item="e"}
+	<tr class="{cycle values='odd,even'}">
+			<td>{$e.id}</td>
+			<td>{$e.Field}</td>
+			<td>{$e.on_insert}</td>
+			<td>{$e.on_update}</td>
+			<td>{$e.on_delete}</td>
+			<td class="cnt"><a href="/admin/wizard/recordset_fields/{$e.Recordset_id}/triggers/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
+			<td class="cnt"><a href="/admin/wizard/recordset_triggers/copy/{$e.id}"><img src="/i/admin/ico_copy.png"></a></td>
+			<td class="cnt"><a href="/admin/wizard/recordset_triggers/delete/{$e.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a></td>
+	</tr>
+	{/foreach}
+	</table>
+	<h5>Редактировать/<a href="/admin/wizard/recordset_fields/{$_gsdata.gspgid_va.0}/triggers#form">создать</a>:</h5>
+	{if $_gsdata.gspgid_va.1=='triggers'}
+	<hr>
+	<pre>
+	   function before_delete($rec,$type) {
+			$rs=new wz_recordset_links;
+			$rs->find_records(array('classname'=>$rec->name))->delete();
+			$rs->commit();
+		}
+
+
+	</pre>
+	<hr><br>
+	<a name="form"></a>
+	{handler gspgid="/admin/form/wz_recordset_triggers/edit/`$_gsdata.gspgid_va.2`" Recordset_id=$recordset.id}
+	{/if}
+
+
 	<h4>submodules</h4>
 
 	<table class="tb">

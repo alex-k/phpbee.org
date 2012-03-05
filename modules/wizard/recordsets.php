@@ -23,6 +23,7 @@ class wz_recordsets extends gs_recordset_short {
 		'Fields'=>"lMany2One wz_recordset_fields:Recordset",
 		'Resizes'=>"lMany2One wz_recordset_resizes:Recordset",
 		'Links'=>"lMany2One wz_recordset_links:Recordset",
+		'Triggers'=>"lMany2One wz_recordset_triggers:Recordset",
 		'Submodules'=>"lMany2One wz_recordset_submodules:Recordset",
 		'showadmin'=>"fCheckbox 'show in admin'",
 		'no_urlkey'=>"fCheckbox 'No URL key' default=1",
@@ -184,6 +185,19 @@ class wz_recordset_links extends gs_recordset_short {
 			if($rec->$f!='' && $f!='Recordset_id') $ret.=sprintf('%s="%s" ',$f,$rec->$f);
 		}
 		return $ret;
+	}
+}
+class wz_recordset_triggers extends gs_recordset_short {
+
+	public $no_urlkey=1;
+	function __construct($init_opts=false) { parent::__construct(array(
+		'on_insert'=>"fSelect widget='radio' on_insert options=',before,after' required=false",
+		'on_update'=>"fSelect widget='radio' on_update options=',before,after' required=false",
+		'on_delete'=>"fSelect widget='radio' on_delete options=',before,after' required=false",
+		'code'=>"fText code",
+		'Recordset'=>'lOne2One wz_recordsets',
+		),$init_opts);
+
 	}
 }
 class wz_recordset_submodules extends gs_recordset_short {
