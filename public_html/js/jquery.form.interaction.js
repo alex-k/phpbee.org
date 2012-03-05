@@ -30,7 +30,12 @@
 		}
 
 		replace_element = function (obj,d) {
-			$('[name='+d.field+']',obj).replaceWith(d.html);
+
+			var new_el=$(d.html);
+			for (ev in events) {
+				$(new_el).filter(ev).bind(events[ev],postform);
+			}
+			$('[name='+d.field+']',obj).replaceWith(new_el);
 		}
 				
 		answer = function(data) {
