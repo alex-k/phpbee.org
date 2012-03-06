@@ -1,17 +1,15 @@
 <div class="navi">
 <form>
 {if $current_page>1}
-	<a href="{href_get_push("`$keyname`_page=`$previous_page`")}">{$page_prev}</a>
+	<a href="{href_get_push("`$keyname`_page=`$previous_page`")}"><img src="/i/bt_prev.png" alt="Prev page" title="Prev page"></a>
 {else}
-	<span>&#171;{$page_prev}
-	</span>
+	<span><img src="/i/bt_prev.png" alt="Prev page" title="Prev page"></span>
 {/if}
 {$page_title}<input type="text" name="{$keyname}_page" value="{$current_page}"/>{$page_between} {$pages}
 {if $current_page<$pages}
-	<a href="{href_get_push("`$keyname`_page=`$next_page`")}">{$page_next}</a>
+	<a href="{href_get_push("`$keyname`_page=`$next_page`")}"><img src="/i/bt_next.png" alt="Next page" title="Next page"></a>
 {else}
-	<span>&#187;{$page_next}
-	</span>
+	<span><img src="/i/bt_next.png" alt="Next page" title="Next page"></span>
 {/if}
 </form>
 </div>
