@@ -69,11 +69,13 @@ class gs_widget_int extends gs_widget {
 	}
 }
 
+
 class gs_widget_password2 extends gs_widget {
+	var $htmlstr='<input class="fPassword %s" type="password" name="%s" value="%s" %s %s></td><td class="helper_tr_error"></td></tr><tr class="helper_tr"><td class="helper_tr_title">%s</td><td class="helper_tr_field"><input class="fPassword %s" type="password" name="%s_repeat" value="%s" %s %s>';
 	function html() {
 		$f2=$this->fieldname.'_repeat';
 		$v2=isset($this->data[$f2]) ? $this->data[$f2] : '';
-		return sprintf('<input class="fPassword %s" type="password" name="%s" value="%s" %s %s></td><td class="helper_tr_error"></td></tr><tr class="helper_tr"><td class="helper_tr_title">%s</td><td class="helper_tr_field"><input class="fPassword %s" type="password" name="%s_repeat" value="%s" %s %s>',
+		return sprintf($this->htmlstr,
 		isset($this->params['cssclass']) ? $this->params['cssclass'] : '',
 		$this->fieldname,
 		trim($this->value),
@@ -93,6 +95,10 @@ class gs_widget_password2 extends gs_widget {
 		$f2=$this->fieldname.'_repeat';
 		return (isset($this->data[$f2]) && $this->data[$f1]==$this->data[$f2]);
 	}
+}
+
+class gs_widget_password2_inline extends gs_widget_password2 {
+	var $htmlstr='<input class="fPassword %s" type="password" name="%s" value="%s" %s %s></td><td class="helper_tr_error"><input class="fPassword %s" type="password" name="%s_repeat" value="%s" %s %s>';
 }
 
 
@@ -378,7 +384,8 @@ class gs_widget_radio extends gs_widget {
 	function html() {
 		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 		foreach ($this->params['options'] as $v=>$l) {
-			$s.=sprintf('<label><input class="fRadio %s" type="radio" name="%s" value="%s" %s> %s </label>%s',
+			$s.=sprintf('<label><input class="%s %s" type="radio" name="%s" value="%s" %s> %s </label>%s',
+				 isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fRadio',
 				 $this->interact,
 				 $this->fieldname,
 				 htmlspecialchars($v),
