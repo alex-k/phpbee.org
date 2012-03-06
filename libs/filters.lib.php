@@ -82,6 +82,25 @@ class gs_filter {
 	}
 }
 
+class gs_filter_firstletters extends gs_filter_like {
+	function __construct($data) {
+		parent::__construct($data);
+		$this->case=isset($this->params['case']) ? $this->params['case'] : 'STARTS';
+		$this->real_value=$this->value;
+		if ($this->value=='digits') {
+			$this->case='NOTREGEXP';
+			$this->value='^[[:alpha:]а-яА-Я[:space:]\'"]';
+		}
+	}
+	function getHtmlBlockNonExlusive($ps) {
+		$curr_value=$this->value;
+		$this->value=$this->real_value;
+		$ret=parent::getHtmlBlockNonExlusive($ps);
+		$this->value=$curr_value;
+		return $ret;
+	}
+}
+
 class gs_filter_like extends gs_filter {
 	function __construct($data) {
 		parent::__construct($data);
