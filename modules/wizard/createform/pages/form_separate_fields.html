@@ -13,9 +13,9 @@
 
 		{$form->_prepare_inputs()}
 
-	{$form->get_error_template('FORM_ERROR')}
+	{$form->print_error('FORM_ERROR')}
 		<label>{%$f->verbose_name%} {$form->get_input('{%$f->name%}')} </label>
-		{$form->get_error_template('{%$f->name%}')}
+		{$form->print_error('{%$f->name%}')}
 		</br>
 	{%/foreach%}
 

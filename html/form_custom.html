@@ -19,14 +19,14 @@
 
 		{$form->_prepare_inputs()}
 
-		{$form->get_error_template('FORM_ERROR')}
+		{$form->print_error('FORM_ERROR')}
 
 		{foreach $form->get_fields() as $field=>$op} 
 			{if $op.verbose_name}
 				{block name="field"}
 					{$op.verbose_name}<br>
 					{$form->get_input($field)}
-					{$form->get_error_template($field)}
+					{$form->print_error($field)}
 				{/block}
 			{/if}
 		{/foreach}

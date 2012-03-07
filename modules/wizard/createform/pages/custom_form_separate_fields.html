@@ -18,14 +18,14 @@
 
 		{$form->_prepare_inputs()}
 
-	{$form->get_error_template('FORM_ERROR')}
+	{$form->print_error('FORM_ERROR')}
 	 <table class="table4">
 
 	{%foreach $fields as $f%}
 
      <tr class="form_help_container interact_box">
      <td class="helper_tr_title"><label class="form_help_over">{%$f->verbose_name%}:</label></td>
-     <td class="helper_tr_field"><div class="form_help_input form_help_over">{$form->get_input('{%$f->name%}')} {$form->get_error_template('{%$f->name%}')} </div></td>
+     <td class="helper_tr_field"><div class="form_help_input form_help_over">{$form->get_input('{%$f->name%}')} {$form->print_error('{%$f->name%}')} </div></td>
      <td class="td_form_help"><div class="form_help form_help_spoiler"><div class="form_help_div"><i></i>{%$f->helper_text|default:"Введите {%$f->verbose_name%}"%}</div></div></td>
      </tr>
 

@@ -19,10 +19,11 @@
 		{handler gspgid="/filter/" class="like" name="search" fields="{%$fields%}" urltype=get }
 		{handler gspgid="/filter/" class="calendar" name="calendar" fields="_ctime,_mtime,{%$datefields%}" urltype=get }
 		{handler gspgid="/filter/" class="sort" name="sort" fields="{%$fields%}" urltype=get }
+		{handler gspgid="/filter/" class="offset"  name="offset" urltype=get limit=20}
 
 
 
-		{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,sort,{%$s_filters%}" _paging="pagenums:20"}
+		{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,sort,offset,{%$s_filters%}" _paging="pagenums:20"}
 
 
 	<table class="tb">
@@ -42,7 +43,9 @@
 		</td></tr>
 	</table>
 	</td> </tr>
-	<tr class="pager"><td colspan="100">Страницы: {${%$rs.name%}_paging}</td></tr>
+	<tr class="pager"><td colspan="100">
+		{handler gspgid="/filter/show" name="offset" tpl="offset_pages.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
+	</td></tr>
 	<tr><th>#</th>
 	{%foreach from=$fields item=f%}
 	<th>{field_name name="{%$f.verbose_name%}" type="{%$f.type%}" key="{%$f.name%}" id="{%$f.id%}"}</th>
@@ -78,7 +81,8 @@
 	{/foreach}
 	<tr class="pager"><td colspan="100">
 	<a name="form"></a>
-	Страницы: {${%$rs.name%}_paging}</td></tr>
+		{handler gspgid="/filter/show" name="offset" tpl="offset_pages.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
+	</td></tr>
 	</table>
 
 	<h5>Редактировать/<a href="/admin/{%$module.name%}/{%$rs.name%}/modify/0#form">создать</a>:</h5>

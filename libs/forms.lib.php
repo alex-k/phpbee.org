@@ -210,7 +210,11 @@ abstract class g_forms implements g_forms_interface{
 	function trigger_error($field,$error) {
 		$this->error($this->validate_errors,$field,$error);
 	}
+
 	function get_error_template($field, $only_first_error=TRUE) {
+		return $this->print_error($field, $only_first_error);
+	}
+	function print_error($field, $only_first_error=TRUE) {
 		$e=$this->get_error($field);
 		$ret='';
 		if ($e && $this->error_template) {
