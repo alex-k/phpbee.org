@@ -236,6 +236,7 @@ class gs_base_handler extends gs_handler {
 					if (class_exists($dclass)) {
 						$d=new $dclass();
 						$hhh=$d->gd($rec,$k,$hhh,$params,$data);
+						
 					}
 				}
 				break;
@@ -804,7 +805,8 @@ class gs_base_handler extends gs_handler {
 		$h=new handler_registry;
 		$rec=$this->check_login();
 		if($rec) $h->before_logout($rec);
-		gs_session::clear('login_'.$this->params['classname']);
+		//gs_session::clear('login_'.$this->params['classname']);
+		gs_session::save(NULL,'login_'.$this->params['classname']);
 		return true;
 	}
 
@@ -836,8 +838,15 @@ class gs_base_handler extends gs_handler {
 		foreach ($this->data['handler_params'] as $n=>$v) {
 			if (isset($rs->structure['fields'][$n])) $d[$n]=$v;
 		}
+		/*
+		foreach ($this->params as $n=>$v) {
+			if (isset($rs->structure['fields'][$n])) $d[$n]=$v;
+		}
+		*/
+
 
 		$rec=$rs->find_records($d)->first();
+
 
 
 

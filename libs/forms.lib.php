@@ -58,7 +58,9 @@ abstract class g_forms implements g_forms_interface{
 	}
 
 	function set_option($field,$option,$value) {
-		if (isset($this->htmlforms[$field])) $this->htmlforms[$field][$option]=$value;
+		if (isset($this->htmlforms[$field])) {
+			$this->htmlforms[$field][$option]=$value;
+		}
 	}
 	function set_option_allfields($option,$value) {
 		foreach ($this->htmlforms as $field=>$h) {

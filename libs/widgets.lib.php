@@ -373,9 +373,9 @@ class gs_widget_Set extends gs_widget_checkboxes {
 class gs_widget_checkbox extends gs_widget {
 	function html() {
 		$s=sprintf('<input type="hidden" name="%s" value="0">', $this->fieldname);
-		$s.=sprintf('<input class="%s %s" type="checkbox" name="%s" value="1" %s>',
+		$s.=sprintf('<input class="%s %s" type="checkbox" name="%s" id="%s" value="1" %s>',
 					isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fCheckbox', $this->interact,
-					$this->fieldname,trim($this->value) ? 'checked="checked"' : '');
+					$this->fieldname,$this->fieldname,trim($this->value) ? 'checked="checked"' : '');
 		return $s;
 	}
 	function js() {
