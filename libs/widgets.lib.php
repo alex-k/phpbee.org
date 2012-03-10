@@ -208,7 +208,11 @@ class gs_widget_datetime extends gs_widget {
 			$this->fieldname,htmlspecialchars(trim($this->value)), $this->placeholder);
 	}
 	function clean() {
-		return date('Y-m-d H:i:s',strtotime(!empty($this->value) ? $this->value : 'now' ));
+		if (empty($this->value)) return '';
+		$s=strtotime($this->value);
+		return $s>0 ?  date('Y-m-d H:i:s',$s) : '';
+
+		//return date('Y-m-d H:i:s',strtotime(!empty($this->value) ? $this->value : 'now' ));
 	}
 }
 
