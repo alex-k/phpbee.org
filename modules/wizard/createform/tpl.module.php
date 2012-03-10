@@ -107,10 +107,14 @@ class form_createform_tpl extends form_admin{
 			$validators_options[$o->get_name()]=$o->description();
 		}
 		$farr=array(
+			'enabled'=>array(
+				'name'=>'enabled',
+				'widget'=>'checkbox',
+				'default'=>1,
+				) ,
 			'name'=>array(
 				'widget'=>'input',
-				)
-			,
+				) ,
 			'verbose_name'=>
 				array(
 				'widget'=>'input',
@@ -155,11 +159,6 @@ class form_createform_tpl extends form_admin{
 				'widget'=>'input',
 				'validate'=>'dummyValid',
 				) ,
-			'enabled'=>array(
-				'widget'=>'checkbox',
-				'default'=>1,
-				)
-			,
 		);
 		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
 		$extends=array_map(basename,glob($dirname."*"));

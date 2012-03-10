@@ -77,6 +77,7 @@ class wz_recordset_fields extends gs_recordset_short {
 		'default_value'=>"fString default required=false",
 		'make_index'=>"fCheckbox index",
 		'required'=>"fCheckbox verbose_name=required",
+		'unique'=>"fCheckbox verbose_name=unique",
 		'Recordset'=>'lOne2One wz_recordsets',
 		),$init_opts);
 		$this->structure['fkeys']=array(
