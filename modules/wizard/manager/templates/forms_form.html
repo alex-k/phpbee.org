@@ -28,12 +28,16 @@
 			
 				{block name="field"}
 					
+					{if $s[3]=='template'}
+						<fieldset><legend>edit form</legend>
+					{/if}
 					{if $s[3]=='enabled'}
 						<span class="toggle_head"  id="field_{$s.1}_{$s.4}">
 						{$form->get_input($field)}
 						{$form->get_data($field|replace:'enabled':'name')}
 						</span>
 					{elseif $s[2]=='recordset'}
+						</fieldset>
 					<hr>
 						<h3>
 						{$op.verbose_name}

@@ -30,15 +30,17 @@ class module_wizard_createform_tpl extends gs_wizard_strategy_module implements 
 	}
 }
 class gs_strategy_createform_tpl_handler extends gs_handler {
-	function createform() {
+	function createform($d=null) {
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
 		$module=record_by_id($this->data['handler_params']['Module_id'],'wz_modules');
 		$this->params['classname']=$rs->name;
 
-		$bh=new gs_base_handler($this->data,$this->params);
-		$f=$bh->validate();
-		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
-		$d=gs_base_handler::explode_data($f->clean());
+		if(!$d) {
+			$bh=new gs_base_handler($this->data,$this->params);
+			$f=$bh->validate();
+			if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+			$d=gs_base_handler::explode_data($f->clean());
+		}
 
 
 		$form=$module->forms->new_record($d);

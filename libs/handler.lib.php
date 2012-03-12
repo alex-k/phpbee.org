@@ -867,6 +867,12 @@ class gs_base_handler extends gs_handler {
 			if (isset($rs->structure['fields'][$n])) $d[$n]=$v;
 		}
 		*/
+		$d=array_filter($d);
+		if (!$d) {
+			$f->trigger_error('FORM_ERROR','EMPTY_SEARCH');
+			return $this->showform($f);
+			
+		}
 
 
 		$rec=$rs->find_records($d)->first();

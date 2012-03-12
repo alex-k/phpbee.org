@@ -31,11 +31,13 @@ class module_wizard_createlogin extends gs_wizard_strategy_module implements gs_
 	}
 }
 class gs_strategy_createlogin_handler extends gs_handler {
-	function createlogin() {
-		$bh=new gs_base_handler($this->data,$this->params);
-		$f=$bh->validate();
-		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
-		$d=$f->clean();
+	function createlogin($d=null) {
+		if (!$d) {
+			$bh=new gs_base_handler($this->data,$this->params);
+			$f=$bh->validate();
+			if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+			$d=$f->clean();
+		}
 
 
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
@@ -57,9 +59,8 @@ class gs_strategy_createlogin_handler extends gs_handler {
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$d['template_name']);
 		$out_form=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$d['form_template_name']);
 
-
-
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'login_'.$rs->name.'.html';
+		check_and_create_dir(dirname($filename));
 		file_put_contents_perm($filename,$out);
 
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'login_form_'.$rs->name.'.html';
@@ -70,6 +71,7 @@ class gs_strategy_createlogin_handler extends gs_handler {
 
 		$modulename=$module->name;
 		$recordsetname=$rs->name;
+
 
 		$template=array(
 			"get"=>array(

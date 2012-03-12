@@ -31,11 +31,13 @@ class module_wizard_createmanager extends gs_wizard_strategy_module implements g
 	}
 }
 class gs_strategy_createmanager_handler extends gs_handler {
-	function createmanager() {
-		$bh=new gs_base_handler($this->data,$this->params);
-		$f=$bh->validate();
-		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
-		$d=$f->clean();
+	function createmanager($d=null) {
+		if (!$d) {
+			$bh=new gs_base_handler($this->data,$this->params);
+			$f=$bh->validate();
+			if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+			$d=$f->clean();
+		}
 
 		$fields=new wz_recordset_fields();
 		$fields->find_records(array('id'=>$d['fields']));
@@ -65,8 +67,19 @@ class gs_strategy_createmanager_handler extends gs_handler {
 		$tpl->assign('links',$links);
 		$tpl->assign('filters',$filters);
 
+		if (isset($d['manager_rs_id'])) {
+			$manager_rs=record_by_id($d['manager_rs_id'],'wz_recordsets');
+			$links=$rs->Links->find(array('classname'=>$manager_rs->name,'type'=>'lOne2One'));
+			$mlinks=array();
+			foreach ($links as $l) {
+				$mlinks[]=$l->name.'_id=$manager->get_id()';
+			}
+			$tpl->assign('manager_link', implode(' ',$mlinks));
+		}
+
 
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$d['template_name']);
+
 
 
 
@@ -77,6 +90,9 @@ class gs_strategy_createmanager_handler extends gs_handler {
 
 		$modulename=$module->name;
 		$recordsetname=$rs->name;
+
+		$formtplname='admin_form.html';
+		if (isset($d['form_template_name'])) $formtplname=$d['form_template_name'];
 
 		$template=array(
 			"get"=>array(
@@ -93,7 +109,7 @@ class gs_strategy_createmanager_handler extends gs_handler {
 			"handler"=>array(
 				"manager/form/$recordsetname"=>array(
 					"gs_base_handler.redirect_if:gl:save_cancel:return:true",
-					"gs_base_handler.post:{name:admin_form.html:classname:$recordsetname:form_class:g_forms_table}",
+					"gs_base_handler.post:{name:$formtplname:classname:$recordsetname:form_class:g_forms_table}",
 					"gs_base_handler.redirect_if:gl:save_continue:return:true",
 					"gs_base_handler.redirect_if:gl:save_return:return:true",
 					//"gs_base_handler.redirect_up:level:2",

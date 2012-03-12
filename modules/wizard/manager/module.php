@@ -49,10 +49,67 @@ class handler_wizard_manager extends gs_handler {
 		$bh=new gs_base_handler(array_merge($d,$this->data),$this->params);
 		$f=$bh->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
-		$d=gs_base_handler::explode_data($f->clean());
-		md($d['recordset'],1);
-		die();
+		$fd=gs_base_handler::explode_data($f->clean());
+		$d=array_merge($d,$fd);
 
+
+		$this->compile_manager_page($d);
+
+		
+		$h=new gs_strategy_createlogin_handler($this->data,$this->params);
+		$d['assign']='manager';
+		$d['template_name']=$d['login_template_name'];
+		$d['form_template_name']=$d['login_form_template_name'];
+		$d['form_class']=$d['login_form_class'];
+		$h->createlogin($d);
+
+		foreach ($d['recordset'] as $k=>$rd) {
+			$rd['manager_rs_id']=$this->data['handler_params']['Recordset_id'];
+			$rd['module']=$this->data['handler_params']['Module_id'];
+			$rd['template_name']=$rd['page_template_name'];
+			$rd['form_template_name']=$rd['formfields']['template_name'];
+			$this->data['handler_params']['Recordset_id']=$k;
+			$h=new gs_strategy_createmanager_handler($this->data,$this->params);
+			$h->createmanager($rd);
+
+
+
+			$fd=$rd['formfields'];
+			$h=new gs_strategy_createform_tpl_handler($this->data,$this->params);
+			$h->createform($fd);
+			md($rd,1);
+		}
+
+
+
+
+	}
+	function compile_manager_page($d) {
+		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
+		$module=record_by_id($this->data['handler_params']['Module_id'],'wz_modules');
+
+				$wz_url=$module->urls->find(array('gspgid_value'=>'','type'=>'get'));
+				if ($wz_url->count()==0) {
+					$wz_url=$module->urls->new_record();
+					$wz_url->gspgid_value='';
+					$wz_url->type='get';
+					$wz_h=$wz_url->Handlers->new_record();
+					$wz_h->handler_value='gs_base_handler.show:name:manager_page.html';
+					$module->commit();
+				}
+
+		$tpl=new gs_tpl();
+		$tpl=$tpl->init();
+		$tpl->left_delimiter='{%';
+		$tpl->right_delimiter='%}';
+
+		$tpl->assign('rs',$rs);
+		$tpl->assign('module',$module);
+		$tpl->assign($d);
+		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$d['manager_form_template_name']);
+		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'manager_page.html';
+		check_and_create_dir(dirname($filename));
+		file_put_contents_perm($filename,$out);
 	}
 }
 class form_wizard_manager_login extends g_forms_table{
@@ -62,6 +119,9 @@ class form_wizard_manager_login extends g_forms_table{
 		$module=record_by_id($data['handler_params']['Module_id'],'wz_modules');
 		$dirname=dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'createlogin'.DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
 		$login_templates=array_map(basename,glob($dirname."*"));
+
+		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
+		$manager_templates=array_map(basename,glob($dirname."*"));
 
 		$login_fields=$rs->Fields->recordset_as_string_array();
 		$login_fields=array_combine($login_fields,$login_fields);
@@ -74,11 +134,22 @@ class form_wizard_manager_login extends g_forms_table{
 
 		$forms=class_members('g_forms');
 		$hh=array(
+		    'manager_form_template_name' => Array
+			(
+			    'type' => 'select',
+			    'options' => array_combine($manager_templates,$manager_templates),
+			),
+		    'login_template_name' => Array
+			(
+			    'type' => 'select',
+			    'options' => array_combine($login_templates,$login_templates),
+			    'default'=>'default.html',
+			),
 		    'login_form_template_name' => Array
 			(
 			    'type' => 'select',
 			    'options' => array_combine($login_templates,$login_templates),
-			    'default'=>'default_form.html',
+			    'default'=>'form_custom.html',
 			),
 		    'login_fields' => Array
 			(
@@ -86,11 +157,18 @@ class form_wizard_manager_login extends g_forms_table{
 			    'options'=>$login_fields,
 			    'validate'=>'notEmpty',
 			),
+		    'login_form_class' => Array
+			(
+			    'type' => 'select',
+			    'options'=>class_members('g_forms'),
+			    'validate'=>'notEmpty',
+			),
 		    'recordsets' => Array
 			(
 			    'type' => 'multiselect',
 			    'options'=>$recordsets,
 			    'validate'=>'notEmpty',
+				'cssclass'=>'chosen_multiselect',
 			),
 		);
 		return parent::__construct($hh,$params,$data);

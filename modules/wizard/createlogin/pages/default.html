@@ -1,14 +1,20 @@
-<div>
+<div class="user_admin">
+<a href="/author/author"><img src="/i/admin/logo2.png" alt=""></a>
 
 {${%$assign%}=$_gsstack.last}
 {if ${%$assign%}}
-	Welcome
+	Welcome 
 	{%foreach $profile_fields as $f%}
 		{${%$assign%}.{%$f%}}
+	{%foreachelse%}	
+		{${%$assign%}.{%reset($login_fields)%}}
 	{%/foreach%}
 	<a href="/{%$module.name%}/logout/{%$rs->name%}">logout</a>
 {else}
+	<div class="overlay_login">
 	  {handler gspgid="{%$module.name%}/login/form/{%$rs->name%}" }
+		<div class="clear"></div>
+	</div>
 
 {/if}
 
