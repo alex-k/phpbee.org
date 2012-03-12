@@ -36,5 +36,23 @@ abstract class gs_base_module {
 		gs_var_storage::save('check_admin_auth',TRUE);
 		return true;
 	}
+	static function gl($name,$record,$data) {
 
+		if (method_exists('gl',$name)) {
+			$gl=new gl($record,$data);
+			return $gl->$name();
+		}
+
+		return null;
+	}
+
+}
+class gl {
+	function __construct($record,$data) {
+		$this->record=$record;
+		$this->data=$data;
+	}
+	function gspgid() {
+		return $this->data;
+	}
 }

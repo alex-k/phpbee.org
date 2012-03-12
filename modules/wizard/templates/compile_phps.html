@@ -33,7 +33,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 '<*$type*>'=>array(
 <*foreach from=$handler key=type item=url*>
 '<*$url->gspgid_value*>'=>array(
-<*foreach from=$url->Handlers->orderby('cnt') item=h*> <*if !$h->handler_keyname|is_numeric*>'<*$h->handler_keyname*>'=><*/if*> '<*$h->handler_value*>', 
+<*foreach from=$url->Handlers->orderby('cnt') item=h*> <*if $h->handler_keyname && !$h->handler_keyname|is_numeric *>'<*$h->handler_keyname*>'=><*/if*> '<*$h->handler_value*>', 
 <*/foreach*>
 ),
 <*/foreach*>
@@ -43,12 +43,13 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 		return self::add_subdir($data,dirname(__file__));
 	}
 
-	static function gl($alias,$rec) {
+	static function gl($alias,$rec,$data) {
 		$fname=dirname(__FILE__).DIRECTORY_SEPARATOR.'gl.php';
 		if (file_exists($fname)) {
 			$x=include($fname);
 			return $x;
 		}
+		return parent::gl($alias,$rec,$data);
 	}
 
 	/*

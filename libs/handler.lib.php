@@ -73,7 +73,9 @@ class gs_base_handler extends gs_handler {
 	}
 
 	function validate_gl() {
-		$ret=call_user_func($this->params['module_name'].'::gl',$this->params['name'],$this->data['gspgid_v'],$this->data['gspgid']);
+		$name=$this->params['name'];
+		if (isset($this->params['gl'])) $name=$this->params['gl'];
+		$ret=call_user_func($this->params['module_name'].'::gl',$name,$this->data['gspgid_v'],$this->data['gspgid']);
 		if ($ret instanceof gs_record) return $ret;
 		$url=trim($ret,'/');
 		return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/') || $ret===TRUE );
@@ -93,6 +95,14 @@ class gs_base_handler extends gs_handler {
 	
 	function show($ret) {
 
+		if (isset($this->params['gl'])) {
+			if ($this->validate_gl()!==TRUE) {
+				unset($this->params['gl']);
+				$this->params['name']='404.html';
+				return $this->show404();
+			}
+		}
+
 		$tpl=gs_tpl::get_instance();
 
 		if (empty($this->params['name'])) {
@@ -110,6 +120,18 @@ class gs_base_handler extends gs_handler {
 		if (!$language) $language=gs_session::load('multilanguage_lang');
 		if (!$language) $language=cfg('multilang_default_language');
 
+		if ($language) {
+				$newtplname=dirname($tplname).DIRECTORY_SEPARATOR.$language.DIRECTORY_SEPARATOR.(basename($tplname));
+				if (file_exists($newtplname)) {
+					$tplname=$newtplname;
+					$old_tpl_dir=$dir=$tpl->getTemplateDir();
+					if (!is_array($dir)) $dir=array($dir);
+					array_unshift($dir,'.',dirname($newtplname));
+					$tpl->setTemplateDir($dir);
+				}
+		}
+
+		/*
 		if ($language) {
 			$langs=languages();
 			if ($langs) {
@@ -129,6 +151,7 @@ class gs_base_handler extends gs_handler {
 			}
 			
 		}
+		*/
 
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
@@ -350,6 +373,7 @@ class gs_base_handler extends gs_handler {
 		$f->set_values($rec_values);
 		$f->set_values(self::implode_data($rec_values));
 		$f->set_values($data);
+
 
 		return $f;
 

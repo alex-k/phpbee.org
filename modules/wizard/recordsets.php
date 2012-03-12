@@ -240,7 +240,7 @@ class wz_handlers extends gs_recordset_short {
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'cnt'=> "fInt cnt",
-		'handler_keyname'=> "fString key",
+		'handler_keyname'=> "fString key required=false",
 		'handler_value'=>"fString value",
 		'Url'=>'lOne2One wz_urls',
 		),$init_opts);

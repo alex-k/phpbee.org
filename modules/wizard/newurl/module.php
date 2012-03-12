@@ -38,10 +38,31 @@ class handler_wizard_newurl extends gs_handler {
 		$url=$module->urls->find_records(array('Module_id'=>$module->get_id(),'gspgid_value'=>$d['url'],'type'=>$d['type']))->first(TRUE);
 		$url->Handlers->delete();
 		$cnt=0;
+
+		/*
+		if ($d['type']=='get') {
+			$cnt+=10;
+			$url->Handlers->new_record(array('cnt'=>$cnt,'handler_value'=>'gs_base_handler.validate_gl:{name:'.$d['gl'].':return:true^e404}'));
+		}
+		*/
+
+
 		foreach(explode("\n",$d['handlers']) as $h) {
 			$cnt+=10;
-			if($h) $url->Handlers->new_record(array('cnt'=>$cnt,'handler_value'=>$h));
+			if($h) {
+				$h=preg_replace('/:module_name:[^:]+/','',$h);
+				if (strpos($h,'gs_base_handler.show')===0) $h.=':gl:'.$d['gl'];
+				$url->Handlers->new_record(array('cnt'=>$cnt,'handler_value'=>$h));
+			}
 		}
+		/*
+		if ($d['type']=='get') {
+			$cnt+=10;
+			$url->Handlers->new_record(array('cnt'=>$cnt,'handler_keyname'=>'end','handler_value'=>'end'));
+			$cnt+=10;
+			$url->Handlers->new_record(array('cnt'=>$cnt,'handler_keyname'=>'e404','handler_value'=>'gs_base_handler.show404:name:404.html:return:true'));
+		}
+		*/
 		$url->commit();
 		return $url;
 	}
@@ -50,10 +71,16 @@ class form_wizard_newurl extends g_forms_table{
 	function __construct($hh,$params=array(),$data=array()) {
 		$modules=new wz_modules;
 		$modules->find_records(array());
+		$gl=get_class_methods('gl');
+		$gl=array_filter($gl,create_function('$a','return strpos($a,"__")!==0;'));
 		$hh=array(
 			'type'=>array(
 				'widget'=>'radio',
 				'options'=>'get,handler,post',
+				),
+			'gl'=>array(
+				'widget'=>'select',
+				'options'=>array_combine($gl,$gl),
 				),
 			'module'=>array(
 				'widget'=>'radio',
@@ -68,7 +95,12 @@ class form_wizard_newurl extends g_forms_table{
 				'widget'=>'TextLines',
 				) ,
 		);
-		return parent::__construct($hh,$params,$data);
+		parent::__construct($hh,$params,$data);
+		$this->interact['type']="
+				#gl.display_if('get');
+				";
+		$this->set_option('type','cssclass','fRadio lOne2One');		
+
 	}
 }
 
