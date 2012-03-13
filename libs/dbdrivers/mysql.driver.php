@@ -135,7 +135,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	}
 
 	public function get_table_fields($tablename) {
-		$que=sprintf("SHOW FIELDS from %s",$tablename);
+		$que=sprintf("SHOW FIELDS from `%s`",$tablename);
 		$this->query($que);
 		$r=array();
 		while ($a=$this->fetch()) { 
@@ -144,7 +144,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		return $r;
 	}
 	public function get_fields_info($tablename) {
-		$this->query(sprintf("SHOW FIELDS from %s",$tablename));
+		$this->query(sprintf("SHOW FIELDS from `%s`",$tablename));
 		$ret=array();
 		while($r=$this->fetch()) {
 			$ret[$r['Field']]=array(
@@ -160,7 +160,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	}
 
 	public function get_table_keys($tablename) {
-		$que=sprintf("SHOW KEYS from %s",$tablename);
+		$que=sprintf("SHOW KEYS from `%s`",$tablename);
 		$this->query($que);
 		$r=array();
 		while ($a=$this->fetch()) { 
@@ -222,14 +222,14 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 						//$que=sprintf('ALTER TABLE %s DROP %s KEY',$tablename,$old_keys[$name]);
 						//$this->query($que);
 					} else {
-						$que=sprintf('CREATE %s INDEX `%s` ON %s(`%s%s`)',$this->_index_types[$index['type']],$name,$tablename,$name,isset($index['options'])?$index['options']:'');
+						$que=sprintf('CREATE %s INDEX `%s` ON `%s`(`%s%s`)',$this->_index_types[$index['type']],$name,$tablename,$name,isset($index['options'])?$index['options']:'');
 						$this->query($que);
 					}
 				}
 	}
 
 	public function construct_droptable($tablename) {
-			$que=sprintf('DROP TABLE IF EXISTS  %s',$tablename);
+			$que=sprintf('DROP TABLE IF EXISTS  `%s`',$tablename);
 			return $this->query($que);
 	}
 	public function construct_altertable($tablename,$structure) {
@@ -253,7 +253,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 				$obj[$rs_name]=new $rs_name;
 				if (isset($obj[$rs_name]->structure['keys'])) foreach ($obj[$rs_name]->structure['keys'] as $key) {
 					if ($key['type']=='foreign' && in_array($key['recordset'],$structure['recordsets'] )) {
-						$que=sprintf('CREATE VIEW %s AS SELECT * FROM %s LEFT JOIN  %s ON (%s.%s=%s.%s)',
+						$que=sprintf('CREATE VIEW %s AS SELECT * FROM `%s` LEFT JOIN  `%s` ON (%s.%s=%s.%s)',
 								$tablename,$obj[$key['recordset']]->table_name,$obj[$rs_name]->table_name,
 								$obj[$rs_name]->table_name, $key['local_field_name'],
 								$obj[$key['recordset']]->table_name,$key['foreign_field_name']);
@@ -271,7 +271,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		default:
 			$construct_fields=$this->construct_createtable_fields($structure);
 			$this->construct_droptable($tablename);
-			$que=sprintf('CREATE TABLE  %s %s ENGINE=MyISAM CHARACTER SET=%s',$tablename, $construct_fields,$this->cinfo['codepage']);
+			$que=sprintf('CREATE TABLE  `%s` %s ENGINE=MyISAM CHARACTER SET=%s',$tablename, $construct_fields,$this->cinfo['codepage']);
 			$this->query($que);
 			$this->construct_indexes($tablename,$structure);
 			break;
@@ -291,7 +291,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 				}
 			}
 		}
-		$que=sprintf('INSERT INTO %s (`%s`) VALUES  (%s)',$rset->db_tablename,implode('`,`',$fields),implode(',',$values));
+		$que=sprintf('INSERT INTO `%s` (`%s`) VALUES  (%s)',$rset->db_tablename,implode('`,`',$fields),implode(',',$values));
 		$this->query($que);
 		return $this->get_insert_id();
 
@@ -312,7 +312,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		}
 		if (sizeof($fields)==0) return;
 		$idname=$rset->id_field_name;
-		$que=sprintf('UPDATE %s SET %s WHERE `%s`=%s',$rset->db_tablename,implode(',',$fields),$idname,$this->escape_value($record->get_old_value($idname)));
+		$que=sprintf('UPDATE `%s` SET %s WHERE `%s`=%s',$rset->db_tablename,implode(',',$fields),$idname,$this->escape_value($record->get_old_value($idname)));
 		return $this->query($que);
 
 	}
@@ -320,7 +320,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$this->_cache=array();
 		$rset=$record->get_recordset();
 		$idname=$rset->id_field_name;
-		$que=sprintf('DELETE FROM %s  WHERE %s=%s',$rset->db_tablename,$idname,$this->escape_value($record->get_old_value($idname)));
+		$que=sprintf('DELETE FROM `%s`  WHERE %s=%s',$rset->db_tablename,$idname,$this->escape_value($record->get_old_value($idname)));
 		return $this->query($que);
 
 	}
@@ -343,7 +343,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	}
 	function count($rset,$options) {
 		$where=$this->construct_where($options);
-		$que=sprintf("SELECT count(*) as count  FROM %s ",$rset->db_tablename);
+		$que=sprintf("SELECT count(*) as count  FROM `%s` ",$rset->db_tablename);
 		if (!empty($where)) $que.=sprintf(" WHERE %s", $where);
 		$this->_que=md5($que);
 		if(isset($this->_cache[$this->_que])) {
@@ -355,7 +355,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	function select($rset,$options,$fields=NULL) {
 		$where=$this->construct_where($options);
 		$fields = is_array($fields) ? array_filter($fields) : array_keys($rset->structure['fields']);
-		$que=sprintf("SELECT `%s` FROM %s ", implode('`,`',$fields), $rset->db_tablename);
+		$que=sprintf("SELECT `%s` FROM `%s` ", implode('`,`',$fields), $rset->db_tablename);
 		if (is_array($options)) foreach($options as $o) {
 			if (isset($o['type'])) switch($o['type']) {
 				case 'limit':

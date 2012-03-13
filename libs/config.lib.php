@@ -576,7 +576,17 @@ function gs_exception_handler_debug($ex)
 	md('');
 	md("EXCEPTION ".get_class($ex));
 	md($ex->getMessage());
-	md($ex->getTrace());
+	$trace=$ex->getTrace();
+	foreach ($trace as $k=>$t) {
+		foreach ($t['args'] as $j=>$a) {
+			if (is_a($a,'gs_record') || is_a($a,'gs_recordset')) {
+				$trace[$k]['args'][$j]=get_class($a);
+			}
+		}
+		//unset($trace[$k]['args']);
+	}
+
+	md($trace);
 	gs_logger::dump();
 }
 function gs_exception_handler($ex)

@@ -29,7 +29,7 @@ final class gs_tpl {
 	}
 	function __destruct() {
 		$msg = $_SERVER['SERVER_ADDR'].' | http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-		gs_logger::udplog($msg);
+		//gs_logger::udplog($msg);
 	}
 }
 
