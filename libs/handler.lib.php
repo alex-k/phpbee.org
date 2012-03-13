@@ -570,6 +570,7 @@ class gs_base_handler extends gs_handler {
 		return false;
 	}
 	function redirect() {
+		$this->params['clean_get']=$this->params['clean_get']=='false' ? false : true;
 		return html_redirect(isset($this->params['href']) ? $this->params['href']: null,array(),'302',$this->params['clean_get']);
 	}
 	
