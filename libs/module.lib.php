@@ -55,4 +55,22 @@ class gl {
 	function gspgid() {
 		return $this->data;
 	}
+
+	function rec_edit() {
+		return $this->data.'/modify/'.$this->record->get_id().$this->__data_get();
+	}
+	function rec_copy() {
+		return $this->data.'/copy/'.$this->record->get_id().$this->__data_get();
+	}
+	function rec_delete() {
+		return $this->data.'/delete/'.$this->record->get_id().$this->__data_get();
+	}
+
+	function __data_get() {
+		$ds=new gs_data_driver_get();
+		$arr=$ds->import();
+		unset($arr['gspgtype']);
+		if($arr) return '?'.http_build_query($arr);
+		return '';
+	}
 }

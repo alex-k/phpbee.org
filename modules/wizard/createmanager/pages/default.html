@@ -74,9 +74,9 @@
 			{%foreach from=$extlinks item=f%}
 			<td><a href="/{%$module%}/manager/{%$f.classname%}?{%$f->linkname%}={$e->get_id()}">{%$f.verbose_name%} ({$e._{%$f.name%}_count})</a></td>
 			{%/foreach%}
-			<td class="cnt"><a href="/{%$module%}/manager/{%$rs.name%}/modify/{$e->get_id()}#form"><img src="/i/admin/ico_edit.png" alt="Edit" title="Edit"></a></td>
-			<td class="cnt"><a href="/{%$module%}/manager/{%$rs.name%}/copy/{$e->get_id()}"><img src="/i/admin/ico_copy.png" alt="Copy" title="Copy"></a></td>
-			<td class="cnt"><a href="/{%$module%}/manager/{%$rs.name%}/delete/{$e->get_id()}" onclick="return confirm('Delete record?');"><img src="/i/admin/ico_delete.png" alt="Delete" title="Delete"></a></td>
+			<td class="cnt"><a href="{gl rec_edit=$e}#form"><img src="/i/admin/ico_edit.png" alt="Edit" title="Edit"></a></td>
+			<td class="cnt"><a href="{gl rec_copy=$e}"><img src="/i/admin/ico_copy.png" alt="Copy" title="Copy"></a></td>
+			<td class="cnt"><a href="{gl rec_delete=$e}" onclick="return confirm('Delete record?');"><img src="/i/admin/ico_delete.png" alt="Delete" title="Delete"></a></td>
 	</tr>
 	{/foreach}
 	<tr class="pager"><td colspan="100">
@@ -85,7 +85,7 @@
 	</td></tr>
 	</table>
 
-	<h5>Edit/<a href="/{%$module%}/manager/{%$rs.name%}/modify/0#form">Create</a>:</h5>
+	<h5>Edit/<a href="{gl rec_edit=$e}#form">Create</a>:</h5>
 	{if $_gsdata.gspgid_va.0=='modify'}
 	<hr><br>
 	{handler gspgid="/{%$module%}/manager/form/{%$rs.name%}/edit/`$_gsdata.gspgid_va.1`" {%$manager_link%}}
