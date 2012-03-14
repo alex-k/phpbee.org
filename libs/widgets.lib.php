@@ -420,7 +420,7 @@ class gs_widget_lMany2Many extends gs_widget {
 		}
 		$ret="<input type=\"hidden\" name=\"".$this->fieldname."\" value=\"0\">";
 		$ret.=sprintf("<select class=\"lMany2Many\" multiple=\"on\" name=\"%s[]\">\n", $this->fieldname);
-		foreach ($this->params['variants'] as $k=>$v) {
+		if (is_array($this->params['variants'])) foreach ($this->params['variants'] as $k=>$v) {
 			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$k, (is_array($this->value) && (in_array($k,$this->value) || array_key_exists($k,$this->value))) ? 'selected="selected"' : '',$v);
 		}
 		$ret.="</select>\n";

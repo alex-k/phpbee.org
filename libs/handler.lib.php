@@ -208,7 +208,7 @@ class gs_base_handler extends gs_handler {
 			$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
 			$f=new $form_class_name(array(),$params,$data);
 		}
-		$this->showform($f);
+		//$this->showform($f);
 		return $f;
 	}
 
@@ -278,12 +278,14 @@ class gs_base_handler extends gs_handler {
 				if (!empty($v['widget'])) {
 					break;
 				}
+
+				/*  
 				$nrs=$rec->$k;
 				$nrs->new_record();
 
 				foreach($nrs as $nobj) {
-					$f=self::get_form_for_record($nobj,$params,$data);
-					$forms=$f->htmlforms;
+					$tmp_f=self::get_form_for_record($nobj,$params,$data);
+					$forms=$tmp_f->htmlforms;
 					$i=intval($nobj->get_id());
 					foreach($forms as $fk=>$fv) {
 						$pfx_key="$k:$i:$fk";
@@ -297,6 +299,7 @@ class gs_base_handler extends gs_handler {
 					}
 				}
 				unset($hh[$k]);
+				*/
 				break;
 			default:
 				break;
@@ -368,12 +371,12 @@ class gs_base_handler extends gs_handler {
 
 
 
+
 		$f->set_values($rec_default_values);
 		$f->set_values($default_values);
 		$f->set_values($rec_values);
 		$f->set_values(self::implode_data($rec_values));
 		$f->set_values($data);
-
 
 		return $f;
 
