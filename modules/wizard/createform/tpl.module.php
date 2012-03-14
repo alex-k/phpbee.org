@@ -30,7 +30,7 @@ class module_wizard_createform_tpl extends gs_wizard_strategy_module implements 
 	}
 }
 class gs_strategy_createform_tpl_handler extends gs_handler {
-	function createform($d=null) {
+	function createform($ret,$d=null) {
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
 		$module=record_by_id($this->data['handler_params']['Module_id'],'wz_modules');
 		$this->params['classname']=$rs->name;

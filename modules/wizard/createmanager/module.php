@@ -31,7 +31,7 @@ class module_wizard_createmanager extends gs_wizard_strategy_module implements g
 	}
 }
 class gs_strategy_createmanager_handler extends gs_handler {
-	function createmanager($d=null) {
+	function createmanager($ret,$d=null) {
 		if (!$d) {
 			$bh=new gs_base_handler($this->data,$this->params);
 			$f=$bh->validate();
@@ -52,6 +52,7 @@ class gs_strategy_createmanager_handler extends gs_handler {
 
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
 		$module=record_by_id($d['module'],'wz_modules');
+		if (!$module) $module=record_by_id($this->data['handler_params']['Module_id'],'wz_modules');
 
 
 
@@ -77,8 +78,10 @@ class gs_strategy_createmanager_handler extends gs_handler {
 			$tpl->assign('manager_link', implode(' ',$mlinks));
 		}
 
+		$tplname=isset($d['template_name']) ? $d['template_name'] :'default.html';
 
-		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$d['template_name']);
+		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$tplname);
+
 
 
 
@@ -119,13 +122,14 @@ class gs_strategy_createmanager_handler extends gs_handler {
 
 		foreach ($template as $type=>$urls) {
 			foreach ($urls as $url=>$handlers) {
-				$f=$module->urls->find(array('gspgid_value'=>$url));
+				$f=$module->urls->find(array('gspgid_value'=>$url,'type'=>$type));
 				if($f->count()) continue;
 				$wz_url=$module->urls->new_record();
 				$wz_url->gspgid_value=$url;
 				$wz_url->type=$type;
 				$cnt=0;
 				foreach ($handlers as $key=>$value) {
+					md($value,1);
 					$cnt++;
 					$wz_h=$wz_url->Handlers->new_record();
 					$wz_h->cnt=$cnt;
@@ -151,7 +155,9 @@ class form_createmanager extends form_admin{
 
 		$all_links=$rs->Links->recordset_as_string_array();
 		$links=$rs->Links->find(array('type'=>array('lMany2Many','lOne2One')))->recordset_as_string_array();
+		$extlinks=$rs->Links->find(array('type'=>'lMany2One'))->recordset_as_string_array();
 		if(!is_array($links)) $links=array();
+		if(!is_array($extlinks)) $extlinks=array();
 		if(!is_array($all_links)) $all_links=array();
 
 
@@ -163,6 +169,7 @@ class form_createmanager extends form_admin{
 			'module'=>array(
 				'widget'=>'radio',
 				'options'=>$modules->recordset_as_string_array(),
+				'default'=>$data['handler_params']['Module_id'],
 				),
 		    'template_name' => Array
 			(
@@ -182,6 +189,14 @@ class form_createmanager extends form_admin{
 			    'options'=>$all_links,
 			    'validate'=>'notEmpty',
 			    'default'=>array_keys($links),
+			),
+		    'extlinks' => Array
+			(
+			    'verbose_name'=>'show links',	
+			    'type' => 'checkboxes',
+			    'options'=>$all_links,
+			    'validate'=>'notEmpty',
+			    'default'=>array_keys($extlinks),
 			),
 		    'filters' => Array
 			(

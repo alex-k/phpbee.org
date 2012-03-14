@@ -44,7 +44,7 @@ class handler_wizard_manager extends gs_handler {
 		return true;
 
 	}
-	function form_forms() {
+	function form_forms($ret) {
 		$d=gs_session::load('handler_wizard_manager_form_login');
 		$bh=new gs_base_handler(array_merge($d,$this->data),$this->params);
 		$f=$bh->validate();
@@ -53,15 +53,20 @@ class handler_wizard_manager extends gs_handler {
 		$d=array_merge($d,$fd);
 
 
-		$this->compile_manager_page($d);
 
+		if($d['make_login']) {
+			$this->compile_manager_page($d);
+		}
 		
-		$h=new gs_strategy_createlogin_handler($this->data,$this->params);
 		$d['assign']='manager';
 		$d['template_name']=$d['login_template_name'];
 		$d['form_template_name']=$d['login_form_template_name'];
 		$d['form_class']=$d['login_form_class'];
-		$h->createlogin($d);
+
+		if($d['make_login']) {
+			$h=new gs_strategy_createlogin_handler($this->data,$this->params);
+			$h->createlogin($ret,$d);
+		}
 
 		foreach ($d['recordset'] as $k=>$rd) {
 			$rd['manager_rs_id']=$this->data['handler_params']['Recordset_id'];
@@ -70,13 +75,13 @@ class handler_wizard_manager extends gs_handler {
 			$rd['form_template_name']=$rd['formfields']['template_name'];
 			$this->data['handler_params']['Recordset_id']=$k;
 			$h=new gs_strategy_createmanager_handler($this->data,$this->params);
-			$h->createmanager($rd);
+			$h->createmanager($ret,$rd);
 
 
 
 			$fd=$rd['formfields'];
 			$h=new gs_strategy_createform_tpl_handler($this->data,$this->params);
-			$h->createform($fd);
+			$h->createform($ret,$fd);
 			md($rd,1);
 		}
 
@@ -138,6 +143,11 @@ class form_wizard_manager_login extends g_forms_table{
 			(
 			    'type' => 'select',
 			    'options' => array_combine($manager_templates,$manager_templates),
+			),
+		    'make_login' => Array
+			(
+			    'type' => 'checkbox',
+				'default'=>1,
 			),
 		    'login_template_name' => Array
 			(

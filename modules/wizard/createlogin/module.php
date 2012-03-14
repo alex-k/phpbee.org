@@ -31,7 +31,7 @@ class module_wizard_createlogin extends gs_wizard_strategy_module implements gs_
 	}
 }
 class gs_strategy_createlogin_handler extends gs_handler {
-	function createlogin($d=null) {
+	function createlogin($ret,$d=null) {
 		if (!$d) {
 			$bh=new gs_base_handler($this->data,$this->params);
 			$f=$bh->validate();
