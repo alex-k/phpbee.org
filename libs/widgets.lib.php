@@ -292,6 +292,13 @@ class gs_widget_multiselect extends gs_widget_select {
 	}
 }
 
+class gs_widget_multiselect_chosen extends gs_widget_multiselect {
+	function __construct($fieldname,$data,$params=array(),$form=NULL) {
+		parent::__construct($fieldname,$data,$params,$form);
+		$this->params['cssclass'].=' chosen_multiselect';
+	}
+}
+
 class gs_data_widget_select_enter extends gs_data_widget_select {}
 
 class gs_widget_select_enter extends gs_widget_select {
@@ -402,6 +409,8 @@ class gs_widget_radio extends gs_widget {
 	}
 }
 
+class gs_widget_lMany2Many extends gs_widget_multiselect {}
+/*
 class gs_widget_lMany2Many extends gs_widget {
 	function js() {
 		$ret="<select class=\"lMany2Many\" multiple=\"on\" name=\"".$this->fieldname."[]\">\n";
@@ -432,6 +441,7 @@ class gs_widget_lMany2Many extends gs_widget {
 		return $ret;
 	}
 }
+*/
 class gs_widget_lOne2One extends gs_widget {
 	function js() {
 		$ret="<select class=\"lOne2One\" name=\"".$this->fieldname."\">\n";
