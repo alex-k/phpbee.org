@@ -53,20 +53,25 @@ class gl {
 		$this->data=$data;
 		$tpl=gs_tpl::get_instance();
 		$this->gs_data=$tpl->getTemplateVars('_gsdata');
+		$this->root=isset($this->gs_data['handler_key_root']) ? $this->gs_data['handler_key_root'] : null;
+		if (!$this->root) $this->root=$this->gs_data['handler_key'];
 
 	}
 	function gspgid() {
 		return $this->data;
 	}
 
+	function rec_create() {
+		return $this->root.'/modify/0'.$this->__data_get();
+	}
 	function rec_edit() {
-		return $this->gs_data['handler_key_root'].'/modify/'.$this->record->get_id().$this->__data_get();
+		return $this->root.'/modify/'.$this->record->get_id().$this->__data_get();
 	}
 	function rec_copy() {
-		return $this->gs_data['handler_key_root'].'/copy/'.$this->record->get_id().$this->__data_get();
+		return $this->root.'/copy/'.$this->record->get_id().$this->__data_get();
 	}
 	function rec_delete() {
-		return $this->gs_data['handler_key_root'].'/delete/'.$this->record->get_id().$this->__data_get();
+		return $this->root.'/delete/'.$this->record->get_id().$this->__data_get();
 	}
 
 	function __data_get() {
