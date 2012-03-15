@@ -1599,11 +1599,13 @@ a.filter_current {
   margin-top:50px !important;
 }
 .field3{
-  width:300px !important;
+  width:95%;
+}
+.table4{
+	width:95%;
 }
 textarea.field3{
-  width:300px !important;
-  height:70px;
+  height:170px;
 }
 .form_help{
   position:absolute !important;
@@ -1744,3 +1746,57 @@ textarea.field3{
 select.chosen{
 	width:96%;
 }
+.admin_img_preview_frame{
+	position:absolute;
+	border:1px solid #ccc;
+	background:#333;
+	padding:5px;
+	display:none;
+	color:#fff;
+	z-index:100;
+	}
+.admin_img_preview_frame img {
+	max-width:500px;
+	max-height:350px;
+}
+.admin_img_preview img {
+	padding:1px;
+	border: 2px solid #FFF;
+}
+.admin_img_preview_checked img {
+	padding:1px;
+	border: 2px dashed #900000;
+}
+
+.navi ul.filter_offset_pages {
+	        margin: 0;
+		            padding: 0;
+			                    list-style: none;
+					                        width: 680px;
+								                        white-space:nowrap;
+}
+.navi ul.filter_offset_pages_center {
+	        text-align: center;
+}
+.navi .filter_offset_pages li {
+	        display: inline;
+		            border:1px solid #dbdbdb;
+			                    padding: 4px;
+					                        padding-left: 5px;
+								                        margin-left: 3px;
+											                            margin-right: 3px;
+														                                    background: #f9f9f9;
+
+}
+
+
+.navi .filter_offset_pages  li a {
+	        color: #333;
+		            text-decoration:underline;
+			                    padding: 0;
+}
+.navi .filter_offset_pages .current {
+	        font-weight:bold;
+		            font-size: 16px;
+}
+

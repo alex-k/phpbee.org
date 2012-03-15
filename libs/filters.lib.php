@@ -202,9 +202,9 @@ class gs_filter_offset extends gs_filter_var {
 		if(!$this->value) $this->value=0;
 	}
 	function applyFilter($options,$rs) {
+		$options[]=array('type'=>'limit','value'=>$this->limit);
 		if (empty($this->value)) return $options;
 		$options[]=array('type'=>'offset','value'=>$this->value);
-		$options[]=array('type'=>'limit','value'=>$this->limit);
 		return $options;
 	}
 	function get_data_get() {

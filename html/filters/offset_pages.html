@@ -18,7 +18,8 @@
 {if $pages>1}
 <ul class="filter_offset_pages filter_offset_pages_{$position}">
 {if $first_page>1}
-		<li><a href="{href_get_push("{$keyname}_page=1")}">1</a></li>	
+		<li>
+		<a href="{href_get_push("{$keyname}_page=1")}">1</a></li>	
 		{if $first_page>2}
 		...
 		{/if}
@@ -27,7 +28,8 @@
 	{if $i==$current_page}
 		<li class="current">{$i}</li>	
 	{else}
-		<li><a href="{href_get_push("{$keyname}_page={$i}")}">{$i}</a></li>	
+		<li>
+		<a href="{href_get_push("{$keyname}_page={$i}")}">{$i}</a></li>	
 	{/if}
 {/for}
 {if $last_page<$pages}

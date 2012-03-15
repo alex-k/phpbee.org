@@ -4,7 +4,7 @@ function href_get_push($array,$url=null) {
 	if(!is_array($array)) parse_str($array,$array);
 
 	$d=parse_url($url);
-	$d_query=parse_str($d['query']);
+	parse_str($d['query'],$d_query);
 	foreach ($array as $k=>$v) $d_query[$k]=$v;
 	$d['query']=http_build_query($d_query);
 	$url=http_build_url($d);

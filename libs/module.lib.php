@@ -62,10 +62,10 @@ class gl {
 	}
 
 	function rec_create() {
-		return $this->root.'/modify/0'.$this->__data_get();
+		return $this->root.'/modify/0'.$this->__data_get().'#form';
 	}
 	function rec_edit() {
-		return $this->root.'/modify/'.$this->record->get_id().$this->__data_get();
+		return $this->root.'/modify/'.$this->record->get_id().$this->__data_get().'#form';
 	}
 	function rec_copy() {
 		return $this->root.'/copy/'.$this->record->get_id().$this->__data_get();

@@ -622,3 +622,36 @@ textarea.big_text {
 	padding:1px;
 	border: 2px dashed #900000;
 }
+
+.navi ul.filter_offset_pages {
+	        margin: 0;
+		            padding: 0;
+			                    list-style: none;
+					                        width: 680px;
+								                        white-space:nowrap;
+}
+.navi ul.filter_offset_pages_center {
+	        text-align: center;
+}
+.navi .filter_offset_pages li {
+	        display: inline;
+		            border:1px solid #dbdbdb;
+			                    padding: 4px;
+					                        padding-left: 5px;
+								                        margin-left: 3px;
+											                            margin-right: 3px;
+														                                    background: #f9f9f9;
+
+}
+
+
+.navi .filter_offset_pages  li a {
+	        color: #333;
+		            text-decoration:underline;
+			                    padding: 0;
+}
+.navi .filter_offset_pages .current {
+	        font-weight:bold;
+		            font-size: 16px;
+}
+
