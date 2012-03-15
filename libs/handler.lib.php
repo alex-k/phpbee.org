@@ -891,6 +891,15 @@ class gs_base_handler extends gs_handler {
 		return $rec;
 	}
 
+	function rec_by_urlkey($ret) {
+		$rec=record_by_urlkey(end($this->data['gspgid_handler_va']),$this->params['classname']);
+		return $rec;
+	}
+	function rec_by_id($ret) {
+		$rec=record_by_id(reset($this->data['gspgid_handler_va']),$this->params['classname']);
+		return $rec;
+	}
+
 }
 
 class gs_tpl_block {

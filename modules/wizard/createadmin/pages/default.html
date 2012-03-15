@@ -88,7 +88,13 @@
 	<h5>Редактировать/<a href="{gl rec_create=0}#form">создать</a>:</h5>
 	{if $_gsdata.gspgid_va.0=='modify'}
 	<hr><br>
-	{handler gspgid="/admin/form/{%$rs.name%}/edit/`$_gsdata.gspgid_va.1`"}
+		{$default_value=""}
+	{%foreach from=$filters item=f%}
+		{if gs_filters_handler::value('{%$f.name%}')}
+			{$default_value="{$default_value},{%$f.name%}_id={gs_filters_handler::value('{%$f.name%}')}"}
+		{/if} 
+	{%/foreach%}
+	{handler gspgid="/admin/form/{%$rs.name%}/edit/`$_gsdata.gspgid_va.1`" _default=trim($default_value,',') }
 	{/if}
 
 {/block}

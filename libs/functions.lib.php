@@ -196,6 +196,13 @@ function record_by_id($id=0,$classname='gs_null') {
 	$r=new $classname;
 	return $r->get_by_id($id);
 }
+function record_by_urlkey($id=0,$classname='gs_null') {
+	return record_by_field('urlkey',$id,$classname);
+}
+function record_by_field($field,$id=0,$classname='gs_null') {
+	$r=new $classname;
+	return $r->get_by_field($field,$id);
+}
 
 function string_to_params($inp) {
 	$arr=is_array($inp) ? $inp : array($inp);

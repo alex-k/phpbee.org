@@ -97,8 +97,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 		throw new gs_exception('static function record_by_id tot works prior php 5.3!');
 	}
-
-	public function get_by_id($id,$fields=null) {
+	public function get_by_field($field,$id,$fields=null) {
 		if (!empty($fields) && is_string($fields)) {
 			$fields=explode(',',$fields);
 		} else {
@@ -108,7 +107,11 @@ abstract class gs_recordset_base extends gs_iterator {
 			$fields[]=$link['local_field_name'];
 		}
 		$fields=array_unique($fields);
-		return $this->find_records(array($this->id_field_name=>$id),$fields)->current();
+		return $this->find_records(array($field=>$id),$fields)->current();
+	}
+
+	public function get_by_id($id,$fields=null) {
+		return $this->get_by_field($this->id_field_name,$id,$fields);
 	}
 	public function set($values=array()) {
 		foreach ($this as $i) {
