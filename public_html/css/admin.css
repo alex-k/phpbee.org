@@ -21,6 +21,10 @@ img {
 	border:0px;
 }
 
+select.chosen {
+	width: 90%;
+}
+
 .main {
 	width:100%;
 	background:url('/i/admin/shadow.jpg') 1000px 0 repeat-y;

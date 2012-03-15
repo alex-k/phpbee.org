@@ -3,6 +3,7 @@ $(document).ready (function () {
 	$(".lMany2Many").gs_multiselect();
 	$(".fMultiSelect").gs_multiselect();
 	$(".chosen_multiselect").chosen();
+	$(".chosen").chosen();
 $(".lOne2One").sel_filter( {slide_width: 150, min_options: 1, crop: false});
 	$(".fSelect").sel_filter();
 	$(".fDateTime").datepicker();
