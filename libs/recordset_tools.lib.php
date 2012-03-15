@@ -57,7 +57,7 @@ class field_interface {
 			'options'=>isset($opts['options']) ? $opts['options'] : NULL,
 			);
 		if (strtolower($opts['required'])=='false') {
-			$structure['htmlforms'][$field]['validate']='dummyValid';
+			$structure['htmlforms'][$field]['validate'][]='dummyValid';
 		} else {
 			$structure['htmlforms'][$field]['validate'][]='isLength';
 			$structure['htmlforms'][$field]['validate_params']['min']=isset($opts['min_length']) ? (int)($opts['min_length']) : 1;
@@ -77,6 +77,11 @@ class field_interface {
 		}
 		if (isset($opts['default'])) {
 			$structure['htmlforms'][$field]['default']=$opts['default'];
+		}
+		if (isset($opts['validate'])) {
+			foreach (explode(',',$opts['validate']) as $v) {
+				$structure['htmlforms'][$field]['validate'][]=$v;
+			}
 		}
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
 		if (isset($opts['cssclass'])) $structure['htmlforms'][$field]['cssclass']=$opts['cssclass'];

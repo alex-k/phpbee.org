@@ -535,7 +535,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 class gs_validate_isURL  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
     if(strlen($value) == 0)
-        return$params['empty'];        
+        return true;
 
     return preg_match('!^http(s)?://[\w-]+\.[\w-]+(\S+)?$!i', $value)==1;
 }

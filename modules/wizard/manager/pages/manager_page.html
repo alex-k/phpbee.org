@@ -33,7 +33,9 @@
 {if $manager}
 	{%controller _class=wz_recordsets _assign=rsets id=array_keys($recordset)%}
 
+	{if class_exists('sys_languages')}
 	{handler gspgid="/filter/" class="select_records" recordset="sys_languages" name="Lang" urltype=session}
+	{/if}
 	{handler gspgid="/setlocale"}
 
 	{handler gspgid="/manager/menu"}
@@ -44,9 +46,6 @@
 		{%/foreach%}
         <li><a href="/{%$module%}/logout/{%$rs%}">Logout</a></li>
 	</ul>
-	<ul>
-	        <li>Unpayed balance: {handler_bw::balance('Photograph',$manager.id)} {$manager->Currency}</li>
-	</ul>		
 </div>
 <div class="minfo" id="minfo">
 

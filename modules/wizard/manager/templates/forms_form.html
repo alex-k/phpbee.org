@@ -1,4 +1,7 @@
 
+<script>
+</script>	
+
 	<form enctype="multipart/form-data" id="div_createform" action="" class="form_login form_wide" method="post">
 		<input type=hidden name="root" value="{$pid_id}">
 		<input type=hidden name="gspgid_form" value="{$gspgid_form}">
@@ -22,29 +25,35 @@
 
 		{$form->get_error_template('FORM_ERROR')}
 
-		{foreach $form->get_fields() as $field=>$op} 
+		{foreach $form->get_fields() as $field=>$op } 
 
 				{$s=explode(':',$field)}
 			
 				{block name="field"}
 					
+					
 					{if $s[3]=='template'}
 						<fieldset><legend>edit form</legend>
 					{/if}
 					{if $s[3]=='enabled'}
-						<span class="toggle_head"  id="field_{$s.1}_{$s.4}">
 						{$form->get_input($field)}
+						<span class="toggle_head"  id="field_{$s.1}_{$s.4}">
 						{$form->get_data($field|replace:'enabled':'name')}
 						</span>
 					{elseif $s[2]=='recordset'}
+					{if !$field@first}
 						</fieldset>
-					<hr>
-						<h3>
+					</fieldset>
+					{/if}
+					<fieldset class="" style="border:1px solid #000;">
+						<legend>
 						{$op.verbose_name}
-						</h3>
+						</legend>
 					{else}
 					{$op.verbose_name|default:$field}
+					<span class="sortable">
 					{$form->get_input($field)}
+					</span>
 					{$form->get_error_template($field)}
 					<br>
 					{/if}
@@ -56,6 +65,8 @@
 					<br>
 					{/if}
 				{/block}
+		{foreachelse}
+		</div>
 		{/foreach}
 	
 
