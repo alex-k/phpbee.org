@@ -417,6 +417,9 @@ class gs_widget_radio extends gs_widget {
 }
 
 class gs_widget_lMany2Many extends gs_widget_multiselect {}
+
+class gs_widget_lMany2Many_chosen extends gs_widget_multiselect_chosen {}
+
 /*
 class gs_widget_lMany2Many extends gs_widget {
 	function js() {

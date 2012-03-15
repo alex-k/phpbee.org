@@ -34,6 +34,7 @@ class field_interface {
 
 			self::$r['func_name']($k,$r,$structure,$init_opts);
 			if (isset($r['default']) && !isset($structure['fields'][$k]['default'])) $structure['fields'][$k]['default']=$r['default'];
+			if (isset($r['default']) && !isset($structure['htmlforms'][$k]['default'])) $structure['htmlforms'][$k]['default']=$r['default'];
 			if (isset($r['trigger'])) {
 				$structure['triggers']['before_insert'][$k]=$r['trigger'];
 				$structure['triggers']['before_update'][$k]=$r['trigger'];
@@ -716,7 +717,7 @@ class %s extends gs_recordset_i18n {
 		if ($recs->count()==0) return true;
 		return $recs->first()->get_id()===$params['rec_id'];
 	}
-        function check_unique($field,$value,$params,$record=null) {
+        function check_unique($field,$value,$params,$record=null,$data=null) {
 		$recs=$this->find_records(array($field=>$value));
 		if ($recs->count()==0) return true;
 		return $recs->first()->get_id()===$params['rec_id'];

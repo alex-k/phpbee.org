@@ -129,7 +129,7 @@ class gs_validate_checkUnique extends gs_validate {
 		$classname=$params['class'];
 		$obj=new $classname;
 		$func_name=isset($params['func']) ? $params['func'] : 'check_unique';
-		return $obj->$func_name($params['field'],$value,$params,$params['rec_id']);
+		return $obj->$func_name($params['field'],$value,$params,$params['rec_id'],$data);
 
 	}
 }

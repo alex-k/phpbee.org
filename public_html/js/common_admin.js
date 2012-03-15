@@ -7,6 +7,9 @@ $(document).ready (function () {
 $(".lOne2One").sel_filter( {slide_width: 150, min_options: 1, crop: false});
 	$(".fSelect").sel_filter();
 	$(".fDateTime").datepicker();
+
+	$(".sortable").sortable();
+
 	$('.fWysiwyg').rte( {
 		//css: ['default.css'],
 controls_rte: rte_toolbar,

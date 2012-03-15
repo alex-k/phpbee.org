@@ -371,7 +371,6 @@ class gs_base_handler extends gs_handler {
 
 
 
-
 		$f->set_values($rec_default_values);
 		$f->set_values($default_values);
 		$f->set_values($rec_values);

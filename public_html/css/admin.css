@@ -615,8 +615,10 @@ textarea.big_text {
 	max-height:350px;
 }
 .admin_img_preview img {
-	border: 3px solid #FFF;
+	padding:1px;
+	border: 2px solid #FFF;
 }
 .admin_img_preview_checked img {
-	border: 3px solid #900000;
+	padding:1px;
+	border: 2px dashed #900000;
 }

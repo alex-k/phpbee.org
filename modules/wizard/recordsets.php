@@ -228,8 +228,8 @@ class wz_urls extends gs_recordset_short {
 			array('link'=>'Module','on_delete'=>'CASCADE','on_update'=>'CASCADE'),
 		);
 	}
-        function check_unique($field,$value,$params,$record=null) {
-		$recs=$this->find_records(array($field=>$value));
+        function check_unique($field,$value,$params,$record=null,$data=null) {
+		$recs=$this->find_records(array($field=>$value,'type'=>$data['type'],'Module_id'=>$data['Module_id']));
 		if ($recs->count()==0) return true;
 		return $recs->first()->get_id()===$params['rec_id'];
         }

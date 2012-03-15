@@ -9,12 +9,11 @@ class module_wizard_manager extends gs_wizard_strategy_module implements gs_modu
 		'handler'=>array(
 			'/admin/wizard/manager/login'=>array(
 				'handler_wizard_manager.form_login:name:admin_form.html:form_class:form_wizard_manager_login:return:true',
-				//'gs_wizard_handler.commit:return:true',
 				'gs_base_handler.redirect_gl:gl:forms',
 				),
 			'/admin/wizard/manager/forms'=>array(
-				'handler_wizard_manager.form_forms:name:forms_form.html:form_class:form_wizard_manager_forms:return:true',
-				//'gs_wizard_handler.commit:return:true',
+				'handler_wizard_manager.form_forms:name:forms_form.html:form_class:form_wizard_manager_forms',
+				'gs_wizard_handler.commit:return:true',
 				),
 			),
 		'get'=>array(
@@ -52,9 +51,12 @@ class handler_wizard_manager extends gs_handler {
 		$fd=gs_base_handler::explode_data($f->clean());
 		$d=array_merge($d,$fd);
 
+		$rs_login=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
+		$module=record_by_id($data['handler_params']['Module_id'],'wz_modules');
 
 
-		if($d['make_login']) {
+
+		if($d['make_login']=='yes') {
 			$this->compile_manager_page($d);
 		}
 		
@@ -63,30 +65,29 @@ class handler_wizard_manager extends gs_handler {
 		$d['form_template_name']=$d['login_form_template_name'];
 		$d['form_class']=$d['login_form_class'];
 
-		if($d['make_login']) {
+		if($d['make_login']=='yes') {
 			$h=new gs_strategy_createlogin_handler($this->data,$this->params);
 			$h->createlogin($ret,$d);
 		}
 
 		foreach ($d['recordset'] as $k=>$rd) {
-			$rd['manager_rs_id']=$this->data['handler_params']['Recordset_id'];
+			$rd['manager_rs_id']=$rs_login->get_id();
 			$rd['module']=$this->data['handler_params']['Module_id'];
 			$rd['template_name']=$rd['page_template_name'];
 			$rd['form_template_name']=$rd['formfields']['template_name'];
 			$this->data['handler_params']['Recordset_id']=$k;
 			$h=new gs_strategy_createmanager_handler($this->data,$this->params);
 			$h->createmanager($ret,$rd);
+			md($rd,1);
 
 
 
 			$fd=$rd['formfields'];
 			$h=new gs_strategy_createform_tpl_handler($this->data,$this->params);
 			$h->createform($ret,$fd);
-			md($rd,1);
 		}
 
-
-
+		return $module;
 
 	}
 	function compile_manager_page($d) {
@@ -146,8 +147,9 @@ class form_wizard_manager_login extends g_forms_table{
 			),
 		    'make_login' => Array
 			(
-			    'type' => 'checkbox',
-				'default'=>1,
+			    'type' => 'radio',
+			    'options'=> array('yes'=>'Yes','no'=>'No'),
+
 			),
 		    'login_template_name' => Array
 			(
