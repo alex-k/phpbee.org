@@ -175,10 +175,9 @@ class form_wizard_manager_login extends g_forms_table{
 			),
 		    'recordsets' => Array
 			(
-			    'type' => 'multiselect',
+			    'type' => 'multiselect_chosen',
 			    'options'=>$recordsets,
 			    'validate'=>'notEmpty',
-				'cssclass'=>'chosen_multiselect',
 			),
 		);
 		return parent::__construct($hh,$params,$data);

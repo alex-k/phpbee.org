@@ -293,11 +293,18 @@ class gs_widget_multiselect extends gs_widget_select {
 }
 
 class gs_widget_multiselect_chosen extends gs_widget_multiselect {
-	function __construct($fieldname,$data,$params=array(),$form=NULL) {
+	function __construct($fieldname,$data,$params=array(),$form=null) {
 		parent::__construct($fieldname,$data,$params,$form);
-		$this->params['cssclass'].=' chosen_multiselect';
+		$this->params['cssclass'].=' chosen';
 	}
 }
+class gs_widget_select_chosen extends gs_widget_select {
+	function __construct($fieldname,$data,$params=array(),$form=null) {
+		parent::__construct($fieldname,$data,$params,$form);
+		$this->params['cssclass'].=' chosen';
+	}
+}
+
 
 class gs_data_widget_select_enter extends gs_data_widget_select {}
 
