@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>{block name="title"}{%$rs%} - Control Panel{/block}</title>
+<title>{block name="title"}{%$rs%} - {'Control Panel'|gsdict}{/block}</title>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <link href="/css/manager.css" rel="stylesheet" type="text/css" title="CSS for site" />
 <link href="/css/jquery.rte.css" rel="stylesheet" type="text/css" title="CSS for site" />
@@ -46,15 +46,21 @@
 <div class="header" id="header_column">
 	<ul>
 		{%foreach $rsets as $r%}
-		<li><a href="/{%$module%}/manager/{%$r.name%}">{%$r.title|default:$r.name%}</a></li>
+		<li>
+			{%if $r.name==$rs%}
+			<a href="/{%$module%}/manager/{%$r.name%}">{'Profile'|gsdict}</a>
+			{%else%}
+			<a href="/{%$module%}/manager/{%$r.name%}">{%$r.title|default:$r.name%}</a>
+			{%/if%}
+		</li>
 		{%/foreach%}
-        <li><a href="/{%$module%}/logout/{%$rs%}">Logout</a></li>
+        <li><a href="/{%$module%}/logout/{%$rs%}">{'Logout'|gsdict}</a></li>
 	</ul>
 </div>
 <div class="minfo" id="minfo">
 
 {block name="main"}
-	<h3><img src="/i/admin/icon_control.png"/>{%$r.name%} - Control Panel</h3>
+	<h3><img src="/i/admin/icon_control.png"/>{%$r.name%} - {'Control Panel'|gsdict}</h3>
 	<table class="sections">
 		{%foreach $rsets as $r%}
         <tr>
@@ -70,7 +76,7 @@
 		<td>
         <div>
         <a href="/{%$module%}/logout/{%$rs%}"><img src="/i/admin/icon_logout.png" alt="Logout"></a>
-        <a href="/{%$module%}/logout/{%$rs%}">Logout</a>
+        <a href="/{%$module%}/logout/{%$rs%}">{'Logout'|gsdict}</a>
         </div>
         </td>
         </tr>

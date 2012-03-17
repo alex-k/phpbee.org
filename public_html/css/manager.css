@@ -537,6 +537,16 @@ textarea.big_text {
     background:#F6F6F6;
 
     }
+.minfo dl {
+	margin-bottom: 20px;
+}
+.minfo dt {
+	font-size: 17px;
+	font-weight: bold;
+}
+.minfo dd {
+	margin-left: 30px;
+}
 .logout{
   background:url("/images/icons/arrow_white.png") no-repeat scroll right 9px #6B6B6B;
   color: white;
@@ -1799,4 +1809,5 @@ select.chosen{
 	        font-weight:bold;
 		            font-size: 16px;
 }
+
 

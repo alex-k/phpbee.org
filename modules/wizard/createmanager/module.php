@@ -100,14 +100,6 @@ class gs_strategy_createmanager_handler extends gs_handler {
 		$template=array(
 			"get"=>array(
 				"manager/$recordsetname"=>array("gs_base_handler.show:name:manage_$recordsetname.html"),
-				"manager/$recordsetname/delete"=>array(
-						"gs_base_handler.delete:{classname:$recordsetname}",
-						"gs_base_handler.redirect",
-						),
-				"manager/$recordsetname/copy"=>array(
-						"gs_base_handler.copy:{classname:$recordsetname}",
-						"gs_base_handler.redirect",
-						),
 				),
 			"handler"=>array(
 				"manager/form/$recordsetname"=>array(
@@ -119,6 +111,21 @@ class gs_strategy_createmanager_handler extends gs_handler {
 					),
 				),
 		);
+		if ($tplname!='profile.html') {
+			$arr=array(	
+				'get'=>array(
+					"manager/$recordsetname/delete"=>array(
+							"gs_base_handler.delete:{classname:$recordsetname}",
+							"gs_base_handler.redirect",
+							),
+					"manager/$recordsetname/copy"=>array(
+							"gs_base_handler.copy:{classname:$recordsetname}",
+							"gs_base_handler.redirect",
+							),
+					),
+				);
+			$template=array_merge_recursive($template,$arr);
+		}
 
 		foreach ($template as $type=>$urls) {
 			foreach ($urls as $url=>$handlers) {

@@ -76,7 +76,7 @@
 			{%/foreach%}
 			<td class="cnt"><a href="{gl rec_edit=$e}#form"><img src="/i/admin/ico_edit.png" alt="Edit" title="Edit"></a></td>
 			<td class="cnt"><a href="{gl rec_copy=$e}"><img src="/i/admin/ico_copy.png" alt="Copy" title="Copy"></a></td>
-			<td class="cnt"><a href="{gl rec_delete=$e}" onclick="return confirm('Delete record?');"><img src="/i/admin/ico_delete.png" alt="Delete" title="Delete"></a></td>
+			<td class="cnt"><a href="{gl rec_delete=$e}" onclick="return confirm('{'Delete record'|gsdict}?');"><img src="/i/admin/ico_delete.png" alt="Delete" title="Delete"></a></td>
 	</tr>
 	{/foreach}
 	<tr class="pager"><td colspan="100">
@@ -85,10 +85,13 @@
 	</td></tr>
 	</table>
 
-	<h5>Edit/<a href="{gl rec_create=0}#form">Create</a>:</h5>
+	<div>
 	{if $_gsdata.gspgid_va.0=='modify'}
-	<hr><br>
-	{handler gspgid="/{%$module%}/manager/form/{%$rs.name%}/edit/`$_gsdata.gspgid_va.1`" {%$manager_link%}}
+		{handler gspgid="/{%$module%}/manager/form/{%$rs.name%}/edit/`$_gsdata.gspgid_va.1`" {%$manager_link%}}
+	{else}
+		<a class="button" href="{gl rec_create=0}#form">{'Create'|gsdict}</a>
 	{/if}
+	</div>
+	
 
 {/block}

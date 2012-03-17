@@ -187,10 +187,10 @@ class form_wizard_manager_login extends g_forms_table{
 }
 class form_wizard_manager_forms extends g_forms_table{
 	function __construct($hh,$params=array(),$data=array()) {
-		$rs=record_by_id($data['handler_params']['Recordset_id'],'wz_recordsets');
+		$login_rs=$rs=record_by_id($data['handler_params']['Recordset_id'],'wz_recordsets');
 
 		$module=$rs->Module->first();
-		$dirname=dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'createadmin'.DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
+		$dirname=dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'createmanager'.DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
 		$page_templates=array_map(basename,glob($dirname."*"));
 
 
@@ -215,6 +215,7 @@ class form_wizard_manager_forms extends g_forms_table{
 				(
 					'type' => 'select',
 					'options' => array_combine($page_templates,$page_templates),
+					'default' => $rs->get_id()==$login_rs->get_id() ? 'profile.html' : '',
 				);
 				$hh['recordset:'.$rs_id.':fields'] = Array
 				(

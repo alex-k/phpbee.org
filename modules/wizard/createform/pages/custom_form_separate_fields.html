@@ -6,6 +6,11 @@
 	<div class="form_login_div">
 
 		{include file="form_error_messages.html"}
+
+
+	{%foreach $fields as $f%}
+		{%if $f->widget%}{$form->set_option('{%$f->name%}','widget','{%$f->widget%}')}{%/if%}
+	{%/foreach%}
 	
 	{%foreach $fields as $f%}
 		{$form->set_option('{%$f->name%}','placeholder','{%$f->verbose_name%}')}
@@ -37,8 +42,8 @@
 	<td class="helper_tr_field">
 	<div class="block_buttons2">
 	<br>
-	<input type="submit" class="button" name="save_return" value="продолжить">
-	<input type="submit" class="button" name="save_cancel" value="отмена">
+	<input type="submit" class="button" name="save_return" value="{'save'|gsdict}">
+	<input type="submit" class="button" name="save_cancel" value="{'cancel'|gsdict}">
 	</div>
 	</td>
      	</tr> 
