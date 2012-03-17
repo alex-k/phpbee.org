@@ -208,7 +208,7 @@ class gs_base_handler extends gs_handler {
 			$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
 			$f=new $form_class_name(array(),$params,$data);
 		}
-		//$this->showform($f);
+		$this->showform($f); //needs to have changes from form's template!
 		return $f;
 	}
 
