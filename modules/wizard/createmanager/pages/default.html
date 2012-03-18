@@ -35,10 +35,17 @@
 	{%/foreach%}
 		<tr><td>Find:</td><td>
 			<form class="filterform" method="get">
+			<div class="links_inline">	
 			{handler gspgid="/filter/show" name="search"  recordset=${%$rs.name%} tpl="like.html"  }
+			</div>
+			<div class="links_inline">	
 			{handler gspgid="/filter/show" name="calendar"  recordset=${%$rs.name%} tpl="calendar.html" prelabel="date:"  }
+			</div>
+			<div class="links_inline">	
 			{handler gspgid="/filter/show" name="sort"  recordset=${%$rs.name%} tpl="sort.html" prelabel="sort by:"  }
-			<div class="links_inline"><input type="submit" value=""></div>
+			</div>
+			<div class="links_inline">
+				<input type="submit" class="button" value="{'find'|gsdict}"></div>
 			</form>
 		</td></tr>
 	</table>
