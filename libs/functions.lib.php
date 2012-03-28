@@ -210,7 +210,7 @@ function string_to_params($inp) {
 	$arr=preg_replace('|=\s*([^\'\"][^\s]*)|i','=\'\1\'',$arr);
 	foreach ($arr as $k=>$s) {
 		$s.=' ';
-		preg_match_all(':(\s*(([a-z_]+)=)?[\'\"](.+?)[\'\"]\s|([^\s]+)):i',$s,$out);
+		preg_match_all(':(\s*(([a-z0-9_]+)=)?[\'\"](.+?)[\'\"]\s|([^\s]+)):i',$s,$out);
 		$r=array();
 		$j=0;
 		foreach ($out[3] as $i => $v) {

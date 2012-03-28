@@ -376,6 +376,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 class gs_validate_isEqual  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
+		md($field,1);
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isEqual] parameter 'field2' is missing.");            
                 return false;
@@ -501,6 +502,7 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
                 trigger_error("SmartyValidate: [isRange] parameter 'high' is missing.");            
                 return false;
         }
+
         if(strlen($value) == 0)
             return false;
         

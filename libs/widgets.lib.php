@@ -81,7 +81,8 @@ class gs_widget_password2 extends gs_widget {
 		trim($this->value),
 		$this->params['readonly'] ? 'disabled="disabled"' : '',
 		$this->placeholder,
-		$this->params['verbose_name2']? $this->params['verbose_name2'] : gs_dict::get('REPEAT_PASSWORD'),
+		//$this->params['verbose_name2']? $this->params['verbose_name2'] : gs_dict::get('REPEAT_PASSWORD'),
+		$this->params['verbose_name2'],
 		isset($this->params['cssclass']) ? $this->params['cssclass'] : '',
 		$this->fieldname,
 		($this->value==$v2) ? $this->value : '',
@@ -98,7 +99,10 @@ class gs_widget_password2 extends gs_widget {
 }
 
 class gs_widget_password2_inline extends gs_widget_password2 {
-	var $htmlstr='<input class="fPassword %s" type="password" name="%s" value="%s" %s %s></td><td class="helper_tr_error"><input class="fPassword %s" type="password" name="%s_repeat" value="%s" %s %s>';
+	//var $htmlstr='<input class="fPassword %s" type="password" name="%s" value="%s" %s %s></td><td class="helper_tr_error"><input class="fPassword %s" type="password" name="%s_repeat" value="%s" %s %s>';
+	var $htmlstr='<input class="fPassword %s" type="password" name="%s" value="%s" %s %s>
+				%s
+				<input class="fPassword %s" type="password" name="%s_repeat" value="%s" %s %s>';
 }
 
 

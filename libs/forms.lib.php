@@ -30,6 +30,20 @@ abstract class g_forms implements g_forms_interface{
 	function addNode($name) {
 		$this->view->addNode('helper',array('class'=>'dt'),$name);
 	}
+	function replace_validator($field,$value,$params='') {
+		if (isset($this->htmlforms[$field]['validate'])) unset($this->htmlforms[$field]['validate']);
+		return $this->add_validator($field,$value,$params);
+	}
+		
+	function add_validator($field,$value,$params='') {
+		$params=string_to_params($params);
+		if (isset($this->htmlforms[$field]['validate']) && !is_array($this->htmlforms[$field]['validate'])) {
+			$this->htmlforms[$field]['validate']=array($this->htmlforms[$field]['validate']);
+		}
+		$this->htmlforms[$field]['validate'][]=$value;
+		if (!is_array($this->htmlforms[$field]['validate_params'])) $this->htmlforms[$field]['validate_params']=array();
+		$this->htmlforms[$field]['validate_params']=array_merge($this->htmlforms[$field]['validate_params'],$params);
+	}
 	function add_field($name,$params) {
 		if (isset($this->field_options[$name])) $params=array_merge_recursive($this->field_options[$name],$params);
 		$this->htmlforms[$name]=$params;
@@ -516,4 +530,5 @@ class gs_glyph {
 		return $ret;
 	}
 }
+
 ?>

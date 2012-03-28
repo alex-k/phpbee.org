@@ -47,38 +47,39 @@ abstract class gs_base_module {
 	}
 
 }
+
 class gl {
-	function __construct($record,$data) {
-		$this->record=$record;
-		$this->data=$data;
-		$tpl=gs_tpl::get_instance();
-		$this->gs_data=$tpl->getTemplateVars('_gsdata');
-		$this->root=isset($this->gs_data['handler_key_root']) ? $this->gs_data['handler_key_root'] : null;
-		if (!$this->root) $this->root=$this->gs_data['handler_key'];
+        function __construct($record,$data) {
+                $this->record=$record;
+                $this->data=$data;
+                $tpl=gs_tpl::get_instance();
+                $this->gs_data=$tpl->getTemplateVars('_gsdata');
+                $this->root=isset($this->gs_data['handler_key_root']) ? $this->gs_data['handler_key_root'] : null;
+                if (!$this->root) $this->root=$this->gs_data['handler_key'];
+        }
+        function gspgid() {
+                return $this->data;
+        }
 
-	}
-	function gspgid() {
-		return $this->data;
-	}
+        function rec_create() {
+                return $this->root.'/modify/0'.$this->__data_get().'#form';
+        }
+        function rec_edit() {
+                return $this->root.'/modify/'.$this->record->get_id().$this->__data_get().'#form';
+        }
+        function rec_copy() {
+                return $this->root.'/copy/'.$this->record->get_id().$this->__data_get();
+        }
+        function rec_delete() {
+                return $this->root.'/delete/'.$this->record->get_id().$this->__data_get();
+        }
 
-	function rec_create() {
-		return $this->root.'/modify/0'.$this->__data_get().'#form';
-	}
-	function rec_edit() {
-		return $this->root.'/modify/'.$this->record->get_id().$this->__data_get().'#form';
-	}
-	function rec_copy() {
-		return $this->root.'/copy/'.$this->record->get_id().$this->__data_get();
-	}
-	function rec_delete() {
-		return $this->root.'/delete/'.$this->record->get_id().$this->__data_get();
-	}
-
-	function __data_get() {
-		$ds=new gs_data_driver_get();
-		$arr=$ds->import();
-		unset($arr['gspgtype']);
-		if($arr) return '?'.http_build_query($arr);
-		return '';
-	}
+        function __data_get() {
+                $ds=new gs_data_driver_get();
+                $arr=$ds->import();
+                unset($arr['gspgtype']);
+                if($arr) return '?'.http_build_query($arr);
+                return '';
+        }
 }
+
