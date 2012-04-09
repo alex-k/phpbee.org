@@ -263,7 +263,7 @@ class gs_widget_select extends gs_widget {
 		return $ret;
 	}
 	function option_string($v,$l) {
-		$sel=is_array($this->value) ? in_array($v,$this->value) : trim($this->value)==$v;
+		$sel=is_array($this->value) ? in_array($v,array_keys($this->value)) : trim($this->value)==$v;
 
 		return sprintf("<option value=\"%s\" %s>%s</option>\n", htmlspecialchars($v), $sel ? 'selected="selected"' : '', $l);
 	}
@@ -424,38 +424,6 @@ class gs_widget_lMany2Many extends gs_widget_multiselect {}
 
 class gs_widget_lMany2Many_chosen extends gs_widget_multiselect_chosen {}
 
-/*
-class gs_widget_lMany2Many extends gs_widget {
-	function js() {
-		$ret="<select class=\"lMany2Many\" multiple=\"on\" name=\"".$this->fieldname."[]\">\n";
-		$ret.="<% for (vid in t.values.".$this->fieldname.".variants) { %>
-			  <option value=\"<%=vid%>\" <% if (t.values.".$this->fieldname.".selected[vid]) { %> selected=\"selected\" <% } %>  ><%=t.values.".$this->fieldname.".variants[vid]%></option>
-			  <% } %>
-			  ";
-		$ret.="</select>\n";
-		return $ret;
-	}
-	function html() {
-		$e_data=gs_base_handler::explode_data($this->data);
-		if (isset($e_data[$this->fieldname]) && is_array($e_data[$this->fieldname]) && !empty($e_data[$this->fieldname])) {
-			//$this->value=array_combine(array_values($e_data[$this->fieldname]),array_values($e_data[$this->fieldname]));
-			$this->value=array_combine(array_keys($e_data[$this->fieldname]),array_keys($e_data[$this->fieldname]));
-		}
-		$ret="<input type=\"hidden\" name=\"".$this->fieldname."\" value=\"0\">";
-		$ret.=sprintf("<select class=\"lMany2Many\" multiple=\"on\" name=\"%s[]\">\n", $this->fieldname);
-		if (is_array($this->params['variants'])) foreach ($this->params['variants'] as $k=>$v) {
-			$ret.=sprintf("<option value=\"%d\" %s>%s</option>\n",$k, (is_array($this->value) && (in_array($k,$this->value) || array_key_exists($k,$this->value))) ? 'selected="selected"' : '',$v);
-		}
-		$ret.="</select>\n";
-		return $ret;
-	}
-	function clean() {
-		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
-		$ret=is_array($this->value) && count($this->value)>0 ? array_combine(array_values($this->value),array_values($this->value)) : array();
-		return $ret;
-	}
-}
-*/
 class gs_widget_lOne2One extends gs_widget {
 	function js() {
 		$ret="<select class=\"lOne2One\" name=\"".$this->fieldname."\">\n";

@@ -96,6 +96,8 @@ function html_fetch($url,$data=array(),$scheme='GET') {
 
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 180);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+	curl_setopt($ch, CURLOPT_MAXREDIRS,5);
 
 
 	$result=curl_exec($ch);
@@ -347,6 +349,21 @@ function add_quote($a,$q="'") {
 		return array_map('add_quote',$a);
 	}
 	return $q.$ret.$q;
+}
+
+function tidy_html($str,$options=array()) {
+	$config = array(	'indent' => FALSE,
+				'show-body-only' => TRUE,
+				'output-xml' => TRUE,
+				'wrap-script-literals'=>TRUE,
+			);
+	$config=array_merge($config,$options);
+	$tidy = tidy_parse_string($str, $config,'UTF8');
+	$tidy->cleanRepair();
+	$txt=trim($tidy);
+	$txt=preg_replace('/&[a-zA-Z]+;/','',$txt);
+
+	return $txt;
 }
 
 ?>
