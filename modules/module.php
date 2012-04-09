@@ -1,6 +1,4 @@
 <?php
-
-
 class module extends gs_base_module implements gs_module {
 	function __construct() {}
 	
