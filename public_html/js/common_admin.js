@@ -4,7 +4,7 @@ $(document).ready (function () {
 	$(".fMultiSelect").gs_multiselect();
 	$(".chosen_multiselect").chosen();
 	$(".chosen").chosen();
-$(".lOne2One").sel_filter( {slide_width: 150, min_options: 1, crop: false});
+	$(".lOne2One").sel_filter( {slide_width: 150, min_options: 1, crop: false});
 	$(".fSelect").sel_filter();
 	$(".fDateTime").datepicker();
 
@@ -78,4 +78,12 @@ onOpen: function() {
 	
 
 });
+
+function md(obj) {
+	var str="";
+	for (key in obj) {
+		str +="\n"+key+"="+obj[key];
+	}
+	return str;
+}
 

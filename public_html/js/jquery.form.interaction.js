@@ -25,56 +25,70 @@
 		hide= function(obj,d) {
 			obj.hide();
 		}
-		set_value= function(obj,d) {
-			$('[name='+d.field+']',obj).val(d.value);
+		set_value= function(obj,d,request) {
+			var new_el=$('[name='+d.field+']',obj);
+			new_el.val(d.value);
+			new_el.get(0).interact_request=request;
 		}
 
-		replace_element = function (obj,d) {
+		replace_element = function (obj,d,request) {
 
 			var new_el=$(d.html);
+			var old_el=$('[name='+d.field+']',obj);
 			for (ev in events) {
 				$(new_el).filter(ev).bind(events[ev],postform);
 			}
-			$('[name='+d.field+']',obj).replaceWith(new_el);
+			if (typeof old_el.get(0).construct=="function") new_el.get(0).construct=old_el.get(0).construct;
+			if (typeof old_el.get(0).destruct=="function") old_el.get(0).destruct(new_el.get(0));
+			new_el.get(0).interact_request=request;
+
+			old_el.replaceWith(new_el);
+
+			if (typeof new_el.get(0).construct=="function") new_el.get(0).construct();
 		}
 				
-		answer = function(data) {
-			for ( k in data) {
-				var d=data[k];
-				var obj=$('[name='+d.field+']');
-				var i_box=obj.closest('.interact_box');
-				if (i_box.size()) obj=i_box;
-				self[d.action](obj,d);
-			}
-		}
 		postform=function() {
-			var form = $(this).closest('form');
-			var data = {} ;
-			data['gsform_interact'] = this.name;
-			data['gspgid_form']=$('[name=gspgid_form]',form).val();
-			$('.fInteract',form).each(function() {
-				if ($(this).hasClass('fCheckbox')) {
-					data[this.name]=this.checked ? 1 : 0;
-				} else if ($(this).hasClass('fRadio')) {
-					if (this.checked) data[this.name]=this.value;
-				} else {
-					data[this.name]=this.value;
-				}
-			});
+			clearTimeout($(this).data('timeout'));
+			var e = $(this).data('timeout', setTimeout(function() 
+				{
+				var form = e.closest('form');
+				var data = {} ;
+				data['gsform_interact'] = e.attr('name');
+				data['gspgid_form']=$('[name=gspgid_form]',form).val();
+				$('.fInteract',form).each(function() {
+					if ($(this).hasClass('fCheckbox')) {
+						data[this.name]=this.checked ? 1 : 0;
+					} else if ($(this).hasClass('fRadio')) {
+						if (this.checked) data[this.name]=this.value;
+					} else {
+						data[this.name]=this.value;
+					}
+				});
 
-			$.ajax({
-				url:document.location.href,
-				data: data,
-				type: 'POST',
-				dataType: 'JSON',
-				success : answer
-			});
+				var request=data;
+				answer = function(data) {
+					for ( k in data) {
+						var d=data[k];
+						var obj=$('[name='+d.field+']');
+						var i_box=obj.closest('.interact_box');
+						if (i_box.size()) obj=i_box;
+						self[d.action](obj,d,request);
+					}
+				}
+
+				$.ajax({
+					url:document.location.href,
+					data: data,
+					type: 'POST',
+					dataType: 'JSON',
+					success : answer
+				});
+			},1));
 
 
 		}
 
 		return this.each(function() {
-
 
 			$('.fInteract',this).each(function() {
 				if (this.interact==1) {
