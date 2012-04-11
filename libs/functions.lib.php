@@ -53,6 +53,12 @@ function array_search_recursive($n,$a,$s=false) {
 	}
 	return FALSE;
 }
+function array_key_recursive($a,$k,$v) {
+	foreach ($a as $ak=>$aa) {
+		if (isset($aa[$k]) && $aa[$k]==$v) return $ak;
+	}
+	return FALSE;
+}
 
 function get_output() {
 	$txt=ob_get_contents();

@@ -263,7 +263,7 @@ class gs_cacher {
 		} else {
 			$fn=$dirname.$id;
 		}
-		file_put_contents_perm($fn,serialize($data));
+		if (!is_a($data,'gs_null')) file_put_contents_perm($fn,serialize($data));
 		return $id;
 	}
 	static function load($id,$subdir='.') {

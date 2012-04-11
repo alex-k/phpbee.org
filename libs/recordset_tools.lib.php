@@ -490,7 +490,7 @@ class gs_rs_links extends gs_recordset{
 				if ($link->recordstate & RECORD_DELETED) $counter_arr[$id]=$counter_arr[$id]-1;
 			}
 			foreach ($counter_arr as $id=>$cnt) {
-				$prec[$id]->$counter_fieldname+=$cnt;
+				if (isset($counter_fieldname)) $prec[$id]->$counter_fieldname+=$cnt;
 			}
 			$prec->commit();
 		}
@@ -739,6 +739,14 @@ class %s extends gs_recordset_i18n {
 			if (substr($backlink,0,1)!='_' && $rs_link['recordset']==$link['recordset']) return $backlink;
 		}
 		return null;
+	}
+	function set_fkey($name,$on_delete='RESTRICT',$on_update='CASCADE') {
+		$k=array_key_recursive($this->structure['fkeys'],'link',$name);
+		if ($k!==FALSE) unset($this->structure['fkeys'][$k]);
+		$fkey=array('link'=>$name);
+		if($on_delete) $fkey['on_delete']=$on_delete;
+		if($on_update) $fkey['on_update']=$on_update;
+		$this->structure['fkeys'][]=$fkey;
 	}
 
 }

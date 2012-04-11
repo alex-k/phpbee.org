@@ -402,7 +402,9 @@ class gs_base_handler extends gs_handler {
 		if(isset($this->data['handler_params']['form_class'])) {
 			$this->params['form_class']=$this->data['handler_params']['form_class'];
 		}
-		if (!$this->is_post()) return $this->showform();
+		if (!$this->is_post()) {
+			return $this->showform();
+		}
 
 		$tpl=gs_tpl::get_instance();
 		if (!$f) $f=$this->get_form();
@@ -421,11 +423,22 @@ class gs_base_handler extends gs_handler {
 		$ret=$tpl->fetch($tplname);
 		return $ret;
 	}
-	function post() {
+	function post($ret) {
+		if (!$this->is_post()) {
+			gs_session::save(cfg('referer_path'),'post_referer_'.$this->data['gspgid']);
+		}
 		$f=$this->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 		$f->rec->fill_values(self::explode_data($f->clean()));
 		$f->rec->get_recordset()->commit();
+
+		/*
+		if (isset($this->data['save_return'])) {
+				$this->params['gl']='save_return';
+				$this->redirect_if($ret);
+		}
+		 */
+
 		return $f->rec;
 	}
 
@@ -567,7 +580,7 @@ class gs_base_handler extends gs_handler {
 	}
 	function redirect_if($ret) {
 		if (!isset($this->data[$this->params['gl']])) return true;
-		$this->params['href']=call_user_func('module::gl',$this->params['gl'],$ret['last'],$this->data);
+		$this->params['href']=call_user_func($this->params['module_name'].'::gl',$this->params['gl'],$ret['last'],$this->data);
 		$this->redirect();
 		return false;
 	}
