@@ -69,12 +69,17 @@ abstract class gs_recordset_base extends gs_iterator {
 		return $this;
 	}
 
-
-	public function record_as_string($rec) {
+	function get_name_field(){
 		reset($this->structure['fields']);
 		next($this->structure['fields']);
 		$fieldname=key($this->structure['fields']);
 		reset($this->structure['fields']);
+		return $fieldname;
+	}
+
+
+	public function record_as_string($rec) {
+		$fieldname=$this->get_name_field();
 		return $rec->$fieldname ? $rec->$fieldname : '';
 	}
 	public function __toString() {

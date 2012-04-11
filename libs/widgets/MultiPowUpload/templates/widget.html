@@ -31,7 +31,7 @@
 {/if}
 
 <div id="MultiPowUpload_holder">
-<input type="button" class="MultiPowUploadStartButton" onClick="left_heightWid(); MultiPowUpload_Start();" value="UPLOAD PHOTOS">
+<input type="button" id="MultiPowUploadStartButton" class="MultiPowUploadStartButton" onClick="left_heightWid(); MultiPowUpload_Start();" value="UPLOAD PHOTOS">
 </div>
 <script>
 	var params_str={$params_str}
@@ -40,6 +40,24 @@
 {/foreach}
 </script>
 <script type="text/javascript">
+
+
+	function MultiPowUpload_onAddFiles() {
+		var submit=$("input[type=submit]");
+		submit.each(function(){
+			var t=$(this);
+			t.attr('MultiPowUpload_val',t.val());
+			t.hide();
+		});
+	}
+	function MultiPowUpload_onComplete() {
+		var submit=$("input[type=submit]");
+		submit.each(function(){
+			var t=$(this);
+			t.show();
+		});
+	}
+
 	var widget_MultiPowUpload_license='{cfg('widget_MultiPowUpload_license')}';
 	var widget_MultiPowUpload_watermark='{cfg('widget_MultiPowUpload_watermark')}';
 	var widget_MultiPowUpload_upload_thubnail='{cfg('widget_MultiPowUpload_upload_thubnail')}';
@@ -47,11 +65,17 @@
 
 	var flashvars = {ldelim}
 	  "language.autoDetect": "true",
+		"useExternalInterface":"true",
+	  "eventHandler.onCancel":"_onComplete",
+	  "eventHandler.onClearList":"_onComplete",
+	  "eventHandler.onResponse":"_onComplete",
+	  "eventHandler.onRemoveFiles":"_onComplete",
 	  "serialNumber": "{cfg('widget_MultiPowUpload_license')}",
 	  "uploadUrl": "/widgets/MultiPowUpload/upload/original",
 	  "customPostFields":params_str,
 	  "removeUploadedFilesFromList": "true",
 	  "fileFilter.types":"Images|*.jpg:*.jpeg:*.gif:*.png:*.bmp",
+	  "autoStart": {if cfg('widget_MultiPowUpload_autoStart')}"true"{else}"false"{/if},
 	  "sendThumbnails": {if cfg('widget_MultiPowUpload_upload_thubnail')}"true"{else}"false"{/if},
 	  "sendOriginalImages": {if cfg('widget_MultiPowUpload_upload_thubnail') && !cfg('widget_MultiPowUpload_upload_original')}"false"{else}"true"{/if},
 	  "useExternalInterface": "true",

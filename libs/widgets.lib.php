@@ -434,8 +434,11 @@ class gs_widget_lOne2One extends gs_widget {
 		$ret.="</select>\n";
 		return $ret;
 	}
+	function option_string($fieldname) {
+		return sprintf("<select  class=\"lOne2One fInteract\" name=\"%s\">\n", $fieldname);
+	}
 	function html() {
-		$ret=sprintf("<select  class=\"lOne2One fInteract\" name=\"%s\">\n", $this->fieldname);
+		$ret=$this->option_string($this->fieldname);
 		if ($this->params['nulloption']) $ret.=sprintf('<option value="%s">%s</option>',$this->params['nulloption'][0],isset($this->params['nulloption'][1]) ? $this->params['nulloption'][1] : '' );
 		if (is_array($this->params['variants'])) foreach ($this->params['variants'] as $k=>$v) {
 			$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n", ($k==0 && empty($v)) ? '' : $k, ($this->value==$k) ? 'selected="selected"' : '',$v);

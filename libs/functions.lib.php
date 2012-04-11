@@ -174,7 +174,6 @@ function bee_mail($to,$subj,$text,$from='') {
 }
 
 function string_to_safeurl($str, $replace=array(), $delimiter='-') {
-	md('---------',1);
 	$old_locale=setlocale(LC_ALL,"0");
 	setlocale(LC_ALL, 'ru_RU.UTF-8');
 	if( !empty($replace) ) {
@@ -183,7 +182,6 @@ function string_to_safeurl($str, $replace=array(), $delimiter='-') {
 
 	$clean = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $str);
 	$clean_test = preg_replace("/[^a-zA-Z0-9]/", '', $clean);
-	var_dump($clean_test);
 	if($str && !$clean_test) {
 		$clean = iconv("UTF-8", "KOI8-R//IGNORE", $str);
 		$clean=str_split($clean,1);

@@ -333,10 +333,14 @@ class gs_init {
 			foreach ($files as $f) {
 				/*$s=file_get_contents($f);
 				$s=$tpl->fetch('string:'.$s);*/
-				$s=$tpl->fetch($f);
 				$pf=$tplcdir.DIRECTORY_SEPARATOR.basename($f);
-				if(file_put_contents_perm($pf,$s)===FALSE) {
-					throw new gs_exception('Can`t copy template '.$f.' into '.$pf);
+				if (is_dir($f)) {
+					copy_directory($f,$pf);
+				} else {
+					$s=$tpl->fetch($f);
+					if(file_put_contents_perm($pf,$s)===FALSE) {
+						throw new gs_exception('Can`t copy template '.$f.' into '.$pf);
+					}
 				}
 			}
 		}
