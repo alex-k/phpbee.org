@@ -26,7 +26,7 @@ class gs_dbdriver_sqlite extends gs_prepare_sql implements gs_dbdriver_interface
 
 	function escape_value($v,$c=null) {
 		if (is_float($v)) {
-			return sprintf('truncate(%s,5)',$v);
+			return sprintf('truncate(%s,5)',str_replace(',','.',sprintf('%.05f',$v)));
 		}else if (is_numeric($v)) {
 			return $v;
 		} else if (is_null($v)) {
