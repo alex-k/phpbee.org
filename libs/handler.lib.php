@@ -568,7 +568,7 @@ class gs_base_handler extends gs_handler {
 		//md($xml,1);
 		$newrs=xml_import($xml);
 		$newrs->commit();
-		return $rec;
+		return $newrs->first();
 	}
 	function redirect_gl($ret) {
 		if (isset($this->params['gl'])) {
@@ -820,8 +820,6 @@ class gs_base_handler extends gs_handler {
 	function test_id($data) {
 		//$code=$this->hpar($data);
 		$code=$this->data['gspgid_va'][0];
-		md($code,1);
-		md($this->params,1);
 		$res=preg_match("|(\d+)a(.*)|is",$code,$out);
 		if (count($out)<2) return false;
 		if (md5($out[1])!=$out[2]) return false;
@@ -909,7 +907,13 @@ class gs_base_handler extends gs_handler {
 		return $rec;
 	}
 	function rec_by_id($ret) {
-		$rec=record_by_id(reset($this->data['gspgid_handler_va']),$this->params['classname']);
+		$id=null;
+		if (isset($this->data['gspgid_handler_va'])) $id=reset($this->data['gspgid_handler_va']);
+		if (!$id) $id=reset($this->data['gspgid_va']);
+
+		if(!$id) return false;
+
+		$rec=record_by_id($id,$this->params['classname']);
 		return $rec;
 	}
 
