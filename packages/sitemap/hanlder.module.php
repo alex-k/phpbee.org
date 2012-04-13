@@ -14,7 +14,7 @@ class sitemap_handler extends gs_base_handler {
 		setlocale(LC_NUMERIC,'POSIX');
 
 		$xml=new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
-		$xml->lastmod=date('W3C');
+		$xml->lastmod=date(DATE_W3C);
 		$xml->priority=1.0;
 		$xml->changefreq='daily';
 
@@ -28,7 +28,7 @@ class sitemap_handler extends gs_base_handler {
 
 				$i=$xml->addChild('url');
 				$i->loc=$url;
-				if($xrec->_ctime) $i->lastmod=date('W3C',strtotime($xrec->_ctime));
+				if($xrec->_ctime) $i->lastmod=date(DATE_W3C,strtotime($xrec->_ctime));
 				$i->changefreq='weekly';
 				$i->priority=0.5;
 
