@@ -105,6 +105,7 @@ class gs_filter_like extends gs_filter {
 	function __construct($data) {
 		parent::__construct($data);
 		$this->fields=array_map(trim,array_filter(explode(',',$this->params['fields'])));
+		$this->strong=array_map(trim,array_filter(explode(',',$this->params['strong'])));
 		$this->case=isset($this->params['case']) ? $this->params['case'] : 'LIKE';
 	}
 	function getHtmlBlock($ps) {
@@ -133,7 +134,7 @@ class gs_filter_like extends gs_filter {
 					'type'=>'value',
 					'field'=>$field,
 					'value'=>$this->value,
-					'case'=>$this->case,
+					'case'=>in_array($field,$this->strong) ? '=' : $this->case,
 					);
 		}
 		$options[$this->name]=$to;
@@ -258,7 +259,7 @@ class gs_filter_sort extends gs_filter {
 	function applyFilter($options,$rs) {
 		if (empty($this->value)) return $options;
 		$value=str_replace(":"," ",$this->value);
-		$options[$this->name]=array('type'=>'orderby','value'=>$value);
+		$options['orderby']=array('type'=>'orderby','value'=>$value);
 
 		return $options;
 	}
@@ -361,6 +362,7 @@ class gs_filter_select_by_links extends gs_filter {
 
 		$fieldname=$this->fieldname;
 		$link=$this->link;
+
 
 
 		if ($link['type']=='many') {

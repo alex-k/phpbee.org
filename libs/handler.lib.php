@@ -554,6 +554,11 @@ class gs_base_handler extends gs_handler {
 		echo $txt;
 		return $txt;
 	}
+	function xml2txt($ret){
+		$x=xml_print($ret['last']->asXML());
+		return $x;
+	}
+
 	function xml_dump($ret) {
 		$x=xml_print($ret['last']->asXML());
 		md($x,1);
