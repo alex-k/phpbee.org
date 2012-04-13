@@ -65,5 +65,5 @@
 	//$this->widget_MultiPowUpload_thubnail_quality=90;
 
 
+	setlocale(LC_NUMERIC,'POSIX');
 
-?>
