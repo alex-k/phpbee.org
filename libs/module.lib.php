@@ -59,7 +59,11 @@ class gl {
         }
         function gspgid() {
                 return $this->data;
-        }
+		}
+
+		function rec_show() {
+			return $this->root.'/'.$this->record->get_id();
+		}
 
         function rec_create() {
                 return $this->root.'/modify/0'.$this->__data_get().'#form';

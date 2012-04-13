@@ -1,4 +1,8 @@
 <?php
+function http_host($url) {
+	$s=parse_url($url);
+	return sprintf('%s://%s',$s['scheme'],$s['host']);
+}
 function href_get_push($array,$url=null) {
 	if ($url===null) $url=$_SERVER['REQUEST_URI'];
 	if(!is_array($array)) parse_str($array,$array);

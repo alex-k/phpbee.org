@@ -41,7 +41,7 @@ class helper_label_br{
 }
 class helper_dl {
 	function show($label,$txt,$errors=array(),$field=array()) {
-		return sprintf('<dl>%s</dl>',$txt);
+		return sprintf('<dl class="interact_box">%s</dl>',$txt);
 	}
 }
 class helper_dt {

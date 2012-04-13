@@ -624,7 +624,8 @@ function check_and_create_dir($dir) {
 
 function file_put_contents_perm($filename,$data,$flags = 0, $context = NULL) {
 	$ret= ($context===NULL) ? file_put_contents($filename,$data,$flags) : file_put_contents($filename,$data,$flags = 0, $context );
-	@chmod($filename,cfg('created_files_perm'));
+	if ($ret) @chmod($filename,cfg('created_files_perm'));
+	return $ret;
 
 }
 

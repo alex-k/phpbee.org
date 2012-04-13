@@ -540,13 +540,33 @@ class gs_base_handler extends gs_handler {
 		$newrec->commit();
 		return $rec;
 	}
+	function save_file_public_html($data) {
+		$txt=trim($this->hpar($data));
+		$filename=$this->params['filename'];
+		$filename=cfg('document_root').trim($filename,DIRECTORY_SEPARATOR);
+		$dirname=realpath(dirname($filename));
+		if (strpos($dirname,realpath(cfg('document_root')))!==0) return false;
+		if (!file_put_contents_perm($filename,$txt)) return false;
+		return $txt;
+	}
+	function dump($data) {
+		$txt=trim($this->hpar($data));
+		echo $txt;
+		return $txt;
+	}
 	function xml_dump($ret) {
-		md(xml_print($ret['last']->asXML()),1);
+		$x=xml_print($ret['last']->asXML());
+		md($x,1);
+		return $x;
+	}
+	function xml_show($ret) {
+		return $this->xml_print($ret);
 	}
 	function xml_print($ret) {
 		$x=xml_print($ret['last']->asXML());
 		header('Content-type: text/xml');
 		echo $x;
+		return $x;
 	}
 	function xml_save_file($ret) {
 		$x=xml_print($ret['last']->asXML());
