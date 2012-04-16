@@ -327,6 +327,7 @@ class gs_init {
 		$tpldir=$dir.$path.'templates';
 		$tplcdir=$dir.$path.'___templates';
 		if (file_exists($tpldir)) {
+			rrmdir($tplcdir);
 			check_and_create_dir($tplcdir);
 			@touch($tplcdir);
 			$files=glob($tpldir.DIRECTORY_SEPARATOR.'*');

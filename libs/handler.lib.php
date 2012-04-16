@@ -114,44 +114,10 @@ class gs_base_handler extends gs_handler {
 		if (!$tplname && file_exists(cfg('tpl_data_dir').DIRECTORY_SEPARATOR.$this->params['name'])) $tplname=cfg('tpl_data_dir').DIRECTORY_SEPARATOR.$this->params['name'];
 		if (!$tplname) $tplname=$this->params['name'];
 
+		mlog($tplname);
+		$tplname=$tpl->multilang($tplname);
 
-		$language=false;
-		if (!$language) $language=gs_var_storage::load('multilanguage_lang');
-		if (!$language) $language=gs_session::load('multilanguage_lang');
-		if (!$language) $language=cfg('multilang_default_language');
 
-		if ($language) {
-				$newtplname=dirname($tplname).DIRECTORY_SEPARATOR.$language.DIRECTORY_SEPARATOR.(basename($tplname));
-				if (file_exists($newtplname)) {
-					$tplname=$newtplname;
-					$old_tpl_dir=$dir=$tpl->getTemplateDir();
-					if (!is_array($dir)) $dir=array($dir);
-					array_unshift($dir,'.',dirname($newtplname));
-					$tpl->setTemplateDir($dir);
-				}
-		}
-
-		/*
-		if ($language) {
-			$langs=languages();
-			if ($langs) {
-				$default_lang=key($langs);
-				array_shift($langs);
-				if ($langs && $language!=$default_lang) {
-					$newtplname=dirname($tplname).DIRECTORY_SEPARATOR.$language.DIRECTORY_SEPARATOR.(basename($tplname));
-					if (file_exists($newtplname)) {
-						$tplname=$newtplname;
-						$old_tpl_dir=$dir=$tpl->getTemplateDir();
-						if (!is_array($dir)) $dir=array($dir);
-						array_unshift($dir,'.',dirname($newtplname));
-						$tpl->setTemplateDir($dir);
-					}
-
-				}
-			}
-			
-		}
-		*/
 
 		$tpl->assign('_gsdata',$this->data);
 		$tpl->assign('_gsparams',$this->params);
@@ -174,7 +140,6 @@ class gs_base_handler extends gs_handler {
 		mlog($tplname);
 		$html=$tpl->fetch($tplname);
 		echo $html;
-		//if (isset($old_tpl_dir)) $tpl->setTemplateDir($old_tpl_dir);
 		if (function_exists('memory_get_peak_usage')) mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
 		if (DEBUG) {
 			$g=gs_logger::get_instance();
@@ -394,6 +359,7 @@ class gs_base_handler extends gs_handler {
 		if(!$this->params['name']) $this->params['name']='form_empty.html';
 
 		$tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
+		$tplname=$tpl->multilang($tplname);
 		mlog($tplname);
 		$ret=$tpl->fetch($tplname);
 		return $ret;
