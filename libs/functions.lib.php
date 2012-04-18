@@ -369,7 +369,47 @@ function tidy_html($str,$options=array()) {
 	$tidy = tidy_parse_string($str, $config,'UTF8');
 	$tidy->cleanRepair();
 	$txt=trim($tidy);
-	$txt=preg_replace('/&[a-zA-Z]+;/','',$txt);
+	//$txt=preg_replace('/&[a-zA-Z]+;/','',$txt);
+
+	$txt=str_ireplace(array('&nbsp;'),'',$txt);
+
+	return $txt;
+}
+function make_paragraph($a,$class="") {
+	if ($class) $class="class=\"$class\"";
+	return "<p $class>".PHP_EOL.trim($a).PHP_EOL."</p>";
+}
+function rec_autoformat($rec,$txtfield='text',$imgfield=null) {
+
+	$txt=$rec->$txtfield;
+	$txt=explode("\n",$txt);
+	$txt=array_map(make_paragraph,$txt);
+
+	if ($imgfield && $rec->$imgfield->count()>0) {
+		$images=$rec->$imgfield->img('prev');
+		$atxt=array();
+		$cnt=ceil(0.5*count($txt)/$rec->$imgfield->count());
+		$imgcnt=ceil($rec->$imgfield->count()/count($txt));
+		reset($txt);
+		do {
+			for ($i=0;$i<$cnt;$i++) {
+				array_push($atxt,current($txt));
+				if (next($txt)===FALSE) break;
+			}
+			for ($i=0;$i<$imgcnt;$i++) {
+				$ip=make_paragraph(current($images),$odd?"left":"right");
+				$odd=!$odd;
+				array_push($atxt,$ip);
+				if (next($images)===FALSE) break;
+			}
+		} while (current($txt)!==FALSE);
+
+		$txt=$atxt;
+
+	}
+
+
+	$txt=implode("\n",$txt);
 
 	return $txt;
 }

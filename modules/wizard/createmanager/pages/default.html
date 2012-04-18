@@ -19,11 +19,12 @@
 		{handler gspgid="/filter/" class="like" name="search" fields="{%$fields%}" urltype=get }
 		{handler gspgid="/filter/" class="calendar" name="calendar" fields="_ctime,_mtime,{%$datefields%}" urltype=get }
 		{handler gspgid="/filter/" class="sort" name="sort" fields="{%$fields%}" urltype=get }
-		{handler gspgid="/filter/" class="offset"  name="offset" urltype=get limit=20}
+		{handler gspgid="/filter/" class="limit" name="limit" urltype=session values='20,50,100,500' default_value=20}
+		{handler gspgid="/filter/" class="offset"  name="offset" urltype=get limit='limit'}
 
 
 
-		{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,sort,offset,{%$s_filters%}" _limit=20 {%$manager_link%}}
+		{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,sort,limit,offset,{%$s_filters%}" _limit=20 {%$manager_link%}}
 
 
 	<table class="tb">
@@ -52,6 +53,7 @@
 	</td> </tr>
 	<tr class="pager"><td colspan="100">
 		{handler gspgid="/filter/show" name="offset" tpl="offset_pages.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
+		{handler gspgid="/filter/show" name="limit" tpl="limit_select.html" prelabel='show by' label='records'}
 	</td></tr>
 	<tr><th>#</th>
 	{%foreach from=$fields item=f%}
@@ -89,6 +91,7 @@
 	<tr class="pager"><td colspan="100">
 	<a name="form"></a>
 		{handler gspgid="/filter/show" name="offset" tpl="offset_pages.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
+		{handler gspgid="/filter/show" name="limit" tpl="limit_select.html" prelabel='show by' label='records'}
 	</td></tr>
 	</table>
 

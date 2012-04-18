@@ -282,6 +282,10 @@ input.fString, input.fPassword {
 	width:auto;
 }
 
+.inline_form span{
+	float:left;
+}
+
 input.fInt {
 	width:100px;
 	border:1px solid #a0a0a0;
@@ -629,6 +633,10 @@ textarea.big_text {
 	border: 2px dashed #900000;
 }
 
+.pager div.navi{
+	float:left;
+}
+
 .navi ul.filter_offset_pages {
 	        margin: 0;
 		            padding: 0;
@@ -659,5 +667,10 @@ textarea.big_text {
 .navi .filter_offset_pages .current {
 	        font-weight:bold;
 		            font-size: 16px;
+}
+
+
+.pager div.filter_limit_select{
+	float:right;
 }
 

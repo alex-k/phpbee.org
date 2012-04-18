@@ -102,6 +102,13 @@ class gs_strategy_createadmin_handler extends gs_handler {
 					"gs_base_handler.redirect_if:gl:save_return:return:true",
 					//"gs_base_handler.redirect_up:level:2",
 					),
+				"/admin/inline_form/$recordsetname"=>array(
+					"gs_base_handler.redirect_if:gl:save_cancel:return:true",
+					"gs_base_handler.post:{name:inline_form.html:classname:$recordsetname}",
+					"gs_base_handler.redirect_if:gl:save_continue:return:true",
+					"gs_base_handler.redirect_if:gl:save_return:return:true",
+					//"gs_base_handler.redirect_up:level:2",
+					),
 				),
 		);
 

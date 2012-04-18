@@ -13,6 +13,9 @@ abstract class tw_images extends gs_recordset_handler {
 		}
 		return $ret;
 	}
+	function img1($params,$record=null) {
+		return trim(reset($this->img($params,$record)));
+	}
 	function img($params,$record=null) {
 		$records=$record ? array($record) : $this;
 		$ret=array();
