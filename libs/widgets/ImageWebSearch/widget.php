@@ -1,4 +1,5 @@
 <?php
+load_file(dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'MultiPowUpload'.DIRECTORY_SEPARATOR.'widget.php');
 class gs_widget_ImageWebSearch extends gs_widget_MultiPowUpload {
     function html() {
         $hash_field_name=$this->params['linkname'].'_hash';
