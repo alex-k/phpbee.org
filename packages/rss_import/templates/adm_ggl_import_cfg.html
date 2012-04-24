@@ -55,7 +55,7 @@
 	
 	{foreach from=$ggl_import_cfg item="e"}
 	<tr class="{cycle values='odd,even'}">
-		<td>{$e->get_id()} <a href="/ggl_import/execute/{$e->get_id()}">Execute</a></td>
+		<td>{$e->get_id()} <a href="/rss_import/execute/{$e->get_id()}">Execute</a></td>
 						<td class="frm_fString">{field_formatter value=$e.url type="fString"}</td>
 						<td class="frm_fString">{field_formatter value=$e.cron_line type="fString"}</td>
 						<td class="frm_fCheckbox">{field_formatter value=$e.disabled type="fCheckbox"}</td>
