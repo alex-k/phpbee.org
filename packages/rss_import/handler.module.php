@@ -27,6 +27,9 @@ class ggl_import_handler extends gs_base_handler {
 				if($title_fieldname) $r->$title_fieldname=trim($a->title);
 				if($description_fieldname) $r->$description_fieldname=trim($a->description);
 				if($link_fieldname) $r->$link_fieldname=$link;
+				if ($rec->default_values) {
+					$r->fill_values(string_to_params($rec->default_values));
+				}
 				if ($images_linkname && $a->enclosure) {
 					foreach ($a->enclosure as $enc) {
 						$url=http_host($rec->url).trim($enc['url']);
