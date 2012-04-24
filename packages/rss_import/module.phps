@@ -7,7 +7,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 	}
 	function install() {
 		foreach(array(
-					'ggl_import_cfg',				) as $r){
+					'rss_import_cfg',				) as $r){
 			$this->$r=new $r;
 			$this->$r->install();
 		}
@@ -17,38 +17,38 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 		$ret=array();
 		$item=array();
 		$item[]='<a href="/admin/rss_import/">rss_import</a>';
-					$item[]='<a href="/admin/rss_import/ggl_import_cfg">ggl_import_cfg</a>';				$ret[]=$item;
+					$item[]='<a href="/admin/rss_import/rss_import_cfg">rss_import_cfg</a>';				$ret[]=$item;
 		return $ret;
 	}
 	
 	static function get_handlers() {
 		$data=array(
 'get'=>array(
-'/admin/ggl_import/ggl_import_cfg'=>array(
-  'gs_base_handler.show:name:adm_ggl_import_cfg.html', 
+'/admin/rss_import/rss_import_cfg'=>array(
+  'gs_base_handler.show:name:adm_rss_import_cfg.html', 
 ),
-'/admin/ggl_import/ggl_import_cfg/delete'=>array(
-  'gs_base_handler.delete:{classname:ggl_import_cfg}', 
+'/admin/rss_import/rss_import_cfg/delete'=>array(
+  'gs_base_handler.delete:{classname:rss_import_cfg}', 
   'gs_base_handler.redirect', 
 ),
-'/admin/ggl_import/ggl_import_cfg/copy'=>array(
-  'gs_base_handler.copy:{classname:ggl_import_cfg}', 
+'/admin/rss_import/rss_import_cfg/copy'=>array(
+  'gs_base_handler.copy:{classname:rss_import_cfg}', 
   'gs_base_handler.redirect', 
 ),
 'execute'=>array(
-  'ggl_import_handler.execute', 
+  'rss_import_handler.execute', 
 ),
 ),
 'handler'=>array(
-'/admin/form/ggl_import_cfg'=>array(
+'/admin/form/rss_import_cfg'=>array(
   'gs_base_handler.redirect_if:gl:save_cancel:return:true', 
-  'gs_base_handler.post:{name:admin_form.html:classname:ggl_import_cfg:form_class:ggl_import_cfg_form}', 
+  'gs_base_handler.post:{name:admin_form.html:classname:rss_import_cfg:form_class:rss_import_cfg_form}', 
   'gs_base_handler.redirect_if:gl:save_continue:return:true', 
   'gs_base_handler.redirect_if:gl:save_return:return:true', 
 ),
-'/admin/inline_form/ggl_import_cfg'=>array(
+'/admin/inline_form/rss_import_cfg'=>array(
   'gs_base_handler.redirect_if:gl:save_cancel:return:true', 
-  'gs_base_handler.post:{name:inline_form.html:classname:ggl_import_cfg}', 
+  'gs_base_handler.post:{name:inline_form.html:classname:rss_import_cfg}', 
   'gs_base_handler.redirect_if:gl:save_continue:return:true', 
   'gs_base_handler.redirect_if:gl:save_return:return:true', 
 ),
@@ -88,7 +88,7 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 */
 
 
-class ggl_import_cfg extends gs_recordset_short {
+class rss_import_cfg extends gs_recordset_short {
 		public $no_urlkey=true; 	public $no_ctime=true; 	public $orderby="id"; 
 	function __construct($init_opts=false) { parent::__construct(array(
 
@@ -102,7 +102,7 @@ class ggl_import_cfg extends gs_recordset_short {
 			'disabled'=>'fCheckbox verbose_name="disabled"     required=false        ',
 
 		
-			'default_values'=>'fString verbose_name="default_values"     required=false        ',
+			'rec_default_values'=>'fString verbose_name="rec_default_values"     required=false        ',
 
 				
 			'recordset'=>'lOne2One wz_recordsets verbose_name="recordset"   widget="parent_list"  required=true    ',

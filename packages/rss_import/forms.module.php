@@ -1,6 +1,6 @@
 <?php
 
-class ggl_import_cfg_form extends g_forms_html {
+class rss_import_cfg_form extends g_forms_html {
 
 	    function __construct($hh,$params=array(),$data=array()) {
 			parent::__construct($hh,$params,$data);

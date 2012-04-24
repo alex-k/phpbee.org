@@ -1,10 +1,10 @@
 <?php
-class ggl_import_handler extends gs_base_handler {
+class rss_import_handler extends gs_base_handler {
 	function execute($ret) {
-		$rs=new ggl_import_cfg();
+		$rs=new rss_import_cfg();
 		$options=array('disabled'=>0);
 		if ($this->data['gspgid_va'][0]) $options['id']=$this->data['gspgid_va'][0];
-		//$rec=record_by_id($this->data['gspgid_va'][0],'ggl_import_cfg');
+		//$rec=record_by_id($this->data['gspgid_va'][0],'rss_import_cfg');
 		foreach ($rs->find_records($options) as $rec) {
 			md($rec->get_values(),1);
 			$rss=html_fetch($rec->url);
@@ -27,8 +27,8 @@ class ggl_import_handler extends gs_base_handler {
 				if($title_fieldname) $r->$title_fieldname=trim($a->title);
 				if($description_fieldname) $r->$description_fieldname=trim($a->description);
 				if($link_fieldname) $r->$link_fieldname=$link;
-				if ($rec->default_values) {
-					$r->fill_values(string_to_params($rec->default_values));
+				if ($rec->rec_default_values) {
+					$r->fill_values(string_to_params($rec->rec_default_values));
 				}
 				if ($images_linkname && $a->enclosure) {
 					foreach ($a->enclosure as $enc) {
