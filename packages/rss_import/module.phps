@@ -16,8 +16,8 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 	function get_menu() {
 		$ret=array();
 		$item=array();
-		$item[]='<a href="/admin/ggl_import/">ggl_import</a>';
-					$item[]='<a href="/admin/ggl_import/ggl_import_cfg">ggl_import_cfg</a>';				$ret[]=$item;
+		$item[]='<a href="/admin/rss_import/">rss_import</a>';
+					$item[]='<a href="/admin/rss_import/ggl_import_cfg">ggl_import_cfg</a>';				$ret[]=$item;
 		return $ret;
 	}
 	
@@ -43,6 +43,12 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 '/admin/form/ggl_import_cfg'=>array(
   'gs_base_handler.redirect_if:gl:save_cancel:return:true', 
   'gs_base_handler.post:{name:admin_form.html:classname:ggl_import_cfg:form_class:ggl_import_cfg_form}', 
+  'gs_base_handler.redirect_if:gl:save_continue:return:true', 
+  'gs_base_handler.redirect_if:gl:save_return:return:true', 
+),
+'/admin/inline_form/ggl_import_cfg'=>array(
+  'gs_base_handler.redirect_if:gl:save_cancel:return:true', 
+  'gs_base_handler.post:{name:inline_form.html:classname:ggl_import_cfg}', 
   'gs_base_handler.redirect_if:gl:save_continue:return:true', 
   'gs_base_handler.redirect_if:gl:save_return:return:true', 
 ),
@@ -94,6 +100,9 @@ class ggl_import_cfg extends gs_recordset_short {
 
 		
 			'disabled'=>'fCheckbox verbose_name="disabled"     required=false        ',
+
+		
+			'default_values'=>'fString verbose_name="default_values"     required=false        ',
 
 				
 			'recordset'=>'lOne2One wz_recordsets verbose_name="recordset"   widget="parent_list"  required=true    ',
