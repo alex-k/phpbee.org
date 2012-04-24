@@ -203,10 +203,16 @@ class gs_base_handler extends gs_handler {
 				if (method_exists($rec->get_recordset(),'form_variants_'.$k)) {
 					$vrecs=call_user_func(array($rec->get_recordset(),'form_variants_'.$k),$rec,$data);
 				} else {
+					$options=array();
+					foreach ($data['handler_params'] as $hp_k=>$hp_v) {
+						if(!strpos($hp_k,'__')) continue;
+						list($hp_link,$hp_field) = explode ('__',$hp_k);
+						if ($hp_link==$k) $options[$hp_field]=$hp_v;
+					}
 					$rsl=$rec->init_linked_recordset($k);
 					$rsname=$rsl->structure['recordsets']['childs']['recordset'];
 					$rs=new $rsname();
-					$vrecs=$rs->find_records(array());
+					$vrecs=$rs->find_records($options);
 				}
 				$variants=array();
 				foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
