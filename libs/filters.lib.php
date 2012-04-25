@@ -78,6 +78,12 @@ class gs_filter {
 		return $options;
 	}
 	function getHtmlBlock($ps) {
+		foreach ($this->va as $fname=>$fvalue) {
+			if (strpos('_page',$fname)) continue;
+			$filter_name=str_replace('_page','',$fname);
+			$filter=gs_filters_handler::get($filter_name);
+			if (is_a($filter,'gs_filter_offset'))  unset($this->va[$fname]);
+		}
 		return $this->name;
 	}
 }
@@ -109,6 +115,7 @@ class gs_filter_like extends gs_filter {
 		$this->case=isset($this->params['case']) ? $this->params['case'] : 'LIKE';
 	}
 	function getHtmlBlock($ps) {
+		parent::getHtmlBlock($ps);
 		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
 		return $this->getHtmlBlockNonExlusive($ps);
 	}
@@ -163,6 +170,7 @@ class gs_filter_var extends gs_filter {
 		$this->tpl=gs_tpl::get_instance();
 	}
 	function getHtmlBlock($ps) {
+		parent::getHtmlBlock($ps);
 		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
 		return $this->getHtmlBlockNonExlusive($ps);
 	}
@@ -242,6 +250,7 @@ class gs_filter_sort extends gs_filter {
 		$this->fields=array_map(trim,array_filter(explode(',',$this->params['fields'])));
 	}
 	function getHtmlBlock($ps) {
+		parent::getHtmlBlock($ps);
 		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
 		return $this->getHtmlBlockNonExlusive($ps);
 	}
@@ -396,6 +405,7 @@ class gs_filter_select_by_links extends gs_filter {
 		return $options;
 	}
 	function getHtmlBlock($ps) {
+		parent::getHtmlBlock($ps);
 		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
 		return $this->getHtmlBlockNonExlusive($ps);
 	}
@@ -530,6 +540,7 @@ class gs_filter_select_records extends gs_filter {
 		return $options;
 	}
 	function getHtmlBlock($ps) {
+		parent::getHtmlBlock($ps);
 		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
 		return $this->getHtmlBlockNonExlusive($ps);
 	}
