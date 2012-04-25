@@ -208,6 +208,8 @@ class gs_parser {
 			case 'not_false': 
 			case 'notfalse': 
 				return $result!==FALSE;
+			case 'array':
+				return is_array($result);
 			case 'gs_record':
 				return is_object($result) && is_a($result,'gs_record');
 			case 'gs_recordset':

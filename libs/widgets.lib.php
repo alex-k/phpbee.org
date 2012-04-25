@@ -205,6 +205,36 @@ class gs_widget_image extends gs_widget_file {
 	}
 }
 
+class gs_widget_dateMonthYear extends gs_widget {
+	function html() {
+		$this->data[$this->fieldname.'[Month]']= $this->data[$this->fieldname]['Month'];
+		$this->data[$this->fieldname.'[Year]']= $this->data[$this->fieldname]['Year'];
+		$this->params['options']=array(''=>'');
+		foreach (range(1,12) as $i)  $this->params['options'][$i]=sprintf("%02d",$i);
+		$w_sel=new gs_widget_select($this->fieldname.'[Month]',$this->data,$this->params,$this->form);
+		$out=$w_sel->html();
+		$min_year=date('Y',strtotime($this->params['min_year']));
+		$max_year=date('Y',strtotime($this->params['max_year']));
+		$this->params['options']=array(''=>'');
+		foreach (range($min_year,$max_year) as $i)  $this->params['options'][$i]=$i;
+		$w_sel=new gs_widget_select($this->fieldname.'[Year]',$this->data,$this->params,$this->form);
+		$out.=$w_sel->html();
+		return $out;
+	}
+
+	function clean() {
+		parent::clean();
+		return array(
+				$this->fieldname.'_Month'=>$this->value['Month'],
+				$this->fieldname.'_Year'=>$this->value['Year'],
+			   );
+	}
+	function validate() {
+		return (!empty($this->value['Month']) && !empty($this->value['Year']));
+	}
+
+}
+
 class gs_widget_datetime extends gs_widget {
 	function html() {
 		return sprintf('<input class="%s fDateTime" type="text" name="%s" value="%s" %s>',

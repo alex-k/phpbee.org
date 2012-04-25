@@ -72,45 +72,65 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
  
 
 class gs_validate_isCCNum  extends gs_validate {
-function validate($field,$value,$data=array(),$params=array(),$record=null) {
-	if(strlen($value) == 0)
-		return$params['empty']&&TRUE;
+	function validate($field,$value,$data=array(),$params=array(),$record=null) {
+		if(strlen($value) == 0)
+			return$params['empty']&&TRUE;
 
-	if (substr($value,0,4)=='2222' || substr($value,0,4)=='3333')
-		return true;
-	
-	global $_CONF;
-	if (!empty($value) && ($value==$_CONF[auth_testcard_approve] || $value==$_CONF[auth_testcard_decline]))
-		return true;
+		if (substr($value,0,4)=='2222' || substr($value,0,4)=='3333')
+			return true;
+		
+		// strip everything but digits
+		$value = preg_replace('!\D+!', '', $value);
+		return $this->validate_cc_number($value);
 
-	// strip everything but digits
-	$value = preg_replace('!\D+!', '', $value);
-
-	if (empty($value))
-		return false;
-
-	$_c_digits = preg_split('//', $value, -1, PREG_SPLIT_NO_EMPTY);
-
-	$_max_digit   = count($_c_digits)-1;
-	$_even_odd    = $_max_digit % 2;
-
-	$_sum = 0;
-	for ($_count=0; $_count <= $_max_digit; $_count++) {
-		$_digit = $_c_digits[$_count];
-		if ($_even_odd) {
-			if ($_digit > 9) {
-				$_digit = substr($_digit, 1, 1) + 1;
-			}
-		}
-		$_even_odd = 1 - $_even_odd;
-		$_sum += $_digit;
 	}
-	$_sum = $_sum % 10;
-	if($_sum)
-		return false;
-	return true;
 
-}
+	function validate_cc_number($cc_number) {
+	   /* Validate; return value is card type if valid. */
+	   $false = false;
+	   $card_type = "";
+	   $card_regexes = array(
+	      "/^4\d{12}(\d\d\d){0,1}$/" => "visa",
+	      "/^5[12345]\d{14}$/"       => "mastercard",
+	      "/^3[47]\d{13}$/"          => "amex",
+	      "/^6011\d{12}$/"           => "discover",
+	      "/^30[012345]\d{11}$/"     => "diners",
+	      "/^3[68]\d{12}$/"          => "diners",
+	   );
+	 
+	   foreach ($card_regexes as $regex => $type) {
+	       if (preg_match($regex, $cc_number)) {
+		   $card_type = $type;
+		   break;
+	       }
+	   }
+	 
+	   if (!$card_type) {
+	       return $false;
+	   }
+	 
+	   /*  mod 10 checksum algorithm  */
+	   $revcode = strrev($cc_number);
+	   $checksum = 0; 
+	 
+	   for ($i = 0; $i < strlen($revcode); $i++) {
+	       $current_num = intval($revcode[$i]);  
+	       if($i & 1) {  /* Odd  position */
+		  $current_num *= 2;
+	       }
+	       /* Split digits and add. */
+		   $checksum += $current_num % 10; if
+	       ($current_num >  9) {
+		   $checksum += 1;
+	       }
+	   }
+	 
+	   if ($checksum % 10 == 0) {
+	       return $card_type;
+	   } else {
+	       return $false;
+	   }
+	}
 }
 
 
@@ -434,6 +454,8 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
                 trigger_error("SmartyValidate: [isLength] parameter 'max' is missing.");            
                 return false;
         }
+
+	if (isset($params['required']) && $params['required']===false && empty($value)) return true;
 
         $_length = strlen($value);
                 

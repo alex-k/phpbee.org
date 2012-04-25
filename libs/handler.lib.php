@@ -172,6 +172,10 @@ class gs_base_handler extends gs_handler {
 		} else {
 			$form_class_name=isset($params['form_class']) ? $params['form_class'] : 'g_forms_html';
 			$f=new $form_class_name(array(),$params,$data);
+			if(isset($data['handler_params']['_default'])) {
+				$default_values=string_to_params($data['handler_params']['_default']);
+				$f->set_values($default_values);
+			}
 		}
 		$this->showform($f); //needs to have changes from form's template!
 		return $f;
@@ -848,7 +852,6 @@ class gs_base_handler extends gs_handler {
 	function post_login($data) {
 		$rec=$this->post_find_record($data);
 		if (!is_object($rec) || !is_a($rec,'gs_record')) return $rec;
-
 		gs_session::save($rec->get_id(),'login_'.$this->params['classname']);
 		$h=new handler_registry;
 		$h->after_login($rec);

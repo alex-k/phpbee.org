@@ -296,7 +296,9 @@ class gs_session {
 		$data[$name]=$obj;
 		$id=gs_cacher::save($data,'gs_session',isset($_COOKIE['gs_session']) ? $_COOKIE['gs_session'] : NULL);
 		$t=strtotime("now +".cfg('session_lifetime'));
-		setcookie('gs_session',$id,$t,cfg('www_dir'));
+		setcookie('gs_session',$id,$t,cfg('www_dir'),'www.'.cfg('host'));
+		setcookie('gs_session',$id,$t,cfg('www_dir'),'.'.cfg('host'));
+		setcookie('gs_session',$id,$t,cfg('www_dir'),cfg('host'));
 		if (!isset($_COOKIE['gs_session']) || $_COOKIE['gs_session']!=$id) $_COOKIE['gs_session']=$id;
 		return $id;
 	}
