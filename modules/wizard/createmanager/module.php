@@ -80,13 +80,15 @@ class gs_strategy_createmanager_handler extends gs_handler {
 
 		$tplname=isset($d['template_name']) ? $d['template_name'] :'default.html';
 
+		$prefix=pathinfo($tplname,PATHINFO_FILENAME);
+		if($prefix=='default') $prefix='manager';
+		$tpl->assign('prefix',$prefix);
+
+		$suffix=pathinfo($tplname,PATHINFO_FILENAME);
+		if($suffix=='default') $suffix='manage';
+
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$tplname);
-
-
-
-
-
-		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'manage_'.$rs->name.'.html';
+		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$suffix.'_'.$rs->name.'.html';
 		file_put_contents_perm($filename,$out);
 
 		$rs->showadmin=1;
@@ -96,13 +98,14 @@ class gs_strategy_createmanager_handler extends gs_handler {
 
 		$formtplname='admin_form.html';
 		if (isset($d['form_template_name'])) $formtplname=$d['form_template_name'];
+	
 
 		$template=array(
 			"get"=>array(
-				"manager/$recordsetname"=>array("gs_base_handler.show:name:manage_$recordsetname.html"),
+				"$prefix/$recordsetname"=>array("gs_base_handler.show:name:".$suffix."_$recordsetname.html"),
 				),
 			"handler"=>array(
-				"manager/form/$recordsetname"=>array(
+				"$prefix/form/$recordsetname"=>array(
 					"gs_base_handler.redirect_if:gl:save_cancel:return:true",
 					"gs_base_handler.post:{name:$formtplname:classname:$recordsetname:form_class:g_forms_table}",
 					"gs_base_handler.redirect_if:gl:save_continue:return:true",
@@ -111,14 +114,58 @@ class gs_strategy_createmanager_handler extends gs_handler {
 					),
 				),
 		);
-		if ($tplname!='profile.html') {
+		if ($prefix=='registration') {
+			foreach(array("completed.html","email_registration.html","email_registration_title.html") as $page) {
+				$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'registration_pages'.DIRECTORY_SEPARATOR.$page);
+				$bsname=pathinfo($page,PATHINFO_FILENAME);
+				$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$bsname.'_'.$recordsetname.'.html';
+				file_put_contents_perm($filename,$out);
+			}
+
+
+			$template=array(
+				"get"=>array(
+					"$prefix/$recordsetname"=>array(
+						"gs_base_handler.check_login:return:gs_record^show:classname:$recordsetname",
+						"gs_base_handler.redirect"=>"profile",
+						"end"=>"end",
+						"show"=>"gs_base_handler.show:name:".$suffix."_$recordsetname.html",
+						),
+					 "resend_mail/$recordsetname"=>array(
+						 "gs_base_handler.rec_by_id:classname:$recordsetname",
+						 "gs_base_handler.email4record:email:email:template:email_registration_"."$recordsetname.html:template_title:email_registration_title_"."$recordsetname.html",
+						 "gs_base_handler.redirect_rs_hkey:{href:/$modulename/completed/$recordsetname/%d/sent}",
+						),
+					 "verify_mail/$recordsetname"=>array( 
+						 "gs_base_handler.test_id:{rs:$recordsetname:field:id:return:gs_record^er}",
+						 "gs_base_handler.set_record:{field:verified:value:1}",
+						 "gs_base_handler.post_login:classname:$recordsetname:name:login_form_$recordsetname.html:form_class:g_forms_html:fields:login,password",
+						 "gs_base_handler.redirect:href:/$modulename",
+						 "end",
+						 "er"=>"gs_base_handler.show:{name:code_failed.html}",
+					 	),
+					"completed/$recordsetname"=>array(
+						"gs_base_handler.show:name:completed_$recordsetname.html",
+						),
+					),
+				"handler"=>array(
+					"$prefix/form/$recordsetname"=>array(
+						"gs_base_handler.post:{name:$formtplname:classname:$recordsetname:form_class:g_forms_table}",
+						"gs_base_handler.email4record:{email:email:template:email_registration_"."$recordsetname.html:template_title:email_registration_title_"."$recordsetname.html}",
+						"gs_base_handler.redirect_rs_hkey:{href:/$modulename/completed/$recordsetname/%d}",
+						//"gs_base_handler.redirect:href:/$modulename/completed/$recordsetname",
+						),
+					),
+			);
+		}
+		if ($prefix=='manager') {
 			$arr=array(	
 				'get'=>array(
-					"manager/$recordsetname/delete"=>array(
+					"$prefix/$recordsetname/delete"=>array(
 							"gs_base_handler.delete:{classname:$recordsetname}",
 							"gs_base_handler.redirect",
 							),
-					"manager/$recordsetname/copy"=>array(
+					"$prefix/$recordsetname/copy"=>array(
 							"gs_base_handler.copy:{classname:$recordsetname}",
 							"gs_base_handler.redirect",
 							),

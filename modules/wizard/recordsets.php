@@ -1,6 +1,7 @@
 <?php
 
 class wz_modules extends gs_recordset_short {
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
@@ -14,6 +15,7 @@ class wz_modules extends gs_recordset_short {
 
 class wz_recordsets extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
@@ -46,6 +48,7 @@ class wz_recordsets extends gs_recordset_short {
 
 class wz_recordset_resizes extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
@@ -64,6 +67,7 @@ class wz_recordset_resizes extends gs_recordset_short {
 
 class wz_recordset_fields extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
@@ -118,6 +122,7 @@ class wz_recordset_fields extends gs_recordset_short {
 }
 class wz_recordset_links extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
@@ -190,6 +195,7 @@ class wz_recordset_links extends gs_recordset_short {
 }
 class wz_recordset_triggers extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'on_insert'=>"fSelect widget='radio' on_insert options=',before,after' required=false",
@@ -203,6 +209,7 @@ class wz_recordset_triggers extends gs_recordset_short {
 }
 class wz_recordset_submodules extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=>"fSelect name widget=select",
@@ -217,6 +224,7 @@ class wz_recordset_submodules extends gs_recordset_short {
 }
 class wz_urls extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'gspgid_value'=> "fString gspgid required=false unique=true",
@@ -237,6 +245,7 @@ class wz_urls extends gs_recordset_short {
 }
 class wz_handlers extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'cnt'=> "fInt cnt",
@@ -251,6 +260,7 @@ class wz_handlers extends gs_recordset_short {
 }
 class wz_forms extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'classname'=> "fString classname required=true unique=true",
@@ -268,6 +278,7 @@ class wz_forms extends gs_recordset_short {
 }
 class wz_form_fields extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=>'fString name min_length=3 max_length=55',
@@ -290,6 +301,7 @@ class wz_form_fields extends gs_recordset_short {
 }
 class wz_form_fields_validators extends gs_recordset_short {
 
+	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'class'=>'fSelect class',

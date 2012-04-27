@@ -30,9 +30,12 @@
 </head>
 <body>
 
-
+{block name="login"}
 {handler gspgid="/{%$module%}/login/{%$rs%}" assign=manager}
+{/block}
+
 {$manager=gs_var_storage::load('manager')}
+
 
 {if $manager}
 	{%controller _class=wz_recordsets _assign=rsets id=array_keys($recordset)%}
@@ -48,9 +51,9 @@
 		{%foreach $rsets as $r%}
 		<li>
 			{%if $r.name==$rs%}
-			<a href="/{%$module%}/manager/{%$r.name%}">{'Profile'|gsdict}</a>
+			<a href="/{%$module%}/{%$prefix%}/{%$r.name%}">{'Profile'|gsdict}</a>
 			{%else%}
-			<a href="/{%$module%}/manager/{%$r.name%}">{%$r.title|default:$r.name%}</a>
+			<a href="/{%$module%}/{%$prefix%}/{%$r.name%}">{%$r.title|default:$r.name%}</a>
 			{%/if%}
 		</li>
 		{%/foreach%}
@@ -66,8 +69,8 @@
         <tr>
 		<td>
         <div>
-        <a href="/{%$module%}/manager/{%$r.name%}"><img src="/i/admin/icon_{%$r.name%}.png" alt=""></a>
-        <a href="/{%$module%}/manager/{%$r.name%}">{%$r.title|default:$r.name%}</a>
+        <a href="/{%$module%}/{%$prefix%}/{%$r.name%}"><img src="/i/admin/icon_{%$r.name%}.png" alt=""></a>
+        <a href="/{%$module%}/{%$prefix%}/{%$r.name%}">{%$r.title|default:$r.name%}</a>
         </div>
         </td>
         </tr>

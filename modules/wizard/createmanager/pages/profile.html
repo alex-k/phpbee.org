@@ -30,14 +30,14 @@
 			{%foreach from=$extlinks item=f%}
 			<dt>{%$f.verbose_name%}</dt>
 			<dd>
-			<a href="/{%$module%}/manager/{%$f.classname%}?{%$f->linkname%}={$e->get_id()}">{%$f.verbose_name%} ({$e._{%$f.name%}_count})</a>
+			<a href="/{%$module%}/{%$prefix%}/{%$f.classname%}?{%$f->linkname%}={$e->get_id()}">{%$f.verbose_name%} ({$e._{%$f.name%}_count})</a>
 			</dd>
 			{%/foreach%}
 
 		</dl>	
 	<div>
 	{if $_gsdata.gspgid_va.0=='modify'}
-		{handler gspgid="/{%$module%}/manager/form/{%$rs.name%}/edit/`{$manager->get_id()}`" {%$manager_link%}}
+		{handler gspgid="/{%$module%}/{%$prefix%}/form/{%$rs.name%}/edit/`{$manager->get_id()}`" {%$manager_link%}}
 	{else}
 		<a class="button" href="{gl rec_create=0}#form">{'update'|gsdict}</a>
 	{/if}

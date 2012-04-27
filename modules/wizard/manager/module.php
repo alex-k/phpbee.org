@@ -51,6 +51,7 @@ class handler_wizard_manager extends gs_handler {
 		$fd=gs_base_handler::explode_data($f->clean());
 		$d=array_merge($d,$fd);
 
+
 		$rs_login=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
 		$module=record_by_id($data['handler_params']['Module_id'],'wz_modules');
 
@@ -75,7 +76,7 @@ class handler_wizard_manager extends gs_handler {
 			$rd['module']=$this->data['handler_params']['Module_id'];
 			$rd['template_name']=$rd['page_template_name'];
 			$rd['form_template_name']=$rd['formfields']['template_name'];
-			$this->data['handler_params']['Recordset_id']=$k;
+			$this->data['handler_params']['Recordset_id']=intval($k);
 			$h=new gs_strategy_createmanager_handler($this->data,$this->params);
 			$h->createmanager($ret,$rd);
 			md($rd,1);
@@ -175,6 +176,12 @@ class form_wizard_manager_login extends g_forms_table{
 			    'options'=>class_members('g_forms'),
 			    'validate'=>'notEmpty',
 			),
+		    'make_registration' => Array
+			(
+			    'type' => 'radio',
+			    'options'=> array('yes'=>'Yes','no'=>'No'),
+
+			),
 		    'recordsets' => Array
 			(
 			    'type' => 'multiselect_chosen',
@@ -189,86 +196,99 @@ class form_wizard_manager_forms extends g_forms_table{
 	function __construct($hh,$params=array(),$data=array()) {
 		$login_rs=$rs=record_by_id($data['handler_params']['Recordset_id'],'wz_recordsets');
 
-		$module=$rs->Module->first();
-		$dirname=dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'createmanager'.DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
-		$page_templates=array_map(basename,glob($dirname."*"));
+		if ($data['make_registration']=='yes') {
+			$key=$login_rs->get_id().'_registration';
+			self::recordset_form_fields($hh,$key,$login_rs);
+			$hh["recordset:$key:page_template_name"]['default']='registration.html';
+			$hh["recordset:$key:formfields:template_name"]['default']='form_'.$login_rs->name.'_registration.html';
+			unset($hh["recordset:$key:fields"]);
+			unset($hh["recordset:$key:links"]);
+			unset($hh["recordset:$key:extlinks"]);
+			unset($hh["recordset:$key:filters"]);
+		}
 
 
 		foreach ($data['recordsets'] as $rs_id) {
-			$rs=record_by_id($rs_id,'wz_recordsets');
-			$all_links=$rs->Links->recordset_as_string_array();
-			$links=$rs->Links->find(array('type'=>array('lMany2Many','lOne2One')))->recordset_as_string_array();
-			$extlinks=$rs->Links->find(array('type'=>'lMany2One'))->recordset_as_string_array();
-			if(!is_array($links)) $links=array();
-			if(!is_array($extlinks)) $extlinks=array();
-			if(!is_array($all_links)) $all_links=array();
-
-
-				$hh['recordset:'.$rs_id.':recordset'] = Array
-				(
-					'type' => 'checkbox',
-					'verbose_name'=>$rs->name,	
-					'validate'=>'dummyValid',
-					'default'=>$rs->name,
-				);
-				$hh['recordset:'.$rs_id.':page_template_name'] = Array
-				(
-					'type' => 'select',
-					'options' => array_combine($page_templates,$page_templates),
-					'default' => $rs->get_id()==$login_rs->get_id() ? 'profile.html' : '',
-				);
-				$hh['recordset:'.$rs_id.':fields'] = Array
-				(
-					'type' => 'checkboxes',
-					'options'=>$rs->Fields->recordset_as_string_array(),
-					'validate'=>'notEmpty',
-					'default'=>array_keys($rs->Fields->recordset_as_string_array()),
-				);
-				$hh['recordset:'.$rs_id.':links'] = Array
-				(
-					'verbose_name'=>'show values',	
-					'type' => 'checkboxes',
-					'options'=>$all_links,
-					'validate'=>'notEmpty',
-					'default'=>array_keys($links),
-				);
-				$hh['recordset:'.$rs_id.':extlinks'] = Array
-				(
-					'verbose_name'=>'show links',	
-					'type' => 'checkboxes',
-					'options'=>$all_links,
-					'validate'=>'notEmpty',
-					'default'=>array_keys($extlinks),
-				);
-				$hh['recordset:'.$rs_id.':filters'] = Array
-				(
-					'type' => 'checkboxes',
-					'options'=>$all_links,
-					'validate'=>'notEmpty',
-					'default'=>array_keys($links),
-				);
-
-				$fields_data=$data;
-				$fields_data['handler_params']['Recordset_id']=$rs->get_id();
-
-				$fields_form=new form_createform_tpl($hh,$params,$fields_data);
-
-				$rs2=record_by_id($rs_id,'wz_recordsets');
-
-				foreach ($fields_form->htmlforms as $k=>$v) {
-					if ($v['name']=='enabled') {
-						$v['default']=0;
-						$fname=end(explode(':',$fields_form->htmlforms[str_replace('enabled','name',$k)]['default']));
-						$fname=preg_replace('/_id$/','',$fname);
-						if (in_array($fname,$rs->Fields->recordset_as_string_array())) $v['default']=1;
-						$links_121=$rs2->Links->find(array('type'=>array('lOne2One'),'required'=>1,'name'=>$fname));
-						if ($links_121->count()) $v['default']=1;
-					}
-					$hh['recordset:'.$rs_id.':formfields:'.$k]=$v;
-				}
-
+			self::recordset_form_fields($hh,$rs_id,$login_rs);
 		}
 		return parent::__construct($hh,$params,$data);
 	}
+
+	static function recordset_form_fields(&$hh,$rs_id,$login_rs=NULL) {
+		$dirname=dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'createmanager'.DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
+		$page_templates=array_map(basename,glob($dirname."*"));
+		$rs=record_by_id(intval($rs_id),'wz_recordsets');
+		$all_links=$rs->Links->recordset_as_string_array();
+		$links=$rs->Links->find(array('type'=>array('lMany2Many','lOne2One')))->recordset_as_string_array();
+		$extlinks=$rs->Links->find(array('type'=>'lMany2One'))->recordset_as_string_array();
+		if(!is_array($links)) $links=array();
+		if(!is_array($extlinks)) $extlinks=array();
+		if(!is_array($all_links)) $all_links=array();
+
+			$hh['recordset:'.$rs_id.':recordset'] = Array
+			(
+				'type' => 'checkbox',
+				'verbose_name'=>$rs->name,	
+				'validate'=>'dummyValid',
+				'default'=>$rs->name,
+			);
+			$hh['recordset:'.$rs_id.':page_template_name'] = Array
+			(
+				'type' => 'select',
+				'options' => array_combine($page_templates,$page_templates),
+				'default' => ($login_rs && $rs->get_id()==$login_rs->get_id()) ? 'profile.html' : '',
+			);
+			$hh['recordset:'.$rs_id.':fields'] = Array
+			(
+				'type' => 'checkboxes',
+				'options'=>$rs->Fields->recordset_as_string_array(),
+				'validate'=>'notEmpty',
+				'default'=>array_keys($rs->Fields->recordset_as_string_array()),
+			);
+			$hh['recordset:'.$rs_id.':links'] = Array
+			(
+				'verbose_name'=>'show values',	
+				'type' => 'checkboxes',
+				'options'=>$all_links,
+				'validate'=>'notEmpty',
+				'default'=>array_keys($links),
+			);
+			$hh['recordset:'.$rs_id.':extlinks'] = Array
+			(
+				'verbose_name'=>'show links',	
+				'type' => 'checkboxes',
+				'options'=>$all_links,
+				'validate'=>'notEmpty',
+				'default'=>array_keys($extlinks),
+			);
+			$hh['recordset:'.$rs_id.':filters'] = Array
+			(
+				'type' => 'checkboxes',
+				'options'=>$all_links,
+				'validate'=>'notEmpty',
+				'default'=>array_keys($links),
+			);
+
+			$fields_data=$data;
+			$fields_data['handler_params']['Recordset_id']=$rs->get_id();
+
+			$fields_form=new form_createform_tpl($hh,$params,$fields_data);
+
+			$rs2=record_by_id(intval($rs_id),'wz_recordsets');
+
+			foreach ($fields_form->htmlforms as $k=>$v) {
+				if ($v['name']=='enabled') {
+					$v['default']=0;
+					$fname=end(explode(':',$fields_form->htmlforms[str_replace('enabled','name',$k)]['default']));
+					$fname=preg_replace('/_id$/','',$fname);
+					if (in_array($fname,$rs->Fields->recordset_as_string_array())) $v['default']=1;
+					$links_121=$rs2->Links->find(array('type'=>array('lOne2One'),'required'=>1,'name'=>$fname));
+					if ($links_121->count()) $v['default']=1;
+				}
+				$hh['recordset:'.$rs_id.':formfields:'.$k]=$v;
+			}
+
+	}
+	
 }
 
