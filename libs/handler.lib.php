@@ -611,7 +611,7 @@ class gs_base_handler extends gs_handler {
 	**/
 	function redirect_rs_hkey($data) {
 		$rec=$this->hpar($data);
-		return html_redirect(sprintf($this->params['href'],$rec->{$this->params['field']}));
+		return html_redirect(sprintf($this->params['href'],$this->params['field'] ?  $rec->{$this->params['field']} : $rec->get_id()));
 	}
 	
 	function redirect_up() {
@@ -812,7 +812,8 @@ class gs_base_handler extends gs_handler {
 		
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('rec',$rec);
-		$subj=$tpl->fetch(str_replace(".html","_title.html",$this->params['template']));
+		$tpltitle=$this->params['template_title'] ? $this->params['template_title'] : str_replace(".html","_title.html",$this->params['template']);
+		$subj=$tpl->fetch($tpltitle);
 		$txt=$tpl->fetch($this->params['template']);
 		bee_mail($to,$subj,$txt,cfg('support_email_address'));
 		return $rec;

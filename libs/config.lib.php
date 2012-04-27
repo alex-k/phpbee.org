@@ -103,7 +103,12 @@ class gs_config {
 		$this->s_handler_cnt=0;
 
 
-		foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {
+		//foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {
+		$cfgfiles=array(
+		                dirname($this->document_root).DIRECTORY_SEPARATOR.'config.php',
+				$this->lib_modules_dir.'config.php',
+				);
+		foreach($cfgfiles as $cfg_filename) {
 			if (file_exists($cfg_filename)) {
 					
 				require_once($cfg_filename);
