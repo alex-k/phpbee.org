@@ -1,59 +1,15 @@
 <?php
-/*
-login/form/author
-oauth2_handler.login:classname:author:login_field:email:full_name_field:fullName:return:not_false		
-gs_base_handler.post_login:return:gs_record:classname:author:name:login_form_author.html:form_class:g_forms_html:fields:email,password,active		
-gs_base_handler.redirect		
-*/
-/*
-class module_oauth2 extends gs_base_module implements gs_module {
-	function __construct() {
-	}
-	function install() {
-		foreach(array('oauth2_config') as $r){
-			$this->$r=new $r;
-			$this->$r->install();
-		}
-	}
-    function get_menu() {
-        $ret = array();
-        $item = array();
-        $item[] = '<a href="/admin/oauth2/">oauth2</a>';
-        $item[] = '<a href="/admin/oauth2/config">oauth2 config</a>';
-        $ret[] = $item;
-        return $ret;
-    }
-
-static function get_handlers() {
-		$data=array(
-		'get_post'=>array(
-			''=>'oauth2_handler.startlogin',
-		),
-		);
-	return self::add_subdir($data,dirname(__FILE__));
-	}
-}
-class oauth2_config extends gs_recordset_short {
-	public $no_urlkey=1;
-	function __construct($init_opts=false) { parent::__construct(array(
-		'class'=> "fSelect options='oauth2_vk,oauth2_google,oauth2_facebook,oauth2_twitter'",
-		'APP_ID'=> "fString APP_ID required=false",
-		'APP_SECRET'=> "fString APP_SECRET required=false",
-		'SCOPE'=> "fString SCOPE required=false",
-		'CONSUMER_KEY'=>"fString CONSUMER_KEY required=false",
-		),$init_opts);
-	}
-}
-*/
 class oauth2_handler extends gs_handler {
 	function startlogin($ret) {
 		$classname=$this->data['gspgid_va'][0];
 		if (!class_exists($classname)) throw new gs_exception('oauth2_handler:startlogin no class found '.$classname);
+		$config=record_by_field('class',$classname,'oauth2_config');
+		if (!$config) throw new gs_exception('oauth2_handler:startlogin can not find config for '.$classname);
 		$d=parse_url($this->data['url']);
 		$this->data['data']['oa2c']=$classname;
 		$d['query']=http_build_query($this->data['data']);
 		$callback=http_build_url($d);
-		$oauth=new $classname;
+		$oauth=new $classname($config);
 		$url=$oauth->authorize($callback);
 		header('Location: '.$url);
 	}
@@ -64,7 +20,9 @@ class oauth2_handler extends gs_handler {
 		if (!isset($data['oa2c'])) return true;
 		$classname=$data['oa2c'];
 		if (!class_exists($classname)) throw new gs_exception('oauth2_handler:login no class found '.$classname);
-		$oauth=new $classname;
+		$config=record_by_field('class',$classname,'oauth2_config');
+		if (!$config) throw new gs_exception('oauth2_handler:startlogin can not find config for '.$classname);
+		$oauth=new $classname($config);
 		$token=$oauth->token($data);
 		if(!$token) return true;
 		$profile=$oauth->profile($token);
@@ -98,17 +56,15 @@ class oauth2_twitter{
 	/*
 	http://habrahabr.ru/post/114955/
 	*/
-	const APP_ID='2152827';
-	const APP_SECRET='qFzjfqj57t5s3VklenConmamcMCmM8XEbQVuyRh7f3E';
-	const CONSUMER_KEY='j01djlRk7RQwtoDthZ8ejw';
-	function __construct() {
+	function __construct($config) {
+		$this->config=$config;
 		load_file(dirname(__FILE__) . DIRECTORY_SEPARATOR. 'lib'.DIRECTORY_SEPARATOR.'twitter'.DIRECTORY_SEPARATOR.'twitteroauth'.DIRECTORY_SEPARATOR.'twitteroauth.php');
 		load_file(dirname(__FILE__) . DIRECTORY_SEPARATOR. 'lib'.DIRECTORY_SEPARATOR.'twitter'.DIRECTORY_SEPARATOR.'config.php');
 
 	}
 	function authorize($callback) {
 
-		$connection = new TwitterOAuth(self::CONSUMER_KEY, self::APP_SECRET);
+		$connection = new TwitterOAuth($this->config->CONSUMER_KEY, $this->config->APP_SECRET);
 		$request_token = $connection->getRequestToken($callback);
 		gs_session::save($request_token,'oauth2_twitter_token');
 		$url=$connection->getAuthorizeURL($request_token);
@@ -116,7 +72,7 @@ class oauth2_twitter{
 	}
 	function token($data) {
 		$request_token=gs_session::load('oauth2_twitter_token');
-		$connection = new TwitterOAuth(self::CONSUMER_KEY, self::APP_SECRET,$request_token['oauth_token'],$request_token['oauth_token_secret']);
+		$connection = new TwitterOAuth($this->config->CONSUMER_KEY, $this->config->APP_SECRET,$request_token['oauth_token'],$request_token['oauth_token_secret']);
 		$access_token = $connection->getAccessToken($data['oauth_verifier']);
 		return $connection;
 	}
@@ -131,16 +87,16 @@ class oauth2_twitter{
 }
 
 class oauth2_vk {
-	const APP_ID='2934735';
-	const APP_SECRET='lnTik6NHIL87zbR78Bfr';
-	const SCOPE='notify';
+	function __construct($config) {
+		$this->config=$config;
+	}
 	function authorize($callback) {
 		$callback=urlencode($callback);
-		return "http://oauth.vk.com/authorize?client_id=".self::APP_ID."&scope=".self::SCOPE."&redirect_uri=$callback&response_type=code";
+		return "http://oauth.vk.com/authorize?client_id=".$this->config->APP_ID."&scope=".$this->config->SCOPE."&redirect_uri=$callback&response_type=code";
 	}
 	function token($data) {
 		$code=$data['code'];
-		$url="https://oauth.vk.com/access_token?client_id=".self::APP_ID."&client_secret=".self::APP_SECRET."&code=$code";
+		$url="https://oauth.vk.com/access_token?client_id=".$this->config->APP_ID."&client_secret=".$this->config->APP_SECRET."&code=$code";
 		$d=json_decode(html_fetch($url));
 		return $d;
 	}
@@ -162,14 +118,14 @@ class oauth2_google{
 	https://developers.google.com/accounts/docs/OAuth2Login?hl=ru
 	https://developers.google.com/accounts/docs/OAuth2WebServer
 	*/
-	const APP_ID='222759715716.apps.googleusercontent.com';
-	const APP_SECRET='kWmMQh1WOgq97I-GJew0mIBb';
-	const SCOPE='https://www.googleapis.com/auth/userinfo.profile';
+	function __construct($config) {
+		$this->config=$config;
+	}
 	function authorize($callback) {
 		$r=array();
 		$r['response_type']='code';
-		$r['client_id']=self::APP_ID;
-		$r['scope']=self::SCOPE;
+		$r['client_id']=$this->config->APP_ID;
+		$r['scope']=$this->config->SCOPE;
 		$r['redirect_uri']=$callback;
 		$r['state']=$callback;
 		return "https://accounts.google.com/o/oauth2/auth?".http_build_query($r);
@@ -177,8 +133,8 @@ class oauth2_google{
 	function token($data) {
 		$r=array();
 		$r['code']=$data['code'];
-		$r['client_id']=self::APP_ID;
-		$r['client_secret']=self::APP_SECRET;
+		$r['client_id']=$this->config->APP_ID;
+		$r['client_secret']=$this->config->APP_SECRET;
 		$r['grant_type']='authorization_code';
 		$r['redirect_uri']=$data['state'];
 
@@ -201,12 +157,12 @@ class oauth2_facebook{
 	/*
 	http://developers.facebook.com/docs/authentication/server-side/
 	*/
-	const APP_ID='434528456575944';
-	const APP_SECRET='8cb72fa583b8dbe36029c6a29ff94268';
-	const SCOPE='offline_access,user_checkins,friends_checkins';
+	function __construct($config) {
+		$this->config=$config;
+	}
 	function authorize($callback) {
 		$r=array();
-		$r['client_id']=self::APP_ID;
+		$r['client_id']=$this->config->APP_ID;
 		$r['redirect_uri']=$callback;
 		gs_session::save($r,'oauth2_facebook_request');
 
@@ -217,8 +173,8 @@ class oauth2_facebook{
 		$request=gs_session::load('oauth2_facebook_request');
 		$r=array();
 		$r['code']=$data['code'];
-		$r['client_id']=self::APP_ID;
-		$r['client_secret']=self::APP_SECRET;
+		$r['client_id']=$this->config->APP_ID;
+		$r['client_secret']=$this->config->APP_SECRET;
 		$r['redirect_uri']=$request['redirect_uri'];
 
 		$url="https://graph.facebook.com/oauth/access_token";
