@@ -5,11 +5,24 @@ oauth2_handler.login:classname:author:login_field:email:full_name_field:fullName
 gs_base_handler.post_login:return:gs_record:classname:author:name:login_form_author.html:form_class:g_forms_html:fields:email,password,active		
 gs_base_handler.redirect		
 */
+/*
 class module_oauth2 extends gs_base_module implements gs_module {
 	function __construct() {
 	}
 	function install() {
+		foreach(array('oauth2_config') as $r){
+			$this->$r=new $r;
+			$this->$r->install();
+		}
 	}
+    function get_menu() {
+        $ret = array();
+        $item = array();
+        $item[] = '<a href="/admin/oauth2/">oauth2</a>';
+        $item[] = '<a href="/admin/oauth2/config">oauth2 config</a>';
+        $ret[] = $item;
+        return $ret;
+    }
 
 static function get_handlers() {
 		$data=array(
@@ -20,9 +33,21 @@ static function get_handlers() {
 	return self::add_subdir($data,dirname(__FILE__));
 	}
 }
+class oauth2_config extends gs_recordset_short {
+	public $no_urlkey=1;
+	function __construct($init_opts=false) { parent::__construct(array(
+		'class'=> "fSelect options='oauth2_vk,oauth2_google,oauth2_facebook,oauth2_twitter'",
+		'APP_ID'=> "fString APP_ID required=false",
+		'APP_SECRET'=> "fString APP_SECRET required=false",
+		'SCOPE'=> "fString SCOPE required=false",
+		'CONSUMER_KEY'=>"fString CONSUMER_KEY required=false",
+		),$init_opts);
+	}
+}
+*/
 class oauth2_handler extends gs_handler {
 	function startlogin($ret) {
-		$classname="oauth2_".$this->data['gspgid_va'][0];
+		$classname=$this->data['gspgid_va'][0];
 		if (!class_exists($classname)) throw new gs_exception('oauth2_handler:startlogin no class found '.$classname);
 		$d=parse_url($this->data['url']);
 		$this->data['data']['oa2c']=$classname;
@@ -74,8 +99,8 @@ class oauth2_twitter{
 	http://habrahabr.ru/post/114955/
 	*/
 	const APP_ID='2152827';
+	const APP_SECRET='qFzjfqj57t5s3VklenConmamcMCmM8XEbQVuyRh7f3E';
 	const CONSUMER_KEY='j01djlRk7RQwtoDthZ8ejw';
-	const CONSUMER_SECRET='qFzjfqj57t5s3VklenConmamcMCmM8XEbQVuyRh7f3E';
 	function __construct() {
 		load_file(dirname(__FILE__) . DIRECTORY_SEPARATOR. 'lib'.DIRECTORY_SEPARATOR.'twitter'.DIRECTORY_SEPARATOR.'twitteroauth'.DIRECTORY_SEPARATOR.'twitteroauth.php');
 		load_file(dirname(__FILE__) . DIRECTORY_SEPARATOR. 'lib'.DIRECTORY_SEPARATOR.'twitter'.DIRECTORY_SEPARATOR.'config.php');
@@ -83,7 +108,7 @@ class oauth2_twitter{
 	}
 	function authorize($callback) {
 
-		$connection = new TwitterOAuth(self::CONSUMER_KEY, self::CONSUMER_SECRET);
+		$connection = new TwitterOAuth(self::CONSUMER_KEY, self::APP_SECRET);
 		$request_token = $connection->getRequestToken($callback);
 		gs_session::save($request_token,'oauth2_twitter_token');
 		$url=$connection->getAuthorizeURL($request_token);
@@ -91,7 +116,7 @@ class oauth2_twitter{
 	}
 	function token($data) {
 		$request_token=gs_session::load('oauth2_twitter_token');
-		$connection = new TwitterOAuth(self::CONSUMER_KEY, self::CONSUMER_SECRET,$request_token['oauth_token'],$request_token['oauth_token_secret']);
+		$connection = new TwitterOAuth(self::CONSUMER_KEY, self::APP_SECRET,$request_token['oauth_token'],$request_token['oauth_token_secret']);
 		$access_token = $connection->getAccessToken($data['oauth_verifier']);
 		return $connection;
 	}
@@ -107,8 +132,8 @@ class oauth2_twitter{
 
 class oauth2_vk {
 	const APP_ID='2934735';
-	const SCOPE='notify';
 	const APP_SECRET='lnTik6NHIL87zbR78Bfr';
+	const SCOPE='notify';
 	function authorize($callback) {
 		$callback=urlencode($callback);
 		return "http://oauth.vk.com/authorize?client_id=".self::APP_ID."&scope=".self::SCOPE."&redirect_uri=$callback&response_type=code";
@@ -138,8 +163,8 @@ class oauth2_google{
 	https://developers.google.com/accounts/docs/OAuth2WebServer
 	*/
 	const APP_ID='222759715716.apps.googleusercontent.com';
-	const SCOPE='https://www.googleapis.com/auth/userinfo.profile';
 	const APP_SECRET='kWmMQh1WOgq97I-GJew0mIBb';
+	const SCOPE='https://www.googleapis.com/auth/userinfo.profile';
 	function authorize($callback) {
 		$r=array();
 		$r['response_type']='code';
