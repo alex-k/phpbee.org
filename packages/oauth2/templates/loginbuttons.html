@@ -1,0 +1,6 @@
+
+	{$oauth2=rs('oauth2_config')}
+	{$a=array()}
+	{foreach $oauth2->find_records($a)  as $oa}
+		<a href="/oauth2/{$oa->class}?url={current_url()}&data[gspgid_form]={$gspgid_form}"><img src="{$oa->Logo->src1('orig')}" alt="{$oa->title}"></a> 
+	{/foreach}
