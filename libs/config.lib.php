@@ -105,6 +105,7 @@ class gs_config {
 
 		//foreach(array($this->root_dir.'config.php',$this->lib_modules_dir.'config.php') as $cfg_filename) {
 		$cfgfiles=array(
+				$this->root_dir.'config.php',
 		                dirname($this->document_root).DIRECTORY_SEPARATOR.'config.php',
 				$this->lib_modules_dir.'config.php',
 				);
