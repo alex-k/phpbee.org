@@ -83,6 +83,9 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
                     'gs_base_handler.redirect',
                     'gs_base_handler.redirect',
                 ) ,
+                'loginbuttons' => array(
+                    'admin_handler.show:name:loginbuttons.html',
+                ) ,
             ) ,
         );
         return self::add_subdir($data, dirname(__file__));
@@ -126,7 +129,7 @@ class oauth2_config extends gs_recordset_short {
             'APP_SECRET' => 'fString verbose_name="APP_SECRET"     required=false        ',
             'SCOPE' => 'fString verbose_name="SCOPE"     required=false        ',
             'CONSUMER_KEY' => 'fString verbose_name="CONSUMER_KEY"     required=false        ',
-            'Title' => 'fString verbose_name="Title"     required=false        ',
+            'title' => 'fString verbose_name="Title"     required=false        ',
             'Logo' => 'lMany2One oauth2_config_images:Parent verbose_name="Logo"   widget="gallery"  required=false    ',
         ) , $init_opts);
     }

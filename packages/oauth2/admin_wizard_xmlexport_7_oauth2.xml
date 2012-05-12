@@ -112,7 +112,7 @@
                     <record>
                       <links/>
                       <values>
-                        <name>Title</name>
+                        <name>title</name>
                         <verbose_name>Title</verbose_name>
                         <helper_text/>
                         <type>fString</type>
@@ -126,7 +126,7 @@
                         <unique>0</unique>
                         <Recordset_id>12</Recordset_id>
                         <_ctime>2012-05-11 17:39:41</_ctime>
-                        <_mtime>2012-05-11 17:39:41</_mtime>
+                        <_mtime>2012-05-12 13:25:29</_mtime>
                       </values>
                     </record>
                   </recordset>
@@ -832,6 +832,33 @@
                 <_Handlers_count>0</_Handlers_count>
                 <_ctime>2012-05-11 17:39:28</_ctime>
                 <_mtime>2012-05-11 18:20:17</_mtime>
+              </values>
+            </record>
+            <record>
+              <links>
+                <Handlers>
+                  <recordset name="wz_handlers">
+                    <record>
+                      <links/>
+                      <values>
+                        <cnt>10</cnt>
+                        <handler_keyname/>
+                        <handler_value>admin_handler.show:name:loginbuttons.html</handler_value>
+                        <Url_id>194</Url_id>
+                        <_ctime>2012-05-12 13:15:58</_ctime>
+                        <_mtime>2012-05-12 13:15:58</_mtime>
+                      </values>
+                    </record>
+                  </recordset>
+                </Handlers>
+              </links>
+              <values>
+                <gspgid_value>loginbuttons</gspgid_value>
+                <type>handler</type>
+                <Module_id>7</Module_id>
+                <_Handlers_count>0</_Handlers_count>
+                <_ctime>2012-05-12 13:15:58</_ctime>
+                <_mtime>2012-05-12 13:15:58</_mtime>
               </values>
             </record>
           </recordset>
