@@ -1,4 +1,7 @@
 <?php
+/*
+oauth2_handler.login:classname:photographers:login_field:login:return:not_false:first_name_field:name:full_name_field:fullname
+*/
 class oauth2_handler extends gs_handler {
 	function startlogin($ret) {
 		$classname=$this->data['gspgid_va'][0];
