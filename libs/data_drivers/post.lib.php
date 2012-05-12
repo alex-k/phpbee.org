@@ -17,6 +17,10 @@ class gs_data_driver_post implements gs_data_driver {
 			if ($v['error']==4) unset($_FILES[$k]);
 		}
 		$_POST=array_merge($_POST,$_FILES);
+		if (isset($_GET['gspgid_form']) && !isset($_POST['gspgid_form'])) {
+			$_POST['gspgid_form']=$_GET['gspgid_form'];
+		}
+
 		return get_magic_quotes_gpc() ? stripslashes_deep($_POST) : $_POST;
 	}
 }

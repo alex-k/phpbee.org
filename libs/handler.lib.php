@@ -851,6 +851,9 @@ class gs_base_handler extends gs_handler {
 	}
 
 	function post_login($data) {
+		$rec=$this->check_login($data);
+		if (is_object($rec) && is_a($rec,'gs_record')) return $rec;
+
 		$rec=$this->post_find_record($data);
 		if (!is_object($rec) || !is_a($rec,'gs_record')) return $rec;
 		gs_session::save($rec->get_id(),'login_'.$this->params['classname']);
