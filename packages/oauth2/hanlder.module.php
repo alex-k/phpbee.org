@@ -123,6 +123,9 @@ class oauth2_google{
 		$this->config=$config;
 	}
 	function authorize($callback) {
+		$d=parse_url($callback);
+		if ($this->config->CONSUMER_KEY) $d['path']=$this->config->CONSUMER_KEY;
+		$callback=http_build_url($d);
 		$r=array();
 		$r['response_type']='code';
 		$r['client_id']=$this->config->APP_ID;
