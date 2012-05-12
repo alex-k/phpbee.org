@@ -6,8 +6,9 @@ class oauth2_handler extends gs_handler {
 		$config=record_by_field('class',$classname,'oauth2_config');
 		if (!$config) throw new gs_exception('oauth2_handler:startlogin can not find config for '.$classname);
 		$d=parse_url($this->data['url']);
+		parse_str($d['query'],$get_vars);
 		$this->data['data']['oa2c']=$classname;
-		$d['query']=http_build_query($this->data['data']);
+		$d['query']=http_build_query(array_merge($get_vars,$this->data['data']));
 		$callback=http_build_url($d);
 		$oauth=new $classname($config);
 		$url=$oauth->authorize($callback);
