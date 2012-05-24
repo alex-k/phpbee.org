@@ -36,6 +36,7 @@ class oauth2_handler extends gs_handler {
 		$options=array(
 			$this->params['login_field']=>$profile['uid']
 			);
+		if (isset($profile['email']) && $profile['email']) $options[$this->params['login_field']]=$profile['email'];
 		$rec=$rs->find_records($options)->first();
 		if (!$rec) {
 			$rec=$rs->find_records($options)->first(true);
@@ -81,7 +82,7 @@ class oauth2_twitter{
 		return $connection;
 	}
 	function profile($connection) {
-		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'twitter');
+		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'twitter','email'=>null);
 		$d=$connection->get('account/verify_credentials');
 		if (!$d || !$d->id) return $ret;
 		$ret['uid']='tw-'.$d->id;
@@ -105,7 +106,7 @@ class oauth2_vk {
 		return $d;
 	}
 	function profile($token) {
-		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'vk');
+		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'vk','email'=>null);
 		$url=sprintf("https://api.vk.com/method/getProfiles?uid=%d&access_token=%s&fields=nickname,screen_name",$token->user_id,$token->access_token);
 		$d=json_decode(html_fetch($url));
 		if (!$d) return $ret;
@@ -121,6 +122,10 @@ class oauth2_google{
 	/*
 	https://developers.google.com/accounts/docs/OAuth2Login?hl=ru
 	https://developers.google.com/accounts/docs/OAuth2WebServer
+
+	https://developers.google.com/accounts/docs/OAuth2?hl=ru
+
+	scope: space delimeted https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
 	*/
 	function __construct($config) {
 		$this->config=$config;
@@ -150,13 +155,14 @@ class oauth2_google{
 		return $d;
 	}
 	function profile($token) {
-		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'google');
+		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'google','email'=>null);
 		$url=sprintf("https://www.googleapis.com/oauth2/v1/userinfo?access_token=%s",$token->access_token);
 		$d=json_decode(html_fetch($url));
 		if (!$d || !$d->id) return $ret;
 		$ret['uid']='google-'.$d->id;
 		$ret['first_name']=$d->given_name;
 		$ret['last_name']=$d->family_name;
+		if (isset($d->email) && $d->email) $ret['email']=$d->email; 
 		return $ret;
 	}
 }
@@ -171,6 +177,7 @@ class oauth2_facebook{
 		$r=array();
 		$r['client_id']=$this->config->APP_ID;
 		$r['redirect_uri']=$callback;
+		if ($this->config->SCOPE) $r['scope']=$this->config->SCOPE;
 		gs_session::save($r,'oauth2_facebook_request');
 
 		$url="https://www.facebook.com/dialog/oauth?".http_build_query($r);
@@ -191,7 +198,7 @@ class oauth2_facebook{
 		return $d;
 	}
 	function profile($token) {
-		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'facebook');
+		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'facebook','email'=>null);
 		$url=sprintf("https://graph.facebook.com/me?access_token=%s",$token['access_token']);
 		$d=html_fetch($url);
 		$d=json_decode($d,1);
@@ -199,6 +206,7 @@ class oauth2_facebook{
 		$ret['uid']='fb-'.$d['id'];
 		$ret['first_name']=$d['first_name'];
 		$ret['last_name']=$d['last_name'];
+		if ($d['email']) $ret['email']=$d['email'];
 		return $ret;
 	}
 }
