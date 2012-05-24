@@ -124,12 +124,13 @@ class oauth2_config extends gs_recordset_short {
     public $orderby = "id";
     function __construct($init_opts = false) {
         parent::__construct(array(
-            'class' => 'fSelect verbose_name="class"  widget="select"   options="oauth2_vk,oauth2_google,oauth2_facebook,oauth2_twitter"  required=true unique=true       ',
+            'class' => 'fSelect verbose_name="class"  widget="select"   options="oauth2_vk,oauth2_google,oauth2_facebook,oauth2_twitter"  required=true        ',
             'APP_ID' => 'fString verbose_name="APP_ID"     required=true        ',
             'APP_SECRET' => 'fString verbose_name="APP_SECRET"     required=false        ',
             'SCOPE' => 'fString verbose_name="SCOPE"     required=false        ',
             'CONSUMER_KEY' => 'fString verbose_name="CONSUMER_KEY"     required=false        ',
             'title' => 'fString verbose_name="Title"     required=false        ',
+            'enabled' => 'fCheckbox verbose_name="enabled"   default="1"   required=false  index=true      ',
             'Logo' => 'lMany2One oauth2_config_images:Parent verbose_name="Logo"   widget="gallery"  required=false    ',
         ) , $init_opts);
     }
