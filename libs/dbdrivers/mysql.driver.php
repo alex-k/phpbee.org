@@ -192,7 +192,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$drop_fields=array_diff(array_keys($old_fields),array_keys($table_fields));
 		foreach($drop_fields as $k=>$v) {
 			if (!isset($options['fields'][$v]['type']) || $options['fields'][$v]['type']!='serial') 
-				$tf[]="DROP $v";
+				$tf[]="DROP `$v`";
 		}
 
 		return sprintf ('%s',implode(",",$tf));

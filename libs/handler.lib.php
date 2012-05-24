@@ -114,10 +114,40 @@ class gs_base_handler extends gs_handler {
             $this->params['name']=basename($this->data['handler_key']).'.html';
         }
 
-        $tplname=false;
-        if (!$tplname && file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'])) $tplname=$this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'];
-        if (!$tplname && file_exists(cfg('tpl_data_dir').DIRECTORY_SEPARATOR.$this->params['name'])) $tplname=cfg('tpl_data_dir').DIRECTORY_SEPARATOR.$this->params['name'];
-        if (!$tplname) $tplname=$this->params['name'];
+		if (isset($this->data['handler_params'])) {
+			try {
+				mlog($tplname);
+				$html=$tpl->fetch($tplname);
+				echo $html;
+				return;
+			} catch (gs_exception $e) {
+				var_dump($this->params);
+				var_dump($this->data);
+				throw $e;
+			}
+		}
+		$txt=ob_get_contents();
+		ob_end_clean();
+		mlog($tplname);
+		$html=$tpl->fetch($tplname);
+		echo $html;
+		if (function_exists('memory_get_peak_usage')) mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
+		if (DEBUG) {
+			$g=gs_logger::get_instance();
+			$g->console();
+		}
+	}
+	function null() {
+		return null;
+	}
+	protected function get_form() {
+		$params=$this->params;
+		$data=$this->data;
+		if (isset($params['classname'])) {
+			$id=isset($data['gspgid_va'][1]) ? $data['gspgid_va'][1] : null;
+			$classname=$params['classname'];
+			$obj=new $classname;
+			$fields=array_keys($obj->structure['fields']);
 
         mlog($tplname);
         $tplname=$tpl->multilang($tplname);

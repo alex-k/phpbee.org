@@ -31,7 +31,7 @@
 {/if}
 
 <div id="MultiPowUpload_holder">
-<input type="button" id="MultiPowUploadStartButton" class="MultiPowUploadStartButton" onClick="left_heightWid(); MultiPowUpload_Start();" value="UPLOAD PHOTOS">
+<input type="button" id="MultiPowUploadStartButton" class="MultiPowUploadStartButton" onClick="left_heightWid(); MultiPowUpload_Start();" value="Загрузить фотографии">
 </div>
 <script>
 	var params_str={$params_str}
@@ -93,16 +93,14 @@
 	  "readImageMetadata": "true",
 	  "thumbnailView.allowCrop": "true",
 	  "thumbnailView.allowRotate": "true",
+	  "thumbnailView.cropRectKeepAspectRatio": "NO",
+	  "thumbnailView.showCropRectDimensions": "true",
 	  "thumbnailView.thumbnailWidth": "180",
 	  "thumbnailView.thumbnailHeight": "180",
-	  {if cfg('widget_MultiPowUpload_watermark')}
-	  "thumbnail.watermark.enabled": true,
+	  "thumbnail.watermark.enabled": {if cfg('widget_MultiPowUpload_watermark')}"true"{else}"false"{/if},
 	  "thumbnail.watermark.position": "bottom.center",
 	  "thumbnail.watermark.text" : "",
-	  "thumbnail.watermark.imageUrl": "{cfg('widget_MultiPowUpload_watermark')}",
-	  {/if}
-	  "thumbnailView.cropRectKeepAspectRatio": "NO",
-	  "thumbnailView.showCropRectDimensions": "true"
+	  "thumbnail.watermark.imageUrl": "{cfg('widget_MultiPowUpload_watermark')}"
 	{rdelim};
 
 

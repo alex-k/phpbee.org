@@ -39,7 +39,7 @@ abstract class gs_base_module {
 	static function gl($name,$record,$data) {
 
 		if (method_exists('gl',$name)) {
-			$gl=new gl($record,$data);
+			$gl=new gl($record,$data,str_replace('module_','',get_called_class()));
 			return $gl->$name();
 		}
 
@@ -49,7 +49,8 @@ abstract class gs_base_module {
 }
 
 class gl {
-        function __construct($record,$data) {
+        function __construct($record,$data,$module_name) {
+		$this->module_name=$module_name;
                 $this->record=$record;
                 $this->data=$data;
                 $tpl=gs_tpl::get_instance();
@@ -61,9 +62,11 @@ class gl {
                 return $this->data;
 		}
 
-		function rec_show() {
-			return $this->root.'/'.$this->record->get_id();
-		}
+	function rec_show() {
+		return $this->module_name.'/'.$this->record->get_recordset_name().'/'.$this->record->get_id();
+		#return $this->root.'/'.$this->record->get_id();
+	}
+
 
         function rec_create() {
                 return $this->root.'/modify/0'.$this->__data_get().'#form';
