@@ -88,7 +88,7 @@ class vpa_gd {
 			case 'check_and_rotate_right':
 				$this->check_and_rotate_right();
 			break;
-			case 'watermakr':
+			case 'watermark':
 				$this->watermark();
 			break;
 		}
@@ -151,8 +151,11 @@ class vpa_gd {
 	}
 
 	function watermark() {
-		$wname=cfg('watermark_filename');
-		if (!file_exists('watermark_filename')) return;
+		$wname=cfg('document_root').cfg('watermark_filename');
+		if (!file_exists($wname)) return;
+		$wm=new vpa_gd(file_get_contents($wname),false);
+		imagealphablending($wm->old_img, true);
+		ImageCopyResampled($this->old_img,$wm->old_img,0, 0, 0, 0, $this->old_width, $this->old_height, $wm->old_width, $wm->old_height);
 	}
 	
 	function make_width()

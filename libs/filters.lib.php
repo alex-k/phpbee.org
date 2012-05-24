@@ -17,7 +17,7 @@ class gs_filters_handler extends gs_handler {
 	}
 	static function get($name) {
 		$filters=gs_var_storage::load('filters');
-		return $filters[$name];
+		return isset($filters[$name]) ? $filters[$name] : NULL;
 	}
 	static function value($name) {
 		$f=self::get($name);
@@ -74,7 +74,7 @@ class gs_filter {
 		$this->va=$arr;
 		$this->value=isset($arr[$this->name]) ? $arr[$this->name] :(isset($this->params['default']) ? $this->params['default'] : null);
 	}
-	function applyFilter($options) {
+	function applyFilter($options,$rs) {
 		return $options;
 	}
 	function getHtmlBlock($ps) {
@@ -110,8 +110,10 @@ class gs_filter_firstletters extends gs_filter_like {
 class gs_filter_like extends gs_filter {
 	function __construct($data) {
 		parent::__construct($data);
-		$this->fields=array_map(trim,array_filter(explode(',',$this->params['fields'])));
-		$this->strong=array_map(trim,array_filter(explode(',',$this->params['strong'])));
+		if (!isset($this->params['fields'])) $this->params['fields']='';
+		if (!isset($this->params['strong'])) $this->params['strong']='';
+		$this->fields=array_map('trim',array_filter(explode(',',$this->params['fields'])));
+		$this->strong=array_map('trim',array_filter(explode(',',$this->params['strong'])));
 		$this->case=isset($this->params['case']) ? $this->params['case'] : 'LIKE';
 	}
 	function getHtmlBlock($ps) {
@@ -123,8 +125,8 @@ class gs_filter_like extends gs_filter {
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('current',$this->value);
 		$tpl->assign('keyname',$this->name);
-		$tpl->assign('prelabel',$ps['prelabel']);
-		$tpl->assign('label',$ps['label']);
+		$tpl->assign('prelabel',isset($ps['prelabel']) ? $ps['prelabel'] : null);
+		$tpl->assign('label',isset($ps['label']) ? $ps['label'] : null);
 		$tpl->assign('params',$ps);
 		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
 		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);

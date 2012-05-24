@@ -93,14 +93,16 @@
 	  "readImageMetadata": "true",
 	  "thumbnailView.allowCrop": "true",
 	  "thumbnailView.allowRotate": "true",
-	  "thumbnailView.cropRectKeepAspectRatio": "NO",
-	  "thumbnailView.showCropRectDimensions": "true",
 	  "thumbnailView.thumbnailWidth": "180",
 	  "thumbnailView.thumbnailHeight": "180",
-	  "thumbnail.watermark.enabled": {if cfg('widget_MultiPowUpload_watermark')}"true"{else}"false"{/if},
+	  {if cfg('widget_MultiPowUpload_watermark')}
+	  "thumbnail.watermark.enabled": true,
 	  "thumbnail.watermark.position": "bottom.center",
 	  "thumbnail.watermark.text" : "",
-	  "thumbnail.watermark.imageUrl": "{cfg('widget_MultiPowUpload_watermark')}"
+	  "thumbnail.watermark.imageUrl": "{cfg('widget_MultiPowUpload_watermark')}",
+	  {/if}
+	  "thumbnailView.cropRectKeepAspectRatio": "NO",
+	  "thumbnailView.showCropRectDimensions": "true"
 	{rdelim};
 
 

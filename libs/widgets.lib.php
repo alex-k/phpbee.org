@@ -17,7 +17,7 @@ abstract class gs_widget implements gs_widget_interface {
 		$this->params=$params;
 		$this->data=$data;
 		$this->tpl=gs_tpl::get_instance();
-		$this->interact=$this->params['interact'] ? ' fInteract' : '';
+		$this->interact=(isset($this->params['interact']) && $this->params['interact']) ? ' fInteract' : '';
 		$this->placeholder=isset($this->params['placeholder']) ? 'placeholder="'.$this->params['placeholder'].'"' : '';
 	}
 	function clean() {
@@ -470,7 +470,7 @@ class gs_widget_lOne2One extends gs_widget {
 	function html() {
 		$ret=$this->option_string($this->fieldname);
 		if ($this->params['nulloption']) $ret.=sprintf('<option value="%s">%s</option>',$this->params['nulloption'][0],isset($this->params['nulloption'][1]) ? $this->params['nulloption'][1] : '' );
-		if (is_array($this->params['variants'])) foreach ($this->params['variants'] as $k=>$v) {
+		if (isset($this->params['variants']) && is_array($this->params['variants'])) foreach ($this->params['variants'] as $k=>$v) {
 			$ret.=sprintf("<option value=\"%s\" %s>%s</option>\n", ($k==0 && empty($v)) ? '' : $k, ($this->value==$k) ? 'selected="selected"' : '',$v);
 		}
 		$ret.="</select>\n";

@@ -305,11 +305,13 @@ class gs_record implements arrayaccess {
 		$fields=$this->get_recordset()->structure['fields'];
 		if ($this->recordstate & RECORD_ROLLBACK) {
 			$this->recordstate=RECORD_NEW;
-		} elseif((is_array($fields) && array_key_exists($name,$fields) && (!isset($this->values[$name]) || $value!=$this->values[$name]))
-		       || ($this->recordstate & RECORD_NEW)) {
-			$this->recordstate=$this->recordstate|RECORD_CHANGED;
-			if (isset($this->values[$name])) $this->old_values[$name]=$this->values[$name];
-			$this->modified_values[$name]=$value;
+		} elseif(is_array($fields) && array_key_exists($name,$fields) ) {
+			is_array(array(1));
+			if  (!isset($this->values[$name]) || $value!=$this->values[$name] || ($this->recordstate & RECORD_NEW)) {
+				$this->recordstate=$this->recordstate|RECORD_CHANGED;
+				if (isset($this->values[$name])) $this->old_values[$name]=$this->values[$name];
+				$this->modified_values[$name]=$value;
+			}
 		}
 		if (($parent=$this->get_recordset()->parent_record)!==NULL) $parent->child_modified();
 		return $this->values[$name]=$value;
@@ -375,7 +377,7 @@ class gs_record implements arrayaccess {
 	private function commit_childrens() {
 		$this->recordstate=RECORD_UNCHANGED;
 		foreach ($this->recordsets_array as $rs) {
-			if ($rs) {
+			if (is_object($rs) && is_a($rs,'gs_recordset_base')) {
 				$rec=$rs->first();
 				$recordstate=$rec->recordstate;
 				$rs->commit();

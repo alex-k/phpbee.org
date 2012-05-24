@@ -160,7 +160,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	function find($options,$linkname=null) {
 		$options=$this->string2options($options);
 		foreach ($options as $k=>$o) {
-			switch($o['field']) {
+			if (isset($o['field'])) switch($o['field']) {
 				case 'orderby':
 					$options[$k]['type']='orderby';
 					$options[$k]['value']=str_replace(':',' ',$options[$k]['value']);
@@ -178,7 +178,7 @@ abstract class gs_recordset_base extends gs_iterator {
 			$rs=$this->first()->init_linked_recordset($linkname);
 			$s=$this->structure['recordsets'][$linkname];
 			foreach ($this as $r) $ids[]=$r->$s['local_field_name'];
-			$options=array_merge($options,array($rs->foreign_field_name=>$ids));
+			if ($rs && isset($rs->foreign_field_name)) $options=array_merge($options,array($rs->foreign_field_name=>$ids));
 		} else {
 			foreach ($this as $r) $ids[]=$r->get_id();
 			$cur_class_name=get_class($this);
@@ -262,7 +262,6 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 
 	public function find_records($options=null,$fields=null,$index_field_name=null) {
-		mlog('RS_INIT on '.get_class($this));//.' options:'.print_r($options,TRUE));
 		$this->query_options['options']=$this->string2options($options);
 		$this->query_options['index_field_name'] = is_string($index_field_name) ? $index_field_name : $this->id_field_name;
 		if ($fields && !is_array($fields)) {
@@ -277,7 +276,6 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->reset();
 		$this->state=RS_STATE_UNLOADED;
 		cfg_set('handler_cache_status',cfg('handler_cache_status') | $this->handler_cache_status);
-		mlog('RS_STATE_UNLOADED on '.get_class($this));//.' options:'.print_r($options,TRUE));
 		return $this;
 	}
 	public function late_load_records() {
@@ -333,11 +331,12 @@ abstract class gs_recordset_base extends gs_iterator {
 		$options=$this->string2options($options);
 		if (isset($this->query_options['options'])) $options=array_merge($this->query_options['options'],$options); // Add to array of options all options what already used from lazy load (c) Andrey Pakhomov
 		foreach($options as $k=>$o) {
-			if (in_array(strtolower($o['type']),array('limit','offset','orderby'))) unset($options[$k]);
+			if (isset($o['type']) && in_array(strtolower($o['type']),array('limit','offset','orderby'))) unset($options[$k]);
 		}
 		//$this->get_connector()->select($this,$options,array('count(*) as count'));
 		$this->get_connector()->count($this,$options);
-		$res=reset($this->get_connector()->fetchall());
+		$res=$this->get_connector()->fetchall();
+		$res=reset($res);
 		return $res['count'];
 	}
 	public function commit() {

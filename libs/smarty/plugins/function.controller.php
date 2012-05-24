@@ -79,7 +79,7 @@ function smarty_function_controller($params, &$smarty)
 	if (isset($params['_offset'])) $_offset=(int)$params['_offset'];
 
 	if (isset($params['_filters'])) {
-		$filternames=array_filter(array_map(trim,explode(',',$params['_filters'])));
+		$filternames=array_filter(array_map('trim',explode(',',isset($params['_filters'])?$params['_filters'] : '')));
 		$filters=gs_var_storage::load('filters');
 		foreach ($filternames as $f) {
 			$filter=$filters[$f];

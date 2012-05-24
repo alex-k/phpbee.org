@@ -8,7 +8,7 @@ function href_get_push($array,$url=null) {
     if(!is_array($array)) parse_str($array,$array);
 
     $d=parse_url($url);
-    parse_str($d['query'],$d_query);
+    parse_str(isset($d['query']) ? $d['query'] : '',$d_query);
     foreach ($array as $k=>$v) $d_query[$k]=$v;
     $d['query']=http_build_query($d_query);
     $url=http_build_url($d);
@@ -426,7 +426,8 @@ function current_url() {
     $host = $_SERVER['HTTP_HOST'];
     $port = $_SERVER['SERVER_PORT'];
     $request = $_SERVER['REQUEST_URI'];
-    $query = substr($_SERVER['argv'][0], strpos($_SERVER['argv'][0], ';') + 1);
+	$query='';
+    if (isset($_SERVER['argv'])) $query = substr($_SERVER['argv'][0], strpos($_SERVER['argv'][0], ';') + 1);
     $toret = $protocol . '://' . $host . ($port == $protocol_port ? '' : ':' . $port) . $request . (empty($query) ? '' : '?' . $query);
     return $toret;
 }

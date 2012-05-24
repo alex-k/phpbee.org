@@ -9,9 +9,9 @@ DEFINE ('DEBUG_SQL',2);
 date_default_timezone_set('GMT');
 
 if (defined('DEBUG') && DEBUG) {
-	ini_set('display_errors','On');
+	//ini_set('display_errors','On');
 	//error_reporting(E_ALL ^E_NOTICE);
-	error_reporting(E_ALL | E_STRICT);
+	//error_reporting(E_ALL | E_STRICT);
 }
 
 if (!defined('PHP_VERSION_ID')) {
@@ -119,8 +119,9 @@ class gs_config {
 		if (!defined('DEBUG')) define('DEBUG',FALSE);
 		if (!defined('DEBUG_LEVEL')) define('DEBUG_LEVEL',65537);
 		if (DEBUG) {
-			ini_set('display_errors','On');
-			error_reporting(E_ALL ^E_NOTICE);
+			//ini_set('display_errors','On');
+			//error_reporting(E_ALL ^E_NOTICE);
+			//error_reporting(E_ALL | E_STRICT);
 			set_exception_handler('gs_exception_handler_debug');
 		}
 
@@ -505,7 +506,7 @@ class gs_logger {
 	function log($data) {
 		$backtrace = debug_backtrace();
 		foreach ($backtrace as $trace) {
-			if ($trace['file']!==__FILE__ && isset($trace['class'])) break;
+			if (isset($trace['file']) && $trace['file']!==__FILE__ && isset($trace['class'])) break;
 		}
 
 			ob_start();
