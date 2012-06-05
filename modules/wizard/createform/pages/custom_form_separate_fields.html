@@ -1,9 +1,8 @@
-	<form action="" method="post" class="form_login" enctype="multipart/form-data">
+	<form action="" method="post" enctype="multipart/form-data">
 	<input type=hidden name="dialog" value="{$_gsdata.dialog}">
 	<input type=hidden name="gspgid_form" value="{$gspgid_form}">
 	<input type=hidden name="form_id" value="form_login">
 
-	<div class="form_login_div">
 
 		{include file="form_error_messages.html"}
 
@@ -24,28 +23,12 @@
 		{$form->_prepare_inputs()}
 
 	{$form->print_error('FORM_ERROR')}
-	 <table class="table4">
 
 	{%foreach $fields as $f%}
-
-     <tr class="form_help_container interact_box">
-     <td class="helper_tr_title"><label class="form_help_over">{%$f->verbose_name%}:</label></td>
-     <td class="helper_tr_field"><div class="form_help_input form_help_over">{$form->get_input('{%$f->name%}')} {$form->print_error('{%$f->name%}')} </div></td>
-     <td class="td_form_help"><div class="form_help form_help_spoiler"><div class="form_help_div"><i></i>{%$f->helper_text|default:"Введите {%$f->verbose_name%}"%}</div></div></td>
-     </tr>
-
+	<label>
+		{%$f->verbose_name%}
+		{$form->get_input('{%$f->name%}')} {$form->print_error('{%$f->name%}')}
+	</label>	
 	{%/foreach%}
-	</table>
-
-	<tr>
-	<td class="helper_tr_title"></td>
-	<td class="helper_tr_field">
-	<div class="block_buttons2">
-	<br>
 	<input type="submit" class="button" name="save_return" value="{'save'|gsdict}">
 	<input type="submit" class="button" name="save_cancel" value="{'cancel'|gsdict}">
-	</div>
-	</td>
-     	</tr> 
-	</div>
-	</form>

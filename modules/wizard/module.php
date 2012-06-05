@@ -263,8 +263,7 @@ class gs_wizard_handler extends gs_handler {
 		$f=$bh->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 		$d=$f->clean();
-		md($d,1);
-		$xml=!empty($d['xmlfile_data']) ? $d['xmlfile_data'] : $xml;
+		$xml=!empty($d['xmlfile_data']) ? $d['xmlfile_data'] : $d['xml'];
 		$newrs=xml_import(trim($xml));
 		$newrs->commit();
 		return TRUE;
