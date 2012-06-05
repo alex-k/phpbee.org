@@ -211,7 +211,7 @@ class gs_parser {
 			case 'array':
 				return is_array($result);
 			case 'gs_record':
-				return is_object($result) && is_a($result,'gs_record');
+				return is_object($result) && is_a($result,'gs_record') && $result->get_id()!==NULL;
 			case 'gs_recordset':
 				return is_object($result) && is_a($result,'gs_recordset');
 			case 'g_forms':

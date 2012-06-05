@@ -7,6 +7,9 @@ abstract class gs_handler {
         $this->data=$data;
         $this->params=$params;
     }
+	function va($i) {
+		return $this->data['gspgid_va'][$i];
+	}
 }
 class gs_base_handler extends gs_handler {
     public function __construct($data=null,$params=null) {
