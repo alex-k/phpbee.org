@@ -117,6 +117,20 @@ class oauth2_vk {
 		$ret['last_name']=$d->last_name;
 		return $ret;
 	}
+
+	function exec($method,$data) {
+		$url=sprintf("https://api.vk.com/method/%s?uid=%d&access_token=%s&%s",
+					$method,
+					$this->token->user_id,
+					$this->token->access_token,
+					http_build_query($data));
+
+		$d=json_decode(html_fetch($url));
+		return $d;
+
+	}
+
+
 }
 class oauth2_google{
 	/*
