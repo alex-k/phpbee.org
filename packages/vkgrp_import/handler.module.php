@@ -23,7 +23,7 @@ class vkgrp_import_handler extends gs_base_handler {
 	function execute($ret) {
 		$rs=new vkgrp_import_cfg();
 		$options=array('disabled'=>0);
-		if ($this->data['gspgid_va'][0]) $options['id']=$this->data['gspgid_va'][0];
+		if ($this->va(0)) $options['id']=$this->va(0);
 		//$rec=record_by_id($this->data['gspgid_va'][0],'vkgrp_import_cfg');
 		foreach ($rs->find_records($options) as $rec) {
 
@@ -52,7 +52,6 @@ class vkgrp_import_handler extends gs_base_handler {
 			$count=0;
 			foreach ($messages as $a) {
 				if ($rec->max_count && $count>=$rec->max_count) break;
-				var_dump($a->id);
 				if (!$a->id) continue;
 				$link=$rec->group_id.'_'.$a->id;
 				if ($link_fieldname) {
@@ -85,6 +84,7 @@ class vkgrp_import_handler extends gs_base_handler {
 				}
 				if (
 					($description_fieldname && $rec->only_with_body && !$r->$description_fieldname) 
+					|| ($description_fieldname && $rec->min_body_length && strlen($r->$description_fieldname<$rec->min_body_length)) 
 					|| ($images_linkname && $rec->only_with_images && !$r->$images_linkname->count()) 
 					) {
 					$r->delete();

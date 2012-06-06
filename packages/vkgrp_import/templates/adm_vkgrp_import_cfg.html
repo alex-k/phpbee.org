@@ -44,6 +44,7 @@
 	<tr><th>#</th>
 		<th>
 		{field_name name="group_id" type="fString" key="group_id" id="51"}
+
 	</th>
 		<th>
 		{field_name name="name" type="fString" key="name" id="52"}
@@ -72,7 +73,9 @@
 	
 	{foreach from=$vkgrp_import_cfg item="e"}
 	<tr class="{cycle values='odd,even'}">
-			<td>{$e->get_id()}</td>
+			<td>{$e->get_id()}
+				<a href="/vkgrp_import/execute/{$e->get_id()}">Execute</a>
+			</td>
 						<td class="frm_fString">
 									<a href="{gl rec_edit=$e}">{field_formatter value=$e.group_id type="fString"}</a>
 						
