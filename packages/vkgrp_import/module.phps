@@ -122,6 +122,7 @@ class vkgrp_import_cfg extends gs_recordset_short {
             'only_with_body' => 'fCheckbox verbose_name="body not empty"     required=true        ',
             'only_with_images' => 'fCheckbox verbose_name="only with images"     required=true        ',
             'max_count' => 'fInt verbose_name="max articles count"   default="25"   required=true        ',
+            'min_body_length' => 'fInt verbose_name="min_body_length"     required=false        ',
             'recordset' => 'lOne2One wz_recordsets verbose_name="recordset"   widget="parent_list"  required=true    ',
             'title_fieldname' => 'lOne2One wz_recordset_fields verbose_name="title_fieldname"   widget="parent_list"  required=false    ',
             'description_fieldname' => 'lOne2One wz_recordset_fields verbose_name="description_fieldname"   widget="parent_list"  required=false    ',
