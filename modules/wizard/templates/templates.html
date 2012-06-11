@@ -2,7 +2,7 @@
 </h3>
 
 
-{if $_gsdata.gspgid_handler_va.1=='addtpl'}
+{if isset($_gsdata.gspgid_handler_va) && $_gsdata.gspgid_handler_va.1=='addtpl'}
 	{handler gspgid="/admin/form/templates" Module_id=$module.id}
 {/if}
 

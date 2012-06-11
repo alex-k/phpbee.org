@@ -141,7 +141,7 @@ class form_createadmin extends form_admin{
 
 		$module=$rs->Module->first();
 		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
-		$extends=array_map(basename,glob($dirname."*"));
+		$extends=array_map('basename',glob($dirname."*"));
 
 		$all_links=$rs->Links->recordset_as_string_array();
 		$links=$rs->Links->find(array('type'=>array('lMany2Many','lOne2One')))->recordset_as_string_array();

@@ -357,7 +357,7 @@ class gs_base_handler extends gs_handler {
         $tpl->assign('formerrors',$f->validate_errors['FIELDS']);
         */
         $tpl->assign('form',$f);
-        if(!$this->params['name']) $this->params['name']='form_empty.html';
+        if(!isset($this->params['name'])) $this->params['name']='form_empty.html';
 
         $tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
         $tplname=$tpl->multilang($tplname);

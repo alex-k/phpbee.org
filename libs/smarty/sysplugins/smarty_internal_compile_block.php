@@ -181,7 +181,7 @@ class Smarty_Internal_Compile_Blockclose extends Smarty_Internal_CompileBase {
         $compiler->smarty->inheritance = $saved_data[4];
         // $_output content has already nocache code processed
         $compiler->suppressNocacheProcessing = true;
-	if($this->smarty->iddqd) $_output='<beeblock class="bee_block" id="bee_block_'.$_name.'">'.$_output.'</beeblock>';
+	if(isset($this->smarty->iddqd) && $this->smarty->iddqd) $_output='<beeblock class="bee_block" id="bee_block_'.$_name.'">'.$_output.'</beeblock>';
         return $_output;
     }
 }

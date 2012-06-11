@@ -40,7 +40,7 @@
 	{/foreach}
 	</table>
 	<h5>Редактировать/<a href="/admin/wizard/recordsets/{$module.id}/form1/0#form">создать</a>:</h5>
-	{if $_gsdata.gspgid_va.1=='form1'}
+	{if isset($_gsdata.gspgid_va.1) &&  $_gsdata.gspgid_va.1=='form1'}
 	<hr><br>
 	<a name="form"></a>
 		{if $_gsdata.gspgid_va.2}

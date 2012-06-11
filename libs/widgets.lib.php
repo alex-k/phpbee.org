@@ -274,7 +274,7 @@ class gs_widget_select extends gs_widget {
 					 ($multi ? '[]' : ''),
 					 ($multi ? 'multiple="on"' : '')
 					);
-		if (($this->params['variants'])) $this->params['options']=$this->params['variants'];
+		if (isset($this->params['variants']) && $this->params['variants']) $this->params['options']=$this->params['variants'];
 		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 
 		foreach ($this->params['options'] as $v=>$l) {

@@ -1,6 +1,6 @@
 <?php
 	$this->install_key='12345'; // run site.com/install.php?install_key=12345
-	$this->admin_ip_access='127.0.0.1, 192.168.1.102';
+	//$this->admin_ip_access='127.0.0.1, 192.168.1.102';
 	$this->admin_user_name='admin';
 	$this->admin_password='admin';
 

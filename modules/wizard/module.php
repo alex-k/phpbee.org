@@ -398,7 +398,7 @@ class gs_wizard_handler extends gs_handler {
 		$module=record_by_id($this->data['gspgid_va'][0],'wz_modules');
 		$dirname=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR;
 
-		$templates=array_map(basename,glob($dirname.'*'));
+		$templates=array_map('basename',glob($dirname.'*'));
 
 
 		$tpl=gs_tpl::get_instance();

@@ -49,7 +49,7 @@
 	{/foreach}
 	</table>
 	<h5>Редактировать/<a href="/admin/wizard/recordset_fields/{$_gsdata.gspgid_va.0}/fields/0#form">создать</a>:</h5>
-	{if $_gsdata.gspgid_va.1=='fields' && isset($_gsdata.gspgid_va.2)}
+	{if isset($_gsdata.gspgid_va.1) && $_gsdata.gspgid_va.1=='fields' && isset($_gsdata.gspgid_va.2)}
 	<hr><br>
 	<a name="form"></a>
 	{handler gspgid="/admin/form/wz_recordset_fields/edit/`$_gsdata.gspgid_va.2`" Recordset_id=$recordset.id}
@@ -89,7 +89,7 @@
 	{/foreach}
 	</table>
 	<h5>Редактировать/<a href="/admin/wizard/recordset_fields/{$_gsdata.gspgid_va.0}/links#form">создать</a>:</h5>
-	{if $_gsdata.gspgid_va.1=='links'}
+	{if isset($_gsdata.gspgid_va.1) &&  $_gsdata.gspgid_va.1=='links'}
 	<hr><br>
 	<a name="form"></a>
 	{handler gspgid="/admin/form/wz_recordset_links/edit/`$_gsdata.gspgid_va.2`" Recordset_id=$recordset.id}
@@ -122,7 +122,7 @@
 	{/foreach}
 	</table>
 	<h5>Редактировать/<a href="/admin/wizard/recordset_fields/{$_gsdata.gspgid_va.0}/triggers#form">создать</a>:</h5>
-	{if $_gsdata.gspgid_va.1=='triggers'}
+	{if isset($_gsdata.gspgid_va.1) && $_gsdata.gspgid_va.1=='triggers'}
 	<hr>
 	<pre>
 	   function before_delete($rec,$type) {
@@ -158,7 +158,7 @@
 	{/foreach}
 	</table>
 	<h5>Редактировать/<a href="/admin/wizard/recordset_fields/{$_gsdata.gspgid_va.0}/submodules#form">создать</a>:</h5>
-	{if $_gsdata.gspgid_va.1=='submodules'}
+	{if isset($_gsdata.gspgid_va.1) && $_gsdata.gspgid_va.1=='submodules'}
 	<hr><br>
 	<a name="form"></a>
 	{handler gspgid="/admin/form/wz_recordset_submodules/edit/`$_gsdata.gspgid_va.2`" Recordset_id=$recordset.id}
