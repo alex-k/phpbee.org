@@ -6,6 +6,22 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 	private $_id;
 	private $stats;
 	function __construct($cinfo) {
+		$this->_escape_case=array(
+		                        '='=>'$in',
+		                        '!='=>'$ne',
+		                        '>'=>'$gt',
+		                        '>='=>'$gte',
+		                        '<'=>'$lt',
+		                        '<='=>'$lte',
+		                        'STRONGLIKE'=>'$regex',
+		                        'LIKE'=>'$regex',
+		                        'STARTS'=>'$regex',
+		                        'ENDS'=>'$regex',
+		                        'FULLTEXT'=>'$regex',
+		                        'REGEXP'=>'$regex',
+		                        'NOTREGEXP'=>'$regex',
+		                        'BETWEEN'=>'$and',
+		                    );
 		parent::__construct();
 		$this->_field_types['serial']='INTEGER PRIMARY KEY';
 		$this->cinfo=$cinfo;
@@ -24,25 +40,6 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 		}
 	}
 
-	function escape_value($v,$c=null) {
-		if (is_float($v)) {
-			return sprintf('truncate(%s,5)',str_replace(',','.',sprintf('%.05f',$v)));
-		}else if (is_numeric($v)) {
-			return $v;
-		} else if (is_null($v)) {
-			return 'NULL';
-		} else if (is_array($v)) {
-			$arr=array();
-			foreach($v as $k=>$l) {
-				$arr[]=$this->escape_value($l);
-			}
-			return sprintf('(%s)',implode(',',$arr));
-		} else if ($c=='LIKE') {
-			return sprintf('%s',$this->db_connection->escapeString($v));
-		} else {
-			return sprintf("'%s'",$this->db_connection->escapeString($v));
-		}
-	}
 
 	function escape($f,$c,$v) {
 		$v_type='STRING';
@@ -58,19 +55,6 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 
 	}
 
-	function replace_pattern($escape_pattern,$v,$f=null,$c=null) {
-		preg_match_all('/{v/',$escape_pattern,$value_replaces);
-		if (sizeof($value_replaces[0])>1) {
-			$ret=str_replace('{f}',$f,$escape_pattern);
-			for ($i=0; $i<sizeof($value_replaces[0]); $i++) {
-				$ret=str_replace("{v$i}",$this->escape_value($v[$i]),$ret);
-			}
-		} else {
-			$v=$this->escape_value($v,$c);
-			$ret=str_replace(array('{f}','{v}'),array($f,$v),$escape_pattern);
-		}
-		return $ret;
-	}
 
 
 	function connect() {
@@ -89,21 +73,7 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 
 
 	function query($que='') {
-		$t=microtime(true);
-
-		mlog($que);
-
-		$this->_res=$this->db_connection->query($que);
-		
-		if ($this->_res===FALSE) {
-			throw new gs_dbd_exception('gs_dbdriver_sqlite: '.$this->db_connection->lastErrorMsg().' in query '.$que);
-		}
-		$t=microtime(true)-$t;
-		$rows=count($this->_res);
-		mlog(sprintf("%.03f secounds, %d rows",$t, $rows));
-		$this->stats['total_time']+=$t;
-		$this->stats['total_queries']+=1;
-		$this->stats['total_rows']+=$rows;
+		$this->_res=$que;
 		return $this->_res;
 
 	}
@@ -171,6 +141,7 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 				$values[$fieldname]=$this->escape_value($record->$fieldname);
 			}
 		}
+		$this->recordset=$rset;
 		$this->db_connection->selectCollection($rset->db_tablename)->insert($values);
 		return $values['_id'];
 
@@ -186,9 +157,12 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 			}
 		}
 		$idname=$rset->id_field_name;
+		$theObjId = new MongoId($record->get_old_value($idname)); 
 		return $this->db_connection->selectCollection($rset->db_tablename)->update(
-									array('_id'=>$record->get_old_value($idname)),
-									$values);
+									//array('_id'=>$record->get_old_value($idname)),
+									array('_id'=>$theObjId),
+									array('$set' => $values)
+									);
 
 	}
 	public function delete($record) {
@@ -200,8 +174,16 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 	}
 	function fetchall() {
 		$ret=array();
+		$idfieldname=isset($this->recordset) ? $this->recordset->id_field_name : null;
 		if (!$this->_que) {
-			while ($r=$this->_res->fetchArray(SQLITE3_ASSOC)) $ret[]=$r;
+			foreach ($this->_res as $r) {
+
+				if (is_array($r) && isset($r['_id']) && $idfieldname) {
+					$r[$idfieldname]=trim($r['_id']);
+					unset($r['_id']);
+				}
+				$ret[]=$r;
+			}
 			return $ret;
 		}
 		if (!isset($this->_cache[$this->_que])) {
@@ -218,51 +200,88 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 	}
 	function count($rset,$options) {
 		$count=$this->db_connection->selectCollection($rset->db_tablename)->count($options);
-		return array(array('count'=>$count));
+		return $this->query(array(array('count'=>$count)));
 	}
 	function select($rset,$options,$fields=NULL) {
+		$this->recordset=$rset;
 		$col=$this->selectCollection($rset);
-		if ($fields) $ret=$col->find($options,$fields);
-			else $ret=$col->find($options);
 
-		return $ret;	
-		/*
 		$where=$this->construct_where($options);
-		//md($rset->structure['fields'],1);
-		$fields = is_array($fields) ? array_filter($fields) : array_keys($rset->structure['fields']);
-		$que=sprintf("SELECT %s FROM %s ", implode(',',$fields), $rset->db_tablename);
+
+		md($where,1);
+
+		if ($fields) $ret=$col->find($where,$fields);
+			else $ret=$col->find($where);
+		
+
+
+		
 		if (is_array($options)) foreach($options as $o) {
 			if (isset($o['type'])) switch($o['type']) {
 				case 'limit':
-					$str_limit=sprintf(' LIMIT %d ',$this->escape_value($o['value']));
+					$ret->limit($this->escape_value($o['value']));
 					break;
 				case 'offset':
-					$str_offset=sprintf(' OFFSET %d ',$this->escape_value($o['value']));
+					$ret->skip($this->escape_value($o['value']));
 					break;
 				case 'orderby':
-					$str_orderby=sprintf(' ORDER BY %s ',$this->db_connection->escapeString($o['value']));
+					$val=explode(',',$o['value']);
+					$sort_arr=array();
+					foreach ($val as $v) {
+						$f=explode(' ',$v,2);
+						$sort_arr[$f[0]]= (isset($f[1]) && stripos($f[1],'DESC')!==FALSE) ? -1 : 1;
+					}
+					$ret->sort($sort_arr);
 					break;
 				case 'groupby':
-					$str_groupby=sprintf(' GROUP BY %s ',$this->db_connection->escapeString($o['value']));
 					break;
 			}
 		}
-		if (!empty($where)) $que.=sprintf(" WHERE %s", $where);
-		if (!empty($str_groupby)) $que.=$str_groupby;
-		if (!empty($str_orderby)) $que.=$str_orderby;
-		if (!empty($str_limit)) $que.=$str_limit;
-		if (!empty($str_offset)) $que.=$str_offset;
-
-		$this->_que=md5($que);
-		if(isset($this->_cache[$this->_que])) {
-			return true;
-		}
-
-		return $this->query($que);
-		*/
+		return $this->query($ret);	
 	}
 	private function selectCollection($rset) {
 		return $this->db_connection->selectCollection($rset->db_tablename);
+	}
+
+	function  construct_where($options,$type='AND') {
+		md($options,1);
+		$tmpsql=array();
+		$counter_or=0;
+		if (is_array($options)) foreach ($options as $kkey=>$value) {
+				if (!is_array($value) || !isset($value['value'])) {
+					$value=array('type'=>'value', 'field'=>$kkey,'case'=>'=','value'=>$value);
+				}
+				if (!isset($value['case'])) $value['case']='=';
+				if (!isset($value['type'])) $value['type']='value';
+
+
+					//$txt=$this->escape($value['field'],$value['case'],$value['value']);
+
+				if ($value['type']=='value') {
+
+					if ($value['field']==$this->recordset->id_field_name) {
+						$value['field']='_id';
+						$value['value']=new MongoId($value['value']);
+					}
+
+				if ($value['case']=='=') {
+					$tmpsql[$value['field']]=$this->escape_value($value['value'],$value['case']);	
+				} else {
+					$tmpsql[$value['field']][$this->escape_case($value['case'])]=$this->escape_value($value['value'],$value['case']);	
+				}
+
+				}
+
+		}
+		if (!$tmpsql) return array();
+		return array($type=='OR' ? '$or' : '$and'  => array($tmpsql));
+
+	}
+	function escape_case($case) {
+		return $this->_escape_case[$case];
+	}
+	function escape_value($v,$c=null) {
+		return $v;
 	}
 
 
