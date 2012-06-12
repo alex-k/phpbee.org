@@ -6,6 +6,7 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 	private $_id;
 	private $stats;
 	function __construct($cinfo) {
+		parent::__construct();
 		$this->_escape_case=array(
 		                        '='=>'$in',
 		                        '!='=>'$ne',
@@ -22,7 +23,6 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 		                        'NOTREGEXP'=>'$regex',
 		                        'BETWEEN'=>'$and',
 		                    );
-		parent::__construct();
 		$this->_field_types['serial']='INTEGER PRIMARY KEY';
 		$this->cinfo=$cinfo;
 		$this->_id=rand();
@@ -208,7 +208,6 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 
 		$where=$this->construct_where($options);
 
-		md($where,1);
 
 		if ($fields) $ret=$col->find($where,$fields);
 			else $ret=$col->find($where);
@@ -244,10 +243,19 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 	}
 
 	function  construct_where($options,$type='AND') {
-		md($options,1);
 		$tmpsql=array();
 		$counter_or=0;
 		if (is_array($options)) foreach ($options as $kkey=>$value) {
+					//$txt=$this->escape($value['field'],$value['case'],$value['value']);
+				if (isset($value['type']) && $value['type']=='condition') {
+					$condition=$value['condition'];
+					unset($value['type']);
+					unset($value['condition']);
+					$casesql=$this->construct_where($value,$condition);
+					$tmpsql[]=$casesql;
+					continue;
+				} 
+
 				if (!is_array($value) || !isset($value['value'])) {
 					$value=array('type'=>'value', 'field'=>$kkey,'case'=>'=','value'=>$value);
 				}
@@ -255,7 +263,6 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 				if (!isset($value['type'])) $value['type']='value';
 
 
-					//$txt=$this->escape($value['field'],$value['case'],$value['value']);
 
 				if ($value['type']=='value') {
 
@@ -264,23 +271,25 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 						$value['value']=new MongoId($value['value']);
 					}
 
-				if ($value['case']=='=') {
-					$tmpsql[$value['field']]=$this->escape_value($value['value'],$value['case']);	
-				} else {
-					$tmpsql[$value['field']][$this->escape_case($value['case'])]=$this->escape_value($value['value'],$value['case']);	
-				}
+					if ($value['case']=='=') {
+						$tmpsql[][$value['field']]=$this->escape_value($value['value'],$value['case']);	
+					} else {
+						$tmpsql[][$value['field']][$this->escape_case($value['case'])]=$this->escape_value($value['value'],$value['case']);	
+					}
 
 				}
 
 		}
 		if (!$tmpsql) return array();
-		return array($type=='OR' ? '$or' : '$and'  => array($tmpsql));
+		return array($type=='OR' ? '$or' : '$and'  => $tmpsql);
 
 	}
 	function escape_case($case) {
-		return $this->_escape_case[$case];
+		$ret=$this->_escape_case[$case];
+		return $ret;
 	}
 	function escape_value($v,$c=null) {
+		if ($c=='LIKE') return ".*$v.*";
 		return $v;
 	}
 
