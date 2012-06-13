@@ -431,6 +431,12 @@ class gs_rs_links extends gs_recordset{
 			$rs->parent_recordset=$this;
 			$links=array();
 			foreach ($this->array as $l) {
+				/*
+				md('---------',1);
+				md($idname,1);
+				md($l->get_values(),1);
+				md($l->$idname,1);
+				*/
 				$links[$l->$idname]=$l;
 			}
 			$this->links=$links;

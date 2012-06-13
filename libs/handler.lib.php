@@ -230,11 +230,6 @@ class gs_base_handler extends gs_handler {
                 $variants=array();
                 foreach ($vrecs as $vrec) $variants[$vrec->get_id()]=trim($vrec);
                 $hhh[$k]['variants']=$variants;
-                if (isset($data[$k])) {
-                    unset($fields[$k]);
-                    $data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
-                    $rec->$k->flush($data[$k]);
-                }
                 break;
             case 'lOne2One':
                 if ($hh[$k]['hidden']!='false' && $hh[$k]['hidden']) break;
@@ -397,7 +392,16 @@ class gs_base_handler extends gs_handler {
         }
         $f=$this->validate();
         if (!is_object($f) || !is_a($f,'g_forms')) return $f;
-        $f->rec->fill_values(self::explode_data($f->clean()));
+	$cleandata=$f->clean();
+        $f->rec->fill_values(self::explode_data($cleandata));
+	foreach ($f->htmlforms as $fieldname=>$field) {
+		if ($field['type']=='lMany2Many') {
+			if (isset($cleandata[$fieldname])) {
+			    //$data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
+			    $f->rec->$fieldname->flush($cleandata[$fieldname]);
+			}
+		}
+	}
         $f->rec->get_recordset()->commit();
 
         /*

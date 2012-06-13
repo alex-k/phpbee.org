@@ -169,7 +169,7 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 		$this->_cache=array();
 		$rset=$record->get_recordset();
 		$idname=$rset->id_field_name;
-		return $this->db_connection->selectCollection($rset->db_tablename)->remove(array('_id'=>$record->get_old_value($idname)));
+		return $this->db_connection->selectCollection($rset->db_tablename)->remove(array('_id'=>new MongoId($record->get_old_value($idname))));
 
 	}
 	function fetchall() {
@@ -207,6 +207,13 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 		$col=$this->selectCollection($rset);
 
 		$where=$this->construct_where($options);
+
+		/*
+		md('-------------------',1);
+		md($this->recordset->get_recordset_name(),1);
+		md($options,1);
+		md($where,1);
+		*/
 
 
 		if ($fields) $ret=$col->find($where,$fields);
@@ -268,11 +275,21 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 
 					if ($value['field']==$this->recordset->id_field_name) {
 						$value['field']='_id';
-						$value['value']=new MongoId($value['value']);
+						if (is_array($value['value'])) {
+							foreach ($value['value'] as $k=>$v) {
+								$value['value'][$k]=new MongoId($v);
+							}
+						} else {
+							$value['value']=new MongoId($value['value']);
+						}
 					}
 
 					if ($value['case']=='=') {
-						$tmpsql[][$value['field']]=$this->escape_value($value['value'],$value['case']);	
+						if (is_array($value['value'])) {
+							$tmpsql[][$value['field']]['$in']=$this->escape_value($value['value'],$value['case']);	
+						} else {
+							$tmpsql[][$value['field']]=$this->escape_value($value['value'],$value['case']);	
+						}
 					} else {
 						$tmpsql[][$value['field']][$this->escape_case($value['case'])]=$this->escape_value($value['value'],$value['case']);	
 					}

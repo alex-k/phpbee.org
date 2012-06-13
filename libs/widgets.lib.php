@@ -321,7 +321,11 @@ class gs_widget_multiselect extends gs_widget_select {
 	}
 	function clean() {
 		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
-		$ret=is_array($this->value) && count($this->value)>0 ? array_combine(array_values($this->value),array_values($this->value)) : array();
+		$ret=array();
+		//$ret=is_array($this->value) && count($this->value)>0 ? array_combine(array_values($this->value),array_values($this->value)) : array();
+		if (is_array($this->value)) foreach ($this->value as $k=>$v) {
+			if (is_string($v) || is_numeric($v)) $ret[$v]=$v;
+		}
 		return array($this->fieldname=>$ret);
 	}
 }
@@ -434,6 +438,7 @@ class gs_widget_checkbox extends gs_widget {
 }
 class gs_widget_radio extends gs_widget {
 	function html() {
+		$s="";
 		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 		foreach ($this->params['options'] as $v=>$l) {
 			$s.=sprintf('<label><input class="%s %s" type="radio" name="%s" value="%s" %s> %s </label>%s',

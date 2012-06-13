@@ -424,7 +424,7 @@ class gs_filter_select_by_links extends gs_filter {
 		$rec_rs=new $recordsetname();
 		//$rec_rs=$rec_rs->find_records(array());
 		$options=array();
-		$options=string_to_params($this->params['options']);
+		if (isset($this->params['options'])) $options=string_to_params($this->params['options']);
 		foreach ($this->recordset->query_options['options'] as $o) {
 			if (isset($o['field']) && isset($rec_rs->structure['fields'][$o['field']])) {
 				$options[]=$o;
@@ -476,11 +476,12 @@ class gs_filter_select_by_links extends gs_filter {
 
 			$links[]=array('name'=>$name,'keyname'=>$this->name,'key'=>$key,'count'=>$count, 'va'=>$arr,'rec'=>null,);
 		}
-		$count_all= $rs ? $rs->count_records($count_array_all) : 0;
+		$count_all= isset($rs) ? $rs->count_records($count_array_all) : 0;
 		
 		$current_name='';
 
-		
+		$link_all='';
+		$count_all='';
 		foreach($links as $key=>$l) {
 			ksort($l['va']);
 			switch ($this->data['handler_params']['urltype']) {
@@ -503,7 +504,6 @@ class gs_filter_select_by_links extends gs_filter {
 			if ($l['key']==$this->value) $current_name=$l['name'];
 		}
 		$link_all_array=array('name'=>'all','key'=>'all','href'=>$link_all,'count'=>$count_all, 'va'=>null,'rec'=>null);
-
 		$tpl->assign('link_all',$link_all_array);
 		$tpl->assign('links',$links);
 		$tpl->assign('current',$this->value);

@@ -88,8 +88,8 @@
 	</tr>
 	{/foreach}
 	</table>
-	<h5>Редактировать/<a href="/admin/wizard/recordset_fields/{$_gsdata.gspgid_va.0}/links#form">создать</a>:</h5>
-	{if isset($_gsdata.gspgid_va.1) &&  $_gsdata.gspgid_va.1=='links'}
+	<h5>Редактировать/<a href="/admin/wizard/recordset_fields/{$_gsdata.gspgid_va.0}/links/0#form">создать</a>:</h5>
+	{if isset($_gsdata.gspgid_va.1) &&  $_gsdata.gspgid_va.1=='links' && isset($_gsdata.gspgid_va.2)}
 	<hr><br>
 	<a name="form"></a>
 	{handler gspgid="/admin/form/wz_recordset_links/edit/`$_gsdata.gspgid_va.2`" Recordset_id=$recordset.id}
@@ -121,8 +121,8 @@
 	</tr>
 	{/foreach}
 	</table>
-	<h5>Редактировать/<a href="/admin/wizard/recordset_fields/{$_gsdata.gspgid_va.0}/triggers#form">создать</a>:</h5>
-	{if isset($_gsdata.gspgid_va.1) && $_gsdata.gspgid_va.1=='triggers'}
+	<h5>Редактировать/<a href="/admin/wizard/recordset_fields/{$_gsdata.gspgid_va.0}/triggers/0#form">создать</a>:</h5>
+	{if isset($_gsdata.gspgid_va.1) && $_gsdata.gspgid_va.1=='triggers' && isset($_gsdata.gspgid_va.2)}
 	<hr>
 	<pre>
 	   function before_delete($rec,$type) {
