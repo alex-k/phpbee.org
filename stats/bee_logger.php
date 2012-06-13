@@ -1,10 +1,10 @@
-#!/usr/local/bin/php
+#!/usr//bin/php
 <?php
 require_once('../libs/vpa_daemon.lib.php');
 date_default_timezone_set('Europe/Moscow');
 error_reporting(E_ALL | E_STRICT);
 $config=array(
-		'host'=>'195.182.131.62',
+		'host'=>'5.9.20.143',
 		'port'=>8080,
 	);
 
@@ -30,7 +30,7 @@ class bee_logger_daemon extends vpa_daemon_base {
 		$from = '';
 		$port = 0;
 		while (true) {
-			socket_recvfrom($socket, $buf, 128, 0, $from, $port);
+			socket_recvfrom($socket, $buf, 1024, 0, $from, $port);
 			//echo $buf.PHP_EOL;
 			file_put_contents($this->logfile,$buf.PHP_EOL,FILE_APPEND);
 		}

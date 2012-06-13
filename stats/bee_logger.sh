@@ -2,12 +2,12 @@
    case "$1" in
    start)
      echo "starting VD Logger..."
-     /home/pahomov/www/phpbee.org/stats/bee_logger.php 
+     /home/www/phpbee.org/stats/bee_logger.php 
      ;;
    restart)
      echo "restarting VD Logger..."
      kill -HUP `cat /var/run/bee_logger.pid` 
-     /home/pahomov/www/phpbee.org/stats/bee_logger.php
+     /home/www/phpbee.org/stats/bee_logger.php
      ;;
    stop)
      echo "stopping VD Logger..."
