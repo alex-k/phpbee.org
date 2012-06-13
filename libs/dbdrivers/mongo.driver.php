@@ -145,7 +145,7 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 		}
 		$this->recordset=$rset;
 		$this->db_connection->selectCollection($rset->db_tablename)->insert($values);
-		return $values['_id'];
+		return trim($values['_id']);
 
 	}
 	public function update($record) {

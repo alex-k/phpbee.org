@@ -50,6 +50,7 @@ class gs_recordset_short_Test extends PHPUnit_Framework_TestCase {
 		);
 		$rec=$rs->new_record($data);
 		$rs->commit();
+		var_dump($rec->get_id());
 
 		$nrec=record_by_id($rec->get_id(),'tst_recordset1');
 
