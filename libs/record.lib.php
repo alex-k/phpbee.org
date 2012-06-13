@@ -421,7 +421,7 @@ class gs_record implements arrayaccess {
 			$node->addAttribute('name',$this->get_recordset_name());
 		}
 		$fkey=gs_fkey::get_instance();
-		$fkey_arr=$fkey->key_array[$this->get_recordset_name()];
+		$fkey_arr=isset($fkey->key_array[$this->get_recordset_name()]) ? $fkey->key_array[$this->get_recordset_name()] : array();
 		$structure=$this->get_recordset()->structure['recordsets'];
 		$x=$node->addChild('record');
 		$values=$this->get_values();
