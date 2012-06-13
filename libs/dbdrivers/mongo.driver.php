@@ -65,7 +65,7 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 						$this->cinfo['db_username'],
 						$this->cinfo['db_password'],
 						$this->cinfo['db_hostname'],
-						$this->cinfo['db_database'],
+						$this->cinfo['db_database']
 						));
 		if (!$mongo) {
 			throw new gs_dbd_exception('gs_dbdriver_mongo: can not open database '.$this->cinfo['db_hostname']);
