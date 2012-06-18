@@ -24,6 +24,17 @@ abstract class tw_images extends gs_recordset_handler {
 		}
 		return $ret;
 	}
+	function href($img,$href,$record=null) {
+		 $records=$record ? array($record) : $this;
+		$ret=array();
+		foreach ($records as $rec) {
+			$h=reset($rec->File->src($href));
+			$i=reset($rec->File->img($img));
+			$ret[]=sprintf('<a href="%s">%s</a>',$h,$i);
+		}
+		 return $ret;
+		
+	}
 	function record_as_string($rec) {
 		$res=$rec->File->img('small');
 		$res=trim(implode(' ',$res));
