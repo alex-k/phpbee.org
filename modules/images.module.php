@@ -27,10 +27,11 @@ abstract class tw_images extends gs_recordset_handler {
 	function href($img,$href,$record=null) {
 		 $records=$record ? array($record) : $this;
 		$ret=array();
+		$rel='hrefgrp_'.$records->first()->Parent_id;
 		foreach ($records as $rec) {
 			$h=reset($rec->File->src($href));
 			$i=reset($rec->File->img($img));
-			$ret[]=sprintf('<a href="%s">%s</a>',$h,$i);
+			$ret[]=sprintf('<a class="images_href" href="%s" rel="%s">%s</a>',$h,$rel,$i);
 		}
 		 return $ret;
 		
@@ -101,6 +102,7 @@ abstract class tw_file_images extends gs_recordset_short{
 		$this->config=array(
 			//'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
 			'admin'=>array('width'=>100,'height'=>100,'method'=>'use_fields','bgcolor'=>array(255,255,255)),
+			'tumb'=>array('width'=>300,'height'=>300,'method'=>'use_box','bgcolor'=>array(255,255,255)),
 			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(255,255,255)),
 		);
 	}
@@ -177,6 +179,7 @@ class images_handler extends gs_base_handler {
 		$type=$t['filename'];
 		$key=array_pop($d);
 		$o=new $rs;
+		load_dbdriver('file');
 		$c=new gs_dbdriver_file($cinfo);
 		$id=$c->id2int($key);
 		$rec=$o->get_by_id($id);
