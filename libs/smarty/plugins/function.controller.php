@@ -23,7 +23,7 @@ function smarty_function_controller($params, &$smarty)
 
 	$vars=array();
 	foreach ($params as $k=>$v) {
-		if ($v!==FALSE && $v!==NULL && strpos($k,'_')!==0) {
+		if ($v!==FALSE && $v!==NULL && (array_key_exists($k,$obj->structure['fields']) || strpos($k,'_')!==0)) {
 			if (is_array($v)) {
 				$vars[]=array($k,$v);
 			} else {
