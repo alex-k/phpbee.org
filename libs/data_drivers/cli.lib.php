@@ -16,6 +16,3 @@ class gs_data_driver_cli implements gs_data_driver {
 		return $this->test_type() ? array('gspgid'=>$this->gspgid,'gspgtype'=>GS_DATA_GET) : array();
 	}
 }
-
-?>
-
