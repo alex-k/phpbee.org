@@ -86,6 +86,9 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
                 'loginbuttons' => array(
                     'admin_handler.show:name:loginbuttons.html',
                 ) ,
+                'loginlinks' => array(
+                    'admin_handler.show:name:loginlinks.html',
+                ) ,
             ) ,
         );
         return self::add_subdir($data, dirname(__file__));
