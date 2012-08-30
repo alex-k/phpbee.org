@@ -72,6 +72,7 @@ class gl {
                 return $this->root.'/modify/0'.$this->__data_get().'#form';
         }
         function rec_edit() {
+		#return $this->module_name.'/'.$this->record->get_recordset_name().'/modify/'.$this->record->get_id().$this->__data_get().'#form';
                 return $this->root.'/modify/'.$this->record->get_id().$this->__data_get().'#form';
         }
         function rec_copy() {

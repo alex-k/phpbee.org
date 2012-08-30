@@ -146,6 +146,7 @@ class gs_validate_checkField  extends gs_validate {
 
 class gs_validate_checkUnique extends gs_validate {
 	function validate($field,$value,$data=array(),$params=array(),$record=null) {
+		if (empty($value)) return true;
 		$classname=$params['class'];
 		$obj=new $classname;
 		$func_name=isset($params['func']) ? $params['func'] : 'check_unique';

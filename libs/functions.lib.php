@@ -415,7 +415,8 @@ function rec_autoformat($rec,$txtfield='text',$imgfield=null) {
     return $txt;
 }
 
-function current_url() {
+
+function base_url() {
     $protocol = 'http';
     if ($_SERVER['SERVER_PORT'] == 443 || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')) {
         $protocol = 'https';
@@ -425,11 +426,34 @@ function current_url() {
     }
     $host = $_SERVER['HTTP_HOST'];
     $port = $_SERVER['SERVER_PORT'];
+    $toret = $protocol . '://' . $host . ($port == $protocol_port ? '' : ':' . $port);
+    return $toret;
+}
+function current_url() {
     $request = $_SERVER['REQUEST_URI'];
 	$query='';
     if (isset($_SERVER['argv'])) $query = substr($_SERVER['argv'][0], strpos($_SERVER['argv'][0], ';') + 1);
-    $toret = $protocol . '://' . $host . ($port == $protocol_port ? '' : ':' . $port) . $request . (empty($query) ? '' : '?' . $query);
+    $toret = base_url() . $request . (empty($query) ? '' : '?' . $query);
     return $toret;
+}
+
+
+
+function va($n) {
+	$tpl=gs_tpl::get_instance();
+	$data=$tpl->getTemplateVars('_gsdata');
+	return $data['gspgid_va'][$n];
+}
+function current_handler() {
+	$tpl=gs_tpl::get_instance();
+	$data=$tpl->getTemplateVars('_gsdata');
+	return $data['handler_key'];
+}
+function ch() {
+	return current_handler();
+}
+function current_handler_url() {
+	return base_url().'/'.current_handler();
 }
 
 

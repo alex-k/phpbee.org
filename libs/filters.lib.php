@@ -357,6 +357,10 @@ class gs_filter_verbose_calendar extends gs_filter_like {
 
 
 class gs_filter_select_by_links extends gs_filter {
+	/*
+	 {handler gspgid="/filter/" class="select_by_links" link="reports.status:name" name="status"}
+										 ^имя поля в линке, по которому фильтруем
+	 */
 	function __construct($data) {
 		parent::__construct($data);
 		list($recordsetname,$linkname)=explode('.',$this->params['link']);

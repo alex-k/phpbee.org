@@ -348,6 +348,7 @@ class gs_base_handler extends gs_handler {
         $tpl=gs_tpl::get_instance();
         if (!$f) $f=$this->get_form();
         $tpl->assign('formfields',$f->show());
+	$tpl->assign('handler_params',$this->data['handler_params']);
         /*
         $tpl->assign('forminputs',$f->get_inputs());
         $tpl->assign('formerrors',$f->validate_errors['FIELDS']);
@@ -850,6 +851,7 @@ function hpar($data,$name='hkey',$default=null) {
         return true;
     }
 
+
     function post_login($data) {
         $rec=$this->check_login($data);
         if (is_object($rec) && is_a($rec,'gs_record')) return $rec;
@@ -906,6 +908,10 @@ function hpar($data,$name='hkey',$default=null) {
         return $rec;
     }
 
+    function rec_by_field($ret) {
+        $rec=record_by_field($this->params['field'],end($this->data['gspgid_va']),$this->params['classname']);
+        return $rec;
+    }
     function rec_by_urlkey($ret) {
         $rec=record_by_urlkey(end($this->data['gspgid_handler_va']),$this->params['classname']);
         return $rec;

@@ -19,6 +19,7 @@ abstract class gs_widget implements gs_widget_interface {
 		$this->tpl=gs_tpl::get_instance();
 		$this->interact=(isset($this->params['interact']) && $this->params['interact']) ? ' fInteract' : '';
 		$this->placeholder=isset($this->params['placeholder']) ? 'placeholder="'.$this->params['placeholder'].'"' : '';
+		$this->rows=isset($this->params['rows']) ? 'rows="'.$this->params['rows'].'"' : '';
 	}
 	function clean() {
 		if (!$this->validate()) throw new gs_widget_validate_exception($this->fieldname);
@@ -120,10 +121,11 @@ class gs_widget_hidden extends gs_widget {
 }
 class gs_widget_text extends gs_widget {
 	function html() {
-		return sprintf('<textarea class="%s" name="%s" %s>%s</textarea>',
+		return sprintf('<textarea class="%s" name="%s" %s %s>%s</textarea>',
 					   isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fText',
 					   $this->fieldname,
 					   $this->placeholder,
+					   $this->rows,
 					   trim($this->value)
 					   );
 	}
@@ -461,7 +463,8 @@ class gs_widget_lMany2Many_chosen extends gs_widget_multiselect_chosen {}
 
 class gs_widget_lOne2One extends gs_widget {
 	function js() {
-		$ret="<select class=\"lOne2One\" name=\"".$this->fieldname."\">\n";
+		$ret=sprintf("<select class=\"%s\" name=\"".$this->fieldname."\">\n",
+				isset($this->params['cssclass']) ? $this->params['cssclass'] : 'lOne2One');
 		$ret.="<% for (vid in t.values.".$this->fieldname.".variants) { %>
 			  <option value=\"<%=vid%>\" <% if (t.values.".$this->fieldname.".selected == vid) { %> selected=\"selected\" <% } %>  ><%=t.values.".$this->fieldname.".variants[vid]%></option>
 			  <% } %>
@@ -470,7 +473,9 @@ class gs_widget_lOne2One extends gs_widget {
 		return $ret;
 	}
 	function option_string($fieldname) {
-		return sprintf("<select  class=\"lOne2One fInteract\" name=\"%s\">\n", $fieldname);
+		return sprintf("<select  class=\"%s fInteract\" name=\"%s\">\n",
+				isset($this->params['cssclass']) ? $this->params['cssclass'] : 'lOne2One',
+				$fieldname);
 	}
 	function html() {
 		$ret=$this->option_string($this->fieldname);
