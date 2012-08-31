@@ -37,7 +37,7 @@ function ImageWebSearch_search(obj) {
 		for (var i = 0; i < results.length; i++) {
 			var result = results[i];
 			//var img=new Image();
-			var img=$('<div class="MultiPowUploadGalleryItem"><a href="#" onClick="return false;" class="preview"><img src="'+result.tbUrl+'"></a></div>').get(0);
+			var img=$('<div class="ImageWebSearchGalleryItem"><a href="#" onClick="return false;" class="preview"><img src="'+result.tbUrl+'"></a></div>').get(0);
 			img.url=$(obj).attr('rel');
 			img.imgurl=result.url;
 			img.onclick=ImageWebSearch_click;
@@ -55,7 +55,7 @@ function ImageWebSearch_search(obj) {
 }
 
 function ImageWebSearch_click() {
-	$(this).addClass("MultiPowUploadCheckedElement");
+	$(this).addClass("ImageWebSearchCheckedElement");
     jQuery.ajax(this.url, {
 				context: this,
 				dataType: "html" ,
@@ -71,28 +71,28 @@ function ImageWebSearch_click() {
 
 
 	$(document).ready(function() {
-		$("#gallery_"+hash+" div.MultiPowUploadGalleryItem").live("click",function(){
+		$("#gallery_"+hash+" div.ImageWebSearchGalleryItem").live("click",function(){
 			var li=$(this);
 			var inp=$("input",li);
 			inp.attr('checked',!(inp.attr('checked')));
-			li.removeClass('MultiPowUploadCheckedElement');
-			if(inp.attr('checked')) li.addClass('MultiPowUploadCheckedElement');
+			li.removeClass('ImageWebSearchCheckedElement');
+			if(inp.attr('checked')) li.addClass('ImageWebSearchCheckedElement');
 		});
 
 
-		$(".MultiPowUploadGalleryGroup").dblclick(function(){
-			$("div.MultiPowUploadGalleryItem",this).click();
+		$(".ImageWebSearchGalleryGroup").dblclick(function(){
+			$("div.ImageWebSearchGalleryItem",this).click();
 			return false;
 		});
-		$(".MultiPowUploadGallery").dblclick(function(){
-			$("div.MultiPowUploadGalleryItem",this).click();
+		$(".ImageWebSearchGallery").dblclick(function(){
+			$("div.ImageWebSearchGalleryItem",this).click();
 			return false;
 		});
 
-		$("#checked_items_submit").click(function(){
+		$("#ImageWebSearch_checked_items_submit").click(function(){
 			var form=$(this).closest('form');
 			//var action=$(':radio[name=checked_items_action]',form).filter(":checked").val();
-			var gspgid="widgets/MultiPowUpload/action";
+			var gspgid="widgets/ImageWebSearch/action";
 			$('input[name=gspgid_form]',form).val(gspgid);
 			form.get(0).submit();
 		});

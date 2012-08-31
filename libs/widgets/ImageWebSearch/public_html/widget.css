@@ -1,20 +1,20 @@
 
-.MultiPowUploadStartButton {
+.ImageWebSearchStartButton {
 	border: 2px;
 }
-.MultiPowUploadGallery input{
+.ImageWebSearchGallery input{
 	display:none;
 }
 
 
-.MultiPowUploadGalleryGroup{
+.ImageWebSearchGalleryGroup{
 	float: left;
 	background: #DDf;
 	margin-right: 12px;
 	margin-bottom: 6px;
 	/*border: 1px solid #666;*/
 }
-.MultiPowUploadGalleryItem{
+.ImageWebSearchGalleryItem{
 	float: left;
 	padding: 6px;
 	margin:0px;
@@ -30,7 +30,7 @@
 	color:#fff;
 	}
 
-.MultiPowUploadStartButton{
+.ImageWebSearchStartButton{
 font-weight:bold;
 text-align:center;
 font-size:12px;
@@ -40,21 +40,21 @@ cursor:pointer;
 background-image:none;
 margin-top:2px;
 }
-.MultiPowUploadStartButton:hover{
+.ImageWebSearchStartButton:hover{
 background-color:#E0E0E0;
 background-image:none;
 }
-.MultiPowUploadCheckedElement{
+.ImageWebSearchCheckedElement{
 background-color:#DBEBF0 !important;
 border:1px solid #64AFE1 !important;
 box-shadow:0 0 1px white;
 }
-.MultiPowUploadCheckedElement img{
+.ImageWebSearchCheckedElement img{
 box-shadow:0 0 3px black !important;
 }
 
 
-.MultiPowUploadGalleryItem{
+.ImageWebSearchGalleryItem{
 float: none !important;
 display:inline-block;
 border-radius:3px;
@@ -64,7 +64,7 @@ margin-top:2px !important;
 border:1px solid white;
 } 
 
-.MultiPowUploadGalleryItem img, .images_uploader img{
+.ImageWebSearchGalleryItem img, .images_uploader img{
 border:1px solid white;
 box-shadow:0 0 1px #707076;
 } 
@@ -72,7 +72,7 @@ box-shadow:0 0 1px #707076;
 
 
 
-.MultiPowUploadStartButton{
+.ImageWebSearchStartButton{
 font-weight:bold;
 text-align:center;
 font-size:16px;
@@ -91,12 +91,12 @@ color:white;
 margin-top:2px;
 margin-bottom:10px;
 }
-.MultiPowUploadStartButton:hover{
+.ImageWebSearchStartButton:hover{
 background-color:#99A72F !important;
 background-image:none !important;
 background-image:none;
 }
-.MultiPowUploadGalleryGroup{
+.ImageWebSearchGalleryGroup{
 background:  #EAEAEA !important;
 border:1px solid #D4D4D4;
 display:block;
@@ -105,13 +105,13 @@ clear:both;
 padding:0 2px !important;
 margin-bottom:0 !important;
 }
-.MultiPowUploadGalleryGroup .MultiPowUploadGalleryItem{
+.ImageWebSearchGalleryGroup .ImageWebSearchGalleryItem{
 border:1px solid #EAEAEA;
 }
 
 
 
-.MultiPowUpload{
+.ImageWebSearch{
 margin-top:10px;
 }
 
