@@ -1,7 +1,7 @@
 <?php
 load_file(dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'MultiPowUpload'.DIRECTORY_SEPARATOR.'widget.php');
 class gs_widget_ImageWebSearch extends gs_widget_MultiPowUpload {
-    function html() {
+	function html() {
         $hash_field_name=$this->params['linkname'].'_hash';
         $hash=isset($this->data[$hash_field_name]) ? $this->data[$hash_field_name] : time().rand(10,99);
         $rid_name=$this->params['options']['local_field_name'];
@@ -45,7 +45,7 @@ class gs_widget_ImageWebSearch extends gs_widget_MultiPowUpload {
         $tpl->assign('images',$images);
         $tpl->assign('g_images',$g_images);
 
-        return $tpl->fetch('widget.html');
+        return $tpl->fetch('widget_ImageWebSearch.html');
 
     }
     function clean() {
@@ -104,7 +104,7 @@ class gs_widget_ImageWebSearch_handler extends gs_widget_MultiPowUpload_handler 
 		$tpl=gs_tpl::get_instance();
 		$tpl->template_dir=cfg('lib_dir').DIRECTORY_SEPARATOR.'widgets'.DIRECTORY_SEPARATOR.'MultiPowUpload'.DIRECTORY_SEPARATOR.'templates';
 		$tpl->assign('i',$f);
-		echo $tpl->fetch('li_image.html');
+		echo $tpl->fetch('li_image_ImageWebSearch.html');
 	}
 
 	function search() {

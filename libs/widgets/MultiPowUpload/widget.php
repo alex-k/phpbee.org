@@ -47,7 +47,7 @@ class gs_widget_MultiPowUpload extends gs_widget{
 		$tpl->assign('images',$images);
 		$tpl->assign('g_images',$g_images);
 
-		return $tpl->fetch('widget.html');
+		return $tpl->fetch('widget_MultiPowUpload.html');
 
 	}
 	function clean() {
@@ -157,6 +157,6 @@ class gs_widget_MultiPowUpload_handler extends gs_handler {
 		$tpl=gs_tpl::get_instance();
 		$tpl->template_dir=cfg('lib_dir').DIRECTORY_SEPARATOR.'widgets'.DIRECTORY_SEPARATOR.'MultiPowUpload'.DIRECTORY_SEPARATOR.'templates';
 		$tpl->assign('i',$f);
-		echo $tpl->fetch('li_image.html');
+		echo $tpl->fetch('li_image_MultiPowUpload.html');
 	}
 }

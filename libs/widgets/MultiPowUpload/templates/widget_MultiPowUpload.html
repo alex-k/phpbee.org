@@ -8,7 +8,7 @@
 	{foreach $g_images as $g_key=>$images}
 		{if $g_key && $g_key!="nogrp"}<div class=MultiPowUploadGalleryGroup>{/if}
 		{foreach $images as $i}
-		{include file="li_image.html" i=$i}
+		{include file="li_image_MultiPowUpload.html" i=$i}
 		{/foreach}
 		{if $g_key && $g_key!="nogrp"}</div>{/if}
 
