@@ -257,7 +257,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 	
 	function orderby ($orderby) {
-		$this->query_options['options'][]=array('type'=>'orderby','value'=>$orderby);
+		$this->query_options['options']['orderby']=array('type'=>'orderby','value'=>$orderby);
 		return $this;
 	}
 
