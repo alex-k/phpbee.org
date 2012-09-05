@@ -409,6 +409,7 @@ abstract class gs_recordset_base extends gs_iterator {
 	public function insert($record) {
 		$this->process_trigger('before_insert',$record);
 		$r=$record->set_id($this->get_connector()->insert($record));
+		$record->reset_old_values();
 		$this->process_trigger('after_insert',$record);
 		return $r;
 	}

@@ -335,6 +335,7 @@ class gs_widget_multiselect extends gs_widget_select {
 class gs_widget_multiselect_chosen extends gs_widget_multiselect {
 	function __construct($fieldname,$data,$params=array(),$form=null) {
 		parent::__construct($fieldname,$data,$params,$form);
+		if (!isset($this->params['cssclass'])) $this->params['cssclass']='';
 		$this->params['cssclass'].=' chosen';
 	}
 }

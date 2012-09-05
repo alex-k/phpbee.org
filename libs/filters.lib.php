@@ -268,6 +268,9 @@ class gs_filter_sort extends gs_filter {
 		return $out;
 	}
 	function applyFilter($options,$rs) {
+		if (empty($this->value)) {
+			$this->value=reset($this->fields);
+		}
 		if (empty($this->value)) return $options;
 		$value=str_replace(":"," ",$this->value);
 		$options['orderby']=array('type'=>'orderby','value'=>$value);
@@ -423,7 +426,7 @@ class gs_filter_select_by_links extends gs_filter {
 
 
 		$recordsetname=$this->link['recordset'];
-		if ($this->link['type']=='many') $recordsetname=$this->link['rs2_name'];
+		if (isset($this->link['type']) && $this->link['type']=='many') $recordsetname=$this->link['rs2_name'];
 
 		$rec_rs=new $recordsetname();
 		//$rec_rs=$rec_rs->find_records(array());
@@ -445,7 +448,7 @@ class gs_filter_select_by_links extends gs_filter {
 		foreach ($rec_rs as $rec) {
 			$arr=$this->va;
 			$key=$rec->{$this->fieldname};
-			if ($this->link['type']=='many') {
+			if (isset($this->link['type']) && $this->link['type']=='many') {
 				$field=$this->recordset->id_field_name;
 				$backlink='_'.$this->recordset->get_backlink_name($this->linkname);
 				$id=array();

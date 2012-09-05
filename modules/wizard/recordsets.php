@@ -17,6 +17,7 @@ class wz_recordsets extends gs_recordset_short {
 
 	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
+	public $sortkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'title'=> "fString 'название'",
@@ -30,6 +31,7 @@ class wz_recordsets extends gs_recordset_short {
 		'showadmin'=>"fCheckbox 'show in admin'",
 		'no_urlkey'=>"fCheckbox 'No URL key' default=1",
 		'no_ctime'=>"fCheckbox 'No ctime'",
+		'sortkey'=>"fCheckbox 'sortkey' default=0",
 		'install'=>"fCheckbox 'make install table' default=1",
 		'orderby'=>"fString 'order by' required=false default='id'",
 		'id_field_name'=>"fString 'id_field_name' required=false default='id'",
@@ -68,6 +70,7 @@ class wz_recordset_resizes extends gs_recordset_short {
 class wz_recordset_fields extends gs_recordset_short {
 
 	public $gs_connector_id='wizard';
+	public $sortkey=1;
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",

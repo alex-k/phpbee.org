@@ -18,7 +18,7 @@
 
 		{handler gspgid="/filter/" class="like" name="search" fields="{%$fields%}" urltype=get }
 		{handler gspgid="/filter/" class="calendar" name="calendar" fields="_ctime,_mtime,{%$datefields%}" urltype=get }
-		{handler gspgid="/filter/" class="sort" name="sort" fields="{%$fields%}" urltype=get }
+		{handler gspgid="/filter/" class="sort" name="sort" fields="{%if $rs->sortkey%}sortkey,{%/if%}{%$fields%}" urltype=get }
 		{handler gspgid="/filter/" class="limit" name="limit" urltype=session values='20,50,100,500' default_value=20}
 		{handler gspgid="/filter/" class="offset"  name="offset" urltype=get limit='limit'}
 
@@ -27,7 +27,11 @@
 		{controller _class="{%$rs.name%}" _assign="{%$rs.name%}" _filters="search,calendar,sort,limit,offset,{%$s_filters%}"}
 
 
-	<table class="tb">
+		{%if $rs->sortkey%}
+		{handler gspgid="/sortkey" sortkey_id="{%$rs->name%}" recordset_name="{%$rs->name%}"}
+		{%/if%}
+
+	<table {%if $rs->sortkey%}class="tb sortkey-table" sortkey_id="{%$rs->name%}"{%else%}class="tb"{%/if%}>
 	<thead>
 	<tr class="filters"><td colspan="100">
 	<table>
@@ -67,7 +71,7 @@
 	</thead>
 	
 	{foreach from=${%$rs.name%} item="e"}
-	<tr class="{cycle values='odd,even'}">
+	<tr class="{cycle values='odd,even'}" record_id="{$e->get_id()}">
 			<td>{$e->get_id()}</td>
 			{%foreach from=$fields item=f%}
 			<td class="frm_{%$f.type%}">

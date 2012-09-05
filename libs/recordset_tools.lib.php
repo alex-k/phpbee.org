@@ -507,6 +507,9 @@ class gs_rs_links extends gs_recordset{
 	}
 }
 class gs_recordset_short extends gs_recordset {
+	public $sortkey=0;
+	public $no_urlkey=1;
+	public $no_ctime=0;
 	function __construct($s=false,$init_opts=false) {
 		$this->init_fields=$s;
 		$this->init_opts=$init_opts;
@@ -521,6 +524,12 @@ class gs_recordset_short extends gs_recordset {
 		if(!isset($this->no_ctime) || !$this->no_ctime) {
 			$this->structure['fields']['_ctime']=array('type'=>'date');
 			$this->structure['fields']['_mtime']=array('type'=>'date');
+		}
+		if(isset($this->sortkey) && $this->sortkey) {
+			$this->structure['fields']['sortkey']=array('type'=>'float','default'=>0);
+			$this->structure['indexes']['sortkey']='sortkey';
+			$this->structure['triggers']['after_insert'][]='trigger_sortkey';
+			$this->structure['triggers']['before_update'][]='trigger_sortkey';
 		}
 		if(!isset($this->no_urlkey) || !$this->no_urlkey) {
 			$this->structure['fields']['urlkey']=array('type'=>'varchar','options'=>'128');
@@ -731,6 +740,9 @@ class %s extends gs_recordset_i18n {
 
 	function trigger_urlkey($rec,$type) {
 		if(!trim($rec->urlkey)) $rec->urlkey=string_to_safeurl(trim($rec));
+	}
+	function trigger_sortkey($rec,$type) {
+		if (!$rec->sortkey) $rec->sortkey=$rec->get_id();
 	}
 
 	function get_backlink_class($linkname) {

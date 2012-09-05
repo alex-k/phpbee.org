@@ -301,6 +301,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$rset=$record->get_recordset();
 		$fields=array();
 		foreach ($rset->structure['fields'] as $fieldname=>$st) {
+			
 			if ($record->is_modified($fieldname)) {
 				if ($st['type']=='set') {
 				$fields[]=sprintf('`%s` = %s',$fieldname,$this->escape_value($record->$fieldname,'SET'));

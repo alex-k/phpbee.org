@@ -88,8 +88,12 @@ class gs_record implements arrayaccess {
 
 	public function set_id($id) {
 		$field=$this->gs_recordset->id_field_name;
-		$this->values[$field]=trim($id);
+		$this->values[$field]=$this->old_values[$field]=trim($id);
 		return ($id);
+	}
+	public function reset_old_values() {
+		$this->old_values=$this->values;
+		$this->modified_values=array();
 	}
 
 	public function fill_values($values) {
@@ -350,10 +354,12 @@ class gs_record implements arrayaccess {
 			$this->_mtime=date("Y-m-d H:i:s");
 			$ret=$this->gs_recordset->insert($this);
 			$this->set_id($ret);
-		} else if ($this->recordstate & RECORD_DELETED) {
+		} 
+		if ($this->recordstate & RECORD_DELETED) {
 			if (!gs_fkey::event('on_delete',$this)) return false;
 			$ret=$this->gs_recordset->delete($this);
-		} else if ( $this->recordstate & RECORD_CHANGED) {
+		} 
+		if ( $this->recordstate & RECORD_CHANGED) {
 			if (!gs_fkey::event('on_update',$this)) return false;
 			//$this->_mtime=date("c");
 			$this->_mtime=date("Y-m-d H:i:s");

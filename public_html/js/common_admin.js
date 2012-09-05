@@ -7,8 +7,42 @@ $(document).ready (function () {
 	$(".lOne2One").sel_filter( {slide_width: 150, min_options: 1, crop: false});
 	$(".fSelect").sel_filter();
 	$(".fDateTime").datepicker();
+	 $(".sortable").sortable();
+	 $(".sortkey-table tbody").sortable({
+		     helper: function(e, ui) {
+			    ui.children().each(function() {
+				    $(this).width($(this).width());
+				});
+		        return ui;
+			},
+		update: function(event, ui) {
+			var rec_id=ui.item.attr('record_id');
+			var dir='after';
+			var dir_rec_id=ui.item.prev().attr('record_id');
+			if (!dir_rec_id) {
+				var dir='before';
+				var dir_rec_id=ui.item.next().attr('record_id');
 
-	$(".sortable").sortable();
+			}
+			var sortkey_id=ui.item.closest('table').attr('sortkey_id');
+			if (rec_id && dir_rec_id && sortkey_id) {
+				var data = {};
+				data['sortkey_id']=sortkey_id;
+				data['rec_id']=rec_id;
+				data['dir_rec_id']=dir_rec_id;
+				data['dir']=dir;
+				$.ajax({
+					url:document.location.href,
+					data: data,
+					type: 'GET',
+					dataType: 'JSON',
+				});
+			}
+			
+		}
+
+
+	 }).disableSelection();
 
 	$('.fWysiwyg').rte( {
 		//css: ['default.css'],

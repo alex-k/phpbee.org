@@ -111,9 +111,9 @@ abstract class g_forms implements g_forms_interface{
 				if (!isset($this->htmlforms[$name])) continue;
 				$field=$this->htmlforms[$name];
 				$value=$this->_inputs[$name];
-				if ($field['type']=='private') continue;
+				if (isset($field['type']) && $field['type']=='private') continue;
 
-				if ($field['type']=='hidden' || (isset($field['widget']) && $field['widget']=='hidden')) {
+				if ((isset($field['type']) && $field['type']=='hidden') || (isset($field['widget']) && $field['widget']=='hidden')) {
 					$arr[]=$value['input'];
 				} else {
 					$arr[]=$helper->show($value['label'],$value['input'],isset($validate['FIELDS'][$name]) ? $validate['FIELDS'][$name] : NULL,$field);
@@ -306,7 +306,7 @@ class g_forms_html extends g_forms {
 			$v['gs_form_params']=$this->params;
 			$v['interact']=isset($this->interact[$field]);
 			$w =new $wclass($field,$this->data,$v,$this);
-			if($v['type']=='label') {
+			if(isset($v['type']) && $v['type']=='label') {
 				$arr[$field]=array('input'=>$v['verbose_name']);
 				continue;
 			}

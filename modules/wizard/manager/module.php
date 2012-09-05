@@ -125,10 +125,10 @@ class form_wizard_manager_login extends g_forms_table{
 
 		$module=record_by_id($data['handler_params']['Module_id'],'wz_modules');
 		$dirname=dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'createlogin'.DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
-		$login_templates=array_map(basename,glob($dirname."*"));
+		$login_templates=array_map('basename',glob($dirname."*"));
 
 		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
-		$manager_templates=array_map(basename,glob($dirname."*"));
+		$manager_templates=array_map('basename',glob($dirname."*"));
 
 		$login_fields=$rs->Fields->recordset_as_string_array();
 		$login_fields=array_combine($login_fields,$login_fields);
@@ -216,7 +216,7 @@ class form_wizard_manager_forms extends g_forms_table{
 
 	static function recordset_form_fields(&$hh,$rs_id,$login_rs=NULL) {
 		$dirname=dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'createmanager'.DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
-		$page_templates=array_map(basename,glob($dirname."*"));
+		$page_templates=array_map('basename',glob($dirname."*"));
 		$rs=record_by_id(intval($rs_id),'wz_recordsets');
 		$all_links=$rs->Links->recordset_as_string_array();
 		$links=$rs->Links->find(array('type'=>array('lMany2Many','lOne2One')))->recordset_as_string_array();
