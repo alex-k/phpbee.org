@@ -387,7 +387,7 @@ function rec_autoformat($rec,$txtfield='text',$imgfield=null) {
     $txt=array_map(make_paragraph,$txt);
 
     if ($imgfield && $rec->$imgfield->count()>0) {
-        $images=$rec->$imgfield->img('prev');
+        $images=$rec->$imgfield->imghref('prev','fullscreen');
         $atxt=array();
         $cnt=ceil(0.5*count($txt)/$rec->$imgfield->count());
         $imgcnt=ceil($rec->$imgfield->count()/count($txt));

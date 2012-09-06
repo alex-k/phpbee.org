@@ -3,6 +3,7 @@ DEFINE ('GS_DATA_STDIN','stdin');
 DEFINE ('GS_DATA_POST','post'); // operator
 DEFINE ('GS_DATA_GET','get'); // operator
 DEFINE ('GS_DATA_SEF','sef'); // Search Engines Frendly URI
+DEFINE ('GS_DATA_CLI','cli');
 DEFINE ('GS_DATA_SESSION','session');
 DEFINE ('GS_DATA_COOKIE','cookie');
 DEFINE ('GS_NULL_XML',"<null></null>");
@@ -56,6 +57,7 @@ class gs_data {
 			GS_DATA_SESSION,
 			GS_DATA_GET,
 			GS_DATA_SEF,
+			GS_DATA_CLI,
 			GS_DATA_POST,
 			GS_DATA_STDIN,
 		);

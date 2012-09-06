@@ -614,7 +614,18 @@ class gs_recordset_short extends gs_recordset {
 	function install() {
 		$ret=parent::install();
 		$this->i18n_install();
+		$this->sortkey_install();
 		return $ret;
+	}
+
+	function sortkey_install() {
+		if (!isset($this->structure['fields']['sortkey'])) return;
+		$sr=$this->find_records(array('sortkey'=>0));
+		foreach ($sr as $rec) {
+			$rec->sortkey=$rec->get_id();
+		}
+		$sr->commit();
+
 	}
 	function i18n_install () {
 		$s=$this->init_fields;
