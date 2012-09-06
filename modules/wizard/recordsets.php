@@ -250,8 +250,10 @@ class wz_handlers extends gs_recordset_short {
 
 	public $gs_connector_id='wizard';
 	public $no_urlkey=1;
+	public $sortkey=1;
+
 	function __construct($init_opts=false) { parent::__construct(array(
-		'cnt'=> "fInt cnt",
+		'cnt'=> "fInt",
 		'handler_keyname'=> "fString key required=false",
 		'handler_value'=>"fString value",
 		'Url'=>'lOne2One wz_urls',

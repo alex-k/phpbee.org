@@ -12,22 +12,21 @@
 
 	<a href="/admin/wizard/commit/{$url.Module->first()->id}">commit</a>
 	</h3>
+	{handler gspgid="/sortkey" sortkey_id=table1 recordset_name=wz_handlers}
 
 	<h4>handlers</h4>
 
-	<table class="tb">
+	<table class="tb sortkey-table" sortkey_id="table1">
 	<thead>
 	<tr><th>#</th>
-	<th>cnt</th>
 	<th>handler_key</th>
 	<th>handler_value</th>
 	<th></th>
 	<th></th>
 	</thead>
-	{foreach from=$url->Handlers->orderby('cnt') item="e"}
-	<tr class="{cycle values='odd,even'}">
+	{foreach from=$url->Handlers->orderby('sortkey') item="e"}
+	<tr class="{cycle values='odd,even'}" record_id="{$e.id}">
 			<td>{$e.id}</td>
-			<td>{$e.cnt}</td>
 			<td>{$e.handler_keyname}</td>
 			<td><a href="/admin/wizard/handlers/{$e.Url_id}/handlers/{$e.id}#form">{$e.handler_value}</a></td>
 			<td class="cnt"><a href="/admin/wizard/handlers/{$e.Url_id}/handlers/{$e.id}#form"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
@@ -36,7 +35,7 @@
 	{/foreach}
 	</table>
 
-	<h5>Редактировать/<a href="/admin/wizard/handlers/{$_gsdata.gspgid_va.0}/handlers#form">создать</a>:</h5>
+	<h5>Редактировать/<a href="/admin/wizard/handlers/{$_gsdata.gspgid_va.0}/handlers/0#form">создать</a>:</h5>
 	{if $_gsdata.gspgid_va.1=='handlers'}
 	<hr><br>
 	<a name="form"></a>

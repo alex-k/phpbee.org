@@ -622,7 +622,8 @@ class gs_recordset_short extends gs_recordset {
 		if (!isset($this->structure['fields']['sortkey'])) return;
 		$sr=$this->find_records(array('sortkey'=>0));
 		foreach ($sr as $rec) {
-			$rec->sortkey=$rec->get_id();
+			if (isset($this->structure['fields']['cnt'])) $rec->sortkey=$rec->cnt;
+			else $rec->sortkey=$rec->get_id();
 		}
 		$sr->commit();
 
