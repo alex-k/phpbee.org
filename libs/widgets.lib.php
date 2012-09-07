@@ -83,12 +83,12 @@ class gs_widget_password2 extends gs_widget {
 		$this->params['readonly'] ? 'disabled="disabled"' : '',
 		$this->placeholder,
 		//$this->params['verbose_name2']? $this->params['verbose_name2'] : gs_dict::get('REPEAT_PASSWORD'),
-		$this->params['verbose_name2'],
+		isset($this->params['verbose_name2']) ? $this->params['verbose_name2'] : '',
 		isset($this->params['cssclass']) ? $this->params['cssclass'] : '',
 		$this->fieldname,
 		($this->value==$v2) ? $this->value : '',
 		$this->params['readonly'] ? 'disabled="disabled"' : '',
-		$this->params['placeholder2'] ? 'placeholder="'.$this->params['placeholder2'].'"' : ''
+		isset($this->params['placeholder2']) ? 'placeholder="'.$this->params['placeholder2'].'"' : ''
 		);
 	}
 

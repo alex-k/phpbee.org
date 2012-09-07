@@ -904,12 +904,17 @@ function hpar($data,$name='hkey',$default=null) {
             return $this->showform($f);
         }
 
-		foreach ($password_fields as $n=>$v) {
-				if ($rec->$n != $rs->encode_password($rec,$v)) {
-						$f->trigger_error('FORM_ERROR','REC_NOTFOUND');
-						return $this->showform($f);
-				}
-		}
+	foreach ($password_fields as $n=>$v) {
+			if ($rec->$n == $v) {
+				$rec->$n=FALSE;
+				$rec->$n=$v;
+				$rec->commit();
+			}
+			if ($rec->$n != $rs->encode_password($rec,$v)) {
+					$f->trigger_error('FORM_ERROR','REC_NOTFOUND');
+					return $this->showform($f);
+			}
+	}
 
 
         return $rec;
