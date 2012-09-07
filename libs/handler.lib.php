@@ -878,32 +878,39 @@ function hpar($data,$name='hkey',$default=null) {
         $rsname=$this->params['classname'];
         $rs=new $rsname;
 
+		$password_fields=array();
+
+
+		foreach ($d as $n=>$v) {
+				if ($rs->is_password_field($n)) {
+						$password_fields[$n]=$d[$n];
+						unset($d[$n]);
+				}
+		}
 
         foreach ($this->data['handler_params'] as $n=>$v) {
             if (isset($rs->structure['fields'][$n])) $d[$n]=$v;
         }
-        /*
-        foreach ($this->params as $n=>$v) {
-        	if (isset($rs->structure['fields'][$n])) $d[$n]=$v;
-        }
-        */
         $d=array_filter($d);
         if (!$d) {
             $f->trigger_error('FORM_ERROR','EMPTY_SEARCH');
             return $this->showform($f);
 
         }
-
-
         $rec=$rs->find_records($d)->first();
-
-
-
 
         if (!$rec) {
             $f->trigger_error('FORM_ERROR','REC_NOTFOUND');
             return $this->showform($f);
         }
+
+		foreach ($password_fields as $n=>$v) {
+				if ($rec->$n != $rs->encode_password($rec,$v)) {
+						$f->trigger_error('FORM_ERROR','REC_NOTFOUND');
+						return $this->showform($f);
+				}
+		}
+
 
         return $rec;
     }

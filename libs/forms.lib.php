@@ -110,7 +110,7 @@ abstract class g_forms implements g_forms_interface{
 				$name=(string)$e->name;
 				if (!isset($this->htmlforms[$name])) continue;
 				$field=$this->htmlforms[$name];
-				$value=$this->_inputs[$name];
+				$value=isset($this->_inputs[$name]) ? $this->_inputs[$name] : null;
 				if (isset($field['type']) && $field['type']=='private') continue;
 
 				if ((isset($field['type']) && $field['type']=='hidden') || (isset($field['widget']) && $field['widget']=='hidden')) {

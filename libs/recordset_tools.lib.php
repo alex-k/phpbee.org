@@ -89,7 +89,10 @@ class field_interface {
 		if (isset($opts['helper_text'])) $structure['htmlforms'][$field]['helper_text']=$opts['helper_text'];
 	}
 	static function fPassword($field,$opts,&$structure,$init_opts) {
-		return self::fString($field,$opts,$structure,$init_opts);
+		self::fString($field,$opts,$structure,$init_opts);
+		$structure['password_fields'][]=$field;
+		$structure['triggers']['before_update'][]='trigger_fPassword_encode';
+		$structure['triggers']['after_insert'][]='trigger_fPassword_encode';
 	}
 	static function fCheckbox($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'int','default'=>isset($opts['default']) ? (int)$opts['default'] : 0);
@@ -756,6 +759,19 @@ class %s extends gs_recordset_i18n {
 	function trigger_sortkey($rec,$type) {
 		if (!$rec->sortkey) $rec->sortkey=$rec->get_id();
 	}
+
+	function trigger_fPassword_encode($rec) {
+		foreach ($this->structure['password_fields'] as $field) {
+			$rec->$field=$this->encode_password($rec,$rec->$field);
+		}
+	}
+	function is_password_field($n) {
+		return isset($this->structure['password_fields']) && in_array($n,$this->structure['password_fields']);
+	}
+	function encode_password($rec,$v) {
+		return md5(md5($rec->get_id()).$v);
+	}
+
 
 	function get_backlink_class($linkname) {
 		return $this->structure['recordsets'][$linkname]['rs2_name'];
