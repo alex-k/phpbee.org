@@ -35,7 +35,7 @@ mkdir build
 cd build
 svn export $REPO . --force
 
-svn log -r '{'$LASTDATE'}':'{'`date -v +1d "+%Y-%m-%d"`'}' --xml --verbose $REPO > Changelog.xml
+svn log -r '{'$LASTDATE'}':'{'`date -d tomorrow "+%Y-%m-%d"`'}' --xml --verbose $REPO > Changelog.xml
 xsltproc ../svn2cl.xsl Changelog.xml  > Changelog.txt
 xsltproc ../svn2html.xsl Changelog.xml  > Changelog.html
 
