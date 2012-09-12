@@ -77,7 +77,7 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 
 class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 	<*if $rs->id_field_name && $rs->id_field_name!='id'*>public $id_field_name='<*$rs->id_field_name*>'; <*/if*>
-	<*if $rs->no_urlkey*>public $no_urlkey=true; <*/if*>
+	public $no_urlkey=<*intval($rs->no_urlkey)*>;
 	<*if $rs->sortkey*>public $sortkey=true; <*/if*>
 	<*if $rs->no_ctime*>public $no_ctime=true; <*/if*>
 	<*if $rs->orderby*>public $orderby="<*$rs->orderby*>";<*/if*> 
