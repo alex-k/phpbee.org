@@ -7,7 +7,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 	}
 	function install() {
 		foreach(array(
-					'sitemap_cfg',				) as $r){
+					'rss_cfg',				) as $r){
 			$this->$r=new $r;
 			$this->$r->install();
 		}
@@ -16,35 +16,44 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 	function get_menu() {
 		$ret=array();
 		$item=array();
-		$item[]='<a href="/admin/sitemap/">sitemap</a>';
-					$item[]='<a href="/admin/sitemap/sitemap_cfg">sitemap_cfg</a>';				$ret[]=$item;
+		$item[]='<a href="/admin/rss/">rss</a>';
+					$item[]='<a href="/admin/rss/rss_cfg">rss_cfg</a>';				$ret[]=$item;
 		return $ret;
 	}
 	
 	static function get_handlers() {
 		$data=array(
 'get'=>array(
-'/admin/sitemap/sitemap_cfg'=>array(
-  'gs_base_handler.show:name:adm_sitemap_cfg.html', 
+'/admin/rss/rss_cfg'=>array(
+  'gs_base_handler.show:name:adm_rss_cfg.html', 
 ),
-'/admin/sitemap/sitemap_cfg/delete'=>array(
-  'gs_base_handler.delete:{classname:sitemap_cfg}', 
+'/admin/rss/rss_cfg/delete'=>array(
+  'gs_base_handler.delete:{classname:rss_cfg}', 
   'gs_base_handler.redirect', 
 ),
-'/admin/sitemap/sitemap_cfg/copy'=>array(
-  'gs_base_handler.copy:{classname:sitemap_cfg}', 
+'/admin/rss/rss_cfg/copy'=>array(
+  'gs_base_handler.copy:{classname:rss_cfg}', 
   'gs_base_handler.redirect', 
 ),
-'execute'=>array(
-  'sitemap_handler.execute:return:not_false', 
+''=>array(
+  'gs_base_handler.rec_by_fieldname:classname:rss_cfg:fieldname:alias:return:gs_record^e404', 
+  'rss_handler.execute:return:not_false', 
   'gs_base_handler.xml_show:return:not_false', 
-  'gs_base_handler.save_file_public_html:filename:sitemap.xml:return:not_false', 
+ 'end'=> 'end', 
+  'gs_base_handler.save_file_public_html:filename:rss.xml:return:not_false', 
+ 'e404'=> 'gs_base_handler.show404:name:404.html', 
 ),
 ),
 'handler'=>array(
-'/admin/form/sitemap_cfg'=>array(
+'/admin/form/rss_cfg'=>array(
   'gs_base_handler.redirect_if:gl:save_cancel:return:true', 
-  'gs_base_handler.post:{name:admin_form.html:classname:sitemap_cfg:form_class:sitemap_cfg_form}', 
+  'gs_base_handler.post:{name:admin_form.html:classname:rss_cfg:form_class:rss_cfg_form}', 
+  'gs_base_handler.redirect_if:gl:save_continue:return:true', 
+  'gs_base_handler.redirect_if:gl:save_return:return:true', 
+),
+'/admin/inline_form/rss_cfg'=>array(
+  'gs_base_handler.redirect_if:gl:save_cancel:return:true', 
+  'gs_base_handler.post:{name:inline_form.html:classname:rss_cfg}', 
   'gs_base_handler.redirect_if:gl:save_continue:return:true', 
   'gs_base_handler.redirect_if:gl:save_return:return:true', 
 ),
@@ -84,8 +93,9 @@ class handler{%$MODULE_NAME%} extends gs_base_handler {
 */
 
 
-class sitemap_cfg extends gs_recordset_short {
-		public $no_urlkey=true; 	public $no_ctime=true; 	public $orderby="id"; 
+class rss_cfg extends gs_recordset_short {
+		public $no_urlkey=1;
+	public $sortkey=true; 	public $no_ctime=true; 	public $orderby="id"; 
 	function __construct($init_opts=false) { parent::__construct(array(
 
 		
@@ -99,6 +109,27 @@ class sitemap_cfg extends gs_recordset_short {
 
 		
 			'disabled'=>'fCheckbox verbose_name="disabled"     required=false        ',
+
+		
+			'title_field_name'=>'fString verbose_name="title_field_name"     required=true        ',
+
+		
+			'details_field_name'=>'fString verbose_name="details_field_name"     required=true        ',
+
+		
+			'details_field_length'=>'fInt verbose_name="details_field_length"   default="500"   required=true        ',
+
+		
+			'records_limit'=>'fInt verbose_name="records_limit"   default="50"   required=true        ',
+
+		
+			'alias'=>'fString verbose_name="alias"     required=true  index=true      ',
+
+		
+			'title'=>'fString verbose_name="title"     required=true        ',
+
+		
+			'description'=>'fString verbose_name="description"     required=true        ',
 
 								),$init_opts);
 
