@@ -36,7 +36,7 @@ class oauth2_handler extends gs_handler {
 		$options=array(
 			$this->params['login_field']=>$profile['uid']
 			);
-		if (isset($profile['email']) && $profile['email']) $options[$this->params['login_field']]=$profile['email'];
+		//if (isset($profile['email']) && $profile['email']) $options[$this->params['login_field']]=$profile['email'];
 		$rec=$rs->find_records($options)->first();
 		if (!$rec) {
 			$rec=$rs->find_records($options)->first(true);
@@ -46,6 +46,7 @@ class oauth2_handler extends gs_handler {
 			if (isset($this->params['first_name_field'])) $rec->{$this->params['first_name_field']}=$profile['first_name'];
 			if (isset($this->params['last_name_field'])) $rec->{$this->params['last_name_field']}=$profile['last_name'];
 			if (isset($this->params['full_name_field'])) $rec->{$this->params['full_name_field']}=$profile['first_name'].' '.$profile['last_name'];
+			if (isset($this->params['email_name_field'])) $rec->{$this->params['email_name_field']}=$profile['email'];
 			$rec->commit();
 		}
 		foreach ($this->data['handler_params'] as $n=>$v) {
@@ -96,13 +97,21 @@ class oauth2_vk {
 		$this->config=$config;
 	}
 	function authorize($callback) {
+		gs_session::save($callback,'oauth2_vk_request');
 		$callback=urlencode($callback);
-		return "http://oauth.vk.com/authorize?client_id=".$this->config->APP_ID."&scope=".$this->config->SCOPE."&redirect_uri=$callback&response_type=code";
+		$url="http://oauth.vk.com/authorize?client_id=".$this->config->APP_ID."&scope=".$this->config->SCOPE."&redirect_uri=$callback&response_type=code";
+		return $url;
 	}
 	function token($data) {
-		$code=$data['code'];
-		$url="https://oauth.vk.com/access_token?client_id=".$this->config->APP_ID."&client_secret=".$this->config->APP_SECRET."&code=$code";
-		$d=json_decode(html_fetch($url));
+		$r=array(
+			'client_id'=>$this->config->APP_ID,
+			'client_secret'=>$this->config->APP_SECRET,
+			'code'=>$data['code'],
+			'redirect_uri'=>(gs_session::load('oauth2_vk_request')),
+			);
+		$url="https://oauth.vk.com/access_token?".http_build_query($r);
+		$html=html_fetch($url);
+		$d=json_decode($html);
 		return $d;
 	}
 	function profile($token) {
