@@ -107,7 +107,10 @@ class admin_handler extends gs_base_handler {
 		if (cfg('admin_user_name')==$d['admin_user_name'] && cfg('admin_password')==$d['admin_password']) {
 			$rec=$d;
 		}
-		if (!$rec) return $this->showform();
+		if (!$rec) {
+			$f->trigger_error('FORM_ERROR','LOGIN_ERROR');
+			return $this->showform($f);
+		}
 		gs_session::save($rec,'login_gs_admin');
 		return true;
 	}

@@ -209,6 +209,7 @@ class gs_base_handler extends gs_handler {
         $params['form']=$f;
         $rec=$f->rec;
         foreach ($f->htmlforms as $k=>$v) {
+		if (!isset($hh[$k])) continue;
             $v=$hh[$k];
             $hhh=array($k=>$v);
             switch($v['type']) {

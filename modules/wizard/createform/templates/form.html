@@ -16,9 +16,11 @@
 		{$id=0}
 		{foreach $form->get_inputs() as $name=>$f}
 			{$ids=explode(':',$name)}
+			{if count($ids)>1}
 			{$id=$ids[1]}
 			{if $id && $ids[0]!='enabled'}
 			{$fields[$id][$name]=$f}
+			{/if}
 			{/if}
 		{/foreach}
 		<table>

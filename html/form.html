@@ -1,6 +1,7 @@
 <form action="" method="post" class="form_login">
 	<input type=hidden name="root" value="{$pid_id}">
 	<input type=hidden name="gspgid_form" value="{$gspgid_form}">
+	{$form->print_error('FORM_ERROR')}
 	{$formfields}
 	<input type="submit" name="save_return" value="save & return">
 	<input type="submit" name="save_continue" value="save & continue">

@@ -9,11 +9,16 @@ interface g_forms_interface {
 }
 
 abstract class g_forms implements g_forms_interface{
+	public $error_template='<div class="form_error" id="err" style="display: block; "><i></i>%s</div>';
+	public $clean_data=array();
+	public $validate_errors=array();
+	public $rec;
+
 	function __construct($h,$params=array(),$data=array()) {
+		$this->rec=new gs_null(GS_NULL_XML);
+
 		if (!is_array($data)) $data=array();
 		$this->params=$params;
-		$this->clean_data=array();
-		$this->validate_errors=array();
 		$form_default=array();
 		foreach ($h as $k=>$ih) {
 			if(isset($ih['hidden']) && $ih['hidden']) {
@@ -160,10 +165,10 @@ abstract class g_forms implements g_forms_interface{
 				$value=$w->clean();
 				if (is_array($value) && !is_numeric(key($value))) {
 					foreach ($value as $vk=>$vv) {
-						$this->clean_data[$vk]=$vv;
+						$this->clean_data[$vk]=$this->postfilter($k,$vv);
 					}
 				} else {
-					$this->clean_data[$k]=$value;
+					$this->clean_data[$k]=$this->postfilter($k,$value);
 				}
 			} catch (gs_widget_validate_exception $e) {
 				$this->error($ret, $k,$e->getMessage(),$w->validate_errors);
@@ -293,6 +298,18 @@ abstract class g_forms implements g_forms_interface{
 			$ret=array_merge($ret,$i_ret);
 		}
 		return json_encode($ret);
+	}
+
+	function postfilter($field,$value) {
+		$hf=$this->htmlforms[$field];
+		if (!isset($hf['postfilter'])) return $value;
+		$filters=array_unique(array_filter(array_map('trim',explode(',',$hf['postfilter']))));
+		foreach ($filters as $fname) {
+			$fname='g_forms_postfilter_'.$fname;
+			$f=new $fname();
+			$value=$f->filter($value);
+		}
+		return $value;
 	}
 }
 
@@ -528,6 +545,17 @@ class gs_glyph {
 			$ret=array_merge($ret,$c->find($name,$value));
 		}
 		return $ret;
+	}
+}
+abstract class g_forms_postfilter {
+	function filter($value) {
+		return $value;
+	}
+}
+
+class g_forms_postfilter_strip_tags extends g_forms_postfilter {
+	function filter($value) {
+		return strip_tags($value);
 	}
 }
 

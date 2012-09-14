@@ -465,6 +465,16 @@ class gs_rs_links extends gs_recordset{
 		//$this->links[]=4;
 		return $nr;
 	}
+	public function unlink($id) {
+		$fname=$this->structure['recordsets']['childs']['local_field_name'];
+		if (is_object($id) && is_a($id,'gs_record')) $id=$id->get_id();
+		if (!is_numeric($id)) return false;
+		if (isset($this->links)) foreach ($this->links as $k=>$l) {
+			if ($l->$fname==$id)  {
+				$l->delete();
+			}
+		}
+	}
 	public function flush($data) {
 		$fname=$this->structure['recordsets']['childs']['local_field_name'];
 		if (isset($this->links)) foreach ($this->links as $k=>$l) {

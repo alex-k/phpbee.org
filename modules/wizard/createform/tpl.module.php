@@ -163,7 +163,7 @@ class form_createform_tpl extends form_admin{
 				) ,
 		);
 		$dirname=dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
-		$extends=array_map(basename,glob($dirname."*"));
+		$extends=array_map('basename',glob($dirname."*"));
 		$modules=new wz_modules;
 		$modules->find_records(array());
 		$options=array(
@@ -211,14 +211,14 @@ class form_createform_tpl extends form_admin{
 			$arr=$farr;
 			$arr['name']['default']=$key;
 			$arr['verbose_name']['default']=$h['verbose_name'];
-			$arr['helper_text']['default']=$h['helper_text'];
-			$arr['cssclass']['default']=$h['cssclass'];
+			$arr['helper_text']['default']=isset($h['helper_text']) ? $h['helper_text'] : null ;
+			$arr['cssclass']['default']=isset($h['cssclass']) ? $h['cssclass'] : null;
 			$arr['widget']['default']=isset($h['widget']) ? $h['widget'] : $h['type'];
-			$arr['default_value']['default']=$h['default'];
+			$arr['default_value']['default']=isset($h['default']) ? $h['default'] : null;
 			$arr['readonly_field']['default']=isset($h['readonly']) ? $h['readonly'] : 0;
-			$arr['options']['default']=$h['options'];
+			$arr['options']['default']=isset($h['options']) ? $h['options'] : null;
 			$arr['validate']['default']=$h['validate'];
-			$arr['validate_params']['default']=is_array($h['validate_params']) ? params_to_string($h['validate_params']) : $h['validate_params'];
+			$arr['validate_params']['default']=isset($h['validate_params']) ? ( is_array($h['validate_params']) ? params_to_string($h['validate_params']) : $h['validate_params'] ) : null;
 
 			foreach($arr as $ak=>$av) {
 				//$options["$ak"."[$i]"]=$av;

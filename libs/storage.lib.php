@@ -171,7 +171,8 @@ abstract class gs_recordset_base extends gs_iterator {
 				break;
 			}
 		}
-		if (!$this->first()) return new gs_null(GS_NULL_XML);
+		//if (!$this->first()) return new gs_null(GS_NULL_XML);
+		if (!$this->first()) return $this;
 		$ids=array();
 		if ($linkname!==null) {
 			if (!isset($this->structure['recordsets'][$linkname])) return new gs_null(GS_NULL_XML);
