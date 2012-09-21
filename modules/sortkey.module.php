@@ -39,7 +39,10 @@ class sortkey_handler extends gs_base_handler{
 
 		$rec2=$rs->find_records(array(
 			'sortkey'=>array('field'=>'sortkey','case'=>$case,'value'=>$rec1->sortkey),
-		))->orderby($order)->limit(1)->first(true);
+		))->orderby($order)->limit(1)->first();
+    
+        if (!$rec2) $rec2=$rs->new_record(array());
+
 
 		$sortkey=abs($rec2->sortkey + $rec1->sortkey)/2;
 		$rec=record_by_id($d['rec_id'],$rsname);

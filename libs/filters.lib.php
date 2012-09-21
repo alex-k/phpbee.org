@@ -86,6 +86,10 @@ class gs_filter {
 		}
 		return $this->name;
 	}
+
+	function get_search_field_type() {
+		return 'fText';
+	}
 }
 
 class gs_filter_firstletters extends gs_filter_like {
@@ -158,7 +162,7 @@ class gs_filter_fulltext extends gs_filter_like {
 					'type'=>'value',
 					'field'=>$this->params['fields'],
 					'value'=>$this->value,
-					'case'=>$this->case,
+					'case'=>'FULLTEXT',
 					);
 		return $options;
 
@@ -314,6 +318,9 @@ class gs_filter_calendar extends gs_filter_like {
 		$options[$this->name]=$to;
 		return $options;
 	}
+	function get_search_field_type() {
+		return 'fDateTime';
+	}
 }
 class gs_filter_verbose_calendar extends gs_filter_like {
 	var $values=array (
@@ -383,7 +390,7 @@ class gs_filter_select_by_links extends gs_filter {
 
 
 
-		if ($link['type']=='many') {
+		if (isset($link['type']) && $link['type']=='many') {
 
 			$rec_rs_name=$link['rs2_name'];
 			$rec_rs=new $rec_rs_name();

@@ -81,9 +81,10 @@ class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 	<*if $rs->sortkey*>public $sortkey=true; <*/if*>
 	<*if $rs->no_ctime*>public $no_ctime=true; <*/if*>
 	<*if $rs->orderby*>public $orderby="<*$rs->orderby*>";<*/if*> 
+	<*if $rs->database*>public $gs_connector_id="<*$rs->database*>";<*/if*>
 	function __construct($init_opts=false) { parent::__construct(array(
 
-		<*foreach from=$rs->Fields item=f*>
+		<*foreach from=$rs->Fields->orderby('sortkey') item=f*>
 
 			'<*$f->name*>'=>'<*$f->type*> <*if $f->verbose_name*>verbose_name="<*$f->verbose_name*>" <*/if*> <*if $f->widget*>widget="<*$f->widget*>" <*/if*> <*if $f->default_value*>default="<*$f->default_value*>" <*/if*> <*if $f->options*>options="<*$f->options|escape:quotes*>" <*/if*> required=<*if $f->required*>true<*else*>false<*/if*> <*if $f->is_unique*>unique=true<*/if*> <*if $f->make_index*>index=true<*/if*> <*$f->extra_options|escape:quotes*> <*if $f->multilang*>multilang=true<*/if*> <*if $f->helper_text*>helper_text="<*$f->helper_text*>" <*/if*> <*if $f->cssclass*>cssclass="<*$f->cssclass*>" <*/if*>  ',
 

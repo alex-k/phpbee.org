@@ -387,9 +387,11 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 
 	public function update($record) {
+        gs_eventer::send('record_before_update',$this,$record);
 		$this->process_trigger('before_update',$record);
 		$r=$this->get_connector()->update($record);
 		$this->process_trigger('after_update',$record);
+        gs_eventer::send('record_after_update',$this,$record);
 		return $r;
 	}
 
@@ -398,9 +400,11 @@ abstract class gs_recordset_base extends gs_iterator {
 			foreach ($this as $r) $r->delete();
 			return $this;
 		}
+        gs_eventer::send('record_before_delete',$this,$record);
 		$this->process_trigger('before_delete',$record);
 		$r=$this->get_connector()->delete($record);
 		$this->process_trigger('after_delete',$record);
+        gs_eventer::send('record_after_delete',$this,$record);
 		return $r;
 	}
 
@@ -408,10 +412,12 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 
 	public function insert($record) {
+        gs_eventer::send('record_before_insert',$this,$record);
 		$this->process_trigger('before_insert',$record);
 		$r=$record->set_id($this->get_connector()->insert($record));
 		$record->reset_old_values();
 		$this->process_trigger('after_insert',$record);
+        gs_eventer::send('record_after_insert',$this,$record);
 		return $r;
 	}
 
@@ -636,7 +642,7 @@ abstract class gs_prepare_sql {
 		                        'LIKE'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}%%'",'NULL'=>'FALSE'),
 		                        'STARTS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '{v}%%'",'NULL'=>'FALSE'),
 		                        'ENDS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}'",'NULL'=>'FALSE'),
-		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})>5",'NULL'=>'FALSE'), // dont escape`fieldname` cause of multi-field-indexes (field1,field2,field3)
+		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})>1",'NULL'=>'FALSE'), // dont escape`fieldname` cause of multi-field-indexes (field1,field2,field3)
 		                        'REGEXP'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" `{f}` REGEXP {v}",'NULL'=>'FALSE'), // dont add `fieldname` cause of multi-field-indexes (field1,field2,field3)
 		                        'NOTREGEXP'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" `{f}` NOT REGEXP {v}",'NULL'=>'FALSE'), // dont add `fieldname` cause of multi-field-indexes (field1,field2,field3)
 		                        'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'(`{f}` BETWEEN {v0} AND {v1})'),

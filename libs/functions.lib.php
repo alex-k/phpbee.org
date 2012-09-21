@@ -456,5 +456,23 @@ function current_handler_url() {
 	return base_url().'/'.current_handler();
 }
 
+function beautify($out) {
+		include_once('PHP/Beautifier.php');
+		if (class_exists('PHP_Beautifier')) {
+			$out=str_replace(array('{%','%}'),array('::tpl_ldelim::','::tpl_rdelim::'),$out);
+			$oBeautifier = new PHP_Beautifier(); 
+			$oBeautifier->addFilter('ArrayNested');
+			$oBeautifier->addFilter('Pear',array('add_header'=>'php'));
+			$oBeautifier->setIndentChar(' ');
+			$oBeautifier->setIndentNumber(4);
+			$oBeautifier->setNewLine("\n");
+			$oBeautifier->setInputString($out); 
+			$oBeautifier->process();
+			$out=$oBeautifier->get();
+			$out=str_replace(array('::tpl_ldelim::','::tpl_rdelim::'),array('{%','%}'),$out);
+		}
+		return $out;
+}
+
 
 ?>

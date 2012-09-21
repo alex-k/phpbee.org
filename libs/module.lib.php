@@ -67,6 +67,10 @@ class gl {
 		#return $this->root.'/'.$this->record->get_id();
 	}
 
+    function rec_search() {
+        return $this->rec_show();
+    }
+
 
         function rec_create() {
                 return $this->root.'/modify/0'.$this->__data_get().'#form';

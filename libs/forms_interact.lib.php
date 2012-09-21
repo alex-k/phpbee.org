@@ -2,7 +2,7 @@
 
 class form_interact {
 	static $interact_regexps=array(
-		'|#(\w+)|s'=>'$this->field(\'\1\')',
+		'|#([\w\[\]]+)|s'=>'$this->field(\'\1\')',
 		'|\.hide|s'=>'->hide',
 		'|\.display_if|s'=>'->display_if',
 		'|\.show_if|s'=>'->display_if',
@@ -66,11 +66,30 @@ class form_interact {
 				$data[$r->get_id()]=trim($r);
 			}
 		} 
-		$this->form->set_variants($this->fieldname,$data);
+		$fieldname=str_replace('[]','',$this->fieldname);
+		$this->form->set_variants($fieldname,$data);
 		$this->form->_prepare_inputs();
-		$html=($this->form->get_input($this->fieldname));
-		//$html=$this->form->get_inputs();
+		$html=($this->form->get_input($fieldname));
+
 		$this->actions[]=array('field'=>$this->fieldname,'action'=>'replace_element','html'=>$html);
+	}
+	function link_values_options($condition) {
+		if(is_array($condition)) {
+			$data=$condition;
+		} else {
+			$data['']='';
+			list($rsname,$linkname)=explode('.',$condition);
+			$rec=record_by_id($this->value,$rsname);
+			foreach ($rec->$linkname as $r) {
+				$data[$r->get_id()]=trim($r);
+			}
+		} 
+		$fieldname=str_replace('[]','',$this->fieldname);
+		$this->form->set_variants($fieldname,$data);
+		$this->form->_prepare_inputs();
+		$html=($this->form->get_input($fieldname));
+
+		$this->actions[]=array('field'=>$this->fieldname,'action'=>'replace_options','html'=>$html);
 	}
 	function copy_value($condition) {
 		$this->actions[]=array('field'=>$this->fieldname,'action'=>'set_value','value'=>$this->value);

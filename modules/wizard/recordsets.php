@@ -21,6 +21,7 @@ class wz_recordsets extends gs_recordset_short {
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'title'=> "fString 'название'",
+		'database'=> "fSelect 'database' widget=select",
 		'extends'=>"fString 'extends' required=false",
 		'Module'=>'lOne2One wz_modules Module widget=parent_list',
 		'Fields'=>"lMany2One wz_recordset_fields:Recordset",
@@ -45,6 +46,17 @@ class wz_recordsets extends gs_recordset_short {
 		$rs=new wz_recordset_links;
 		$rs->find_records(array('classname'=>$rec->name))->delete();
 		$rs->commit();
+	}
+	function gs_data_widget_select($rec,$field) {
+		switch($field) {
+			case 'database':
+				$types=array_keys(cfg('gs_connectors'));
+				$types=array_combine($types,$types);
+				array_unshift($types,'');
+				return $types;
+				break;
+		}
+		return array();
 	}
 }
 

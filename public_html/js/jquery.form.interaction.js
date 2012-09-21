@@ -26,7 +26,7 @@
 			obj.hide();
 		}
 		set_value= function(obj,d,request) {
-			var new_el=$('[name='+d.field+']',obj);
+			var new_el=$('[name="'+d.field+'"]',obj);
 			new_el.val(d.value);
 			new_el.get(0).interact_request=request;
 		}
@@ -34,7 +34,7 @@
 		replace_element = function (obj,d,request) {
 
 			var new_el=$(d.html);
-			var old_el=$('[name='+d.field+']',obj);
+			var old_el=$('[name="'+d.field+'"]',obj);
 			for (ev in events) {
 				$(new_el).filter(ev).bind(events[ev],postform);
 			}
@@ -45,6 +45,14 @@
 			old_el.replaceWith(new_el);
 
 			if (typeof new_el.get(0).construct=="function") new_el.get(0).construct();
+		}
+		replace_options = function (obj,d,request) {
+			var new_el=$(d.html);
+			var old_el=$('[name="'+d.field+'"]',obj);
+			old_el.html(new_el.html());
+
+			old_el.trigger("liszt:updated");
+
 		}
 				
 		postform=function() {
@@ -69,7 +77,7 @@
 				answer = function(data) {
 					for ( k in data) {
 						var d=data[k];
-						var obj=$('[name='+d.field+']');
+						var obj=$('[name="'+d.field+'"]');
 						var i_box=obj.closest('.interact_box');
 						if (i_box.size()) obj=i_box;
 						self[d.action](obj,d,request);
@@ -102,7 +110,7 @@
 			});
 	
 			if (options.start_field) {
-				$('[name='+options.start_field+']',this).each(postform);
+				$('[name="'+options.start_field+'"]',this).each(postform);
 			}
 			if (options.start_pattern) {
 				$(options.start_pattern,this).each(postform);

@@ -1,4 +1,6 @@
 <?php
+
+
 abstract class gs_handler {
     protected $blocks;
     protected $data;

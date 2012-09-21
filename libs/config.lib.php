@@ -425,6 +425,7 @@ class gs_init {
 		load_file($this->config->lib_dir.'module.lib.php');
 		load_file($this->config->lib_dir.'handler.lib.php');
 		load_file($this->config->lib_dir.'functions.lib.php');
+		load_file($this->config->lib_dir.'eventer.lib.php');
 	}
 
 	public function load_storage() {
