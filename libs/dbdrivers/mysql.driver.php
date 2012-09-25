@@ -39,9 +39,9 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 			}
 			return sprintf('(%s)',implode(',',$arr));
 		} else if ($c=='LIKE' || $c=='STRONGLIKE' || $c=='STARTS' || $c=='ENDS') {
-			return sprintf('%s',mysql_real_escape_string($v));
+			return sprintf('%s',mysql_real_escape_string($v,$this->db_connection));
 		} else {
-			return sprintf("'%s'",mysql_real_escape_string($v));
+			return sprintf("'%s'",mysql_real_escape_string($v,$this->db_connection));
 		}
 	}
 
@@ -78,19 +78,22 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 
 		$cinfo=$this->cinfo;
-		if(!function_exists('mysql_connect')) throw new gs_dbd_exception('gs_dbdriver_mysql: undefined function mysql_connect() ');
+		if(!function_exists('mysql_connect')) throw new gs_dbd_exception(get_class($this).': undefined function mysql_connect() ');
 		$this->db_connection=@mysql_connect($cinfo['db_hostname'].':'.$cinfo['db_port'],$cinfo['db_username'],$cinfo['db_password'],TRUE);
 		if ($this->db_connection ===FALSE) {
-			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error());
+			throw new gs_dbd_exception(get_class($this).': '.mysql_error());
 		}
 		if (mysql_select_db($cinfo['db_database'],$this->db_connection)===FALSE) {
-			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error());
+			throw new gs_dbd_exception(get_class($this).': '.mysql_error());
 		}
 		if (isset($cinfo['codepage']) && !empty($cinfo['codepage'])) {
-			$this->query(sprintf('SET NAMES %s COLLATE %s_general_ci',$cinfo['codepage'],$cinfo['codepage']));
-		//	$this->query(sprintf('SET NAMES %s',$cinfo['codepage']));
+            $this->set_connection_charset($cinfo['codepage']);
 		}
 	}
+
+    function set_connection_charset($codepage) {
+			$this->query(sprintf('SET NAMES %s COLLATE %s_general_ci',$codepage,$codepage));
+    }
 
 
 	function query($que='') {
@@ -103,7 +106,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		$this->_res=mysql_query($que,$this->db_connection);
 		
 		if ($this->_res===FALSE) {
-			throw new gs_dbd_exception('gs_dbdriver_mysql: '.mysql_error().' in query '.$que);
+			throw new gs_dbd_exception(get_class($this).': '.mysql_error().' in query '.$que);
 		}
 		$t=microtime(true)-$t;
 		$rows=mysql_affected_rows($this->db_connection);
@@ -366,10 +369,10 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 					$str_offset=sprintf(' OFFSET %d ',$this->escape_value($o['value']));
 					break;
 				case 'orderby':
-					$str_orderby=sprintf(' ORDER BY %s ',mysql_real_escape_string($o['value']));
+					$str_orderby=sprintf(' ORDER BY %s ',mysql_real_escape_string($o['value'],$this->db_connection));
 					break;
 				case 'groupby':
-					$str_groupby=sprintf(' GROUP BY %s ',mysql_real_escape_string($o['value']));
+					$str_groupby=sprintf(' GROUP BY %s ',mysql_real_escape_string($o['value'],$this->db_connection));
 					break;
 			}
 		}

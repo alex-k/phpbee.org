@@ -319,7 +319,7 @@ class gs_filter_calendar extends gs_filter_like {
 		return $options;
 	}
 	function get_search_field_type() {
-		return 'fDateTime';
+		return 'fTimestamp';
 	}
 }
 class gs_filter_verbose_calendar extends gs_filter_like {

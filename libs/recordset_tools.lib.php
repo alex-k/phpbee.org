@@ -156,6 +156,10 @@ class field_interface {
 		if (isset($opts['cssclass'])) $structure['htmlforms'][$field]['cssclass']=$opts['cssclass'];
 		if (isset($opts['helper_text'])) $structure['htmlforms'][$field]['helper_text']=$opts['helper_text'];
 	}
+    static function fTimestamp ($field,$opts,&$structure,$init_opts) {
+        self::fDateTime($field,$opts,$structure,$init_opts);
+        $structure['htmlforms'][$field]['type']='timestamp';
+    }
 	static function fText($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'text');
 		$structure['fields'][$field]['multilang']=$opts['multilang'];

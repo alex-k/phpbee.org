@@ -593,6 +593,7 @@ class gs_connector  {
 			throw new gs_dbd_exception('gs_connector: '.$gs_connector_id.'  not exists in config');
 		}
 		$cinfo=$cfg->gs_connectors[$gs_connector_id];
+        $this->gs_connector_id=$gs_connector_id;
 		load_dbdriver($cinfo['db_type']);
 		$dbd_classname='gs_dbdriver_'.$cinfo['db_type'];
 		if (!class_exists($dbd_classname)) {

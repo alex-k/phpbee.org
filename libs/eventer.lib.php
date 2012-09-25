@@ -33,9 +33,9 @@ class gs_eventer {
     }
 
     public function make_event($event_name,$data) {
-        mlog("eventer.make_event $event_name");
         if (isset($this->events[$event_name])) {
             foreach ($this->events[$event_name] as $method) {
+                mlog("eventer.make_event $event_name");
                 switch ($method['type']) {
                 case 'function':
                     call_user_func($method['method'],$data,$event_name);
