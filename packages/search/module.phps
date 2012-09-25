@@ -76,6 +76,9 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
                 'index' => array(
                     'search_handler.index',
                 ) ,
+                'dropindex' => array(
+                    'search_handler.dropindex',
+                ) ,
             ) ,
             'handler' => array(
                 '/admin/form/search_config' => array(
@@ -152,8 +155,8 @@ class search_config_filter extends gs_recordset_short {
     public $orderby = "id";
     function __construct($init_opts = false) {
         parent::__construct(array(
-            'filter_classname' => 'fSelect verbose_name="filter_classname"  widget="select"    required=true        ',
             'group_name' => 'fString verbose_name="group_name"     required=true  index=true      ',
+            'filter_classname' => 'fSelect verbose_name="filter_classname"  widget="select"    required=true        ',
             'gl' => 'fString verbose_name="module_name:gl_name"     required=false        ',
             'Parent' => 'lOne2One search_config verbose_name="Parent"   widget="parent_list"  required=false    ',
             'Recordset' => 'lOne2One wz_recordsets verbose_name="Recordset"   widget="parent_list"  required=true    ',

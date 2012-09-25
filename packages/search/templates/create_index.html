@@ -8,8 +8,10 @@ class sidx__install_module extends gs_base_module implements gs_module{
     }
 	function install() {
         <*foreach $searches as $search_config*>
+            <*if $search_config->database_connector_id!='sphinx'*>
 			$rs=new sidx_<*$search_config->alias*>;
 			$rs->install();
+            <*/if*>
             <*foreach $search_config->Filters as $k=>$f*>
             gs_eventer::subscribe('<*$f->Recordset->first()->name*>_record_after_insert','sidx_index::index_record');
             gs_eventer::subscribe('<*$f->Recordset->first()->name*>_record_after_update','sidx_index::index_record');
@@ -30,9 +32,16 @@ class sidx_<*$search_config->alias*> extends gs_recordset_short {
 	public $gs_connector_id='<*$search_config->database_connector_id*>';
 	public $no_urlkey=1;
     public $recordset_modules=array();
+    public $no_ctime=1;
+    public $rs_uid=array(
+		<*foreach $search_config->Filters as $k=>$f*>
+            '<*$f->Recordset->first()->name*>'=><*$f->Recordset->first()->get_id()*>,
+        <*/foreach*>
+        );
 	function __construct($init_opts=false) { parent::__construct(array(
 		'recordset_name'=> "fString",
-		'record_id'=> "fString",
+		'recordset_uid'=> "fInt",
+		'record_id'=> "fInt",
 		<*foreach $search_config->search_fields as $k=>$f*>
 			'<*$k*>'=>'<*$f.type*> index=1',
 		<*/foreach*>
@@ -83,7 +92,8 @@ class sidx_index {
         <*foreach $searches as $search_name=>$groups*>
 
             $rs=new sidx_<*$search_name*>;
-            $index=$rs->find_records(array('recordset_name'=>'<*$rs_name*>','record_id'=>$rec->get_id()))->first(true);
+            $index=$rs->find_records(array('recordset_uid'=>$rs->rs_uid['<*$rs_name*>'],'record_id'=>$rec->get_id()))->first(true);
+            $index->first()->recordset_name='<*$rs_name*>';
 
                 <*foreach $groups as $grp_name=>$filter*>
 
@@ -101,7 +111,7 @@ class sidx_index {
     function sidx_delete_index_<*$rs_name*>($rec) {
         <*foreach $searches as $search_name=>$groups*>
         $rs=new sidx_<*$search_name*>;
-        $index=$rs->find_records(array('recordset_name'=>'<*$rs_name*>','record_id'=>$rec->get_id()))->first(true);
+        $index=$rs->find_records(array('recordset_uid'=>$rs->rs_uid['<*$rs_name*>'],'record_id'=>$rec->get_id()))->first(true);
         $index->delete();
         $index->commit();
         <*/foreach*>

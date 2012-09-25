@@ -86,11 +86,17 @@ class search_handler extends gs_handler {
 
 	}
 
-
+    function dropindex($d) {
+        $sname='sidx_'.$this->data['gspgid_va'][0];
+        md($sname,1);
+        $sidx=new $sname;
+        $sidx->find_records(array())->limit(10000)->delete()->commit();
+    }
 
 
     function index($d) {
         $rs=new $this->data['gspgid_va'][0];
+
         $rs->find_records(array());
         $sidx=new sidx_index;
         foreach ($rs as $rec) {

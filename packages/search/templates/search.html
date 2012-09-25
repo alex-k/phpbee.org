@@ -24,7 +24,7 @@
             <a href="{gl rec_search=$rec module=$rs->recordset_modules[$r->recordset_name]}">{$rec|trim}</a></legend>
         </p>    
         <p>
-        {$r->grp1|truncate:200}
+        {$rec->content|truncate:200}
         </p>
    </div>
 {/foreach}
