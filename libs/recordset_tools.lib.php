@@ -776,7 +776,7 @@ class %s extends gs_recordset_i18n {
 
 	function trigger_fPassword_encode($rec) {
 		foreach ($this->structure['password_fields'] as $field) {
-			$rec->$field=$this->encode_password($rec,$rec->$field);
+			if ($rec->is_modified($field)) $rec->$field=$this->encode_password($rec,$rec->$field);
 		}
 	}
 	function is_password_field($n) {

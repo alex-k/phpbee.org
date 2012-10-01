@@ -270,7 +270,7 @@ class gs_cacher {
 	}
 	static function load($id,$subdir='.') {
 		$dirname=cfg('cache_dir').DIRECTORY_SEPARATOR.$subdir.DIRECTORY_SEPARATOR.$id;
-		if (!file_exists($dirname)) return NULL;
+		if (!file_exists($dirname)) return FALSE;
 		$ret=unserialize(file_get_contents($dirname));
 		return $ret;
 	}
@@ -290,10 +290,10 @@ class gs_cacher {
 }
 
 class gs_session {
-	static function save($obj,$name='') {
+	static function __save($obj,$name='') {
 		$data=gs_session::load();
 
-		if(is_array($data)) {
+		if($data!==FALSE) {
 			$id=$_COOKIE['gs_session'];
 		} else {
 			$data=array();
@@ -304,15 +304,34 @@ class gs_session {
 		$new_id=gs_cacher::save($data,'gs_session',$id);
 			
 		if (!$id) {
+			md($new_id,1);
+			md(cfg('www_dir'),1);
+			die;
 			$_COOKIE['gs_session']=$new_id;
 			$t=strtotime("now +".cfg('session_lifetime'));
 
-			setcookie('gs_session',$new_id,$t);
 			setcookie('gs_session',$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
 			setcookie('gs_session',$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
 			setcookie('gs_session',$new_id,$t,cfg('www_dir'),cfg('host'));
 		}
 		return $new_id;
+	}
+	static function save($obj,$name) {
+		if (!isset($_COOKIE['gs_session']) || gs_session::load()===FALSE) {
+			$new_id=$_COOKIE['gs_session']=gs_cacher::save(array(),'gs_session');
+		} else {
+			$new_id=$_COOKIE['gs_session'];
+		}
+
+		$t=strtotime("now +".cfg('session_lifetime'));
+		setcookie('gs_session',$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
+		setcookie('gs_session',$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
+		setcookie('gs_session',$new_id,$t,cfg('www_dir'),cfg('host'));
+			
+
+		$data=gs_session::load();
+		$data[$name]=$obj;
+		return gs_cacher::save($data,'gs_session',$new_id);
 	}
 
 	static function get_id() {

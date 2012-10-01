@@ -105,6 +105,8 @@ class gs_base_handler extends gs_handler {
 
     function show($ret) {
 
+	//gs_session::save(current_url(),'current_url');    
+
         if (isset($this->params['gl'])) {
             if ($this->validate_gl()!==TRUE) {
                 unset($this->params['gl']);
