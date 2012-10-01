@@ -80,7 +80,7 @@ class gs_config {
 		$this->log_dir=$this->var_dir.'log/';
 		$this->log_file=NULL;//'gs.log';
 		$this->cache_dir=$this->var_dir.'cache/';
-		$this->session_lifetime='2 hours';
+		$this->session_lifetime='2 week';
 		$this->tmp_dir=$this->var_dir.'tmp/';
 		/*
 		$this->data_dir=$this->root_dir.'data/';

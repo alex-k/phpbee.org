@@ -291,20 +291,28 @@ class gs_cacher {
 
 class gs_session {
 	static function save($obj,$name='') {
-		$data=array();
-		if (isset($_COOKIE['gs_session'])) {
-			$data=gs_cacher::load($_COOKIE['gs_session'],'gs_session');
+		$data=gs_session::load();
+
+		if(is_array($data)) {
+			$id=$_COOKIE['gs_session'];
+		} else {
+			$data=array();
+			$id=NULL;
 		}
+
 		$data[$name]=$obj;
-		$id=gs_cacher::save($data,'gs_session',isset($_COOKIE['gs_session']) ? $_COOKIE['gs_session'] : NULL);
-		$t=strtotime("now +".cfg('session_lifetime'));
-		setcookie('gs_session',$id,$t);
-		setcookie('gs_session',$id,$t,cfg('www_dir'),'www.'.cfg('host'));
-		setcookie('gs_session',$id,$t,cfg('www_dir'),'.'.cfg('host'));
-		setcookie('gs_session',$id,$t,cfg('www_dir'),cfg('host'));
-		//if (!isset($_COOKIE['gs_session']) || $_COOKIE['gs_session']!=$id) $_COOKIE['gs_session']=$id;
-		$_COOKIE['gs_session']=$id;
-		return $id;
+		$new_id=gs_cacher::save($data,'gs_session',$id);
+			
+		if (!$id) {
+			$_COOKIE['gs_session']=$new_id;
+			$t=strtotime("now +".cfg('session_lifetime'));
+
+			setcookie('gs_session',$new_id,$t);
+			setcookie('gs_session',$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
+			setcookie('gs_session',$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
+			setcookie('gs_session',$new_id,$t,cfg('www_dir'),cfg('host'));
+		}
+		return $new_id;
 	}
 
 	static function get_id() {

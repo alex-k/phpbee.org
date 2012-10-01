@@ -81,6 +81,11 @@ abstract class g_forms implements g_forms_interface{
 			$this->htmlforms[$field][$option]=$value;
 		}
 	}
+	function remove_option($field,$option) {
+		if (isset($this->htmlforms[$field])) {
+			unset ($this->htmlforms[$field][$option]);
+		}
+	}
 	function set_option_allfields($option,$value) {
 		foreach ($this->htmlforms as $field=>$h) {
 			$this->set_option($field,$option,$value);

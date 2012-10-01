@@ -837,6 +837,7 @@ function hpar($data,$name='hkey',$default=null) {
     function check_login($data) {
         $id=gs_session::load('login_'.$this->params['classname']);
         $rec=record_by_id($id,$this->params['classname']);
+	
         if(isset($this->data['handler_params']['assign'])) {
             gs_var_storage::save($this->data['handler_params']['assign'],$rec);
         }
@@ -856,8 +857,10 @@ function hpar($data,$name='hkey',$default=null) {
 
 
     function post_login($data) {
+	/*
         $rec=$this->check_login($data);
         if (is_object($rec) && is_a($rec,'gs_record')) return $rec;
+	*/
 
         $rec=$this->post_find_record($data);
         if (!is_object($rec) || !is_a($rec,'gs_record')) return $rec;
