@@ -125,7 +125,22 @@ abstract class tw_file_images extends gs_recordset_short{
 		readfile($fname);
 		die();
 	}
+
+
 	function resize($rec,$type=null,$ret=null,$no_rewrite=false) {
+        $rs=new img_resizes_cfg;
+        $rs->find_records(array());
+        foreach ($rs as $r) {
+            $this->config[$r->name]=array(
+                'width'=>$r->width,
+                'height'=>$r->height,
+                'method'=>$r->method,
+                'modifier'=>$r->modifier,
+                'bgcolor'=>array_map('trim',explode(',',$r->bgcolor)),
+                );
+
+        
+        }
 		$fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR;
 		$sname=$fname.'File_data';
 		foreach ($this->config as $key => $data) {
@@ -150,36 +165,8 @@ abstract class tw_file_images extends gs_recordset_short{
 	}
 
 }
-class images_module extends gs_base_module implements gs_module {
-	function __construct() {}
-	
-	function install() {
-	}
-	
-	static function get_handlers() {
-		$data=array(
-			'get_post'=>array(
-				'img/show'=>'images_handler.show',
-				'img/s'=>'images_handler.s',
-				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
-			),
-		);
-                $ckey=$path=false;
-                $c=cfg('gs_connectors');
-                foreach ($c as $key => $v) {
-                        if ($v['db_type']=='file') {
-                                $path=$v['www_root'];
-                                $ckey=$key;
-                                break;
-                        }
-                }
-                if ($path) {
-                        $data['get'][$path]='images_handler.resize:{key:'.$ckey.'}';
-                }
-		return self::add_subdir($data,dirname(__file__));
-	}
-}
 class images_handler extends gs_base_handler {
+
 	
 	function resize($data=null) {
 		$c=cfg('gs_connectors');
@@ -263,6 +250,81 @@ class images_handler extends gs_base_handler {
 
 }
 
+class images_module extends gs_base_module implements gs_module {
+	function __construct() {}
+	
+    function install() {
+        foreach (array(
+            'img_resizes_cfg',
+        ) as $r) {
+            $this->$r = new $r;
+            $this->$r->install();
+        }
+    }
+    function get_menu() {
+        $ret = array();
+        $item = array();
+        $item[] = '<a href="/admin/img_resizes/">Images</a>';
+        $item[] = '<a href="/admin/img_resizes/img_resizes_cfg">Resizes</a>';
+        $ret[] = $item;
+        return $ret;
+    }
+    static function get_handlers() {
+        $data = array(
+			'get_post'=>array(
+                '/files'=>'images_handler.resize:key:file_public',
+				'img/show'=>'images_handler.show',
+				'img/s'=>'images_handler.s',
+				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
+                ),
+            'get' => array(
+                '/admin/img_resizes/img_resizes_cfg' => array(
+                    'gs_base_handler.show:name:adm_img_resizes_cfg.html',
+                ) ,
+                '/admin/img_resizes/img_resizes_cfg/delete' => array(
+                    'gs_base_handler.delete:{classname:img_resizes_cfg}',
+                    'gs_base_handler.redirect',
+                ) ,
+                '/admin/img_resizes/img_resizes_cfg/copy' => array(
+                    'gs_base_handler.copy:{classname:img_resizes_cfg}',
+                    'gs_base_handler.redirect',
+                ) ,
+            ) ,
+            'handler' => array(
+                '/admin/form/img_resizes_cfg' => array(
+                    'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+                    'gs_base_handler.post:{name:admin_form.html:classname:img_resizes_cfg:form_class:g_forms_table}',
+                    'gs_base_handler.redirect_if:gl:save_continue:return:true',
+                    'gs_base_handler.redirect_if:gl:save_return:return:true',
+                ) ,
+                '/admin/inline_form/img_resizes_cfg' => array(
+                    'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+                    'gs_base_handler.post:{name:inline_form.html:classname:img_resizes_cfg}',
+                    'gs_base_handler.redirect_if:gl:save_continue:return:true',
+                    'gs_base_handler.redirect_if:gl:save_return:return:true',
+                ) ,
+            ) ,
+        );
+        return self::add_subdir($data, dirname(__file__));
+    }
+	
+}
+class img_resizes_cfg extends gs_recordset_short {
+    public $no_urlkey = true;
+    public $no_ctime = true;
+    public $orderby = "id";
+    function __construct($init_opts = false) {
+        parent::__construct(array(
+            'name'=> "fString name",
+            'width'=> "fInt 'Ширина'",
+            'height'=> "fInt 'Высота'",
+            'method'=>"fSelect 'Метод' values='use_width,use_height,use_box,use_space,use_fields,use_crop,copy'",
+            'bgcolor'=> "fString 'Цвет фона R,G,B' default='0,0,0'",
+            'modifier'=>"fSelect 'Модификатор' values=',check_and_rotate_left,check_and_rotate_right,watermark' required=false",
+        ) , $init_opts);
+        $this->structure['fkeys'] = array();
+    }
+}
 
 
 
