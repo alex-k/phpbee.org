@@ -20,13 +20,13 @@
 		<table class="wz_urls">
 			<col style="width: 5em;"></col>
 			<col></col>
-		{$urls=$module->urls->orderby('type desc, gspgid_value')}
+		{$urls=$module->urls->orderby('type desc')->orderby('gspgid_value')}
 		{$urls=array_group($urls,'type')}
 		{foreach $urls as $type=>$hurls}
 			<tr>
 			<th colspan=2>{$type}</th>
 			</tr>
-			{foreach $hurls as $url}
+		  {foreach $hurls as $url}
 			<tr>
 			<td nowrap>
 
@@ -55,7 +55,7 @@
 				{/foreach}
 			</td>			
 			</tr>
-		{/foreach}
+		  {/foreach}
 		{/foreach}
 		</table>
 

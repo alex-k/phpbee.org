@@ -72,21 +72,23 @@
 	
 	{foreach from=${%$rs.name%} item="e"}
 	<tr class="{cycle values='odd,even'}" record_id="{$e->get_id()}">
-			<td>{$e->get_id()}</td>
+			<td><span>{$e->get_id()}</span></td>
 			{%foreach from=$fields item=f%}
 			<td class="frm_{%$f.type%}">
+                <span>
 				{%if $f@first%}
 					<a href="{gl rec_edit=$e}">{field_formatter value=$e.{%$f.name%} type="{%$f.type%}"}</a>
 				{%else%}		
 					{field_formatter value=$e.{%$f.name%} type="{%$f.type%}"}
 				{%/if%}		
+                </span>
 			</td>
 			{%/foreach%}
 			{%foreach from=$links item=f%}
-			<td>{$e.{%$f.name%}}</td>
+			<td><span>{$e.{%$f.name%}}</span></td>
 			{%/foreach%}
 			{%foreach from=$extlinks item=f%}
-			<td><a href="/admin/{%$module.name%}/{%$f.classname%}?{%$f->linkname%}={$e->get_id()}">{%$f.verbose_name%} ({$e._{%$f.name%}_count})</a></td>
+			<td><span><a href="/admin/{%$module.name%}/{%$f.classname%}?{%$f->linkname%}={$e->get_id()}">{%$f.verbose_name%} ({$e._{%$f.name%}_count})</a></span></td>
 			{%/foreach%}
 			<td class="cnt"><a href="{gl rec_edit=$e}"><img src="/i/admin/ico_edit.png" alt="Редактировать" title="Редактировать"></a></td>
 			<td class="cnt"><a href="{gl rec_copy=$e}"><img src="/i/admin/ico_copy.png" alt="Копировать" title="Копировать"></a></td>

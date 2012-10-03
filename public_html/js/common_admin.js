@@ -9,6 +9,9 @@ $(document).ready (function () {
 	$(".fDateTime").datepicker();
 	 $(".sortable").sortable();
 	 $(".sortkey-table tbody").sortable({
+             axis: 'y',
+             revert: true,
+             cancel: 'span',
 		     helper: function(e, ui) {
 			    ui.children().each(function() {
 				    $(this).width($(this).width());
