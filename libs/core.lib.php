@@ -8,6 +8,8 @@ DEFINE ('GS_DATA_SESSION','session');
 DEFINE ('GS_DATA_COOKIE','cookie');
 DEFINE ('GS_NULL_XML',"<null></null>");
 
+DEFINE ('GS_SESSION_COOKIE','gs_session_1');
+
 class gs_null extends SimpleXMLElement implements arrayaccess {
 	public function get_id() {
 		return $this;
@@ -294,62 +296,62 @@ class gs_session {
 		$data=gs_session::load();
 
 		if($data!==FALSE) {
-			$id=$_COOKIE['gs_session'];
+			$id=$_COOKIE[GS_SESSION_COOKIE];
 		} else {
 			$data=array();
 			$id=NULL;
 		}
 
 		$data[$name]=$obj;
-		$new_id=gs_cacher::save($data,'gs_session',$id);
+		$new_id=gs_cacher::save($data,GS_SESSION_COOKIE,$id);
 			
 		if (!$id) {
 			md($new_id,1);
 			md(cfg('www_dir'),1);
 			die;
-			$_COOKIE['gs_session']=$new_id;
+			$_COOKIE[GS_SESSION_COOKIE]=$new_id;
 			$t=strtotime("now +".cfg('session_lifetime'));
 
-			setcookie('gs_session',$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
-			setcookie('gs_session',$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
-			setcookie('gs_session',$new_id,$t,cfg('www_dir'),cfg('host'));
+			setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
+			setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
+			setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),cfg('host'));
 		}
 		return $new_id;
 	}
 	static function save($obj,$name) {
-		if (!isset($_COOKIE['gs_session']) || gs_session::load()===FALSE) {
-			$new_id=$_COOKIE['gs_session']=gs_cacher::save(array(),'gs_session');
+		if (!isset($_COOKIE[GS_SESSION_COOKIE]) || gs_session::load()===FALSE) {
+			$new_id=$_COOKIE[GS_SESSION_COOKIE]=gs_cacher::save(array(),GS_SESSION_COOKIE);
 		} else {
-			$new_id=$_COOKIE['gs_session'];
+			$new_id=$_COOKIE[GS_SESSION_COOKIE];
 		}
 
 		$t=strtotime("now +".cfg('session_lifetime'));
-		setcookie('gs_session',$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
-		setcookie('gs_session',$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
-		setcookie('gs_session',$new_id,$t,cfg('www_dir'),cfg('host'));
+		setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
+		setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
+		setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),cfg('host'));
 			
 
 		$data=gs_session::load();
 		$data[$name]=$obj;
-		return gs_cacher::save($data,'gs_session',$new_id);
+		return gs_cacher::save($data,GS_SESSION_COOKIE,$new_id);
 	}
 
 	static function get_id() {
-		$id=isset($_COOKIE['gs_session']) ? $_COOKIE['gs_session'] : NULL;
+		$id=isset($_COOKIE[GS_SESSION_COOKIE]) ? $_COOKIE[GS_SESSION_COOKIE] : NULL;
 		if (!$id) $id=self::save('_get_id','_get_id');
 		return ($id);
 	}
 
 	static function load($name=NULL) {
-		if (!isset($_COOKIE['gs_session'])) return FALSE;
-		$ret=gs_cacher::load($_COOKIE['gs_session'],'gs_session');
+		if (!isset($_COOKIE[GS_SESSION_COOKIE])) return FALSE;
+		$ret=gs_cacher::load($_COOKIE[GS_SESSION_COOKIE],GS_SESSION_COOKIE);
 		if ($name===NULL) return $ret;
 		return isset($ret[$name]) ? $ret[$name] : NULL;
 	}
 
 	static function clear($name=NULL) {
-		if (!isset($_COOKIE['gs_session'])) return FALSE;
-		return gs_cacher::clear($_COOKIE['gs_session'],'gs_session');
+		if (!isset($_COOKIE[GS_SESSION_COOKIE])) return FALSE;
+		return gs_cacher::clear($_COOKIE[GS_SESSION_COOKIE],GS_SESSION_COOKIE);
 		//return isset($ret[$name]) ? $ret[$name] : $ret;
 	}
 

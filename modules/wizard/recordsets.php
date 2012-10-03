@@ -32,7 +32,7 @@ class wz_recordsets extends gs_recordset_short {
 		'showadmin'=>"fCheckbox 'show in admin'",
 		'no_urlkey'=>"fCheckbox 'No URL key' default=1",
 		'no_ctime'=>"fCheckbox 'No ctime'",
-		'sortkey'=>"fCheckbox 'sortkey' default=0",
+		'use_sortkey'=>"fCheckbox 'sortkey' default=0",
 		'install'=>"fCheckbox 'make install table' default=1",
 		'orderby'=>"fString 'order by' required=false default='id'",
 		'id_field_name'=>"fString 'id_field_name' required=false default='id'",

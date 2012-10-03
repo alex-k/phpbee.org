@@ -881,7 +881,9 @@ function hpar($data,$name='hkey',$default=null) {
         }
         $f=$bh->validate($f);
         if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+
         $d=$f->clean();
+
 
         $rsname=$this->params['classname'];
         $rs=new $rsname;
