@@ -382,9 +382,11 @@ function make_paragraph($a,$class="") {
 }
 function rec_autoformat($rec,$txtfield='text',$imgfield=null) {
 
+	$odd=false;
+
     $txt=$rec->$txtfield;
     $txt=explode("\n",$txt);
-    $txt=array_map(make_paragraph,$txt);
+	$txt=array_map('make_paragraph',$txt);
 
     if ($imgfield && $rec->$imgfield->count()>0) {
         $images=$rec->$imgfield->imghref('prev','fullscreen');
@@ -398,7 +400,7 @@ function rec_autoformat($rec,$txtfield='text',$imgfield=null) {
                 if (next($txt)===FALSE) break;
             }
             for ($i=0; $i<$imgcnt; $i++) {
-                $ip=make_paragraph(current($images),$odd?"left":"right");
+				$ip=make_paragraph(current($images),$odd?"left":"right");
                 $odd=!$odd;
                 array_push($atxt,$ip);
                 if (next($images)===FALSE) break;

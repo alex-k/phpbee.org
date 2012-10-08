@@ -573,6 +573,19 @@ class gs_base_handler extends gs_handler {
         $newrs->commit();
         return $newrs->first();
     }
+	function fix_gl($ret) {
+		$href=null;
+        if (isset($this->params['gl'])) {
+			$href=call_user_func('module_'.$this->params['module'].'::gl',$this->params['gl'],$ret['last'],$this->data);
+			$href=trim($href,'/');
+		}
+
+		if ($href!=$this->data['gspgid']) {
+			$this->params['href']=$href;
+			return $this->redirect();
+		}
+		return $ret['last'];
+    }
     function redirect_gl($ret) {
         if (isset($this->params['gl'])) {
             $this->params['href']=call_user_func($this->params['module_name'].'::gl',$this->params['gl'],$ret['last'],$this->data);
@@ -930,21 +943,35 @@ function hpar($data,$name='hkey',$default=null) {
         return $rec;
     }
 
-    function rec_by_field($ret) {
-        $rec=record_by_field($this->params['field'],end($this->data['gspgid_va']),$this->params['classname']);
+	function rec_by_urlkey($ret) {
+        $id=null;
+        if (isset($this->data['gspgid_handler_va'])) $id=reset($this->data['gspgid_handler_va']);
+        if (!$id) $id=reset($this->data['gspgid_va']);
+        //$rec=record_by_urlkey(end($this->data['gspgid_handler_va']),$this->params['classname']);
+        $rec=record_by_urlkey($id,$this->params['classname']);
         return $rec;
     }
-    function rec_by_urlkey($ret) {
-        $rec=record_by_urlkey(end($this->data['gspgid_handler_va']),$this->params['classname']);
+	function rec_by_fieldname($ret) {
+        $id=null;
+        if (isset($this->data['gspgid_handler_va'])) $id=reset($this->data['gspgid_handler_va']);
+        if (!$id) $id=reset($this->data['gspgid_va']);
+		$rec=record_by_field($this->params['fieldname'],$id,$this->params['classname']);
         return $rec;
     }
     function rec_by_id($ret) {
-        $id=null;
+		$id=null;
         if (isset($this->data['gspgid_handler_va'])) $id=reset($this->data['gspgid_handler_va']);
         if (!$id) $id=reset($this->data['gspgid_va']);
 
         if(!$id) return false;
 
+        $rec=record_by_id($id,$this->params['classname']);
+        return $rec;
+    }
+    function rec_by_handler_id($ret) {
+		$id=null;
+        $id=reset($this->data['gspgid_va']);
+        if(!$id) return false;
         $rec=record_by_id($id,$this->params['classname']);
         return $rec;
     }

@@ -130,9 +130,8 @@ class gs_config {
 	}
 
 	function check_install_key() {
-		if (!isset($this->install_key) || empty($this->install_key) || (
-			$this->install_key!=$_REQUEST['install_key'] && PHP_SAPI!='cli'
-			))
+        if (PHP_SAPI!='cli' &&
+            ( !isset($this->install_key) || empty($this->install_key) || !isset($_REQUEST['install_key']) || $this->install_key!=$_REQUEST['install_key'] ))
 
 			throw new gs_exception('Incorrect install_key. Check config.php and run '.$this->host.'/install.php?install_key=12345 to continue. Install key could be found in the config.php file');
 	}
@@ -463,11 +462,12 @@ function cfg($name) {
 	return NULL ;
 }
 function mlog($data,$debug_level=255) {
+    gs_logger::udplog($data);
 	if (defined('DEBUG') && DEBUG && ($debug_level & DEBUG_LEVEL)) {
 		$log=gs_logger::get_instance();
 		$txt=$log->log($data);
 		return $txt;
-	}
+    }
 	return $data;
 }
 function md($output,$type=false)
@@ -497,6 +497,7 @@ class gs_logger {
 		return $instance;
 	}
 	static function udplog($msg) {
+        if (!defined('UDP_DEBUG') || !UDP_DEBUG) return;
 		if (! self::$udplog_addr) self::$udplog_addr=gethostbyname('ping.phpbee.org');
 		$fp = fsockopen("udp://".self::$udplog_addr, 8080, $errno, $errstr);
 		if ($fp) {
@@ -522,7 +523,7 @@ class gs_logger {
 		$this->gmessages[$trace['class']][$trace['function']][]=sprintf("%s > %s",$txt_time,$txt);
 		$this->tt=$t;
 		$this->log_to_file($data);
-		if (UDP_DEBUG) self::udplog($txt);
+        self::udplog($txt);
 		return $txt;
 	}
 	private function log_to_file($data) {
