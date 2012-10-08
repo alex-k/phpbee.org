@@ -220,6 +220,9 @@ class vpa_gd {
 	
 	function make_crop($params=null)
 	{
+        $x=0;
+        $y=0;
+
 		$k=$this->old_width/$this->old_height;
 		$k1=$this->new_width/$this->new_height;
 		

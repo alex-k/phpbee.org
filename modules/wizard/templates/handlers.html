@@ -36,7 +36,7 @@
 	</table>
 
 	<h5>Редактировать/<a href="/admin/wizard/handlers/{$_gsdata.gspgid_va.0}/handlers/0#form">создать</a>:</h5>
-	{if $_gsdata.gspgid_va.1=='handlers' && isset($_gsdata.gspgid_va.2)}
+	{if isset($_gsdata.gspgid_va.1) && $_gsdata.gspgid_va.1=='handlers' && isset($_gsdata.gspgid_va.2)}
 	<hr><br>
 	<a name="form"></a>
 	{handler gspgid="/admin/form/wz_handlers/edit/`$_gsdata.gspgid_va.2`" Url_id=$url.id}

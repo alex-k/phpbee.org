@@ -205,6 +205,7 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 		return $this->query(array(array('count'=>$count)));
 	}
 	function select($rset,$options,$fields=NULL) {
+        mlog($options);
 		$this->recordset=$rset;
 		$col=$this->selectCollection($rset);
 

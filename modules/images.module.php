@@ -148,8 +148,8 @@ abstract class tw_file_images extends gs_recordset_short{
 			$gd=new vpa_gd($rec->File_data,false);
 			$iname=$fname.$key.'.jpg';
 			if ($data['width']>0  && ($data['width']<$rec->first()->File_width || $data['height']<$rec->first()->File_height)) {
-				if ($data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);
-				if ($data['modifier']) $gd->modifier($data['width'],$data['height'],$data['modifier']);
+				if (isset($data['bgcolor']) && $data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);
+				if (isset($data['modifier']) && $data['modifier']) $gd->modifier($data['width'],$data['height'],$data['modifier']);
 
 				$gd->resize($data['width'],$data['height'],$data['method']);
 			}

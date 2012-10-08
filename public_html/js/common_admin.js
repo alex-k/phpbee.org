@@ -8,7 +8,7 @@ $(document).ready (function () {
 	$(".fSelect").sel_filter();
 	$(".fDateTime").datepicker();
 	 $(".sortable").sortable();
-	 $(".sortkey-table tbody").sortable({
+	 $(".sortkey-table > tbody").sortable({
              axis: 'y',
              revert: true,
              cancel: 'span',

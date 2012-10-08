@@ -97,8 +97,11 @@ class gs_fkey {
 				$rs_name=$rsa->table_name;
 				$link_name=$k['link'];
 
+                if (!$link_name) return;
+
 				$rs=$rsa;
 				$linked_rs_name=$rs->structure['recordsets'][$link_name]['recordset'];
+
 
 				$newrec=$rs->new_record();
 				$linked_rs=$newrec->init_linked_recordset($link_name);
