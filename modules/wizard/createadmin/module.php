@@ -38,7 +38,7 @@ class gs_strategy_createadmin_handler extends gs_handler {
 		$d=$f->clean();
 
 		$fields=new wz_recordset_fields();
-		$fields->find_records(array('id'=>$d['fields']));
+		$fields->find_records(array('id'=>$d['fields']))->orderby('sortkey');
 		$links=new wz_recordset_links();
 		$links->find_records(array('id'=>$d['links']));
 		$extlinks=new wz_recordset_links();
@@ -160,7 +160,7 @@ class form_createadmin extends form_admin{
 		    'fields' => Array
 			(
 			    'type' => 'checkboxes',
-			    'options'=>$rs->Fields->recordset_as_string_array(),
+				'options'=>$rs->Fields->orderby('sortkey')->recordset_as_string_array(),
 			    'validate'=>'notEmpty',
 			    'default'=>array_keys($rs->Fields->recordset_as_string_array()),
 			),
