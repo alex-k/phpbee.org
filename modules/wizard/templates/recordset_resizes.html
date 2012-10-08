@@ -43,7 +43,7 @@
 	{/foreach}
 	</table>
 	<h5>Редактировать/<a href="/admin/wizard/recordset_resizes/{$_gsdata.gspgid_va.0}/fields/0#form">создать</a>:</h5>
-	{if $_gsdata.gspgid_va.1=='fields' && isset($_gsdata.gspgid_va.2)}
+	{if isset($_gsdata.gspgid_va.1) && $_gsdata.gspgid_va.1=='fields' && isset($_gsdata.gspgid_va.2)}
 	<hr><br>
 	<a name="form"></a>
 	{handler gspgid="/admin/form/wz_recordset_resizes/edit/`$_gsdata.gspgid_va.2`" Recordset_id=$recordset.id}
