@@ -360,7 +360,7 @@ function add_quote($a,$q="'") {
     return $q.$ret.$q;
 }
 
-function tidy_html($str,$options=array()) {
+function tidy_obj($str,$options=array()) {
     $config = array(	'indent' => FALSE,
                         'show-body-only' => TRUE,
                         'output-xml' => TRUE,
@@ -369,6 +369,12 @@ function tidy_html($str,$options=array()) {
     $config=array_merge($config,$options);
     $tidy = tidy_parse_string($str, $config,'UTF8');
     $tidy->cleanRepair();
+    return $tidy;
+}
+	
+
+function tidy_html($str,$options=array()) {
+   $tidy=tidy_obj($str,$options);		
     $txt=trim($tidy);
     //$txt=preg_replace('/&[a-zA-Z]+;/','',$txt);
 
@@ -389,7 +395,16 @@ function rec_autoformat($rec,$txtfield='text',$imgfield=null) {
 	$txt=array_map('make_paragraph',$txt);
 
     if ($imgfield && $rec->$imgfield->count()>0) {
-        $images=$rec->$imgfield->imghref('prev','fullscreen');
+        //$images=$rec->$imgfield->img('prev');
+	$images=array();
+	foreach ($rec->$imgfield as $img) {
+		$images[]=sprintf('<a href="%s" class="fancybox" rel="gallery%s%d"><img src="%s"></a>',
+				$img->src1('large'),
+				$rec->get_recordset_name(),
+				$rec->get_id(),
+				$img->src1('prev')
+				);
+	}
         $atxt=array();
         $cnt=ceil(0.5*count($txt)/$rec->$imgfield->count());
         $imgcnt=ceil($rec->$imgfield->count()/count($txt));
