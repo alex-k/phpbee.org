@@ -201,14 +201,15 @@ class gs_dbdriver_mongo extends gs_prepare_sql implements gs_dbdriver_interface 
 		return $res;
 	}
 	function count($rset,$options) {
-		$count=$this->db_connection->selectCollection($rset->db_tablename)->count($options);
+		$where=$this->construct_where($options);
+		$count=$this->db_connection->selectCollection($rset->db_tablename)->count($where);
 		return $this->query(array(array('count'=>$count)));
 	}
 	function select($rset,$options,$fields=NULL) {
         mlog($options);
 		$this->recordset=$rset;
 		$col=$this->selectCollection($rset);
-
+        
 		$where=$this->construct_where($options);
 
 		/*

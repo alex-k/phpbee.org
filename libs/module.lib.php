@@ -66,6 +66,10 @@ class gl {
 		return $this->module_name.'/'.$this->record->get_recordset_name().'/'.$this->record->get_id();
 		#return $this->root.'/'.$this->record->get_id();
 	}
+	function rec_urlkey() {
+        if (!$this->record->urlkey) return $this->rec_show();
+		return $this->record->get_recordset_name().'/'.$this->record->urlkey;
+	}
 
     function rec_search() {
         return $this->rec_show();
