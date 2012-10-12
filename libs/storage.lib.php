@@ -311,7 +311,7 @@ abstract class gs_recordset_base extends gs_iterator {
 			*/
 			if ($this->state==RS_STATE_LOADED) {
 				if(isset($records[$r[$index_field_name]])) {
-					$records[$r[$index_field_name]]->fill_values($r);
+					$records[$r[$index_field_name]]->load_records_fill_values($r);
 				}
 				continue;
 			} 

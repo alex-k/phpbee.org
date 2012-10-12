@@ -304,13 +304,21 @@ class gs_record implements arrayaccess {
 		return new gs_null(GS_NULL_XML);
 	}
 
+    public function load_records_fill_values($values) {
+        foreach ($values as $k=>$v) $this->load_records_set_value($k,$v);
+    }
+
+    public function load_records_set_value($name,$value) {  // only use from gs_recordset class!
+        return $this->values[$name]=$value;
+    }
+
 	public function __set($name,$value) {
 		if ($this->recordstate==RECORD_UNCHANGED) $this->modified_values=array();
 		$fields=$this->get_recordset()->structure['fields'];
 		if ($this->recordstate & RECORD_ROLLBACK) {
 			$this->recordstate=RECORD_NEW;
 		} elseif(is_array($fields) && array_key_exists($name,$fields) ) {
-			is_array(array(1));
+			//is_array(array(1));
 			if  (!isset($this->values[$name]) || $value!=$this->values[$name] || ($this->recordstate & RECORD_NEW)) {
 				$this->recordstate=$this->recordstate|RECORD_CHANGED;
 				if (isset($this->values[$name])) $this->old_values[$name]=$this->values[$name];

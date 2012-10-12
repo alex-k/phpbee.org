@@ -8,6 +8,10 @@ class gs_dbdriver_sphinx extends gs_dbdriver_mysql implements gs_dbdriver_interf
     function set_connection_charset($codepage) {
 			$this->query(sprintf("SET NAMES '%s'",$codepage));
     }
+	function query($que='') {
+        mlog($que);
+        return parent::query($que);
+    }
 	function escape_value($v,$c=null) {
 		if (is_float($v)) {
 			return sprintf('truncate(%s,5)',str_replace(',','.',sprintf('%.05f',$v)));
