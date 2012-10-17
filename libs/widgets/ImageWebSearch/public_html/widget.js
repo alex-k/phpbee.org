@@ -1,33 +1,7 @@
 
-/*
 function ImageWebSearch_search(obj) {
-	ImageWebSearch_search_completed=function() {
-		if (!imageSearch.results || imageSearch.results.length==0) return false;
-		var d=$(obj).siblings('div').first();
-		d.html('');
-	
-		var results = imageSearch.results;
-		for (var i = 0; i < results.length; i++) {
-			var result = results[i];
-			var img=new Image();
-			img.src=result.tbUrl;
-			img.url=$(obj).attr('rel');
-			img.imgurl=result.url;
-			img.onclick=ImageWebSearch_click;
-			d.append(img);
-		}
-	}
-	var inp=$(obj).closest('form').find('input[type=text]').get(0);
-	imageSearch = new google.search.ImageSearch();
-	imageSearch.setSearchCompleteCallback(this, ImageWebSearch_search_completed, null);
-	imageSearch.setResultSetSize(8);
-	imageSearch.execute(inp.value);
-
-}
-*/
-
-function ImageWebSearch_search(obj) {
-	var inp=$(obj).closest('form').find('input[type=text]').get(0);
+	/*var inp=$(obj).closest('form').find('input[type=text]').get(0);*/
+	var inp=$(obj).closest('form').find('input.ImageWebSearch_string').get(0);
 	ImageWebSearch_search_completed=function(imageSearch) {
 		if (!imageSearch.results || imageSearch.results.length==0) return false;
 		var d=$(obj).siblings('div').first();
@@ -71,6 +45,11 @@ function ImageWebSearch_click() {
 
 
 	$(document).ready(function() {
+        $(".ImageWebSearch_string").each(function() {
+            this.value=$(this).closest('form').find('input[type=text]').get(0).value;
+        });
+
+
 		$("#gallery_"+hash+" div.ImageWebSearchGalleryItem").live("click",function(){
 			var li=$(this);
 			var inp=$("input",li);

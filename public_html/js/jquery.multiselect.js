@@ -9,7 +9,7 @@
 			var list_options={};
 			var list_names={};
 			var idx={};
-			var rw=this.offsetWidth;
+			var rw=Math.min(400,this.offsetWidth);
 			var rh=this.offsetHeight;
 			var t=document.createElement('table');
 			var to_sel=this.parentNode.replaceChild(t,this);
