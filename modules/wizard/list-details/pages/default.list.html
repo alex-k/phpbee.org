@@ -30,7 +30,7 @@
     {%/if%}
 
     {%if $d.filter_limit_offset%}    
-		{handler gspgid="/filter/" class="limit" name="limit" urltype=session values='20,50,100,500' default_value=20}
+		{handler gspgid="/filter/" class="limit" name="limit" urltype=session values='10,20,50,500' default_value=20}
 		{handler gspgid="/filter/" class="offset"  name="offset" urltype=get limit='limit'}
 		{%$s_filters="`$s_filters`limit,offset," %}
     {%/if%}    
@@ -46,8 +46,8 @@
 	{%/foreach%}
 
     {%if $d.filter_limit_offset%}    
-		{handler gspgid="/filter/show" name="offset" tpl="offset_pages.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
-		{handler gspgid="/filter/show" name="limit" tpl="limit_select.html" prelabel='show by' label='records'}
+		{handler gspgid="/filter/show" name="offset" tpl="offset_bootstrap.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
+		{handler gspgid="/filter/show" name="limit" tpl="limit_dropdown.html" prelabel='show by' label='records'}
     {%/if%}    
 
 
@@ -62,6 +62,7 @@
 
 
             {%$f.verbose_name%}
+
             {%if isset($d['filter_sort'][$f->get_id()])%}
                 {handler gspgid="/filter/show" name="sort_{%$rs.name%}" field="{%$f.name%}" recordset=${%$rs.name%} tpl="sort_arrows.html"}
             {%/if%}
@@ -129,8 +130,8 @@
 	</table>
 
     {%if $d.filter_limit_offset%}    
-		{handler gspgid="/filter/show" name="offset" tpl="offset_pages.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
-		{handler gspgid="/filter/show" name="limit" tpl="limit_select.html" prelabel='show by' label='records'}
+		{handler gspgid="/filter/show" name="offset" tpl="offset_bootstrap.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
+		{handler gspgid="/filter/show" name="limit" tpl="limit_dropdown.html" prelabel='show by' label='records'}
     {%/if%}    
 
 {/block}
