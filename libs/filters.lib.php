@@ -264,7 +264,8 @@ class gs_filter_sort extends gs_filter {
 		$tpl=gs_tpl::get_instance();
 		$tpl->assign('current',$this->value);
 		$tpl->assign('keyname',$this->name);
-		$tpl->assign('prelabel',$ps['prelabel']);
+		$tpl->assign('field',isset($ps['field']) ? $ps['field'] : '');
+		$tpl->assign('prelabel',isset($ps['prelabel']) ? $ps['prelabel'] : '');
 		$tpl->assign('label',isset($ps['label']) ? $ps['label'] : '');
 		$tpl->assign('values',$this->fields);
 		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
@@ -272,9 +273,11 @@ class gs_filter_sort extends gs_filter {
 		return $out;
 	}
 	function applyFilter($options,$rs) {
+        /*
 		if (empty($this->value)) {
 			$this->value=reset($this->fields);
 		}
+        */
 		if (empty($this->value)) return $options;
 		$value=str_replace(":"," ",$this->value);
 		$options['orderby']=array('type'=>'orderby','value'=>$value);
