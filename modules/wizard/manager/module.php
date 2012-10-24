@@ -76,7 +76,7 @@ class handler_wizard_manager extends gs_handler {
 			$rd['module']=$this->data['handler_params']['Module_id'];
 			$rd['template_name']=$rd['page_template_name'];
 			$rd['form_template_name']=$rd['formfields']['template_name'];
-			$this->data['handler_params']['Recordset_id']=intval($k);
+			$this->data['handler_params']['Recordset_id']=$k;
 			$h=new gs_strategy_createmanager_handler($this->data,$this->params);
 			$h->createmanager($ret,$rd);
 			md($rd,1);
@@ -217,7 +217,7 @@ class form_wizard_manager_forms extends g_forms_table{
 	static function recordset_form_fields(&$hh,$rs_id,$login_rs=NULL) {
 		$dirname=dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'createmanager'.DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR;
 		$page_templates=array_map('basename',glob($dirname."*"));
-		$rs=record_by_id(intval($rs_id),'wz_recordsets');
+		$rs=record_by_id($rs_id,'wz_recordsets');
 		$all_links=$rs->Links->recordset_as_string_array();
 		$links=$rs->Links->find(array('type'=>array('lMany2Many','lOne2One')))->recordset_as_string_array();
 		$extlinks=$rs->Links->find(array('type'=>'lMany2One'))->recordset_as_string_array();
@@ -274,7 +274,7 @@ class form_wizard_manager_forms extends g_forms_table{
 
 			$fields_form=new form_createform_tpl($hh,$params,$fields_data);
 
-			$rs2=record_by_id(intval($rs_id),'wz_recordsets');
+			$rs2=record_by_id($rs_id,'wz_recordsets');
 
 			foreach ($fields_form->htmlforms as $k=>$v) {
 				if ($v['name']=='enabled') {

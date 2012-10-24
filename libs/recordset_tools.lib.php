@@ -772,6 +772,7 @@ class %s extends gs_recordset_i18n {
 	}
 	function trigger_sortkey($rec,$type) {
 		if (!$rec->sortkey) $rec->sortkey=$rec->get_id();
+        if (!is_numeric($rec->sortkey)) $rec->sortkey=sprintf('%u',crc32($rec->sortkey));
 	}
 
 	function trigger_fPassword_encode($rec) {

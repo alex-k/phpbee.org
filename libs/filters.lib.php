@@ -132,6 +132,7 @@ class gs_filter_like extends gs_filter {
 		$tpl->assign('prelabel',isset($ps['prelabel']) ? $ps['prelabel'] : null);
 		$tpl->assign('label',isset($ps['label']) ? $ps['label'] : null);
 		$tpl->assign('params',$ps);
+        if(isset($ps['options'])) $tpl->assign('options',string_to_params($ps['options']));
 		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
 		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
 		return $out;
@@ -443,7 +444,7 @@ class gs_filter_select_by_links extends gs_filter {
 		$options=array();
 		if (isset($this->params['options'])) $options=string_to_params($this->params['options']);
 		foreach ($this->recordset->query_options['options'] as $o) {
-			if (isset($o['field']) && isset($rec_rs->structure['fields'][$o['field']])) {
+			if (isset($o['field']) && isset($rec_rs->structure['fields'][$o['field']]) && $o['field']!=$rec_rs->id_field_name) {
 				$options[]=$o;
 			}
 		}
@@ -526,6 +527,8 @@ class gs_filter_select_by_links extends gs_filter {
 		$tpl->assign('current',$this->value);
 		$tpl->assign('current_name',$current_name);
 		$tpl->assign('filter_params',$ps['params']);
+		$tpl->assign('title',isset($ps['title']) ? $ps['title'] : '');
+        
 		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
 		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
 		return $out;

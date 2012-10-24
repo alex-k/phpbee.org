@@ -510,6 +510,7 @@ class gs_logger {
 		foreach ($backtrace as $trace) {
 			if (isset($trace['file']) && $trace['file']!==__FILE__ && isset($trace['class'])) break;
 		}
+            if (!isset($trace['class'])) $trace['class']="_unknkwn_";
 
 			ob_start();
 			print_r($data);
