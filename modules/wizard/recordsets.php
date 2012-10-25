@@ -21,6 +21,7 @@ class wz_recordsets extends gs_recordset_short {
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'title'=> "fString 'название'",
+		'table_name'=> "fString table_name required=false",
 		'database'=> "fSelect 'database' widget=select",
 		'extends'=>"fString 'extends' required=false",
 		'Module'=>'lOne2One wz_modules Module widget=parent_list',

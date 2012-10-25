@@ -83,6 +83,7 @@ class <*$rs->name*> extends <*$rs->extends|default:"gs_recordset_short"*> {
 	<*if $rs->no_ctime*>public $no_ctime=true; <*/if*>
 	<*if $rs->orderby*>public $orderby="<*$rs->orderby*>";<*/if*> 
 	<*if $rs->database*>public $gs_connector_id="<*$rs->database*>";<*/if*>
+	<*if $rs->table_name*>public $table_name="<*$rs->table_name*>";<*/if*>
 	function __construct($init_opts=false) { parent::__construct(array(
 
 		<*foreach from=$rs->Fields->orderby('sortkey') item=f*>

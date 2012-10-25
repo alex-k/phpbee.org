@@ -118,7 +118,8 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 
 	}
 	function get_insert_id() {
-		return mysql_insert_id($this->db_connection);
+		$id=mysql_insert_id($this->db_connection) ;
+        return $id ? $id : FALSE;
 	}
 	public function get_table_names() {
 		$que=sprintf("SHOW TABLES");
