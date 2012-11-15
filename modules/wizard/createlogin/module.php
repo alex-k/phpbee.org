@@ -90,6 +90,10 @@ class gs_strategy_createlogin_handler extends gs_handler {
 					"gs_base_handler.post_login:return:gs_record:classname:$recordsetname:name:login_form_$recordsetname.html:form_class:".$d['form_class'].":fields:".implode(',',$d['login_fields']),
 					"gs_base_handler.redirect",
 					),
+				"/oauth2/checklogin/$recordsetname"=>array(
+					"oauth2_handler.login:classname:$recordsetname:login_field:".reset($d['login_fields']).":full_name_field:fullName",
+					"gs_base_handler.redirect",
+					),
 				),
 		);
 
