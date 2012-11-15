@@ -83,11 +83,20 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
                     'gs_base_handler.redirect',
                     'gs_base_handler.redirect',
                 ) ,
-                'loginbuttons' => array(
-                    'admin_handler.show:name:loginbuttons.html',
+                loginbuttons' => array(
+                    'oauth2_handler.login:classname:users:login_field:login:full_name_field:fullName:return:gs_record^show',
+                    'gs_base_handler.redirect',
+                    'end'=>'end',
+                    'show'=>'admin_handler.show:name:loginbuttons.html',
                 ) ,
                 'loginlinks' => array(
-                    'admin_handler.show:name:loginlinks.html',
+                    'oauth2_handler.login:classname:users:login_field:login:full_name_field:fullName:return:gs_record^show',
+                    'gs_base_handler.redirect',
+                    'end'=>'end',
+                    'show'=>'admin_handler.show:name:loginlinks.html',
+                ) ,
+                'loginlinks/menu' => array(
+                    'admin_handler.show:name:loginlinks_menu.html',
                 ) ,
             ) ,
         );
