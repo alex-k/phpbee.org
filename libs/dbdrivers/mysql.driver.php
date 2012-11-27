@@ -99,6 +99,8 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	function query($que='') {
 		$t=microtime(true);
 
+        if (!mysql_ping($this->db_connection)) $this->connect();
+
 		mlog($que);
 
 

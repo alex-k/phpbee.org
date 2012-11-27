@@ -376,7 +376,7 @@ class gs_base_handler extends gs_handler {
         }
 
         $tpl=gs_tpl::get_instance();
-        if (!$f) $f=$this->get_form();
+        if (!$f || !is_object($f) || !is_a($f,'g_forms')) $f=$this->get_form();
         if (isset($this->data['gsform_interact'])) {
             $this->flush($f->interact($this->data['gsform_interact']));
         }
@@ -398,16 +398,18 @@ class gs_base_handler extends gs_handler {
         }
         $f=$this->validate();
         if (!is_object($f) || !is_a($f,'g_forms')) return $f;
-	$cleandata=$f->clean();
+        $cleandata=$f->clean();
         $f->rec->fill_values(self::explode_data($cleandata));
-	foreach ($f->htmlforms as $fieldname=>$field) {
-		if ($field['type']=='lMany2Many') {
-			if (isset($cleandata[$fieldname])) {
-			    //$data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
-			    $f->rec->$fieldname->flush($cleandata[$fieldname]);
-			}
-		}
-	}
+
+        foreach ($f->htmlforms as $fieldname=>$field) {
+            if ($field['type']=='lMany2Many') {
+                if (isset($cleandata[$fieldname])) {
+                    //$data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
+                    $f->rec->$fieldname->flush($cleandata[$fieldname]);
+                }
+            }
+        }
+
         $f->rec->get_recordset()->commit();
 
         /*
@@ -893,9 +895,11 @@ function hpar($data,$name='hkey',$default=null) {
             if ($u!==FALSE) unset($f->htmlforms[$k]['validate'][$u]);
         }
         $f=$bh->validate($f);
+
         if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 
         $d=$f->clean();
+
 
 
         $rsname=$this->params['classname'];
@@ -914,8 +918,8 @@ function hpar($data,$name='hkey',$default=null) {
         foreach ($this->data['handler_params'] as $n=>$v) {
             if (isset($rs->structure['fields'][$n])) $d[$n]=$v;
         }
-        $d=array_filter($d);
-        if (!$d) {
+        $e=array_filter($d);
+        if (!$e) {
             $f->trigger_error('FORM_ERROR','EMPTY_SEARCH');
             return $this->showform($f);
 

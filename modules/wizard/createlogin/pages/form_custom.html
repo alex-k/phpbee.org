@@ -1,7 +1,7 @@
-	<form enctype="multipart/form-data" action="" class="form_login2" method="post">
+	<form enctype="multipart/form-data" action="" class="form" method="post">
 		<input type=hidden name="root" value="{$pid_id}">
 		<input type=hidden name="gspgid_form" value="{$gspgid_form}">
-		{if $_gsdata.dialog}<input type=hidden name="dialog" value="{$_gsdata.dialog}">{/if}
+		{if isset($_gsdata.dialog)}<input type=hidden name="dialog" value="{$_gsdata.dialog}">{/if}
 
 		{include file="form_error_messages.html"}
 		{$form->set_error_template('<div class="form_error" id="err" style="display: block; "><i></i>%s</div>')}
@@ -35,7 +35,6 @@
 		{/foreach}
 	
 
-         <br /> <br />
 	 	{block name="submit_button"}
 		<input type="submit" class="button" value="{$submit_title|default:"login"}" />
 		{/block}

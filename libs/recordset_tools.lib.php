@@ -158,7 +158,7 @@ class field_interface {
 	}
     static function fTimestamp ($field,$opts,&$structure,$init_opts) {
         self::fDateTime($field,$opts,$structure,$init_opts);
-        $structure['htmlforms'][$field]['type']='timestamp';
+        $structure['fields'][$field]['type']='timestamp';
     }
 	static function fText($field,$opts,&$structure,$init_opts) {
 		$structure['fields'][$field]=array('type'=>'text');

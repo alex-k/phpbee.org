@@ -386,7 +386,7 @@ class gs_init {
 		foreach ($loaded_classes as $classname) {
 			$refl= new ReflectionClass($classname);
 			$interfaces=$refl->getInterfaces();
-			if (isset($interfaces['gs_module'])) {
+			if (isset($interfaces['gs_module']) && !$refl->isAbstract()) {
 				$cfg->register_module($classname);
 			}
 		}

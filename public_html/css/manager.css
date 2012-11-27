@@ -1802,3 +1802,10 @@ img.icon {
 			margin-left:10px;
 }
 
+.tab-content {
+    padding-left: 3px;
+}
+
+.dollars {
+    color:#fff;
+}

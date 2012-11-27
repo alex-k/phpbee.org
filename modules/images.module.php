@@ -113,8 +113,8 @@ abstract class tw_file_images extends gs_recordset_short{
 		$this->config=array(
 			//'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
 			'admin'=>array('width'=>100,'height'=>100,'method'=>'use_fields','bgcolor'=>array(255,255,255)),
-			'tumb'=>array('width'=>300,'height'=>300,'method'=>'use_box','bgcolor'=>array(255,255,255)),
-			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(255,255,255)),
+			//'tumb'=>array('width'=>300,'height'=>300,'method'=>'use_box','bgcolor'=>array(255,255,255)),
+			//'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(255,255,255)),
 		);
 	}
 	
@@ -151,7 +151,29 @@ abstract class tw_file_images extends gs_recordset_short{
 				if (isset($data['bgcolor']) && $data['bgcolor']) $gd->set_bg_color($data['bgcolor'][0],$data['bgcolor'][0],$data['bgcolor'][0]);
 				if (isset($data['modifier']) && $data['modifier']) $gd->modifier($data['width'],$data['height'],$data['modifier']);
 
-				$gd->resize($data['width'],$data['height'],$data['method']);
+				//$gd->resize($data['width'],$data['height'],$data['method'],array('position','50%','50%'));
+                $gd->new_width=min($data['width'],$gd->old_width);
+                $gd->new_height=min($data['height'],$gd->old_height);
+                switch($data['method']) {
+                    case 'use_width':
+                        $gd->make_width();
+                    break;
+                    case 'use_height':
+                        $gd->make_height();
+                    break;
+                    case 'use_box':
+                        $gd->make_box();
+                    break;
+                    case 'use_space':
+                        $gd->make_space();
+                    break;
+                    case 'use_fields':
+                        $gd->make_fields();
+                    break;
+                    case 'use_crop':
+                        $gd->make_crop(array('position','50%','50%'));
+                    break;
+                }
 			}
 			if (!file_exists($iname) || ($no_rewrite==false && file_exists($iname))) {
 				if (isset($data['method']) && $data['method']=='copy') {

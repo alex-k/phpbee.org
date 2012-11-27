@@ -240,10 +240,11 @@ abstract class g_forms implements g_forms_interface{
 	function get_error_template($field, $only_first_error=TRUE) {
 		return $this->print_error($field, $only_first_error);
 	}
-	function print_error($field, $only_first_error=TRUE) {
+	function print_error($field, $only_first_error=TRUE,$error_template=NULL) {
 		$e=$this->get_error($field);
 		$ret='';
-		if ($e && $this->error_template) {
+        if ($error_template===NULL) $error_template=$this->error_template;
+		if ($e && $error_template) {
 
 			if ($only_first_error) $e=array(reset($e));
 
@@ -254,7 +255,7 @@ abstract class g_forms implements g_forms_interface{
 				$ret.=$t;
 			}
 
-			return sprintf($this->error_template,$ret);
+			return sprintf($error_template,$ret);
 		}
 		return implode($e);
 	}

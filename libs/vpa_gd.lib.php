@@ -240,26 +240,33 @@ class vpa_gd {
         if (!empty($params)) {
             switch ($params[0]) {
                 case 'position':
-                    if (strpos($params[2], '%') !== false) {
-                        $y = ceil($nh / 100 * intval(rtrim($params[2], '%')));
-                    } else {
-                        $y = intval($params[2]);
-                    }
-                    if (strpos($params[1], '%') !== false) {
-                        $x = ceil($nw / 100 * intval(rtrim($params[1], '%')));
-                    } else {
+
+                    if (strpos($params[1], '%') === false) {
                         $x = intval($params[1]);
+                        $y = intval($params[2]);
+                    } else {
+                        $kx=intval(rtrim($params[1], '%'))*.01;
+                        $ky=intval(rtrim($params[2], '%'))*.01;
+
+                        $x=ceil($kx*($this->new_width-$nw));
+                        $y=ceil($ky*($this->new_height-$nh));
                     }
 
                     break;
             }
         }
+        /*
+        md(sprintf("new_height=%s , new_width=%s, nh=%s, nw=%s, dw=%s dh=%s",$this->new_height,$this->new_width,$nh,$nw,$dw,$dh),1);
+        md(sprintf('x=%s y=%s',$x,$y),1);
+        die();
+        */
 
         $this->new_img=imagecreatetruecolor ($this->new_width, $this->new_height);
 		imagealphablending($this->new_img, false);
 		imagesavealpha($this->new_img, true);
 		$bg=imagecolorallocatealpha($this->new_img,255,255,255,127);
-		ImageCopyResampled($this->new_img, $this->old_img, 0, 0, $x, $y, $nw, $nh, $this->old_width, $this->old_height);
+		//ImageCopyResampled($this->new_img, $this->old_img, 0, 0, $x, $y, $nw, $nh, $this->old_width, $this->old_height);
+		ImageCopyResampled($this->new_img, $this->old_img, $x, $y, 0, 0, $nw, $nh, $this->old_width, $this->old_height);
 	}
 	
 	function crop ($x,$y,$w,$h) {
