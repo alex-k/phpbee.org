@@ -1,4 +1,7 @@
 $(document).ready (function () {
+	
+	//map.setCenter(new YMaps.GeoPoint(37.64, 55.76), 10);
+	
 	$("form").interaction({startfield:'Make_id',start_pattern:'.lOne2One,.interact_start_field [name]'});
 	$(".lMany2Many").gs_multiselect();
 	$(".fMultiSelect").gs_multiselect();
@@ -46,12 +49,6 @@ $(document).ready (function () {
 
 
 	 }).disableSelection();
-
-	$('.fWysiwyg').rte( {
-		//css: ['default.css'],
-controls_rte: rte_toolbar,
-controls_html: html_toolbar
-	});
 
 	$("[-data-href]").dblclick(function() {
 		window.document.location.href=$(this).attr('-data-href');
@@ -124,3 +121,22 @@ function md(obj) {
 	return str;
 }
 
+ymaps.ready(init_map);
+
+function init_map() {
+	window.myMap = new ymaps.Map ("coords_map", {center: [ymaps.geolocation.latitude, ymaps.geolocation.longitude], zoom: 10});
+	window.myMap.controls.add(
+		new ymaps.control.ZoomControl()
+	);
+	window.placemark=new ymaps.Placemark([ymaps.geolocation.latitude, ymaps.geolocation.longitude]);
+	window.myMap.geoObjects.add(window.placemark);
+	
+	window.myMap.events.add("click",
+		function(e) {
+			var txt=e.get("coordPosition");
+			$('#coord_x').val(txt[0]);
+			$('#coord_y').val(txt[1]);
+			window.placemark.geometry.setCoordinates(txt);
+		}
+	);
+}
