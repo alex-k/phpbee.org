@@ -362,7 +362,15 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	function select($rset,$options,$fields=NULL) {
 		$where=$this->construct_where($options);
 		$fields = is_array($fields) ? array_filter($fields) : array_keys($rset->structure['fields']);
-		$que=sprintf("SELECT `%s` FROM `%s` ", implode('`,`',$fields), $rset->db_tablename);
+		foreach ($fields as $k=>$f) {
+			if ($rset->structure['fields'][$f]['type']=='float') {
+				$fields[$k]=sprintf("`%s`*1 AS `%s`",$f,$f);
+			} else {
+				$fields[$k]='`'.$f.'`';
+			}
+		}
+		//$que=sprintf("SELECT `%s` FROM `%s` ", implode('`,`',$fields), $rset->db_tablename);
+		$que=sprintf("SELECT %s FROM `%s` ", implode(',',$fields), $rset->db_tablename);
 		if (is_array($options)) foreach($options as $o) {
 			if (isset($o['type'])) switch($o['type']) {
 				case 'limit':
