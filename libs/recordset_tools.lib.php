@@ -196,22 +196,22 @@ class field_interface {
 	}
 	
 		static function fCoords($field,$opts,&$structure,$init_opts) {
-		$structure['fields'][$field.'_x']=array('type'=>'int');
-		$structure['fields'][$field.'_y']=array('type'=>'int');
+		$structure['fields'][$field.'_x']=array('type'=>'float');
+		$structure['fields'][$field.'_y']=array('type'=>'float');
 		$structure['htmlforms'][$field]=array(
 			'type'=>'coords',
 			'hidden'=>$opts['hidden'],
 			'verbose_name'=>$opts['verbose_name'],
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty'
 		);
-		$structure['htmlforms'][$field.'_x']=array(
+		/*$structure['htmlforms'][$field.'_x']=array(
 			'type'=>'input',
-			'hidden'=>true,
+			'hidden'=>false,
 		);
 		$structure['htmlforms'][$field.'_y']=array(
 			'type'=>'input',
-			'hidden'=>true,
-		);
+			'hidden'=>false,
+		);*/
 		
 			
 		if (isset($opts['widget'])) $structure['htmlforms'][$field]['widget']=$opts['widget'];
