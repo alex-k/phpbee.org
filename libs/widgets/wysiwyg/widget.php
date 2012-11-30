@@ -31,16 +31,6 @@ class gs_widget_wysiwyg extends gs_widget {
 			'rid'=>$rid,
 		));
 		return $tpl->fetch('widget_wysiwyg.html');
-		
-		$s=sprintf('<a href="/admin/gallery/%s/%s/%d" target="_blank" id="lMany2One_%s"></a>',
-			$rs,
-			$link,
-			$rid,
-			$link);
-		
-		return $s.sprintf('<textarea class="%s" name="%s" _url="/admin/gallery/%s/%s/%d">%s</textarea>',
-			isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fWysiwyg',
-			$this->fieldname,$link,trim($this->value));
 	}
 }
 
