@@ -14,8 +14,6 @@ class module extends gs_base_module implements gs_module {
 			'get_post'=>array(
 				''=>'gs_base_handler.show:{name:index.html}',
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
-				'/admin/window_form'=>'admin_handler.many2one:{name:window_form.html}',
-				'/admin/many2one'=>'admin_handler.many2one:{name:many2one.html}',
 				'/admin/logout'=>array(
 					  'admin_handler.post_logout:return:true',
 					  'gs_base_handler.redirect',
@@ -158,46 +156,6 @@ class admin_handler extends gs_base_handler {
 		return html_redirect($res,$query);
 	}
 	
-	function many2one($ret) {
-		if (isset($this->data['gspgid_va'][5]) && $this->data['gspgid_va'][5]=='delete') {
-			$rid=intval($this->data['gspgid_va'][6]);
-			$rs_name=$this->data['gspgid_va'][0];
-			$rs=new $rs_name;
-			$rec=$rs->get_by_id($rid);
-			if ($rec) {
-				$rec->delete();
-				$rec->commit();
-			}
-			$res=preg_replace("|/delete/\d+|is","//",$this->data['gspgid']);
-			return html_redirect($res);
-		}
-		
-		if ($this->data['action']=='delete') {
-			$ids=$this->data['act'];
-			$rs_name=$this->data['gspgid_va'][0];
-			$rs=new $rs_name;
-			$recs=$rs->find_records(array('id'=>$ids));
-			foreach ($recs as $rec) {
-				$rec->delete();
-				$rec->commit();
-			}
-			return html_redirect($this->data['gspgid']);
-		}
-		
-		
-		$params=array(
-			$this->data['gspgid_va'][1]=>$this->data['gspgid_va'][2],
-		);
-		$g=array_slice($this->data['gspgid_va'],0,5);
-		$url=implode('/',$g);
-		if ($this->data['gspgid_va'][2]==0) {
-			$params[$this->data['gspgid_va'][1].'_hash']=$this->data['gspgid_va'][3];
-		}
-		$tpl=gs_tpl::get_instance();
-		$tpl->assign('url',$url);
-		$tpl->assign('params',$params);
-		parent::show($ret);
-	}
 }
 
 
