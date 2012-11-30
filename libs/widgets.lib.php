@@ -137,30 +137,6 @@ class gs_widget_plaintext  extends gs_widget_text {
 	}
 }
 
-class gs_widget_wysiwyg extends gs_widget {
-
-	function clean() {
-		parent::clean();
-		//$result=iconv('CP1251','UTF-8',$result);
-		if (function_exists ('tidy_parse_string')) {
-			$config = array('indent' => TRUE,
-							'show-body-only' => TRUE,
-							'output-xhtml' => TRUE,
-						);
-			$tidy = tidy_parse_string($this->value, $config, 'UTF8');
-			$tidy->cleanRepair();
-			$this->value=trim($tidy);
-		}
-		return $this->value;
-	}
-
-	function html() {
-		return sprintf('<textarea class="%s" name="%s" _images="lMany2One_%s">%s</textarea>',
-					   isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fWysiwyg',
-					   $this->fieldname,$this->params['images_key'],trim($this->value));
-	}
-}
-
 class gs_widget_file extends gs_widget {
 	function html() {
 		return sprintf('<input class="fFile" type="file" name="%s" >', $this->fieldname);
@@ -197,6 +173,39 @@ class gs_widget_coords extends gs_widget {
 		return (!empty($this->value['X']) && !empty($this->value['Y']));
 	}
 }
+
+
+class gs_widget_yandex_coords extends gs_widget {
+	function html() {
+		$x=$y=0;
+		
+		if (isset($this->params['variants']) && $this->params['variants']) {
+			$x=$this->params['variants']['x'];
+			$y=$this->params['variants']['y'];
+		}
+			//list($x,$y)=$this->params['variants'];
+		return sprintf('<input type="hidden" class="coords" name="%s[X]" id="coord_x" value="%.9f">:<input type="hidden" class="coords" name="%s[Y]" id="coord_y" value="%.9f"><br><div id="coords_map" ></div><script type="text/javascript">if (%.2f!=0) {ymaps.ready(function() {window.placemark.geometry.setCoordinates([%.9f,%.9f]);window.myMap.setCenter([%.9f,%.9f],11);});}</script>', $this->fieldname,$x, $this->fieldname,$y,$x,$x,$y,$x,$y);
+	}
+	function clean() {
+		parent::clean();
+		return array(
+				   $this->fieldname.'_x'=>$this->value['X'],
+				   $this->fieldname.'_y'=>$this->value['Y'],
+			   );
+	}
+
+	/*function validate() {
+		return (!empty($this->value['X']) && !empty($this->value['Y']));
+	}*/
+}
+
+class gs_data_widget_yandex_coords {
+	function gd($rec,$k,$hh,$params,$data) {
+		$hh[$k]['variants']=array('x'=>$rec[$k.'_x'],'y'=>$rec[$k.'_y']);
+		return $hh;
+	}
+}
+
 
 class gs_widget_image extends gs_widget_file {
 	function html() {
@@ -631,7 +640,7 @@ class gs_widget_include_form extends gs_widget {}
 
 class gs_data_widget_include_form {
 	function gd($rec,$k,$hh,$params,$data) {
-		if ($hh[$k]['type']=='lOne2One') {
+		if (isset($hh[$k]) && $hh[$k]['type']=='lOne2One') {
 			$l_k=$hh[$k]['linkname'];
 			$nrs=$rec->$l_k;
 		} else {
