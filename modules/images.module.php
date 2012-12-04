@@ -198,6 +198,10 @@ class images_handler extends gs_base_handler {
 		$t=pathinfo(array_pop($d));
 		$type=$t['filename'];
 		$key=array_pop($d);
+        if (strlen($key)==0) {
+			header ('HTTP/1.1 404 Not Found');
+			die();
+        }
 		$o=new $rs;
 		load_dbdriver('file');
 		$c=new gs_dbdriver_file($cinfo);

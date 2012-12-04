@@ -91,7 +91,7 @@ class gs_strategy_createlogin_handler extends gs_handler {
 					"gs_base_handler.redirect",
 					),
 				"/oauth2/checklogin/$recordsetname"=>array(
-					"oauth2_handler.login:classname:$recordsetname:login_field:".reset($d['login_fields']).":full_name_field:fullName",
+					"oauth2_handler.login:classname:$recordsetname:login_field:".reset($d['login_fields']).":full_name_field:fullName:email_name_field:email",
 					"gs_base_handler.redirect",
 					),
 				),
