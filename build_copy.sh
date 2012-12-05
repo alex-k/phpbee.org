@@ -6,3 +6,6 @@ mv html/index_page_default.html html/index.html
 mv html/404_default.html html/404.html
 cp public_html/worker.php public_html/index.php
 
+mkdir public_html/files
+chmod 777 public_html/files
+
