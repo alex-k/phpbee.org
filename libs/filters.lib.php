@@ -127,6 +127,7 @@ class gs_filter_like extends gs_filter {
 	}
 	function getHtmlBlockNonExlusive($ps) {
 		$tpl=gs_tpl::get_instance();
+		$tpl->assign(array_filter($ps,'is_string'));
 		$tpl->assign('current',$this->value);
 		$tpl->assign('keyname',$this->name);
 		$tpl->assign('prelabel',isset($ps['prelabel']) ? $ps['prelabel'] : null);
@@ -443,7 +444,8 @@ class gs_filter_select_by_links extends gs_filter {
 		//$rec_rs=$rec_rs->find_records(array());
 		$options=array();
 		if (isset($this->params['options'])) $options=string_to_params($this->params['options']);
-		foreach ($this->recordset->query_options['options'] as $o) {
+		if (isset($this->params['options_arr'])) $options=array(string_to_params($this->params['options_arr']));
+		if (isset($this->recordset->query_options['options'])) foreach ($this->recordset->query_options['options'] as $o) {
 			if (isset($o['field']) && isset($rec_rs->structure['fields'][$o['field']]) && $o['field']!=$rec_rs->id_field_name) {
 				$options[]=$o;
 			}
@@ -488,6 +490,7 @@ class gs_filter_select_by_links extends gs_filter {
 				$rs=new $rsname();
 				$count=$rs->count_records($count_array);
 			}
+			
 
 			$name=trim($rec);
 			$arr[$this->name]=$key;
@@ -522,6 +525,7 @@ class gs_filter_select_by_links extends gs_filter {
 			if ($l['key']==$this->value) $current_name=$l['name'];
 		}
 		$link_all_array=array('name'=>'all','key'=>'all','href'=>$link_all,'count'=>$count_all, 'va'=>null,'rec'=>null);
+		$tpl->assign(array_filter($ps,'is_string'));
 		$tpl->assign('link_all',$link_all_array);
 		$tpl->assign('links',$links);
 		$tpl->assign('current',$this->value);
