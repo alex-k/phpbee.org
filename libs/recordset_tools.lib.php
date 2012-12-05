@@ -353,12 +353,13 @@ class field_interface {
 			'validate'=>strtolower($opts['required'])=='false' ? 'dummyValid' : 'notEmpty',
 		);
 
+
 		$structure['recordsets'][$field]=array(
 			'recordset'=>$table_name,
 			'rs1_name'=>$init_opts['recordset'],
 			'rs2_name'=>$rname,
 			'rs_link'=>false,
-			'local_field_name'=>'id',
+			'local_field_name'=>isset($opts['local_field_name']) ? $opts['local_field_name'] : 'id',
 			'foreign_field_name'=>$foreign_field_name ? $foreign_field_name : $init_opts['recordset'].'_id',
 			'type'=>'many',
 			);
@@ -376,6 +377,7 @@ class field_interface {
 		if (isset($opts['cssclass'])) $structure['htmlforms'][$field]['cssclass']=$opts['cssclass'];
 		if (isset($opts['helper_text'])) $structure['htmlforms'][$field]['helper_text']=$opts['helper_text'];
 
+
 		//$structure['fkeys'][]=array('link'=>$field,'on_delete'=>'CASCADE','on_update'=>'CASCADE');
 	}
 	function install()  {
@@ -384,9 +386,9 @@ class field_interface {
 }
 
 class gs_rs_links extends gs_recordset{
-	public $handler_cache_status=2;
+		public $handler_cache_status=2;
         public $id_field_name='id';
-	private $links=array();
+		private $links=array();
         public $structure=array(
                 'fields'=>array(
                         'id'=>array('type'=>'serial'),
@@ -403,6 +405,8 @@ class gs_rs_links extends gs_recordset{
 
 		$f1=$rs1.'_id';
 		$f2=$rs1!=$rs2 ? $rs2.'_id': 'id2';
+		if ($f1=='tw_tours_id') $f1='tw_trip_id';
+
 		$this->structure['fields'][$f1]=array('type'=>'int');
 		$this->structure['fields'][$f2]=array('type'=>'int');
 
@@ -411,11 +415,11 @@ class gs_rs_links extends gs_recordset{
 
 		$this->structure['recordsets']['parents']=array('recordset'=>$rs1,'local_field_name'=>$f1,'foreign_field_name'=>'id','update_recordset'=>$rs2,'update_link'=>$link_name);
 		$this->structure['recordsets']['childs']=array('recordset'=>$rs2,'local_field_name'=>$f2,'foreign_field_name'=>'id','update_recordset'=>$rs1,'update_link'=>$link_name);
-		/*
-		*/
+
 		$this->structure['fkeys'][]=array('link'=>'parents','on_delete'=>'CASCADE','on_update'=>'CASCADE');
 		$this->structure['fkeys'][]=array('link'=>'childs','on_delete'=>'CASCADE','on_update'=>'CASCADE');
-                return parent::__construct($this->gs_connector_id,$table_name);
+
+		return parent::__construct($this->gs_connector_id,$table_name);
 
 	}
 	public function find($opts,$linkname=null) {
