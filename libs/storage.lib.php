@@ -640,7 +640,7 @@ abstract class gs_prepare_sql {
 		                        '<'=>array('FLOAT'=>'`{f}` < {v}','NUMERIC'=>'`{f}` < {v}','STRING'=>'`{f}` < {v}','NULL'=>'`{f}` IS NOT NULL}'),
 		                        '<='=>array('FLOAT'=>'`{f}` <= {v}','NUMERIC'=>'`{f}` <= {v}','STRING'=>'`{f}` <= {v}','NULL'=>'`{f}` IS NOT NULL'),
 		                        'STRONGLIKE'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '{v}'",'NULL'=>'FALSE'),
-		                        'LIKE'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}%%'",'NULL'=>'FALSE'),
+		                        'LIKE'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>"`{f}` LIKE '%%{v}%%'",'STRING'=>"`{f}` LIKE '%%{v}%%'",'NULL'=>'FALSE'),
 		                        'STARTS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '{v}%%'",'NULL'=>'FALSE'),
 		                        'ENDS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}'",'NULL'=>'FALSE'),
 		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})>1",'NULL'=>'FALSE'), // dont escape`fieldname` cause of multi-field-indexes (field1,field2,field3)
@@ -707,7 +707,7 @@ abstract class gs_prepare_sql {
 			if (!empty($txt)) $tmpsql[]=$txt;
 			$txt='';
 		}
-		$ret=sizeof($tmpsql)>0 ? sprintf ( $counter_or ? '(%s)' : ' %s ',implode(" $type ",$tmpsql)) : '';
+		$ret=sizeof($tmpsql)>0 ? sprintf ( $counter_or ? '(%s)' : '( %s )',implode(" $type ",$tmpsql)) : '';
 		$this->_where=$ret;
 		return $ret;
 	}
