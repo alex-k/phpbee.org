@@ -1,4 +1,5 @@
 <?php
+
 DEFINE ('LOAD_CORE',1);
 DEFINE ('LOAD_STORAGE',2);
 DEFINE ('LOAD_TEMPLATES',4);
@@ -520,8 +521,20 @@ class gs_logger {
 		$t=microtime(true);
 		$txt_time=sprintf("%.3f/%.4f",$t-$this->time_start,$t-$this->tt);
 		$txt_class=sprintf("%s.%s",$trace['class'],$trace['function']);
+		$classname=$trace['class'];
+		$funcname=$trace['function'];
 		$this->messages[]=sprintf("%s [%s] > %s",$txt_time,$txt_class,$txt);
-		$this->gmessages[$trace['class']][$trace['function']][]=sprintf("%s > %s",$txt_time,$txt);
+		$this->gmessages[$classname][$funcname][]=sprintf("%s\t> %s",$txt_time,$txt);
+
+
+		/*
+		foreach ($backtrace as $trace) {
+				$txt=sprintf("%-20s %s:%s",$trace['class'].'.'.$trace['function'],$trace['line'],$trace['file']);
+				$this->gmessages[$classname][$funcname][]=sprintf("\t\t\t> %s",$txt);
+		}
+		*/
+		$this->gmessages[$classname][$funcname][]="";
+
 		$this->tt=$t;
 		$this->log_to_file($data);
         self::udplog($txt);
