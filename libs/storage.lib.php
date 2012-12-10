@@ -643,7 +643,7 @@ abstract class gs_prepare_sql {
 		                        'LIKE'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>"`{f}` LIKE '%%{v}%%'",'STRING'=>"`{f}` LIKE '%%{v}%%'",'NULL'=>'FALSE'),
 		                        'STARTS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '{v}%%'",'NULL'=>'FALSE'),
 		                        'ENDS'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>"`{f}` LIKE '%%{v}'",'NULL'=>'FALSE'),
-		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})>1",'NULL'=>'FALSE'), // dont escape`fieldname` cause of multi-field-indexes (field1,field2,field3)
+		                        'FULLTEXT'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ({f}) AGAINST  ({v})>0",'NULL'=>'FALSE'), // dont escape`fieldname` cause of multi-field-indexes (field1,field2,field3)
 		                        'REGEXP'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" `{f}` REGEXP {v}",'NULL'=>'FALSE'), // dont add `fieldname` cause of multi-field-indexes (field1,field2,field3)
 		                        'NOTREGEXP'=>array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" `{f}` NOT REGEXP {v}",'NULL'=>'FALSE'), // dont add `fieldname` cause of multi-field-indexes (field1,field2,field3)
 		                        'BETWEEN'=>array('FLOAT'=>'FALSE','NUMERIC'=>'FALSE','STRING'=>'FALSE','NULL'=>'FALSE','ARRAY'=>'(`{f}` BETWEEN {v0} AND {v1})'),
@@ -671,7 +671,7 @@ abstract class gs_prepare_sql {
 		$this->_cache=array();
 	}
 
-	function  construct_where($options,$type='AND') {
+	function construct_where($options,$type='AND') {
 		$tmpsql=array();
 		$counter_or=0;
 		if (is_array($options)) foreach ($options as $kkey=>$value) {
@@ -700,6 +700,9 @@ abstract class gs_prepare_sql {
 					break;
 				case 'field':
 					$txt=sprintf("`%s` %s `%s`",$value['field'],$value['case'],$value['value']);
+					break;
+				case 'function':
+					$txt=sprintf("%s %s %s",$value['function'],$value['case'],$value['value']);
 					break;
 				}
 
