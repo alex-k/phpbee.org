@@ -88,6 +88,7 @@ class gs_base_handler extends gs_handler {
         $ret=call_user_func($this->params['module_name'].'::gl',$name,$this->data['gspgid_v'],$this->data['gspgid']);
         if ($ret instanceof gs_record) return $ret;
         $url=trim($ret,'/');
+        
         return ($url==$this->data['gspgid'] || $url==trim($_SERVER['REQUEST_URI'],'/') || $ret===TRUE );
     }
 
@@ -304,10 +305,11 @@ class gs_base_handler extends gs_handler {
         $hh_fields=array_keys($hh);
         $hh_fields=self::minus_fields($hh_fields,$params,$data,$hh);
 
-
+        //md($hh_fields,1);
         if (!count($f->htmlforms)) foreach ($hh_fields as $name) {
             $params=$hh[$name];
             if (!(isset($params['hidden']) && $params['hidden']) && !isset($data['handler_params'][$name])) {
+            //if (!isset($data['handler_params'][$name])) {
                 $f->add_field($name,$params);
                 if(isset($params['default'])) $rec_default_values[$name]=$params['default'];
             }
@@ -317,7 +319,7 @@ class gs_base_handler extends gs_handler {
 
 		$langs=languages();
 		cfg_set('languages',array());
-
+        
         self::apply_data_widgets($f,$hh,$params,$data);
 
 		cfg_set('languages',$langs);
@@ -330,10 +332,10 @@ class gs_base_handler extends gs_handler {
             $default_lang=key($langs);
             $rec_values['Lang'][$default_lang]=$rec->get_values();
         }
-        /*
-        md($fields,1);
-        md($rec_values,1);
-        */
+        
+        /*md($fields,1);
+        md($rec_values,1);*/
+        
 
 
 
@@ -603,7 +605,7 @@ class gs_base_handler extends gs_handler {
         return false;
     }
     function redirect() {
-		if (isset($this->params['clean_get']) && $this->params['clean_get']!='flase') {
+		if (isset($this->params['clean_get']) && $this->params['clean_get']!='false') {
 			$this->params['clean_get']=true;
 		} else {
 			$this->params['clean_get']=false;
