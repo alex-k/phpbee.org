@@ -3,7 +3,7 @@ class gs_dbdriver_sphinx extends gs_dbdriver_mysql implements gs_dbdriver_interf
 
     function __construct($cinfo){
             parent::__construct($cinfo);
-            $this->_escape_case['FULLTEXT']=array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ({v}) ",'NULL'=>'FALSE');
+            $this->_escape_case['FULLTEXT']=array('FLOAT'=>'`{f}`={v}','NUMERIC'=>'`{f}`={v}','STRING'=>" MATCH ('@{f} {v}') ",'NULL'=>'FALSE');
     }
     function set_connection_charset($codepage) {
 			$this->query(sprintf("SET NAMES '%s'",$codepage));
@@ -27,7 +27,7 @@ class gs_dbdriver_sphinx extends gs_dbdriver_mysql implements gs_dbdriver_interf
 				$arr[]=$this->escape_value($l);
 			}
 			return sprintf('(%s)',implode(',',$arr));
-		} else if ($c=='LIKE' || $c=='STRONGLIKE' || $c=='STARTS' || $c=='ENDS') {
+		} else if ($c=='LIKE' || $c=='STRONGLIKE' || $c=='STARTS' || $c=='ENDS' || $c=='FULLTEXT') {
 			return sprintf('%s',mysql_escape_string($v));
 		} else {
 			return sprintf("'%s'",mysql_escape_string($v));
@@ -78,6 +78,7 @@ class gs_dbdriver_sphinx extends gs_dbdriver_mysql implements gs_dbdriver_interf
 		$que=sprintf('REPLACE INTO `%s` (`%s`) VALUES  (%s)',$rset->db_tablename,implode('`,`',$fields),implode(',',$values));
 		return $this->query($que);
 	}
+	
 	function select($rset,$options,$fields=NULL) {
 		$where=$this->construct_where($options);
 		$fields = is_array($fields) ? array_filter($fields) : array_keys($rset->structure['fields']);
@@ -103,7 +104,6 @@ class gs_dbdriver_sphinx extends gs_dbdriver_mysql implements gs_dbdriver_interf
 		if (!empty($str_orderby)) $que.=$str_orderby;
 		if (!empty($str_limit)) $que.=$str_limit;
 		if (!empty($str_offset)) $que.=$str_offset;
-
 		$this->_que=md5($que);
 		if(isset($this->_cache[$this->_que])) {
 			return true;
@@ -111,11 +111,44 @@ class gs_dbdriver_sphinx extends gs_dbdriver_mysql implements gs_dbdriver_interf
 
 		return $this->query($que);
 	}
+	
 	function count($rset,$options) {
         $cnt=0;
         $options[]=array('type'=>'limit','value'=>10000);
         $ret=$this->select($rset,$options);
         if (!is_bool($ret))  $cnt=mysql_num_rows($ret);
         return $this->query(sprintf(" select %d as `count` from `%s` limit 1",$cnt,$rset->table_name));
+	}
+	
+	function construct_where($options,$type='AND') {
+		$tmpsql=array();
+		$counter_or=0;
+		$fulltext=array();
+		if (is_array($options)) foreach ($options as $kkey=>$value) {
+			if (!is_array($value) || !isset($value['value'])) {
+				$value=array('type'=>'value', 'field'=>$kkey,'case'=>'=','value'=>$value);
+			}
+			if (!isset($value['case'])) $value['case']='=';
+			if (!isset($value['type'])) $value['type']='value';
+
+
+			switch ($value['type']) {
+			case 'value':
+				if ($value['case']=='FULLTEXT') {
+					$fulltext[]='@'.$value['field'].' '.$value['value'];
+				}
+				//$txt=$this->escape($value['field'],$value['case'],$value['value']);
+				break;
+			case 'field':
+				$txt=sprintf("`%s` %s `%s`",$value['field'],$value['case'],$value['value']);
+				break;
+			}
+			if (!empty($txt)) $tmpsql[]=$txt;
+			$txt='';
+		}
+		$tmpsql[]=sprintf(" MATCH ('%s') ",implode(' ',$fulltext));
+		$ret=sizeof($tmpsql)>0 ? sprintf ( $counter_or ? '(%s)' : ' %s ',implode(" $type ",$tmpsql)) : '';
+		$this->_where=$ret;
+		return $ret;
 	}
 }
