@@ -43,8 +43,9 @@ class gs_filter {
 		unset($arr['gspgtype']);
 		return $arr;
 	}
-	function loadValues() {
+	function loadValues($get_name=false) {
 		$arr=array();
+		if (!$get_name) $get_name=$this->name;
 		switch ($this->data['handler_params']['urltype']) {
 			case 'get': 
 				$arr=$this->get_data_get();
@@ -52,7 +53,7 @@ class gs_filter {
 			case 'session': 
 				$arr=$this->get_data_get();
 				if(isset($arr[$this->name])) {
-					gs_session::save($arr[$this->name],'filter_'.$this->name);
+					gs_session::save($arr[$get_name],'filter_'.$this->name);
 				} else {
 					$arr[$this->name]=gs_session::load('filter_'.$this->name);
 				}
@@ -72,7 +73,7 @@ class gs_filter {
 				}
 		}
 		$this->va=$arr;
-		$this->value=isset($arr[$this->name]) ? $arr[$this->name] :(isset($this->params['default']) ? $this->params['default'] : null);
+		$this->value=isset($arr[$get_name]) ? $arr[$get_name] :(isset($this->params['default']) ? $this->params['default'] : null);
 	}
 	function applyFilter($options,$rs) {
 		return $options;
@@ -111,6 +112,103 @@ class gs_filter_firstletters extends gs_filter_like {
 	}
 }
 
+class gs_filter_coords extends gs_filter {
+	function __construct($data) {
+		parent::__construct($data);
+		if (!isset($this->params['fields'])) $this->params['fields']='';
+		$this->fields=$this->params['fields'];
+		$this->radius=$this->params['radius'];
+	}
+	function getHtmlBlock($ps) {
+		parent::getHtmlBlock($ps);
+		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
+		return $this->getHtmlBlockNonExlusive($ps);
+	}
+	function getHtmlBlockNonExlusive($ps) {
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('current',$this->value);
+		$tpl->assign('keyname',$this->name);
+		$tpl->assign('params',$ps);
+        if(isset($ps['options'])) $tpl->assign('options',string_to_params($ps['options']));
+		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
+		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
+		return $out;
+	}
+	function applyFilter($options,$rs) {
+		if (empty($this->value)) return $options;
+		list($x,$y)=explode(',',$this->value);
+		$to=array(
+				'type'=>'function',
+				'function'=>sprintf('coords(%s,%.15f,%.15f)',$this->fields,(float)$x,(float)$y),
+				'value'=>$this->radius/1000,
+				'case'=>'<=',
+				);
+		$options[$this->name]=$to;
+		return $options;
+	}
+}
+
+class gs_filter_like_by_link extends gs_filter {
+	function __construct($data) {
+		parent::__construct($data);
+		list($rsname,$fname)=explode('.',$this->params['link']);
+		$this->rsname=$rsname;
+		$this->fieldname=$fname;
+		if (isset($this->params['alias'])) $this->loadValues($this->params['alias']);
+	}
+	function getHtmlBlock($ps) {
+		parent::getHtmlBlock($ps);
+		if (isset($ps['exlusive']) && $ps['exlusive']) return $this->getHtmlBlockExlusive($ps);
+		return $this->getHtmlBlockNonExlusive($ps);
+	}
+	function getHtmlBlockNonExlusive($ps) {
+		$tpl=gs_tpl::get_instance();
+		$tpl->assign('current',$this->value);
+		$tpl->assign('keyname',$this->name);
+		$tpl->assign('params',$ps);
+        if(isset($ps['options'])) $tpl->assign('options',string_to_params($ps['options']));
+		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
+		$out=$tpl->fetch('filters'.DIRECTORY_SEPARATOR.$tplname);
+		return $out;
+	}
+	function applyFilter($options,$rs) {
+		if (empty($this->value)) return $options;
+		$rn=$this->rsname;
+		$link=$rs->structure['recordsets'][$this->rsname];
+		if ($link['type']=='many') {
+			$rsname=$link['rs2_name'];
+			$ors=new $rsname;
+			$opts[$this->fieldname]=array(
+				'type'=>'value',
+				'field'=>$this->fieldname,
+				'value'=>$this->value,
+				'case'=>'LIKE',
+			);
+			$link_ids=array_keys($ors->find_records($opts)->get_values('id'));
+			$lrs=new $link['recordset'];
+			$lf=$lrs->structure['recordsets'][$link['rs2_name']]['local_field_name'];
+			$real_ids=$lrs->find_records(array($lf=>$link_ids))->get_values($link['foreign_field_name']);
+			$ids=array();
+			foreach ($real_ids as $rid) {
+				$ids[]=$rid[$link['foreign_field_name']];
+			}
+		} else {
+			//$rsname=$link['recordset'];
+			// надо сделать
+		}
+		
+		$to=array(
+			'type'=>'value',
+			'field'=>$rs->id_field_name,
+			'value'=>$ids,
+		);
+		$options[$this->name]=$to;
+		return $options;
+	}
+}
+
+
+
 class gs_filter_like extends gs_filter {
 	function __construct($data) {
 		parent::__construct($data);
@@ -127,7 +225,6 @@ class gs_filter_like extends gs_filter {
 	}
 	function getHtmlBlockNonExlusive($ps) {
 		$tpl=gs_tpl::get_instance();
-		$tpl->assign(array_filter($ps,'is_string'));
 		$tpl->assign('current',$this->value);
 		$tpl->assign('keyname',$this->name);
 		$tpl->assign('prelabel',isset($ps['prelabel']) ? $ps['prelabel'] : null);
@@ -144,6 +241,7 @@ class gs_filter_like extends gs_filter {
 			'type'=>'condition',
 			'condition'=>'OR',
 		);
+
 		foreach ($this->fields as $field) {
 			$to[]=array(
 					'type'=>'value',
@@ -444,8 +542,7 @@ class gs_filter_select_by_links extends gs_filter {
 		//$rec_rs=$rec_rs->find_records(array());
 		$options=array();
 		if (isset($this->params['options'])) $options=string_to_params($this->params['options']);
-		if (isset($this->params['options_arr'])) $options=array(string_to_params($this->params['options_arr']));
-		if (isset($this->recordset->query_options['options'])) foreach ($this->recordset->query_options['options'] as $o) {
+		foreach ($this->recordset->query_options['options'] as $o) {
 			if (isset($o['field']) && isset($rec_rs->structure['fields'][$o['field']]) && $o['field']!=$rec_rs->id_field_name) {
 				$options[]=$o;
 			}
@@ -490,7 +587,6 @@ class gs_filter_select_by_links extends gs_filter {
 				$rs=new $rsname();
 				$count=$rs->count_records($count_array);
 			}
-			
 
 			$name=trim($rec);
 			$arr[$this->name]=$key;
@@ -525,7 +621,6 @@ class gs_filter_select_by_links extends gs_filter {
 			if ($l['key']==$this->value) $current_name=$l['name'];
 		}
 		$link_all_array=array('name'=>'all','key'=>'all','href'=>$link_all,'count'=>$count_all, 'va'=>null,'rec'=>null);
-		$tpl->assign(array_filter($ps,'is_string'));
 		$tpl->assign('link_all',$link_all_array);
 		$tpl->assign('links',$links);
 		$tpl->assign('current',$this->value);
