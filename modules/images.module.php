@@ -111,10 +111,10 @@ abstract class tw_file_images extends gs_recordset_short{
 	
 	function config_previews() {
 		$this->config=array(
-			//'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
+			'orig'=>array('width'=>0,'height'=>0,'method'=>'copy'),
 			'admin'=>array('width'=>100,'height'=>100,'method'=>'use_fields','bgcolor'=>array(255,255,255)),
 			//'tumb'=>array('width'=>300,'height'=>300,'method'=>'use_box','bgcolor'=>array(255,255,255)),
-			//'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(255,255,255)),
+			'small'=>array('width'=>100,'height'=>75,'method'=>'use_crop','bgcolor'=>array(255,255,255)),
 		);
 	}
 	
@@ -143,6 +143,15 @@ abstract class tw_file_images extends gs_recordset_short{
         }
 		$fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR;
 		$sname=$fname.'File_data';
+
+		if(!$rec->first()->File_width) {
+			$orname=$fname.'orig.jpg';
+			$data=$rec->get_recordset()->fetch_image($orname);
+			if ($data) {
+				$rec->fill_values($data);
+				$rec->commit();
+			}
+		}
 		foreach ($this->config as $key => $data) {
 			//$gd=new vpa_gd($sname);
 			$gd=new vpa_gd($rec->File_data,false);
@@ -302,6 +311,8 @@ class images_module extends gs_base_module implements gs_module {
 				'img/show'=>'images_handler.show',
 				'img/s'=>'images_handler.s',
 				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
+				'/admin/window_form'=>'admin_handler.many2one:{name:window_form.html}',
+				'/admin/many2one'=>'admin_handler.many2one:{name:many2one.html}',
                 ),
             'get' => array(
                 '/admin/img_resizes/img_resizes_cfg' => array(
