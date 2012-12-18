@@ -12,26 +12,28 @@
 		{/foreach}
 		{if $g_key && $g_key!="nogrp"}</div>{/if}
 
-        <div class="clear"></div>
 	{/foreach}
         </div>
         </div>
 
-<div class="clear"></div>
-{if $images}
-<div class="images_manager">
-<label><input type=radio name="checked_items_action" value="delete">Delete</label>
-{*
-<label><input type=radio name="checked_items_action" value="rotate_cw">Rotete CW</label>
-<label><input type=radio name="checked_items_action" value="rotate_ccw">Rotete CCW</label>
-*}
-<label><input type=radio name="checked_items_action" value="group">Group</label>
-<input type=button class="btn" id="checked_items_submit" value="apply">
+<div id="images_manager_{$params.hash}" class="images_manager alert" style="display:none;">
+	<input type="hidden" name="checked_items_action" id="checked_items_action" value="">
+	<label class="radio inline"><button class="btn btn-mini" id="checked_items_submit" onClick="$('#images_manager_{$params.hash} #checked_items_action').val('delete');" >Удалить</input></label>
 </div>
-{/if}
+{*if $images}
+<div id="images_manager_{$params.hash}" class="images_manager alert" style="display:none;">
+<label class="radio inline"><input type=radio name="checked_items_action" value="delete">Delete</label>
+<label class="radio inline"><input type=radio name="checked_items_action" value="group">Group</label>
+<label class="radio inline"><input type=radio name="checked_items_action" value="rotate_cw">Rotete CW</label>
+<label class="radio inline"><input type=radio name="checked_items_action" value="rotate_ccw">Rotete CCW</label>
+<label class="radio inline"><input type=button class="btn btn-mini" id="checked_items_submit" value="apply"></label>
+</div>
+{/if*}
 
 <div id="MultiPowUpload_holder">
-<input type="button" id="MultiPowUploadStartButton" class="btn btn-link" onClick="left_heightWid(); MultiPowUpload_Start();" value="Загрузить фотографии">
+<a href="#" type="button" id="MultiPowUploadStartButton" class="btn btn-small" onClick="left_heightWid(); MultiPowUpload_Start();" value="Загрузить фотографии">
+Загрузить фотографии <i class="icon-upload"></i>
+</a>
 </div>
 <script>
 	var params_str={$params_str}

@@ -83,7 +83,7 @@ class gs_strategy_createlogin_handler extends gs_handler {
 			"handler"=>array(
 				"login/$recordsetname"=>array(
 					"gs_base_handler.check_login:return:gs_record^show:classname:$recordsetname",
-					"show"=>"gs_base_handler.show:name:login_$recordsetname.html",
+					//"show"=>"gs_base_handler.show:name:login_$recordsetname.html",
 				),
 				"login/form/$recordsetname"=>array(
 					//"oauth2_handler.login:classname:$recordsetname:login_field:".reset($d['login_fields']).":full_name_field:fullName:return:not_false",

@@ -7,14 +7,17 @@
 {block name="main"}
 
 
-	<h4>{%$rs.title%} - {'Profile'|gsdict}</h4>
+	<legend>{%$rs.title%} - {'Profile'|gsdict}</legend>
 
 
 
 	{$e=record_by_id($manager->get_id(),'{%$rs.name%}')}
 
+	{if $_gsdata.gspgid_va.0=='modify'}
+		{handler gspgid="/{%$module%}/{%$prefix%}/form/{%$rs.name%}/edit/{$manager->get_id()}" {%$manager_link%}}
+	{else}
 
-		<dl>
+		<dl class="dl-horizontal">
 			{%foreach from=$fields item=f%}
 			<dt>{%$f.verbose_name%}</dt>
 			<dd>
@@ -35,12 +38,7 @@
 			{%/foreach%}
 
 		</dl>	
-	<div>
-	{if $_gsdata.gspgid_va.0=='modify'}
-		{handler gspgid="/{%$module%}/{%$prefix%}/form/{%$rs.name%}/edit/{$manager->get_id()}" {%$manager_link%}}
-	{else}
-		<a class="button" href="{gl rec_create=0}#form">{'update'|gsdict}</a>
+		<a class="btn" href="{gl rec_create=0}#form">{'Update'|gsdict}</a>
 	{/if}
-	</div>
 
 {/block}

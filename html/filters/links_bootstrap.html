@@ -1,0 +1,7 @@
+<ul class="nav nav-pills">
+	{foreach from=$links item=i}
+	<li {if $i.key==$current}class="active"{/if}>
+	<a href="/{$i.href}">{$i.name} ({$i.count})</a>
+	</li>
+	{/foreach}
+</ul>

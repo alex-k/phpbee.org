@@ -604,13 +604,18 @@ class gs_base_handler extends gs_handler {
         $this->redirect();
         return false;
     }
-    function redirect() {
+    function redirect($ret) {
 		if (isset($this->params['clean_get']) && $this->params['clean_get']!='false') {
 			$this->params['clean_get']=true;
 		} else {
 			$this->params['clean_get']=false;
 		}
-        return html_redirect(isset($this->params['href']) ? $this->params['href']: null,array(),'302',$this->params['clean_get']);
+
+		$href=null;
+		if(isset($this->params['href'])) $href=$this->params['href'];
+		if($href=='current_url') $href=$this->data['gspgid'];
+		
+        return html_redirect($href,array(),'302',$this->params['clean_get']);
     }
 
     function get_record($data) {

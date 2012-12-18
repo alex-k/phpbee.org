@@ -41,6 +41,12 @@
 			inp.attr('checked',!(inp.attr('checked')));
 			li.removeClass('MultiPowUploadCheckedElement');
 			if(inp.attr('checked')) li.addClass('MultiPowUploadCheckedElement');
+
+
+			$("#images_manager_"+hash).hide();
+			if($("#gallery_"+hash+" div.MultiPowUploadGalleryItem input:checked").size()) {
+				$("#images_manager_"+hash).show();
+			}
 		});
 
 
@@ -60,6 +66,7 @@
 			$('input[name=gspgid_form]',form).val(gspgid);
 			form.get(0).submit();
 		});
+
 	});
 
 this.imagePreview = function(){	

@@ -30,9 +30,7 @@
 </head>
 <body>
 
-{block name="login"}
 {handler gspgid="/{%$module%}/login/{%$rs%}" assign=manager}
-{/block}
 
 {$manager=gs_var_storage::load('manager')}
 
@@ -86,6 +84,18 @@
 	</table>
 {/block}
 </div>
+{else}
+	  {handler gspgid="{%$module.name%}/login/form/{%$rs->name%}" }
+
+	  {capture name="checklogin"}
+	  {handler gspgid="oauth2/checklogin/{%$rs->name%}"}	
+	  {/capture}
+
+
+	  {handler gspgid="oauth2/loginlinks"}	
+
+	
+	  <a  class="btn btn-primary btn-small" href="/{%$module.name%}/registration/{%$rs->name%}">registration</a>
 {/if}
 
 {if  isset($_gsdata.D)}

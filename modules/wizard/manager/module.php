@@ -71,6 +71,7 @@ class handler_wizard_manager extends gs_handler {
 			$h->createlogin($ret,$d);
 		}
 
+
 		foreach ($d['recordset'] as $k=>$rd) {
 			$rd['manager_rs_id']=$rs_login->get_id();
 			$rd['module']=$this->data['handler_params']['Module_id'];
@@ -79,7 +80,6 @@ class handler_wizard_manager extends gs_handler {
 			$this->data['handler_params']['Recordset_id']=$k;
 			$h=new gs_strategy_createmanager_handler($this->data,$this->params);
 			$h->createmanager($ret,$rd);
-			md($rd,1);
 
 
 
@@ -112,6 +112,7 @@ class handler_wizard_manager extends gs_handler {
 
 		$tpl->assign('rs',$rs);
 		$tpl->assign('module',$module);
+		$tpl->assign('prefix','manager');
 		$tpl->assign($d);
 		$out=$tpl->fetch('file:'.dirname(__FILE__).DIRECTORY_SEPARATOR.'pages'.DIRECTORY_SEPARATOR.$d['manager_form_template_name']);
 		$filename=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'manager_page.html';

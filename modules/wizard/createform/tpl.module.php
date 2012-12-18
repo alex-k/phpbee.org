@@ -181,7 +181,7 @@ class form_createform_tpl extends form_admin{
 			'template'=>array(
 				'widget'=>'select',
 				'options' => array_combine($extends,$extends),
-				'default'=>"custom_form_separate_fields.html",
+				'default'=>"bootstrap_separate_fields.html",
 			),
 			'template_name'=>array(
 				'widget'=>'input',

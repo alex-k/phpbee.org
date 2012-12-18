@@ -228,7 +228,7 @@ function string_to_params($inp) {
         $j=0;
         foreach ($out[3] as $i => $v) {
             $key= $v ? $v : $j++;
-            $value = $out[4][$i] ? $out[4][$i] : $out[1][$i];
+            $value = strlen($out[4][$i]) ? $out[4][$i] : $out[1][$i];
             //if (strtolower($value)=='false') $value=false;
             //if (strtolower($value)=='true') $value=true;
             $prefix=explode(':',$value,2);

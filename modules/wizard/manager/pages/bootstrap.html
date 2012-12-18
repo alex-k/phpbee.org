@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Kupons.ru join page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- CSS -->
+    <link href="/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+
+      /* Sticky footer styles
+      -------------------------------------------------- */
+
+      html,
+      body {
+        height: 100%;
+        /* The html and body elements cannot have any padding or margin. */
+      }
+
+      /* Wrapper for page content to push down footer */
+      #wrap {
+        min-height: 100%;
+        height: auto !important;
+        height: 100%;
+        /* Negative indent footer by it's height */
+        margin: 0 auto -60px;
+      }
+
+      /* Set the fixed height of the footer here */
+      #push,
+      #footer {
+        height: 60px;
+      }
+      #footer {
+        background-color: #f5f5f5;
+      }
+
+      /* Lastly, apply responsive CSS fixes as necessary */
+      @media (max-width: 767px) {
+        #footer {
+          margin-left: -20px;
+          margin-right: -20px;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+
+
+
+      /* Custom page CSS
+      -------------------------------------------------- */
+      /* Not required for template or sticky footer method. */
+
+      .container {
+        width: auto;
+        max-width: 680px;
+      }
+      .container .credit {
+        margin: 20px 0;
+      }
+
+    </style>
+    <link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.js"></script>
+  </head>
+
+  <body>
+
+{capture assign="checklogin"}
+{handler gspgid="/{%$module%}/login/{%$rs%}" assign=manager}
+{/capture}
+
+{$manager=gs_var_storage::load('manager')}
+
+   <div class="navbar navbar-inverse ">
+      <div class="navbar-inner">
+          <a class="brand" href="/">{%$smarty.server.HTTP_HOST%}</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="/{%$module%}">{%$module%}</a></li>
+
+            </ul>
+			{if $manager}
+			<span class="navbar-text pull-right">
+				{$manager}
+				<a class="btn btn-mini btn-inverse" href="/{%$module%}/profile/{%$rs%}">{'Profile'|gsdict}</a>
+				<a class="btn btn-mini btn-inverse" href="/{%$module%}/logout/{%$rs%}">{'Logout'|gsdict}</a>
+			</span>
+			{/if}
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+<div class="container-fluid">
+	  <div class="row-fluid">
+
+{if $manager}
+
+	{if class_exists('sys_languages')}
+	{handler gspgid="/filter/" class="select_records" recordset="sys_languages" name="Lang" urltype=session}
+	{/if}
+	{handler gspgid="/setlocale"}
+
+	{handler gspgid="/manager/menu"}
+
+	<div class="span2">
+		<div class="well sidebar-nav">
+			<ul class="nav nav-pills nav-stacked">
+				{%controller _class=wz_recordsets _assign=rsets id=array_keys($recordset)%}
+				{%foreach $rsets as $r%}
+				<li>
+					{%if $r.name!=$rs%}
+							<a href="/{%$module%}/{%$prefix%}/{%$r.name%}">{%$r.title|default:$r.name%}</a>
+					{%/if%}		
+				</li>
+				{%/foreach%}
+            </ul>
+	  </div><!--/.well -->
+	</div><!--/span-->
+
+
+<div class="span10">
+{block name="main"}
+	<legend>
+	{%$rs->title%} - {'Control Panel'|gsdict}
+	</legend>
+	<div class="row-fluid">
+	<ul class="thumbnails">
+		{%foreach $rsets as $r%}
+			{%if $r.name!=$rs%}
+			<li class="span4">
+			<div class="thumbnail">
+				<div class="caption">
+				<h3>
+				<a href="/{%$module%}/{%$prefix%}/{%$r.name%}">{%$r.title|default:$r.name%}</a>
+				</h3>
+				</div>
+			</div>
+			</li>
+			{%/if%}		
+		{%/foreach%}
+	</ul>
+	</div><!-- row-->
+{/block}
+</div><!-- span9 -->
+
+
+{else}
+	  <div class="well span6 offset3">
+	  <legend>Please sign in</legend>
+
+	  {handler gspgid="{%$module.name%}/login/form/{%$rs->name%}" }
+
+	  {capture name="checklogin"}
+	  {handler gspgid="oauth2/checklogin/{%$rs->name%}"}	
+	  {/capture}
+
+
+	  {handler gspgid="oauth2/loginlinks"}	
+
+	
+	  <a  class="btn btn-primary btn-small" href="/{%$module.name%}/registration/{%$rs->name%}">registration</a>
+
+	</div><!-- span9 -->
+
+{/if}
+</div><!-- row-->
+</div><!-- container -->
+
+{if  isset($_gsdata.D)}
+{handler gspgid="/debug"}
+{/if}
+    <div id="footer">
+        <p class="muted credit">
+			<ul class="breadcrumb">
+			  <li><a href="/">{%$smarty.server.HTTP_HOST%}</a> <span class="divider">/</span></li>
+				<li><a href="/{%$module%}">{%$module%}</a> </li>
+			</ul>
+		</p>
+    </div>
+</body>
+</html>

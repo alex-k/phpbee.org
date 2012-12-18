@@ -35,6 +35,7 @@ abstract class g_forms implements g_forms_interface{
 	function addNode($name) {
 		$this->view->addNode('helper',array('class'=>'dt'),$name);
 	}
+
 	function replace_validator($field,$value,$params='') {
 		if (isset($this->htmlforms[$field]['validate'])) unset($this->htmlforms[$field]['validate']);
 		return $this->add_validator($field,$value,$params);
@@ -99,6 +100,11 @@ abstract class g_forms implements g_forms_interface{
 	}
 	function set_error_message($type,$message) {
 		$this->error_messages[$type]=$message;
+	}
+	function get_value($name=null,$default=null) {
+		$ret=$this->get_data($name);
+		if ($ret===NULL && $default!==NULL) return $default;
+		return $ret;
 	}
 	function get_data($name=null) {
 		if ($name===NULL) return $this->data;

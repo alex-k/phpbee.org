@@ -103,6 +103,7 @@ class gs_record implements arrayaccess {
 		*/
 		if (!is_array($values)) return FALSE;
 		foreach ($values as $field=>$value) {
+			$this->__get($field);
 			if (isset($this->recordsets_array[$field]) && $this->recordsets_array[$field] && is_array($value) && $this->__get($field)!==NULL) {
 				$struct=$this->get_recordset()->structure['recordsets'][$field];
 				$local_field_name=$this->__get($field)->local_field_name;

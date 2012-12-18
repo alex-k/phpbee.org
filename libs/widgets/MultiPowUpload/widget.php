@@ -72,12 +72,29 @@ class gs_widget_MultiPowUpload_module extends gs_base_module implements gs_modul
 				'gs_widget_MultiPowUpload_handler.upload',
 			),
 		),
+		'get'=>array(
+			/*
+			'/libs/widgets/MultiPowUpload/widget.css'=>'gs_widget_MultiPowUpload_handler.public_html:content-type:text/css',
+			'/libs/widgets/MultiPowUpload/widget.js'=>'gs_widget_MultiPowUpload_handler.public_html:content-type:application/javascript',
+			'/libs/widgets/MultiPowUpload/Extra/swfobject.js'=>'gs_widget_MultiPowUpload_handler.public_html:content-type:application/javascript',
+			*/
+			'/libs/widgets/MultiPowUpload/'=>'gs_widget_MultiPowUpload_handler.public_html',
+		),
 		);
 		return self::add_subdir($data,dirname(__file__));
 	}
 }
 
 class gs_widget_MultiPowUpload_handler extends gs_handler {
+	function public_html() {
+		$fname=dirname(__FILE__).DIRECTORY_SEPARATOR.'public_html'.DIRECTORY_SEPARATOR.trim($this->data['gspgid_v'],DIRECTORY_SEPARATOR);
+		$fname=realpath($fname);
+		if(!$fname) return NULL;
+		//if(isset($this->params['content-type'])) header('Content-type:'.$this->params['content-type']);
+		if (pathinfo($fname, PATHINFO_EXTENSION)=='css') header('Content-type:text/css');
+		if (pathinfo($fname, PATHINFO_EXTENSION)=='js') header('Content-type:application/javascript');
+		readfile($fname);
+	}
 	function action() {
 		$this->handler_params=$this->data['handler_params'];
 		if ($this->data['gspgtype']!==GS_DATA_POST) return '';

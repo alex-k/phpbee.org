@@ -43,6 +43,8 @@ class gs_strategy_createmanager_handler extends gs_handler {
 		$fields->find_records(array('id'=>$d['fields']));
 		$links=new wz_recordset_links();
 		$links->find_records(array('id'=>$d['links']));
+		$extlinks=new wz_recordset_links();
+		$extlinks->find_records(array('id'=>$d['extlinks']));
 		$filters=new wz_recordset_links();
 		$filters->find_records(array('id'=>$d['filters']));
 
@@ -51,6 +53,18 @@ class gs_strategy_createmanager_handler extends gs_handler {
 
 
 		$rs=record_by_id($this->data['handler_params']['Recordset_id'],'wz_recordsets');
+
+		foreach ($extlinks as $link) {
+			if ($link->linkname) continue;
+			$l_rs=new $link->classname;
+			foreach($l_rs->structure['recordsets'] as $backlink=>$rs_link) {
+				if (substr($backlink,0,1)!='_' && $rs_link['recordset']==$rs->name) {
+					$link->linkname=$backlink;
+					continue;
+				}
+			}
+		}
+
 		$module=record_by_id($d['module'],'wz_modules');
 		if (!$module) $module=record_by_id($this->data['handler_params']['Module_id'],'wz_modules');
 
@@ -66,6 +80,7 @@ class gs_strategy_createmanager_handler extends gs_handler {
 		$tpl->assign('fields',$fields);
 		$tpl->assign('datefields',$datefields);
 		$tpl->assign('links',$links);
+		$tpl->assign('extlinks',$extlinks);
 		$tpl->assign('filters',$filters);
 
 		if (isset($d['manager_rs_id'])) {
@@ -82,6 +97,8 @@ class gs_strategy_createmanager_handler extends gs_handler {
 
 		$prefix=pathinfo($tplname,PATHINFO_FILENAME);
 		if($prefix=='default') $prefix='manager';
+		if($prefix=='bootstrap_table') $prefix='manager';
+
 		$tpl->assign('prefix',$prefix);
 
 		$suffix=pathinfo($tplname,PATHINFO_FILENAME);
@@ -106,11 +123,8 @@ class gs_strategy_createmanager_handler extends gs_handler {
 				),
 			"handler"=>array(
 				"$prefix/form/$recordsetname"=>array(
-					"gs_base_handler.redirect_if:gl:save_cancel:return:true",
 					"gs_base_handler.post:{name:$formtplname:classname:$recordsetname:form_class:g_forms_table}",
-					"gs_base_handler.redirect_if:gl:save_continue:return:true",
-					"gs_base_handler.redirect_if:gl:save_return:return:true",
-					//"gs_base_handler.redirect_up:level:2",
+					"gs_base_handler.redirect_up:level:2",
 					),
 				),
 		);

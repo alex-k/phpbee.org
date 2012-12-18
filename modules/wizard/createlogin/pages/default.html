@@ -1,6 +1,3 @@
-<div class="user_admin">
-<a href="/{%$module.name%}/manager"><img src="/i/admin/manager_logo.png" alt=""></a>
-
 {${%$assign%}=$_gsstack.last}
 {if ${%$assign%}}
 	<div class="login_admin">
@@ -13,14 +10,16 @@
 	<a href="/{%$module.name%}/logout/{%$rs->name%}">logout</a>
 	</div>
 {else}
-	<div class="overlay_login">
 	  {handler gspgid="{%$module.name%}/login/form/{%$rs->name%}" }
-		<div class="clear"></div>
-		<a href="/{%$module.name%}/registration/{%$rs->name%}">registration</a>
+
+	  {capture name="checklogin"}
 	  {handler gspgid="oauth2/checklogin/{%$rs->name%}"}	
-	  {handler gspgid="oauth2/loginbuttons"}	
-	</div>
+	  {/capture}
+
+
+	  {handler gspgid="oauth2/loginlinks"}	
+
+	
+		<a  class="btn btn-primary btn-small" href="/{%$module.name%}/registration/{%$rs->name%}">registration</a>
 
 {/if}
-
-</div>
