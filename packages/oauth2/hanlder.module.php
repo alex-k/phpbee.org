@@ -5,10 +5,13 @@ oauth2_handler.login:classname:photographers:login_field:login:return:not_false:
 class oauth2_handler extends gs_handler {
 	function startlogin($ret) {
 		$classname=$this->data['gspgid_va'][0];
+		if (isset($this->params['oauth2_classname'])) $classname=$this->params['oauth2_classname'];
 		if (!class_exists($classname)) throw new gs_exception('oauth2_handler:startlogin no class found '.$classname);
 		$config=record_by_field('class',$classname,'oauth2_config');
 		if (!$config) throw new gs_exception('oauth2_handler:startlogin can not find config for '.$classname);
-		$d=parse_url($this->data['url']);
+	
+		$url=isset($this->data['url']) ? $this->data['url'] : current_url();
+		$d=parse_url($url);
 		parse_str($d['query'],$get_vars);
 		$this->data['data']['oa2c']=$classname;
 		$d['query']=http_build_query(array_merge($get_vars,$this->data['data']));
@@ -30,6 +33,7 @@ class oauth2_handler extends gs_handler {
 		$token=$oauth->token($data);
 		if(!$token) return true;
 		$profile=$oauth->profile($token);
+		gs_session::save($profile,'oauth2_profile');
 		if (!$profile['uid']) return true;
 
 		$rs=new $this->params['classname'];
@@ -40,6 +44,9 @@ class oauth2_handler extends gs_handler {
 		$rec=$rs->find_records($options)->first();
 		if (!$rec) {
 			$rec=$rs->find_records($options)->first(true);
+
+			$rec->fill_values($profile);
+
 			foreach ($rs->structure['fields'] as $k=>$f) {
 				if ($f['type']=='password') $rec->$k=md5(rand());
 			}
@@ -54,6 +61,8 @@ class oauth2_handler extends gs_handler {
 		}
 		$rec=$rs->find_records($options)->first();
 		if (!$rec) return false;
+		$rec->token=$token['access_token'];
+		$rec->commit();
 		gs_session::save($rec->get_id(),'login_'.$this->params['classname']);
 		return $rec;
 	}
@@ -112,26 +121,44 @@ class oauth2_vk {
 		$url="https://oauth.vk.com/access_token?".http_build_query($r);
 		$html=html_fetch($url);
 		$d=json_decode($html);
+		$d=get_object_vars($d);
 		return $d;
 	}
 	function profile($token) {
 		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'vk','email'=>null);
-		$url=sprintf("https://api.vk.com/method/getProfiles?uid=%d&access_token=%s&fields=nickname,screen_name",$token->user_id,$token->access_token);
+		$url=sprintf("https://api.vk.com/method/getProfiles?uid=%d&access_token=%s&fields=nickname,screen_name,sex,country,nickname",$token['user_id'],$token['access_token']);
 		$d=json_decode(html_fetch($url));
 		if (!$d) return $ret;
 		$d=reset($d->response);
 		if (!$d->uid) return $ret;
+		$ret=array_merge($ret,get_object_vars($d));
 		$ret['uid']='vk-'.$d->uid;
-		$ret['first_name']=$d->first_name;
-		$ret['last_name']=$d->last_name;
+		$ret['name']=implode(' ',array($ret['first_name'],$ret['last_name']));
+		$ret['username']=$ret['screen_name'];
+		if ($ret['sex']==2) $ret['gender']='male';
+		if ($ret['sex']==1) $ret['gender']='female';
+		$ret['locale']=$ret['country'];
+
+
+		$url=sprintf("https://api.vk.com/method/friends.get?access_token=%s&fields=first_name,last_name",$token['access_token']);
+		$d=html_fetch($url);
+		$d=json_decode($d,1);
+		if (isset($d['response'])) {
+			$friends=array();
+			foreach ($d['response'] as $f) {
+				$friends[$f['uid']]=array('uid'=>$f['uid'],'name'=>$f['first_name'].' '.$f['last_name']);
+			}
+			$ret['friends']=$friends;
+			$ret['friends_count']=count($ret['friends']);
+		}
 		return $ret;
 	}
 
 	function exec($method,$data) {
 		$url=sprintf("https://api.vk.com/method/%s?uid=%d&access_token=%s&%s",
 					$method,
-					$this->token->user_id,
-					$this->token->access_token,
+					$this->token['user_id'],
+					$this->token['access_token'],
 					http_build_query($data));
 
 		$d=json_decode(html_fetch($url));
@@ -179,7 +206,7 @@ class oauth2_google{
 	}
 	function profile($token) {
 		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'google','email'=>null);
-		$url=sprintf("https://www.googleapis.com/oauth2/v1/userinfo?access_token=%s",$token->access_token);
+		$url=sprintf("https://www.googleapis.com/oauth2/v1/userinfo?access_token=%s",$token['access_token']);
 		$d=json_decode(html_fetch($url));
 		if (!$d || !$d->id) return $ret;
 		$ret['uid']='google-'.$d->id;
@@ -222,14 +249,29 @@ class oauth2_facebook{
 	}
 	function profile($token) {
 		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'facebook','email'=>null);
-		$url=sprintf("https://graph.facebook.com/me?access_token=%s",$token['access_token']);
+		$url=sprintf("https://graph.facebook.com/me?fields=%s&access_token=%s",$this->config->CONSUMER_KEY,$token['access_token']);
 		$d=html_fetch($url);
 		$d=json_decode($d,1);
 		if (!$d || !$d['id']) return $ret;
+		$ret=array_merge($ret,$d);
 		$ret['uid']='fb-'.$d['id'];
+
+		$url=sprintf("https://graph.facebook.com/me/friends/?access_token=%s",$token['access_token']);
+		$d=html_fetch($url);
+		$d=json_decode($d,1);
+		if (isset($d['data'])) {
+			$friends=array();
+			foreach ($d['data'] as $f) {
+				$friends[$f['id']]=array('uid'=>$f['id'],'name'=>$f['name']);
+			}
+			$ret['friends']=$friends;
+			$ret['friends_count']=count($ret['friends']);
+		}
+		/*
 		$ret['first_name']=$d['first_name'];
 		$ret['last_name']=$d['last_name'];
 		if ($d['email']) $ret['email']=$d['email'];
+		*/
 		return $ret;
 	}
 }
