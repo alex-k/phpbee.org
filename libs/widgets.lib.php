@@ -453,7 +453,7 @@ class gs_widget_radio extends gs_widget {
 		$s="";
 		if (!is_array($this->params['options'])) $this->params['options']=array_combine(explode(',',$this->params['options']),explode(',',$this->params['options']));
 		foreach ($this->params['options'] as $v=>$l) {
-			$s.=sprintf('<label><input class="%s %s" type="radio" name="%s" value="%s" %s> %s </label>%s',
+			$s.=sprintf('<label class="radio"><input class="%s %s" type="radio" name="%s" value="%s" %s> %s </label>%s',
 				 isset($this->params['cssclass']) ? $this->params['cssclass'] : 'fRadio',
 				 $this->interact,
 				 $this->fieldname,
@@ -627,7 +627,7 @@ class gs_widget_121_radio extends gs_widget_lOne2One {
 	function html() {
 		$ret="";
 		foreach ($this->params['variants'] as $k=>$v) {
-			$ret.=sprintf("<label class=\"radio_121\"><span><input type=\"radio\" name=\"%s\" value=\"%d\" %s>%s</span></label>\n",$this->fieldname, $k, ($this->value==$k) ? 'checked="checked"' : '',$v);
+			$ret.=sprintf("<label class=\"radio_121 radio\"><span><input type=\"radio\" name=\"%s\" value=\"%d\" %s>%s</span></label>\n",$this->fieldname, $k, ($this->value==$k) ? 'checked="checked"' : '',$v);
 		}
 		$ret.='<div class="radio_121_end"></div>';
 		return $ret;

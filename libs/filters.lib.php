@@ -19,6 +19,12 @@ class gs_filters_handler extends gs_handler {
 		$filters=gs_var_storage::load('filters');
 		return isset($filters[$name]) ? $filters[$name] : NULL;
 	}
+	static function set($name,$value) {
+		if ($value===NULL) return FALSE;
+		$f=self::get($name);
+		if (!$f) return FALSE;
+		return $f->value=$value;
+	}
 	static function value($name) {
 		$f=self::get($name);
 		return $f ? $f->value : NULL;
