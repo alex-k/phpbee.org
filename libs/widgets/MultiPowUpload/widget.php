@@ -23,7 +23,9 @@ class gs_widget_MultiPowUpload extends gs_widget{
 		}
 			
 		$tpl=gs_tpl::get_instance();
-		$tpl->template_dir[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
+		$tpls=$tpl->template_dir;
+		$tpls[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
+		$tpl->setTemplateDir($tpls);
 
 		$params=array();
 		$params['recordset']=$this->params['options']['recordset'];
