@@ -21,7 +21,9 @@ class gs_widget_wysiwyg extends gs_widget {
 		list($rs,$link)=explode(':',$this->params['images_key']);
 		$rid=$this->data['id'];
 		$tpl=gs_tpl::get_instance();
-		$tpl->template_dir[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
+		$tpls=$tpl->template_dir;
+		$tpls[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
+		$tpl->setTemplateDir($tpls);
 		$tpl->assign(array(
 			'value'=>trim($this->value),
 			'fieldname'=>$this->fieldname,
