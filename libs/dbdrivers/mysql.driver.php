@@ -4,7 +4,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	private $db_connection;
 	private $_res;
 	private $_id;
-	private $stats;
+	private static $stats;
 	function __construct($cinfo) {
 		parent::__construct();
 		$this->cinfo=$cinfo;
@@ -22,6 +22,9 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 			//var_dump($this->stats);
 		}
 	}
+    function get_stats() {
+		return sprintf('gs_dbdriver_mysql total time: %.05fs queries: %d rows: %d',$this->stats['total_time'],$this->stats['total_queries'],$this->stats['total_rows']);
+    }
 
 	function escape_value($v,$c=null) {
 		if (is_float($v)) {
@@ -86,6 +89,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 		if (mysql_select_db($cinfo['db_database'],$this->db_connection)===FALSE) {
 			throw new gs_dbd_exception(get_class($this).': '.mysql_error());
 		}
+        mlog('connected to '.$cinfo['db_database']);
 		if (isset($cinfo['codepage']) && !empty($cinfo['codepage'])) {
             $this->set_connection_charset($cinfo['codepage']);
 		}

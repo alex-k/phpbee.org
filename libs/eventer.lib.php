@@ -49,7 +49,7 @@ class gs_eventer {
     }
 
     static public function send($event,$generator=null,$data=null) {
-        mlog("eventer.send $event");
+        mlog("eventer.send start $event");
         if (!$data) $data=$generator;
 
         $ev=gs_eventer::get_instance();
@@ -63,6 +63,7 @@ class gs_eventer {
             $event_name=$class.'_'.$event;
             $ev->make_event($event_name,$data);
         }
+        mlog("eventer.send finished $event");
     }
 
     static public function subscribe ($event_name,$method) {

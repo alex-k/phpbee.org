@@ -4,6 +4,7 @@ $config=gs_config::get_instance();
 if (!class_exists('Smarty',FALSE)) load_file($config->lib_tpl_dir.'Smarty.class.php');
 
 class gs_Smarty extends Smarty {
+    protected $_tpl_arr = array();
 	function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false) {
 		if(!is_string($template)) return parent::fetch($template, $cache_id , $compile_id , $parent);
 		mlog($template);
@@ -23,13 +24,13 @@ class gs_Smarty extends Smarty {
 		return  ($t && isset($t->tpl_vars[$name])) ? $t->tpl_vars[$name]->value : NULL;
 	}
 	function multilang($tplname=4) {
-		mlog($tplname);
+		//mlog($tplname);
 		$language=false;
 		if (!$language) $language=gs_var_storage::load('multilanguage_lang');
 		if (!$language) $language=gs_session::load('multilanguage_lang');
 		if (!$language) $language=cfg('multilang_default_language');
 
-		mlog($language);
+		//mlog($language);
 
 		if ($language) {
 				$newtplname=dirname($tplname).DIRECTORY_SEPARATOR.$language.DIRECTORY_SEPARATOR.(basename($tplname));
@@ -41,7 +42,7 @@ class gs_Smarty extends Smarty {
 					$this->setTemplateDir($dir);
 				}
 		}
-		mlog($tplname);
+		//mlog($tplname);
 		return $tplname;
 	}
 

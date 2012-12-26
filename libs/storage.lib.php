@@ -284,6 +284,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->query_options['late_load_fields']=array();
 	}
 	public function load_records($fields=NULL) {
+        gs_eventer::send('record_before_load_records',$this);
 		if (!isset($this->query_options['options'])) {
 			$this->state=RS_STATE_LOADED;
 			return $this;
@@ -326,6 +327,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 		if (isset($records)) $this->replace($records);
 		$this->state=RS_STATE_LOADED;
+        gs_eventer::send('record_after_load_records',$this);
 		return $this;
 	}
 	public function count_records($options=array()) {

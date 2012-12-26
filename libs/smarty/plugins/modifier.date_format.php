@@ -17,26 +17,25 @@
  *          - format: strftime format for output
  *          - default_date: default date if $string is empty
  * 
- * @link http://smarty.php.net/manual/en/language.modifier.date.format.php date_format (Smarty online manual)
+ * @link http://www.smarty.net/manual/en/language.modifier.date.format.php date_format (Smarty online manual)
  * @author Monte Ohrt <monte at ohrt dot com> 
- * @param string $ 
- * @param string $ 
- * @param string $ 
+ * @param string $string       input date string
+ * @param string $format       strftime format for output
+ * @param string $default_date default date if $string is empty
+ * @param string $formatter    either 'strftime' or 'auto'
  * @return string |void
  * @uses smarty_make_timestamp()
  */
-//function smarty_modifier_date_format($string, $format = SMARTY_RESOURCE_DATE_FORMAT, $default_date = '',$formatter='auto')
-function smarty_modifier_date_format($string, $format = NULL , $default_date = '',$formatter='auto')
+function smarty_modifier_date_format($string, $format=null, $default_date='', $formatter='auto')
 {
-
-	if ($format===NULL) $format=gs_var_storage::load('multilanguage_date_format');
-	if ($format===NULL) $format=SMARTY_RESOURCE_DATE_FORMAT;
-
+    if ($format === null) {
+        $format = Smarty::$_DATE_FORMAT;
+    }
     /**
     * Include the {@link shared.make_timestamp.php} plugin
     */
     require_once(SMARTY_PLUGINS_DIR . 'shared.make_timestamp.php');
-    if ($string != '') {
+    if ($string != '' && $string != '0000-00-00' && $string != '0000-00-00 00:00:00') {
         $timestamp = smarty_make_timestamp($string);
     } elseif ($default_date != '') {
         $timestamp = smarty_make_timestamp($default_date);
@@ -57,11 +56,10 @@ function smarty_modifier_date_format($string, $format = NULL , $default_date = '
             } 
             $format = str_replace($_win_from, $_win_to, $format);
         } 
-        $ret=strftime($format, $timestamp);
+        return strftime($format, $timestamp);
     } else {
-        $ret=date($format, $timestamp);
+        return date($format, $timestamp);
     }
-    return $ret;
 } 
 
 ?>

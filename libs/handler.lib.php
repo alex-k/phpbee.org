@@ -34,10 +34,15 @@ class gs_base_handler extends gs_handler {
 
                 $this->tpl_dir= dirname($filename).DIRECTORY_SEPARATOR.'___templates';
                 if (!file_exists($this->tpl_dir)) $this->tpl_dir=dirname($filename).DIRECTORY_SEPARATOR.'templates';
-                if (is_array($tpl->template_dir))
-                    array_push($tpl->template_dir, $this->tpl_dir);
-                else
-                    $tpl->template_dir = array($tpl->template_dir,$this->tpl_dir);
+
+                $newtpldir=$tpl->template_dir;
+                if (is_array($newtpldir)) {
+                    array_push($newtpldir, $this->tpl_dir);
+                } else {
+                    $newtpldir = array($newtpldir,$this->tpl_dir);
+                }
+                
+                $tpl->setTemplateDir($newtpldir);
 
             }
         $this->subdir=$subdir;
@@ -154,6 +159,10 @@ class gs_base_handler extends gs_handler {
         $html=$tpl->fetch($tplname);
         echo $html;
         if (function_exists('memory_get_peak_usage')) mlog(sprintf('memory usage: %.4f / %.4f Mb ',memory_get_usage(TRUE)/pow(2,20),memory_get_peak_usage(TRUE)/pow(2,20)));
+        $pool=gs_connector_pool::get_instance();
+        $db_conn=$pool->get_connector('mysql');
+        if ($db_conn) mlog($db_conn->get_stats());
+
         if (DEBUG) {
             $g=gs_logger::get_instance();
             $g->console();

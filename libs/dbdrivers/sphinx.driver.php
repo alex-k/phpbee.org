@@ -99,6 +99,7 @@ class gs_dbdriver_sphinx extends gs_dbdriver_mysql implements gs_dbdriver_interf
 					break;
 			}
 		}
+		$where=trim($where,'()');
 		if (!empty($where)) $que.=sprintf(" WHERE %s", $where);
 		if (!empty($str_groupby)) $que.=$str_groupby;
 		if (!empty($str_orderby)) $que.=$str_orderby;

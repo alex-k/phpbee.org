@@ -4,7 +4,7 @@
 {$last_page=min($pages,$first_page-1+$pages_count)}
 {$first_page=max(1,$last_page-$pages_count+1)}
 
-{$center_position=$first+$half}
+{$center_position=$first_page+$half}
 {if $current_page==$center_position}
 	{$position='center'}
 {else}
