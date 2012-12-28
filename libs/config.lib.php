@@ -718,7 +718,7 @@ function __class_filename($class_name) {
 
 function __gs_autoload($class_name) {
 	$filename=__class_filename($class_name);
-	if($filename) load_file($filename);
+	if($filename && strpos($class_name,'_smarty')!==0) load_file($filename);
 	//if (!class_exists($class_name)) gs_logger::udplog(new exception( "$class_name not loaded"));
 }
 
