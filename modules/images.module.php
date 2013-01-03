@@ -62,7 +62,7 @@ abstract class tw_file_images extends gs_recordset_short{
 	var $gs_connector_id='file_public';
 	var $config=array();
 	var $fields=array(
-		'File'=> "fFile 'Файл'",
+		'File'=> "fFile 'Файл' required=false",
 	);
 	function __construct($f=array(),$init_opts=false) {
 		parent::__construct(array_merge($f,$this->fields),$init_opts);
@@ -226,7 +226,8 @@ class images_handler extends gs_base_handler {
 	
 	function show($data) {
 		if (count($this->data['gspgid_va'])<5) {
-			$data=base64_decode($this->data['gspgid_va'][0]);
+			$url=preg_replace("|\..+|is","",$this->data['gspgid_va'][0]);
+			$data=base64_decode($url);
 			
 			$data=preg_replace("|\..+|is","",$data);
 			$data=explode("/",$data);
@@ -242,8 +243,14 @@ class images_handler extends gs_base_handler {
 		$rec=new $data[0]();
 		$rec=$rec->get_by_id($data[4]);
 		$file=$rec->File->first();
+		$fdata=$file->File_data;
+		if (strlen($fdata)==0) {
+			$fname=$file->get_connector()->root.DIRECTORY_SEPARATOR.$file->get_recordset()->db_tablename.DIRECTORY_SEPARATOR.$file->get_connector()->split_id($file->get_id()).DIRECTORY_SEPARATOR.'orig.jpg';
+			md($fname,1);
+			$fdata=load_file($fname,false,true);
+		}
 		$txt=get_output();
-		$gd=new vpa_gd($file->File_data,false);
+		$gd=new vpa_gd($fdata,false);
 		if ($data[2]>0  && ($data[2]<$file->File_width || $data[3]<$file->File_height)) {
 			$gd->set_bg_color(255,255,255);
 			$gd->resize($data[2],$data[3],$method[$data[1]]);
@@ -307,7 +314,7 @@ class images_module extends gs_base_module implements gs_module {
     static function get_handlers() {
         $data = array(
 			'get_post'=>array(
-                '/files'=>'images_handler.resize:key:file_public',
+				'/files'=>'images_handler.resize:key:file_public',
 				'img/show'=>'images_handler.show',
 				'img/s'=>'images_handler.s',
 				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
