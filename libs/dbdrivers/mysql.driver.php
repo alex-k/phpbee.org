@@ -4,7 +4,7 @@ class gs_dbdriver_mysql extends gs_prepare_sql implements gs_dbdriver_interface 
 	private $db_connection;
 	private $_res;
 	private $_id;
-	private static $stats;
+	private $stats;
 	function __construct($cinfo) {
 		parent::__construct();
 		$this->cinfo=$cinfo;
