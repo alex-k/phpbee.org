@@ -467,7 +467,6 @@ class gs_rs_links extends gs_recordset{
 				$this->structure['recordsets']['parents']['local_field_name']=>$this->parent_record->get_id(),
 				$this->structure['recordsets']['childs']['local_field_name']=>$data
 				);
-			md($arr,1);
 			$nr=parent::new_record($arr);
 		} else {
 			$nr=parent::new_record($data);
