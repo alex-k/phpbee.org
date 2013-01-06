@@ -334,6 +334,10 @@ class gs_record implements arrayaccess {
 		return isset($this->old_values[$name]) ? $this->old_values[$name] : $this->__get($name);
 	}
 	
+	function get_old_values() {
+		return $this->old_values;
+	}
+	
 	public function child_modified() {
 		$this->recordstate=$this->recordstate|RECORD_CHILDMOD;
 		if (($rs=$this->get_recordset()->parent_record)!==NULL) $rs->child_modified();
