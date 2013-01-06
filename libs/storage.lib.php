@@ -39,6 +39,19 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 		return $this->gs_connector;
 	}
+	
+	public function set_connector_id($gs_connector_id) {
+		$this->gs_connector_id=$gs_connector_id;
+	}
+	
+	public function get_db_tablename () {
+		return $this->db_tablename;
+	}
+	
+	public function set_db_tablename ($db_tablename) {
+		$this->db_tablename=$db_tablename;
+	}
+	
 	public function __wakeup() {
 		$this->gs_connector=NULL;
 	}
@@ -257,6 +270,15 @@ abstract class gs_recordset_base extends gs_iterator {
 		return $this;
 	}
 	
+	function fields ($fields) {
+		if (is_string($fields)) $fields=explode(',',$fields);
+		if (is_array($fields)) $fields=array_unique($fields);
+		$this->query_options['fields']=$fields;
+		//md($this->query_options['fields'],1);
+		return $this;
+	}
+
+	
 	function orderby ($orderby) {
 		$this->query_options['options']['orderby']=array('type'=>'orderby','value'=>$orderby);
 		return $this;
@@ -284,7 +306,6 @@ abstract class gs_recordset_base extends gs_iterator {
 		$this->query_options['late_load_fields']=array();
 	}
 	public function load_records($fields=NULL) {
-        gs_eventer::send('record_before_load_records',$this);
 		if (!isset($this->query_options['options'])) {
 			$this->state=RS_STATE_LOADED;
 			return $this;
@@ -327,7 +348,7 @@ abstract class gs_recordset_base extends gs_iterator {
 		}
 		if (isset($records)) $this->replace($records);
 		$this->state=RS_STATE_LOADED;
-        gs_eventer::send('record_after_load_records',$this);
+		gs_eventer::send('record_after_load_records',$this);
 		return $this;
 	}
 	public function count_records($options=array()) {
@@ -446,7 +467,7 @@ abstract class gs_recordset_base extends gs_iterator {
 			}
 		}
 
-		if (!$this->get_connector()->table_exists($this->table_name)) {
+		if (!$this->get_connector()->table_exists($this->db_tablename)) {
 			return $this->createtable();
 		} else {
 			return $this->altertable();
@@ -454,14 +475,14 @@ abstract class gs_recordset_base extends gs_iterator {
 	}
 
 	public function altertable() {
-		return $this->get_connector()->construct_altertable($this->table_name,$this->structure);
+		return $this->get_connector()->construct_altertable($this->db_tablename,$this->structure);
 	}
 
 	public function createtable() {
-		return $this->get_connector()->construct_createtable($this->table_name,$this->structure);
+		return $this->get_connector()->construct_createtable($this->db_tablename,$this->structure);
 	}
 	public function droptable() {
-		return $this->get_connector()->construct_droptable($this->table_name);
+		return $this->get_connector()->construct_droptable($this->db_tablename);
 	}
 	public function fill_values($obj,$data) {
 	}
