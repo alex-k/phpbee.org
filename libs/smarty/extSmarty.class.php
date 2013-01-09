@@ -5,19 +5,22 @@ if (!class_exists('Smarty',FALSE)) load_file($config->lib_tpl_dir.'Smarty.class.
 
 class gs_Smarty extends Smarty {
     protected $_tpl_arr = array();
-	function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false) {
-		if(!is_string($template)) return parent::fetch($template, $cache_id , $compile_id , $parent);
+	function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false) {
+		if(!is_string($template)) return parent::fetch($template, $cache_id , $compile_id , $parent, $display, $merge_tpl_vars, $no_output_filter);
 		mlog($template);
 		$id=md5($template);
 		if (!isset($this->_tpl_arr[$id])) {
 			if (!$this->templateExists($template)) {
 				throw new gs_exception('gs_base_handler.show: can not find template file for '.$template);
 			}
-			$this->_tpl_arr[$id]=$this->createTemplate($template, $cache_id , $compile_id , $parent);
+			$this->_tpl_arr[$id]=$this->createTemplate($template, $cache_id , $compile_id , $parent, $display);
 		}
 		$t=$this->_tpl_arr[$id];
 		$t->assign($this->getTemplateVars());
-		return $t->fetch();
+		$_output=$t->fetch($t, $cache_id , $compile_id , $parent, $display, false, $no_output_filter);
+		$this->_tpl_arr[$id]=$t;
+		//$t->assign($this->getTemplateVars());
+		return $_output;
 	}
 	function get_var($name) {
 		$t=reset($this->_tpl_arr);
@@ -47,4 +50,5 @@ class gs_Smarty extends Smarty {
 	}
 
 }
+
 class extSmarty extends gs_Smarty {}
