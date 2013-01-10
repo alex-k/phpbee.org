@@ -9,6 +9,8 @@ class gs_Smarty extends Smarty {
 		if(!is_string($template)) return parent::fetch($template, $cache_id , $compile_id , $parent, $display, $merge_tpl_vars, $no_output_filter);
 		mlog($template);
 		$id=md5($template);
+		$dirs=$this->getTemplateDir();
+
 		if (!isset($this->_tpl_arr[$id])) {
 			if (!$this->templateExists($template)) {
 				throw new gs_exception('gs_base_handler.show: can not find template file for '.$template);
