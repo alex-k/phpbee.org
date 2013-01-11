@@ -548,6 +548,8 @@ class gs_filter_select_by_links extends gs_filter {
 		//$rec_rs=$rec_rs->find_records(array());
 		$options=array();
 		if (isset($this->params['options'])) $options=string_to_params($this->params['options']);
+		if (isset($this->params['options_arr'])) $options=array(string_to_params($this->params['options_arr']));
+		if (isset($this->params['options'])) $options=string_to_params($this->params['options']);
 		foreach ($this->recordset->query_options['options'] as $o) {
 			if (isset($o['field']) && isset($rec_rs->structure['fields'][$o['field']]) && $o['field']!=$rec_rs->id_field_name) {
 				$options[]=$o;
