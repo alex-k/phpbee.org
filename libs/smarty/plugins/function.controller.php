@@ -55,6 +55,8 @@ function smarty_function_controller($params, &$smarty)
 			if (isset($params['_skip_null_options']) && $params['_skip_null_options'] && empty($matches[2])) continue;
 			if ($matches[1]=='IN') {
 				$options[]=array('type'=>'value', 'field'=>$k,'case'=>'=','value'=>explode(':',$matches[2]));
+			} elseif ($matches[1]=='BETWEEN') {
+				$options[]=array('type'=>'value', 'field'=>$k,'case'=>'BETWEEN','value'=>explode(':',$matches[2]));
 			} else {
 				$options[]=array('type'=>'value', 'field'=>$k,'case'=>$matches[1],'value'=>$matches[2]);
 			}
