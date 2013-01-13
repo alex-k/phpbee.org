@@ -126,6 +126,8 @@ class gs_base_handler extends gs_handler {
         if (empty($this->params['name'])) {
             $this->params['name']=basename($this->data['handler_key']).'.html';
         }
+        
+        $this->params['name']=trim($this->params['name']);
 
         $tplname=false;
         if (!$tplname && file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'])) $tplname=$this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'];
