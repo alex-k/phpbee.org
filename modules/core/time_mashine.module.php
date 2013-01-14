@@ -42,10 +42,12 @@ class time_machine_listener {
 		
 		$tb_name=$rs->get_db_tablename();
 		
-		if (strpos($tb_name,'time_machine')===0) return;
+		//if (strpos($tb_name,'time_machine')===0) return;
 		
 		$rs->set_connector_id('time_machine');
 		$rs->set_db_tablename('time_machine_'.$tb_name);
+		
+		$rs['recordsets']=$rs['triggers']=array();
 		
 		$modified=$tm_rec->get_modified_values();
 		
@@ -56,11 +58,18 @@ class time_machine_listener {
 		$rs->structure['fields']['_tm_time']=array('type'=>'date');
 		$rs->structure['fields']['_tm_remote_ip']=array('type'=>'varchar','options'=>16,'multilang'=>'');
 		
-		$rs->install();
+		//$rs->install();
+		if (!$rs->get_connector()->table_exists($rs->get_db_tablename())) {
+			$rs->createtable();
+		} else {
+			$rs->altertable();
+		}
 		
 		switch ($type) {
 			case 'update':
 				$v=$tm_rec->get_old_values();
+				$nv=$tm_rec->get_values();
+				if ($v==$nv) return;
 				$v[$rs->id_field_name]=$tm_rec->get_id();
 			break;
 			default:
@@ -74,7 +83,8 @@ class time_machine_listener {
 		
 		if (!empty($modified) || $type=='delete') {
 			$nrec=$rs->new_record($v);
-			$ret=$rs->insert($nrec);
+			//$ret=$rs->insert($nrec);
+			$ret=$rs->get_connector()->insert($nrec);
 		}
 	}
 }
