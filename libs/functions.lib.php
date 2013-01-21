@@ -1,4 +1,8 @@
 <?php
+
+function recordset($name) {
+	return new $name;
+}
 function http_host($url) {
     $s=parse_url($url);
     return sprintf('%s://%s',$s['scheme'],$s['host']);
@@ -103,7 +107,8 @@ function html_fetch($url,$data=array(),$scheme='GET') {
 	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     if (strtoupper($scheme)=='POST') {
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, is_array($data) ? http_build_query($data) : $data);
+        //curl_setopt($ch, CURLOPT_POSTFIELDS, is_array($data) ? http_build_query($data) : $data);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     }
 
 

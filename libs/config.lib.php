@@ -655,7 +655,7 @@ function file_put_contents_perm($filename,$data,$flags = 0, $context = NULL) {
 
 function load_file($file,$return_contents=FALSE,$return_file=FALSE)
 {
-	mlog('LOAD_FILE '.$file,DEBUG_LOAD_FILE);
+	//mlog('LOAD_FILE '.$file,DEBUG_LOAD_FILE);
 	if (!file_exists($file))
 	{
 		throw new gs_exception('load_file: '.$file.'  not found');

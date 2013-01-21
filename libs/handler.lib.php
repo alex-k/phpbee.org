@@ -872,6 +872,14 @@ function hpar($data,$name='hkey',$default=null) {
     function check_login($data) {
         $id=gs_session::load('login_'.$this->params['classname']);
         $rec=record_by_id($id,$this->params['classname']);
+
+        foreach ($this->params as $n=>$v) {
+            if (isset($rec->get_recordset()->structure['fields'][$n])) {
+				if ($rec->$n!=$v) {
+					return new gs_null(GS_NULL_XML);
+				}
+			}
+        }
 	
         if(isset($this->data['handler_params']['assign'])) {
             gs_var_storage::save($this->data['handler_params']['assign'],$rec);

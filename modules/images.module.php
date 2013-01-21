@@ -126,6 +126,10 @@ abstract class tw_file_images extends gs_recordset_short{
 		die();
 	}
 
+	function get_path($d,$rec) {
+		return $fname=$this->get_connector()->root.DIRECTORY_SEPARATOR.$this->db_tablename.DIRECTORY_SEPARATOR.$this->get_connector()->split_id($rec->get_id()).DIRECTORY_SEPARATOR;
+	}
+
 
 	function resize($rec,$type=null,$ret=null,$no_rewrite=false) {
         $rs=new img_resizes_cfg;
