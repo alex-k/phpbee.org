@@ -13,6 +13,7 @@ class gs_Smarty extends Smarty {
 
 		if (!isset($this->_tpl_arr[$id])) {
 			if (!$this->templateExists($template)) {
+                mlog($this->getTemplateDir());
 				throw new gs_exception('gs_base_handler.show: can not find template file for '.$template);
 			}
 			$this->_tpl_arr[$id]=$this->createTemplate($template, $cache_id , $compile_id , $parent, $display);
@@ -50,6 +51,13 @@ class gs_Smarty extends Smarty {
 		//mlog($tplname);
 		return $tplname;
 	}
+
+    function addTemplateDir($dir) {
+                $tpldir=$this->getTemplateDir();
+                if (!is_array($tpldir)) $tpldir=array($tpldir);
+                array_push($tpldir, $dir);
+                $this->setTemplateDir($tpldir);
+    }
 
 }
 

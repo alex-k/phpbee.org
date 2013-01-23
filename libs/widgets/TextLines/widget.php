@@ -9,7 +9,8 @@ class gs_widget_TextLines extends gs_widget{
 	}
 	function html() {
 		$tpl=gs_tpl::get_instance();
-		$tpl->template_dir[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
+		//$tpl->template_dir[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
+		$tpl->addTemplateDir(dirname(__FILE__).DIRECTORY_SEPARATOR.'templates');
 		$params=$this->params;
 		$params['value']=$this->value;
 		$params['fieldname']=$this->fieldname;

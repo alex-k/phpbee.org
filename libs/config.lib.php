@@ -600,7 +600,7 @@ TXT;
 
 function gs_exception_handler_debug($ex)
 {
-	if (in_array('xdebug',get_loaded_extensions())) throw $ex;
+	//if (in_array('xdebug',get_loaded_extensions())) throw $ex;
 	md('');
 	md("EXCEPTION ".get_class($ex));
 	md($ex->getMessage());

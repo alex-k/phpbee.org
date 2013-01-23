@@ -35,6 +35,8 @@ class gs_base_handler extends gs_handler {
                 $this->tpl_dir= dirname($filename).DIRECTORY_SEPARATOR.'___templates';
                 if (!file_exists($this->tpl_dir)) $this->tpl_dir=dirname($filename).DIRECTORY_SEPARATOR.'templates';
 
+                /*
+
                 $newtpldir=$tpl->template_dir;
                 if (is_array($newtpldir)) {
                     array_push($newtpldir, $this->tpl_dir);
@@ -43,6 +45,9 @@ class gs_base_handler extends gs_handler {
                 }
                 
                 $tpl->setTemplateDir($newtpldir);
+                */
+
+                $tpl->addTemplateDir($this->tpl_dir);
 
             }
         $this->subdir=$subdir;
@@ -82,8 +87,11 @@ class gs_base_handler extends gs_handler {
         $tpl->assign('_gsdata',$this->data);
         $tpl->assign('_gsparams',$this->params);
         if(isset($this->params['hkey'])) $tpl->assign('hdata',$data[$this->params['hkey']]);
-        if (!$tpl->templateExists($tplname)) throw new gs_exception('gs_base_handler.fetch: can not find template file for '.$tplname);
         mlog($tplname);
+        if (!$tpl->templateExists($tplname)) {
+            mlog($tpl->getTemplateDir());
+            throw new gs_exception('gs_base_handler.fetch: can not find template file for '.$tplname);
+        }
         return $tpl->fetch($tplname);
     }
 
