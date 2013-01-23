@@ -69,6 +69,12 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 'loginbuttons'=>array(
   'admin_handler.show:name:loginbuttons.html', 
 ),
+'loginlinks'=>array(
+  'admin_handler.show:name:loginlinks.html', 
+),
+'loginlinks/menu'=>array(
+  'admin_handler.show:name:loginlinks_menu.html', 
+),
 ),
 		);
 		return self::add_subdir($data,dirname(__file__));
@@ -127,6 +133,7 @@ class oauth2_config extends gs_recordset_short {
 
 		
 			'title'=>'fString verbose_name="Title"     required=false        ',
+			'enabled'=>'fCheckbox verbose_name="enabled"     default=1',
 
 				
 			'Logo'=>'lMany2One oauth2_config_images:Parent verbose_name="Logo"   widget="gallery"  required=false    ',
