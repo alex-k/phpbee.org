@@ -17,6 +17,7 @@ class oauth2_handler extends gs_handler {
 		$d['query']=http_build_query(array_merge($get_vars,$this->data['data']));
 		$callback=http_build_url($d);
 		$oauth=new $classname($config);
+		gs_session::save($callback,'oauth2_callback');
 		$url=$oauth->authorize($callback);
 		header('Location: '.$url);
 	}
@@ -66,6 +67,11 @@ class oauth2_handler extends gs_handler {
 		gs_session::save($rec->get_id(),'login_'.$this->params['classname']);
 		return $rec;
 	}
+	function pushtoken($d) {
+		$token=array('access_token'=>$this->data['access_token'],'user_id'=>$this->data['user_id']);
+		gs_session::save($token,'oauth2_token_'.$this->params['name']);
+		html_redirect(gs_session::load('oauth2_callback'));
+	}
 }
 class oauth2_twitter{
 	/*
@@ -101,6 +107,17 @@ class oauth2_twitter{
 	}
 }
 
+class oauth2_vk_app extends oauth2_vk {
+	function authorize($callback) {
+		$url=sprintf("http://api.vk.com/oauth/authorize?client_id=%s&redirect_uri=http://api.vk.com/blank.html&scope=%s&display=page&response_type=token",$this->config->APP_ID,$this->config->SCOPE);
+		return $url;
+	}
+	function token($data) {
+		return gs_session::load('oauth2_token_vk_app');
+	}
+
+}
+
 class oauth2_vk {
 	function __construct($config) {
 		$this->config=$config;
@@ -109,6 +126,7 @@ class oauth2_vk {
 		gs_session::save($callback,'oauth2_vk_request');
 		$callback=urlencode($callback);
 		$url="http://oauth.vk.com/authorize?client_id=".$this->config->APP_ID."&scope=".$this->config->SCOPE."&redirect_uri=$callback&response_type=code";
+		#$url=sprintf("http://api.vk.com/oauth/authorize?client_id=%s&redirect_uri=http://api.vk.com/blank.html&scope=%s&display=page&response_type=token",$this->config->APP_ID,$this->config->SCOPE);
 		return $url;
 	}
 	function token($data) {
@@ -154,7 +172,7 @@ class oauth2_vk {
 		return $ret;
 	}
 
-	function exec($method,$data) {
+	function exec($method,$data=array()) {
 		$url=sprintf("https://api.vk.com/method/%s?uid=%d&access_token=%s&%s",
 					$method,
 					$this->token['user_id'],
