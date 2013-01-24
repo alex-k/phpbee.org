@@ -101,15 +101,22 @@ function html_fetch($url,$data=array(),$scheme='GET') {
     mlog($data);
     if (!isset($url)) throw new gs_exception('html_fetch: empty url');
 
+    if(!is_array($data)) $data=string_to_params($data);
+
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     if (strtoupper($scheme)=='POST') {
         curl_setopt($ch, CURLOPT_POST, 1);
         //curl_setopt($ch, CURLOPT_POSTFIELDS, is_array($data) ? http_build_query($data) : $data);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    } else {
+        if($data) {
+            $url.='?'.http_build_query($data);
+        }
     }
+
+    curl_setopt($ch, CURLOPT_URL, $url);
 
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
