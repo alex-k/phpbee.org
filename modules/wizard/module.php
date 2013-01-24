@@ -79,6 +79,12 @@ class module_wizard extends gs_base_module implements gs_module {
 				'gs_base_handler.redirect_if:gl:save_continue:return:true',
 				'gs_base_handler.redirect_up',
 			),
+			'/admin/form/wz_urls_inline'=>array(
+				'gs_base_handler.redirect_if:gl:save_cancel:return:true',
+				'gs_base_handler.post:{name:inline_form.html:classname:wz_urls:form_class:g_forms_table}',
+				'gs_base_handler.redirect_if:gl:save_continue:return:true',
+				'gs_base_handler.redirect_up',
+			),
 			'/admin/form/wz_handlers'=>array(
 				'gs_base_handler.post:{name:admin_form.html:classname:wz_handlers:form_class:g_forms_table}',
 				'gs_base_handler.redirect_up',
@@ -214,7 +220,8 @@ class module_wizard extends gs_base_module implements gs_module {
                                         ),
 			'/admin/wizard/urls/clone'=>array(
 					'gs_base_handler.xml_clone:{classname:wz_urls}',
-					'gs_base_handler.redirect',
+					'gs_base_handler.redirect_gl:gl:clone_urls',
+					//'gs_base_handler.redirect',
 			),
 			'/admin/wizard/forms'=>'gs_base_handler.show',
 			'/admin/wizard/form_fields'=>'gs_base_handler.show',
@@ -250,7 +257,8 @@ class module_wizard extends gs_base_module implements gs_module {
 				if ($data['save_return']) return '/admin/wizard/module/'.$data['gspgid_va'][0];
 				return null;
 			case 'clone_urls':
-				return '/admin/wizard/module/'.$data['module_id'];
+				//return '/admin/wizard/module/'.$data['module_id'];
+				return '/admin/wizard/handlers/'.$record->get_id();
 			break;
 		}
 	}

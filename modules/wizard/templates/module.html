@@ -31,13 +31,12 @@
 			<td nowrap>
 
 
-				<a href="/admin/wizard/urls/clone/{$url.id}"><img src="/i/admin/ico_copy.png" alt="копировать" title="копировать" class="icon"></a>
 
-				<a href="/admin/wizard/urls/{$module.id}/modify/{$url.id}#form"><img src="/i/admin/ico_edit.png" class="icon"></a>
 			</td>	
 			<td>
 				<a href="/admin/wizard/urls/{$module.id}/modify/{$url.id}">{$url.gspgid_value|default:"_DEFAULT_"}</a>
 				<a href="/admin/wizard/urls/delete/{$url.id}" onclick="return confirm('Вы точно хотите удалить запись ?');"><img src="/i/admin/ico_delete.png" alt="Удалить" title="Удалить"></a>
+				<a href="/admin/wizard/urls/clone/{$url.id}"><img src="/i/admin/ico_copy.png" alt="копировать" title="копировать" class="icon"></a>
 			</td>
 			</tr>
 			<tr>
