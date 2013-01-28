@@ -1,65 +1,141 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
-<head>
-	<title>{block name=title}TITLE{/block}</title>
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>{$smarty.server.HTTP_HOST} : PHPBee default templat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-	<link rel="shortcut icon" href="/i/favicon.ico" />
-	<link rel="stylesheet" type="text/css" href="/css/layout.css" media="screen" />
-	<link href="/css/main.css" rel="stylesheet" type="text/css" title="CSS for site" />
-	<link href="/css/jquery-ui.css" rel="stylesheet" type="text/css" title="CSS for site" />
-	<link href="/css/ui.daterangepicker.css" rel="stylesheet" type="text/css" title="CSS for site" />
-	<link rel="stylesheet" href="/js/jquery.multiselect.css" type="text/css" />
-	<link rel="stylesheet" href="/js/jquery.sel_filter.css" type="text/css" />
-	<link rel="stylesheet" href="/js/chosen/chosen.css" type="text/css" />
+    <!-- Le styles -->
+    <link href="/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 20px;
+        padding-bottom: 40px;
+      }
 
-	<script type="text/javascript" src="/js/jquery.min.js"></script>
-	<script type="text/javascript" src="/js/jquery-ui.js"></script>
-	<script type="text/javascript" src="/js/jquery.multiselect.js"></script>
-	<script type="text/javascript" src="/js/chosen/chosen.jquery.js"></script>
-	<script type="text/javascript" src="/js/jquery.sel_filter.js"></script>
-	<script type="text/javascript" src="/js/jquery.form.interaction.js"></script>
-	<script type="text/javascript" src="/js/jquery.preview.js"></script>
-	<script type="text/javascript" src="/js/functions.js"></script>
-	<script type="text/javascript" src="/js/common.js"></script>
-</head>
+      /* Custom container */
+      .container-narrow {
+        margin: 0 auto;
+        max-width: 700px;
+      }
+      .container-narrow > hr {
+        margin: 30px 0;
+      }
 
-<body>
-{block name="filters"}
+      /* Main marketing message and sign up button */
+      .jumbotron {
+        margin: 60px 0;
+        text-align: center;
+      }
+      .jumbotron h1 {
+        font-size: 72px;
+        line-height: 1;
+      }
+      .jumbotron .btn {
+        font-size: 21px;
+        padding: 14px 24px;
+      }
 
-{/block}
+      /* Supporting marketing content */
+      .marketing {
+        margin: 60px 0;
+      }
+      .marketing p + h4 {
+        margin-top: 28px;
+      }
+    </style>
+    <link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
-<div id="header">
-header
-</div>
-{block name="page"}
-<div class="colmask threecol">
-	<div class="colmid">
-		<div class="colleft">
-			<div class="col1">
-					{block name="content"}content here{/block}
-			</div>
-			<div class="col2">
-					{block name="left"}content_block_left{/block}
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-			</div>
-			<div class="col3">
-					{block name="right"}content_block_right{/block}
-			</div>
-		</div>
-	</div>
-</div>
-{/block}
-<div id="footer">
-footer
-</div>
-{if  isset($_gsdata.D)}
-{handler gspgid="/debug"}
-{/if}
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+                    <link rel="apple-touch-icon-precomposed" href="/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+                                   <link rel="shortcut icon" href="/bootstrap/ico/favicon.png">
+  </head>
 
-{if  isset($_gsdata.D)}
-{handler gspgid="/debug"}
-{/if}
+  <body>
 
-</body>
+    <div class="container-narrow">
+
+    {block page}
+    {block content}
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+        <h3 class="muted">{$smarty.server.HTTP_HOST}</h3>
+      </div>
+
+      <hr>
+
+      <div class="jumbotron">
+        <h1>{$smarty.server.HTTP_HOST}!</h1>
+        <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+        <a class="btn btn-large btn-success" href="#">Sign up today</a>
+      </div>
+
+      <hr>
+
+      <div class="row-fluid marketing">
+        <div class="span6">
+          <h4>Subheading</h4>
+          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+          <h4>Subheading</h4>
+          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+          <h4>Subheading</h4>
+          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+        </div>
+
+        <div class="span6">
+          <h4>Subheading</h4>
+          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+          <h4>Subheading</h4>
+          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+          <h4>Subheading</h4>
+          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+        </div>
+      </div>
+
+        {/block}
+
+    {block footer}
+
+
+      <hr>
+
+    {if  isset($_gsdata.D)}
+    {handler gspgid="/debug"}
+    {/if}
+
+      <div class="footer">
+        <p>&copy; <a href="http://www.phpbee.org/">PHPbee</a> 2012</p>
+      </div>
+
+    {/block}
+    
+    {/block}
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+  </body>
 </html>
 
