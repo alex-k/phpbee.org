@@ -3,7 +3,10 @@
 class gs_widget_DateBirthDate extends gs_widget{
 	function html() {
 		$tpl=gs_tpl::get_instance();
-		$tpl->template_dir[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
+		//$tpl->template_dir[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
+		$tpls=$tpl->template_dir;
+		$tpls[]=dirname(__FILE__).DIRECTORY_SEPARATOR.'templates';
+		$tpl->setTemplateDir($tpls);
 		$params=$this->params;
 		
 		if (!is_array($this->value)) {
