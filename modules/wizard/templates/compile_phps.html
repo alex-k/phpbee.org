@@ -33,7 +33,7 @@ class module{%$MODULE_NAME%} extends gs_base_module implements gs_module {
 '<*$type*>'=>array(
 <*foreach from=$handler key=type item=url*>
 '<*$url->gspgid_value*>'=>array(
-<*foreach from=$url->Handlers->orderby('sortkey') item=h*> <*if $h->handler_keyname && !$h->handler_keyname|is_numeric *>'<*$h->handler_keyname*>'=><*/if*> '<*$h->handler_value*>', 
+<*foreach from=$url->Handlers->orderby('sortkey') item=h*> <*if $h->handler_keyname && !$h->handler_keyname|is_numeric *>'<*$h->handler_keyname*>'=><*/if*> '<*if $h->handler_template*>template.<*$h->handler_template*>:<*/if*><*$h->handler_value*>', 
 <*/foreach*>
 ),
 <*/foreach*>

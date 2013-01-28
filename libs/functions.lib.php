@@ -506,5 +506,19 @@ function beautify($out) {
 		return $out;
 }
 
+function array_var_replace($arr,$variables) {
+    $ret=array();
+    $nk=array();
+    $nv=array();
+    foreach($variables as $k=>$v) {
+        $nk[]='$'.$k;
+        $nv[]=$v;
+    }
+    foreach ($arr as $k=>$v) {
+        $ret[str_ireplace($nk,$nv,$k)] = str_ireplace($nk,$nv,$v);
+    }
+    return $ret;
+}
+
 
 ?>

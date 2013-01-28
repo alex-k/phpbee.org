@@ -43,6 +43,7 @@ class gs_base_handler extends gs_handler {
                 } else {
                     $newtpldir = array($newtpldir,$this->tpl_dir);
                 }
+
                 
                 $tpl->setTemplateDir($newtpldir);
                 */
@@ -60,6 +61,10 @@ class gs_base_handler extends gs_handler {
 
 
         //$this->register_blocks();
+    }
+
+    function nop($r) {
+        return $r['last'];
     }
 
     function get_data($name=null) {
@@ -164,7 +169,7 @@ class gs_base_handler extends gs_handler {
             }
         }
         $txt=ob_get_contents();
-        ob_end_clean();
+        //ob_end_clean();
         mlog($tplname);
         $html=$tpl->fetch($tplname);
         echo $html;
@@ -181,6 +186,7 @@ class gs_base_handler extends gs_handler {
     protected function get_form() {
         $params=$this->params;
         $data=$this->data;
+        if (!isset($params['classname']) && isset($this->data['handler_params']['classname'])) $params['classname']=$this->data['handler_params']['classname'];
         if (isset($params['classname'])) {
             $id=isset($data['gspgid_va'][1]) ? $data['gspgid_va'][1] : null;
             $classname=$params['classname'];
@@ -374,12 +380,13 @@ class gs_base_handler extends gs_handler {
         $tpl=gs_tpl::get_instance();
         if (!$f) $f=$this->get_form();
         $tpl->assign('formfields',$f->show());
-	$tpl->assign('handler_params',$this->data['handler_params']);
+        $tpl->assign('handler_params',$this->data['handler_params']);
         /*
         $tpl->assign('forminputs',$f->get_inputs());
         $tpl->assign('formerrors',$f->validate_errors['FIELDS']);
         */
         $tpl->assign('form',$f);
+        if(!isset($this->params['name'])) $this->params['name']=$this->data['handler_params']['name'];
         if(!isset($this->params['name'])) $this->params['name']='form_empty.html';
 
         $tplname=file_exists($this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name']) ? $this->tpl_dir.DIRECTORY_SEPARATOR.$this->params['name'] : $this->params['name'];
@@ -878,6 +885,7 @@ function hpar($data,$name='hkey',$default=null) {
 
 
     function check_login($data) {
+        if(!isset($this->params['classname']) && isset($this->data['handler_params']['classname'])) $this->params['classname']=$this->data['handler_params']['classname'];
         $id=gs_session::load('login_'.$this->params['classname']);
         $rec=record_by_id($id,$this->params['classname']);
 
@@ -934,8 +942,7 @@ function hpar($data,$name='hkey',$default=null) {
 
         $d=$f->clean();
 
-
-
+        if(!isset($this->params['classname']) && isset($this->data['handler_params']['classname'])) $this->params['classname']=$this->data['handler_params']['classname'];
         $rsname=$this->params['classname'];
         $rs=new $rsname;
 

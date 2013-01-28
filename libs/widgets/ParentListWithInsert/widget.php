@@ -21,7 +21,7 @@ class gs_widget_ParentListWithInsert_module extends gs_base_module implements gs
 	function get_menu() {}
 	static function get_handlers() {
 		$data=array(
-		'get_post'=>array(	
+		'post'=>array(	
 			'/widgets/ParentListWithInsert/action/add'=>array(
 				'gs_widget_ParentListWithInsert_handler.add',
 			),

@@ -11,7 +11,7 @@ class module extends gs_base_module implements gs_module {
 	
 	static function get_handlers() {
 		$data=array(
-			'get_post'=>array(
+			'get'=>array(
 				''=>'gs_base_handler.show:{name:index.html}',
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
 				'/admin/logout'=>array(

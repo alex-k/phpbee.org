@@ -23,7 +23,6 @@ class gs_parser {
 
 
 		
-		//$this->registered_handlers= DEBUG ? NULL : gs_cacher::load('handlers','config');
 		$this->registered_handlers=gs_cacher::load('handlers','config');
 		if (!$this->registered_handlers) {
 			mlog('WILL REHASH HANDLERS');
@@ -38,11 +37,48 @@ class gs_parser {
 			$this->prepare($data);
 		}
 	}
+
+    function apply_wrappers(&$result) {
+        if (!isset($this->registered_handlers['wrapper'])) return;
+		$wrapper=$this->find_handler($this->registered_handlers['wrapper'],$this->data['gspgid']);
+
+        foreach($wrapper['handler'] as $handler) {
+            $val=$this->parse_val($handler);
+            $template=$this->registered_handlers['template'][$val['method_name']];
+            if (!$template) continue;
+            $variables=$val['params'];
+            $variables['continue']='continue_'.preg_replace('/[^a-zA-Z0-9]/','_',$val['method_name']);
+            $template=array_var_replace($template,$variables);
+            $newresult=array();
+            foreach ($template as $tk=>$tv) {
+                if (stripos($tv,'$original_handlers')!==FALSE) {
+                    $newresult=array_merge($newresult,$result['handler']);
+                    continue;
+                }
+                $newresult[$tk]=$tv;
+            }
+            $result['handler']=$newresult;
+
+        }
+       /* 
+        md($wrapper,1);
+        md($result,1);
+        die();
+        */
+
+    }
+
 	function prepare($data,$gspgtype=null) {
 		$data['gspgid']=trim($data['gspgid'],'/');
 		$this->data=$data;
 
-		$result=$this->find_handler($this->registered_handlers[$gspgtype ? $gspgtype : $data['gspgtype']],$data['gspgid']);
+        if (!$gspgtype && isset($data['gspgtype'])) $gspgtype=$data['gspgtype'];
+        if (!$gspgtype) $gspgtype='get';
+
+		$result=$this->find_handler($this->registered_handlers[$gspgtype],$data['gspgid']);
+
+        if ($gspgtype=='get') $this->apply_wrappers($result);
+
 		$this->current_handler=$result['handler'];
 	
 		$data['handler_key']=$result['key'];
@@ -143,6 +179,7 @@ class gs_parser {
 
 			$s_data=$this->data;
 			// --------------------- 
+            /*
 			if(call_user_func(array($module_name, 'admin_auth'),$this->data,$handler['params'])===false) {
 				return false;
 			}
@@ -152,6 +189,7 @@ class gs_parser {
 				$ret['last']=$ret[$h_key]=call_user_func(array($module_name, 'auth'),$this->data,$handler['params']);
 				if ($ret['last']===false) return false;
 			}
+            */
 			// ----------------------
 			mlog($handler['params']['module_name'].':'.$handler['name']);
 			$o_h=new $handler['class_name']($this->data,$handler['params']);
@@ -229,7 +267,9 @@ class gs_parser {
 		if (is_array($modules)) foreach ($modules as $module_name) {
 			$handlers=call_user_func(array($module_name,'get_handlers'));
 			if(is_array($handlers)) {
-				if (isset($handlers['get_post'])) {
+
+
+				if (isset($handlers['get_post'])) { //get_post DEPRECATED
 					$handlers['get']=isset($handlers['get']) ? array_merge($handlers['get_post'],$handlers['get']) : $handlers['get_post'];
 					$handlers['post']=isset($handlers['post']) ? array_merge($handlers['get_post'],$handlers['post']) : $handlers['get_post'];
 				}
@@ -251,6 +291,7 @@ class gs_parser {
 		krsort ($data['post']);
 		return $data;
 	}
+
 
 	
 	

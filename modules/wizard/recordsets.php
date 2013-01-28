@@ -244,7 +244,7 @@ class wz_urls extends gs_recordset_short {
 	public $no_urlkey=1;
 	function __construct($init_opts=false) { parent::__construct(array(
 		'gspgid_value'=> "fString gspgid required=false unique=true",
-		'type'=>'fSelect type values="get,handler,post"',
+		'type'=>'fSelect type values="get,handler,post,wrapper,template"',
 		'Module'=>'lOne2One wz_modules Module widget="parent_list"',
 		'Handlers'=>"lMany2One wz_handlers:Url",
 		),$init_opts);
@@ -268,6 +268,7 @@ class wz_handlers extends gs_recordset_short {
 	function __construct($init_opts=false) { parent::__construct(array(
 		'cnt'=> "fInt",
 		'handler_keyname'=> "fString key required=false",
+        'handler_template' => "fString template required=false widget=SelectHandlerTemplate",
 		'handler_value'=>"fString value",
 		'Url'=>'lOne2One wz_urls',
 		),$init_opts);

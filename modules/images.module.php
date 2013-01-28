@@ -317,15 +317,14 @@ class images_module extends gs_base_module implements gs_module {
     }
     static function get_handlers() {
         $data = array(
-			'get_post'=>array(
+			'get'=>array(
 				'/files'=>'images_handler.resize:key:file_public',
 				'img/show'=>'images_handler.show',
 				'img/s'=>'images_handler.s',
 				'/admin/images'=>'admin_handler.many2one:{name:images.html}',
 				'/admin/window_form'=>'admin_handler.many2one:{name:window_form.html}',
 				'/admin/many2one'=>'admin_handler.many2one:{name:many2one.html}',
-                ),
-            'get' => array(
+
                 '/admin/img_resizes/img_resizes_cfg' => array(
                     'gs_base_handler.show:name:adm_img_resizes_cfg.html',
                 ) ,

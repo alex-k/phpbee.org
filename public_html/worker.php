@@ -10,6 +10,7 @@ mlog('1');//starts time counter in debug
 
 $init=new gs_init();
 $init->init(LOAD_CORE);
+$init->load_modules();
 $o_h=new gs_parser($init->data);
 $o_h->process();
 
