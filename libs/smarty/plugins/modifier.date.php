@@ -64,6 +64,9 @@ class vpa_tpl_date {
             $year=date('Y',$date);
             $month=date('m',$date);
             $day=date('d',$date);
+            $hour=date('H',$date);
+            $minutes=date('i',$date);
+            $seconds=date('s',$date);
 
         }
 		//preg_match_all("|(\d{4})(\d{2})(\d{2})|is",$date,$out);
@@ -72,6 +75,9 @@ class vpa_tpl_date {
 		// используется ручное форматирование, чтобы можно было реально называть месяца и дни недели в независомости от настроек локали на сервере.
 		// можно выдумывать свои модификаторы, только тогда - документируйте плиз :)
 		$date=$format;
+		$date=str_replace("%H",$hour,$date);
+		$date=str_replace("%i",$minutes,$date);
+		$date=str_replace("%s",$seconds,$date);
 		$date=str_replace("%Y",$year,$date);
 		$date=str_replace("%m",$month,$date);
 		$date=str_replace("%FN",$this->months_nominatif[intval($month)],$date);
