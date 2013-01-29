@@ -140,8 +140,9 @@ class gs_record implements arrayaccess {
 		return array_key_exists($name,$this->values);
 	}
 
-	public function is_modified($name) {
-		return array_key_exists($name,$this->modified_values);
+	public function is_modified($name=null) {
+		if ($name) return array_key_exists($name,$this->modified_values);
+        return count($this->modified_values)>0;
 	}
 	public function get_modified_values($name=null) {
 		return $name===null ? $this->modified_values : $this->modified_values[$name];
@@ -412,6 +413,7 @@ class gs_record implements arrayaccess {
 	public function delete() {
 		$this->recordstate=($this->recordstate & RECORD_NEW) ? RECORD_ROLLBACK : RECORD_DELETED;
 		if (($parent=$this->get_recordset()->parent_record)!==NULL) $parent->child_modified();
+        return $this;
 	}
 
 	public function unlink() {

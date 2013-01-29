@@ -520,5 +520,14 @@ function array_var_replace($arr,$variables) {
     return $ret;
 }
 
+function gs_setcookie($name,$new_id) {
+			$_COOKIE[$name]=$new_id;
+			$t=strtotime("now +".cfg('session_lifetime'));
+			setcookie($name,$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
+			setcookie($name,$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
+			setcookie($name,$new_id,$t,cfg('www_dir'),cfg('host'));
+}
+
+
 
 ?>

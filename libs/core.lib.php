@@ -309,12 +309,7 @@ class gs_session {
 			md($new_id,1);
 			md(cfg('www_dir'),1);
 			die;
-			$_COOKIE[GS_SESSION_COOKIE]=$new_id;
-			$t=strtotime("now +".cfg('session_lifetime'));
-
-			setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
-			setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
-			setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),cfg('host'));
+            gs_setcookie(GS_SESSION_COOKIE,$new_id);
 		}
 		return $new_id;
 	}
@@ -325,10 +320,7 @@ class gs_session {
 			$new_id=$_COOKIE[GS_SESSION_COOKIE];
 		}
 
-		$t=strtotime("now +".cfg('session_lifetime'));
-		setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),'www.'.cfg('host'));
-		setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),'.'.cfg('host'));
-		setcookie(GS_SESSION_COOKIE,$new_id,$t,cfg('www_dir'),cfg('host'));
+        gs_setcookie(GS_SESSION_COOKIE,$new_id);
 			
 
 		$data=gs_session::load();

@@ -911,6 +911,9 @@ function hpar($data,$name='hkey',$default=null) {
         if($rec) $h->before_logout($rec);
         //gs_session::clear('login_'.$this->params['classname']);
         gs_session::save(NULL,'login_'.$this->params['classname']);
+
+        if(function_exists('person') && isset($this->params['role'])) person()->remove_role($this->params['role']);
+
         return true;
     }
 
@@ -924,6 +927,9 @@ function hpar($data,$name='hkey',$default=null) {
         $rec=$this->post_find_record($data);
         if (!is_object($rec) || !is_a($rec,'gs_record')) return $rec;
         gs_session::save($rec->get_id(),'login_'.$this->params['classname']);
+
+        if(function_exists('person') && isset($this->params['role'])) person()->add_role($this->params['role'],$rec);
+
         $h=new handler_registry;
         $h->after_login($rec);
         return $rec;

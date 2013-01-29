@@ -85,6 +85,7 @@ class wz_recordset_fields extends gs_recordset_short {
 	public $gs_connector_id='wizard';
 	public $sortkey=1;
 	public $no_urlkey=1;
+    public $orderby = "sortkey";
 	function __construct($init_opts=false) { parent::__construct(array(
 		'name'=> "fString name",
 		'verbose_name'=> "fString verbose_name required=false",

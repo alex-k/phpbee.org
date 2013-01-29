@@ -60,8 +60,10 @@ class gs_filter {
 				$arr=$this->get_data_get();
 				if(isset($arr[$this->name])) {
 					gs_session::save($arr[$get_name],'filter_'.$this->name);
+                    if (function_exists('person')) person()->{'filter_'.$this->name}=$arr[$get_name];
 				} else {
 					$arr[$this->name]=gs_session::load('filter_'.$this->name);
+                    if (function_exists('person')) $arr[$this->name]=person()->{'filter_'.$this->name};
 				}
 				break;
 			default:

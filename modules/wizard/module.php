@@ -39,7 +39,7 @@ class module_wizard extends gs_base_module implements gs_module {
 
 			'/admin/form/wz_modules'=>array(
 				'gs_base_handler.post:{name:admin_form.html:classname:wz_modules:form_class:g_forms_table}',
-				'gs_base_handler.redirect_up',
+				'gs_base_handler.redirect',
 			),
 			'/admin/form/wz_recordsets'=>array(
 				'gs_base_handler.post:{name:admin_form.html:classname:wz_recordsets:form_class:g_forms_table}',
