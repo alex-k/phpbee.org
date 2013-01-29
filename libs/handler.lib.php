@@ -521,6 +521,14 @@ class gs_base_handler extends gs_handler {
         }
         return $rec;
     }
+    
+    function delete_rec ($data) {
+        $rec=$this->hpar($data);
+        $rec->delete();
+        $rec->commit();
+        return $rec;
+    }
+    
     function set_value($data) {
         $rec=$this->hpar($data);
         if (!$rec) return $rec;
@@ -646,6 +654,10 @@ class gs_base_handler extends gs_handler {
 
     function get_record($data) {
         return record_by_id($this->data['gspgid_va'][$this->params['key']],$this->params['rs']);
+    }
+    
+    function get_record_a($data) {
+        return record_by_id($this->data['gspgid_a'][$this->params['key']],$this->params['rs']);
     }
 
     function set_record($data) {
@@ -1003,9 +1015,14 @@ function hpar($data,$name='hkey',$default=null) {
         return $rec;
     }
 	function rec_by_fieldname($ret) {
+        $rec=$this->hpar($data);
         $id=null;
-        if (isset($this->data['gspgid_handler_va'])) $id=reset($this->data['gspgid_handler_va']);
-        if (!$id) $id=reset($this->data['gspgid_va']);
+        if (!$rec) {
+            if (isset($this->data['gspgid_handler_va'])) $id=reset($this->data['gspgid_handler_va']);
+            if (!$id) $id=reset($this->data['gspgid_va']);
+        } else {
+            $id=$rec->get_id();
+        }
 		$rec=record_by_field($this->params['fieldname'],$id,$this->params['classname']);
         return $rec;
     }
