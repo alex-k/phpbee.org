@@ -135,6 +135,9 @@ class oauth2_config extends gs_recordset_short {
 			'title'=>'fString verbose_name="Title"     required=false        ',
 			'enabled'=>'fCheckbox verbose_name="enabled"     default=1',
 
+		
+			'enabled'=>'fCheckbox verbose_name="enabled"     required=true  index=true default=1     ',
+
 				
 			'Logo'=>'lMany2One oauth2_config_images:Parent verbose_name="Logo"   widget="gallery"  required=false    ',
 
