@@ -14,9 +14,9 @@
 				'db_type'=>'mysql',
 				'db_hostname'=>'127.0.0.1',
 				'db_port'=>'3306',
-				'db_username'=>'root',
-				'db_password'=>'root',
 				'db_database'=>'test',
+				'db_username'=>'root',
+				'db_password'=>'',
 				'codepage'=>'utf8',
 				),
 			'wizard'=>array( 
