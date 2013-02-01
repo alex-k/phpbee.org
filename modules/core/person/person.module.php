@@ -17,8 +17,9 @@ class module_person extends gs_base_module implements gs_module {
 	}
 
 }
-function person() {
-    return person::get_instance();
+function person($var=null) {
+    $p=person::get_instance();
+    return $var ? $p->$var : $p;
 }
 class person {
     private $heap=array();
