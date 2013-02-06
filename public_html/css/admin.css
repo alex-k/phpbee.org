@@ -147,7 +147,7 @@ select.chosen {
 	height:20px;
 }
 
-.filterform input[type="submit"]{
+.__filterform input[type="submit"]{
 	width:16px;
 	height:15px;
 	background:url('/i/admin/ico_find.png')  0 0 no-repeat !important;

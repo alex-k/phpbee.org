@@ -611,6 +611,11 @@ class gs_base_handler extends gs_handler {
         $newrs->commit();
         return $newrs->first();
     }
+    function json_print($ret) {
+        $x=json_encode($ret['last']);
+        echo $x;
+        return $x;
+    }
 	function fix_gl($ret) {
 		$href=null;
         if (isset($this->params['gl'])) {
@@ -898,8 +903,13 @@ function hpar($data,$name='hkey',$default=null) {
 
     function check_login($data) {
         if(!isset($this->params['classname']) && isset($this->data['handler_params']['classname'])) $this->params['classname']=$this->data['handler_params']['classname'];
-        $id=gs_session::load('login_'.$this->params['classname']);
-        $rec=record_by_id($id,$this->params['classname']);
+
+        if(function_exists('person') && isset($this->params['role'])) {
+			$rec=person($this->params['role']);
+		} else {
+			$id=gs_session::load('login_'.$this->params['classname']);
+			$rec=record_by_id($id,$this->params['classname']);
+		}
 
         foreach ($this->params as $n=>$v) {
             if (isset($rec->get_recordset()->structure['fields'][$n])) {

@@ -59,11 +59,13 @@ class gs_filter {
 			case 'session': 
 				$arr=$this->get_data_get();
 				if(isset($arr[$this->name])) {
-					gs_session::save($arr[$get_name],'filter_'.$this->name);
                     if (function_exists('person')) person()->{'filter_'.$this->name}=$arr[$get_name];
+						else gs_session::save($arr[$get_name],'filter_'.$this->name);
 				} else {
-					$arr[$this->name]=gs_session::load('filter_'.$this->name);
-                    if (function_exists('person')) $arr[$this->name]=person()->{'filter_'.$this->name};
+                    if (function_exists('person')) {
+							$sess=person()->{'filter_'.$this->name};
+							if (!is_a($sess,'gs_null')) $arr[$this->name]=$sess;
+					} else $arr[$this->name]=gs_session::load('filter_'.$this->name);
 				}
 				break;
 			default:

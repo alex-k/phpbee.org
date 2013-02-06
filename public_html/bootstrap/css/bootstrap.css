@@ -593,6 +593,8 @@ p {
   font-size: 21px;
   font-weight: 200;
   line-height: 30px;
+  color: #099999; text-shadow: 1px 1px 1px #FFFFFF;}
+
 }
 
 small {
@@ -1278,6 +1280,7 @@ input.span6,
 textarea.span6,
 .uneditable-input.span6 {
   width: 446px;
+  color: #099999;
 }
 
 input.span5,
