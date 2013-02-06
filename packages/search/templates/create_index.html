@@ -77,7 +77,6 @@ class sidx_index {
         $fname='sidx_update_index_'.$rec->get_recordset_name();
         if (method_exists($this,$fname)) {
             $this->$fname($rec);
-            md($rec->get_id(),1);
         }
     }
     function sidx_delete_index($rec) {
