@@ -279,7 +279,7 @@ class gs_wizard_handler extends gs_handler {
 
 	function commit($rec=null) {
 
-		if ($rec['last']) $module=$rec['last'];
+		if ($rec['last'] && is_a($rec['last'],'gs_record')) $module=$rec['last'];
 			else $module=record_by_id($this->data['gspgid_va'][0],'wz_modules');
 
 		$dirname=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR;
