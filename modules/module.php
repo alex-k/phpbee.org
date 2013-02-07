@@ -36,6 +36,20 @@ class module extends gs_base_module implements gs_module {
 				'/filter/show'=>'gs_filters_handler.show',
 				'/debug'=>'debug_handler.show',
 			),
+			'template' => array(
+				'/admin/auth' => array(
+					'session_login' => 'admin_handler.check_login:return:array&continue^auth_page',
+					#'post_login' => 'admin_handler.post_login:classname:$classname:fields:$fields:__name:login_form_users.html:form_class:g_forms_html:return:gs_record&continue^auth_page',
+					'auth_page' => 'gs_base_handler.show:name:admin_login.html',
+					'continue' => 'gs_base_handler.nop:return:not_false',
+					'$original_handlers',
+				) ,
+			),
+			'wrapper' => array (	
+				'/admin'=>array (
+						'template.admin/auth',
+					),
+			),
 		);
 		return self::add_subdir($data,dirname(__file__));
 	}
@@ -87,6 +101,7 @@ class admin_handler extends gs_base_handler {
 			gs_var_storage::save($this->params['assign'],$rec);
 		}
 		return $rec;
+
 	}
 	function post_logout($data) {
 		$rec=$this->check_login();
