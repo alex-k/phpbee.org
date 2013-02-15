@@ -1,3 +1,8 @@
+{handler gspgid="/oauth2/checklogin/user"}
+{$user=person('visitor')}
+{if $smarty.server.HTTP_X_REQUESTED_WITH=='XMLHttpRequest'}
+	{block content}{/block}
+{else}
 <!DOCTYPE html>
 <html lang="ru">
   <head>
@@ -60,8 +65,11 @@
                     <link rel="apple-touch-icon-precomposed" href="/bootstrap/ico/apple-touch-icon-57-precomposed.png">
                                    <link rel="shortcut icon" href="/bootstrap/ico/favicon.png">
   </head>
-
   <body>
+  {if $smarty.get.modal}
+		{block content}{/block}
+  {else}
+
 
     <div class="container-narrow">
 
@@ -130,6 +138,8 @@
     {/block}
 
     </div> <!-- /container -->
+
+	{/if}
 
     <!-- Le javascript
     ================================================== -->
