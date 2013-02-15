@@ -12,11 +12,12 @@ class module extends gs_base_module implements gs_module {
 	static function get_handlers() {
 		$data=array(
 			'get'=>array(
-				''=>'gs_base_handler.show:{name:index.html}',
+				''=>array(
+					'gs_base_handler.show:{name:index.html}',
+					),
 				'/admin'=>'admin_handler.show:{name:admin_page.html}',
 				'/admin/logout'=>array(
 					  'admin_handler.post_logout:return:true',
-					  'gs_base_handler.redirect',
 					),
 				'*'=>'gs_base_handler.show404:{name:404.html}',
 			),
@@ -104,8 +105,9 @@ class admin_handler extends gs_base_handler {
 
 	}
 	function post_logout($data) {
-		$rec=$this->check_login();
+		//$rec=$this->check_login();
 		gs_session::clear('login_gs_admin');
+		html_redirect('/admin');
 		return true;
 	}
 

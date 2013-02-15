@@ -2,6 +2,10 @@
 
 class gs_dict {
 	static $words=array();
+
+	static function add($key,$word) {
+		self::$words[$key]=$word;
+	}
 	
 	static function append($words) {
 		self::$words=array_merge(self::$words,$words);
