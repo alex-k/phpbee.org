@@ -1,4 +1,5 @@
 <?php
+
 /*
 oauth2_handler.login:classname:photographers:login_field:login:return:not_false:first_name_field:name:full_name_field:fullname
 */
@@ -25,7 +26,7 @@ class oauth2_handler extends gs_handler {
 	function login($ret) {
 		$ds=new gs_data_driver_get();
 		$data=$ds->import();
-		if (!isset($data['oa2c'])) return true;
+		if (!isset($data['oa2c'])) return null;
 		$classname=$data['oa2c'];
 		if (!class_exists($classname)) throw new gs_exception('oauth2_handler:login no class found '.$classname);
 		$config=record_by_field('class',$classname,'oauth2_config');
@@ -34,6 +35,7 @@ class oauth2_handler extends gs_handler {
 		$token=$oauth->token($data);
 		if(!$token) return true;
 		$profile=$oauth->profile($token);
+
 		gs_session::save($profile,'oauth2_profile');
 		if (!$profile['uid']) return true;
 
@@ -62,9 +64,19 @@ class oauth2_handler extends gs_handler {
 		}
 		$rec=$rs->find_records($options)->first();
 		if (!$rec) return false;
+
+
+		$rec->fill_values(array_filter($profile));
+		if ($profile && isset($profile['friends']) && ($friends=$profile['friends'])) {
+			 $rec->fill_values(array('Friends'=>$friends));
+			 $rec->_Friends_count=count($friends);
+		 }
+
+
 		$rec->token=$token['access_token'];
 		$rec->commit();
 		gs_session::save($rec->get_id(),'login_'.$this->params['classname']);
+        if(function_exists('person') && isset($this->params['role'])) person()->add_role($this->params['role'],$rec);
 		return $rec;
 	}
 	function pushtoken($d) {
@@ -121,6 +133,7 @@ class oauth2_vk_app extends oauth2_vk {
 class oauth2_vk {
 	function __construct($config) {
 		$this->config=$config;
+		$this->fields="first_name,last_name,nickname,screen_name,sex,country,bdate,city,photo_medium,photo,photo_big";
 	}
 	function authorize($callback) {
 		gs_session::save($callback,'oauth2_vk_request');
@@ -144,11 +157,12 @@ class oauth2_vk {
 	}
 	function profile($token) {
 		$ret=array('uid'=>null,'first_name'=>null,'last_name'=>null,'type'=>'vk','email'=>null);
-		$url=sprintf("https://api.vk.com/method/getProfiles?uid=%d&access_token=%s&fields=nickname,screen_name,sex,country,nickname",$token['user_id'],$token['access_token']);
+		$url=sprintf("https://api.vk.com/method/getProfiles?uid=%d&access_token=%s&fields=%s",$token['user_id'],$token['access_token'],$this->fields);
 		$d=json_decode(html_fetch($url));
 		if (!$d) return $ret;
 		$d=reset($d->response);
 		if (!$d->uid) return $ret;
+		$uid=$d->uid;
 		$ret=array_merge($ret,get_object_vars($d));
 		$ret['uid']='vk-'.$d->uid;
 		$ret['name']=implode(' ',array($ret['first_name'],$ret['last_name']));
@@ -157,14 +171,14 @@ class oauth2_vk {
 		if ($ret['sex']==1) $ret['gender']='female';
 		$ret['locale']=$ret['country'];
 
-
-		$url=sprintf("https://api.vk.com/method/friends.get?access_token=%s&fields=first_name,last_name",$token['access_token']);
+		$url=sprintf("https://api.vk.com/method/friends.get?access_token=%s&fields=%s",$token['access_token'],$this->fields);
 		$d=html_fetch($url);
 		$d=json_decode($d,1);
 		if (isset($d['response'])) {
 			$friends=array();
 			foreach ($d['response'] as $f) {
-				$friends[$f['uid']]=array('uid'=>$f['uid'],'name'=>$f['first_name'].' '.$f['last_name']);
+				$friend=array_merge($f,array('uid'=>$f['uid'],'user_uid'=>$uid,'name'=>$f['first_name'].' '.$f['last_name']));
+				$friends[$f['uid']]=$friend;
 			}
 			$ret['friends']=$friends;
 			$ret['friends_count']=count($ret['friends']);
