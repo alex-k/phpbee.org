@@ -31,7 +31,6 @@ function addToQueryString(url, key, value) {
 					this.style.border=0;
 					if (!frm.keep_modal) {
 						$target.modal('hide');
-						window.location.reload();
 					}
 				});
 				return false;
