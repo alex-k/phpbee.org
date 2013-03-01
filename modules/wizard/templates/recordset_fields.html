@@ -33,7 +33,7 @@
 	{foreach from=$recordset->Fields->orderby('sortkey') item="e"}
 	<tr class="{cycle values='odd,even'}" record_id="{$e.id}">
 			<td>{$e.id}</td>
-			<td>{$e.name}</td>
+			<td><a href="/admin/wizard/recordset_fields/{$e.Recordset_id}/fields/{$e.id}#form">{$e.name}</a></td>
 			<td>{$e.verbose_name}</td>
 			<td>{$e.multilang}</td>
 			<td>{$e.type}</td>
