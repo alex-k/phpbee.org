@@ -86,13 +86,49 @@ class module_query extends gs_base_module implements gs_module {
 			$this->$r->install();
 		}
 	}
+	function get_menu() {
+		$ret=array();
+		$item=array();
+		$item[]='<a href="/admin/subscriptions/">Query</a>';
+		$item[]='<a href="/admin/subscriptions/sb_config">Подписки</a>';
+				$ret[]=$item;
+		return $ret;
+	}
 	static function get_handlers() {
 		$data=array(
 		'get'=>array(
 			'run'=>array(
 			  'query_handler.process_query', 
 			),
+			'/admin/subscriptions/sb_config'=>array(
+			  'gs_base_handler.show:name:adm_sb_config.html', 
 			),
+			'/admin/subscriptions/sb_config/delete'=>array(
+			  'gs_base_handler.delete:{classname:sb_config}', 
+			  'gs_base_handler.redirect', 
+			),
+			'/admin/subscriptions/sb_config/copy'=>array(
+			  'gs_base_handler.copy:{classname:sb_config}', 
+			  'gs_base_handler.redirect', 
+			),
+			),
+		'handler'=>array(
+			'/admin/form/sb_config'=>array(
+			  'gs_base_handler.redirect_if:gl:save_cancel:return:true', 
+			  'gs_base_handler.post:{name:admin_form.html:classname:sb_config:form_class:g_forms_table}', 
+			  'gs_base_handler.redirect_if:gl:save_continue:return:true', 
+			  'gs_base_handler.redirect_if:gl:save_return:return:true', 
+			),
+			'/admin/inline_form/sb_config'=>array(
+			  'gs_base_handler.redirect_if:gl:save_cancel:return:true', 
+			  'gs_base_handler.post:{name:inline_form.html:classname:sb_config}', 
+			  'gs_base_handler.redirect_if:gl:save_continue:return:true', 
+			  'gs_base_handler.redirect_if:gl:save_return:return:true', 
+			),
+			'subscribe'=>array(
+			  'sb_handler.subscribe', 
+			),
+		),
 		);
 		return self::add_subdir($data,dirname(__file__));
 	}
