@@ -76,7 +76,7 @@ class gs_strategy_createlogin_handler extends gs_handler {
 		$template=array(
 			"get"=>array(
 				"logout/$recordsetname"=>array(
-					"gs_base_handler.post_logout:classname:$recordsetname:return:true",
+					"gs_base_handler.post_logout:classname:$recordsetname:role:$recordsetname:return:true:",
 					"gs_base_handler.redirect",
 					),
 				),
@@ -87,7 +87,7 @@ class gs_strategy_createlogin_handler extends gs_handler {
 				),
 				"login/form/$recordsetname"=>array(
 					//"oauth2_handler.login:classname:$recordsetname:login_field:".reset($d['login_fields']).":full_name_field:fullName:return:not_false",
-					"gs_base_handler.post_login:return:gs_record:classname:$recordsetname:name:login_form_$recordsetname.html:form_class:".$d['form_class'].":fields:".implode(',',$d['login_fields']),
+					"gs_base_handler.post_login:return:gs_record:classname:$recordsetname:name:login_form_$recordsetname.html:form_class:".$d['form_class'].":fields:".implode(',',$d['login_fields']).":role:$recordsetname",
 					"gs_base_handler.redirect",
 					),
 				"/oauth2/checklogin/$recordsetname"=>array(

@@ -292,6 +292,7 @@ class field_interface {
 		list($rname,$linkname)=explode(':',$opts['linked_recordset']);
 				// если в init_opts такой же рекордсет что и в $opts['linked_recordset'] - то не надо создавать новый объект, иначе скрипт уходит в рекурсию
 		if(!class_exists($rname)) return;		
+		if(!$linkname) return;
 		if ($init_opts['recordset']!=$rname) {
 			$obj=new $rname();
 			$obj_rs=$obj->structure['recordsets'][$linkname];
@@ -443,12 +444,6 @@ class gs_rs_links extends gs_recordset{
 			$rs->parent_recordset=$this;
 			$links=array();
 			foreach ($this->array as $l) {
-				/*
-				md('---------',1);
-				md($idname,1);
-				md($l->get_values(),1);
-				md($l->$idname,1);
-				*/
 				$links[$l->$idname]=$l;
 			}
 			$this->links=$links;
@@ -462,6 +457,24 @@ class gs_rs_links extends gs_recordset{
 	function array_keys() {
 		return array_keys($this->array);
 	}
+
+	private function get_parent_linkname() {
+		return $this->structure['recordsets']['parents']['update_link'];
+	}
+	private function get_child_fieldname() {
+		return $this->structure['recordsets']['childs']['local_field_name'];
+	}
+
+	private function modified_links_add($l) {
+			$this->modified_links_action('new_links',$l);
+	}
+	private function modified_links_remove($l) {
+			$this->modified_links_action('removed_links',$l);
+	}
+	 private function modified_links_action($type,$l) {
+			if ($this->parent_record) $this->parent_record->set_modified_links($this->get_parent_linkname(),$type,$l,$this->get_child_fieldname()) ;
+	}
+
 	public function new_record($data=null,$id=NULL) {
 		if ($data) {
 			$arr=array(
@@ -472,9 +485,8 @@ class gs_rs_links extends gs_recordset{
 		} else {
 			$nr=parent::new_record($data);
 		}
-		//throw new gs_exception("field_interface: no method '".$r['func_name']."'");
 		$this->links[]=$nr;
-		//$this->links[]=4;
+		$this->modified_links_add($nr);
 		return $nr;
 	}
 	public function unlink($id) {
@@ -483,14 +495,18 @@ class gs_rs_links extends gs_recordset{
 		if (!is_numeric($id)) return false;
 		if (isset($this->links)) foreach ($this->links as $k=>$l) {
 			if ($l->$fname==$id)  {
+				$this->modified_links_remove($l);
 				$l->delete();
 			}
 		}
 	}
+
+
 	public function flush($data) {
 		$fname=$this->structure['recordsets']['childs']['local_field_name'];
 		if (isset($this->links)) foreach ($this->links as $k=>$l) {
 			if (!array_key_exists($l->$fname,$data))  {
+				$this->modified_links_remove($l);
 				$l->delete();
 			}
 		}
@@ -513,6 +529,7 @@ class gs_rs_links extends gs_recordset{
 			foreach ($this->links as $a) {
 				$ids[]=$a->{$st['local_field_name']};
 			}
+			/* // Otorvalu counters, vse ravno ne rabotaet
 			$prec->find_records(array($st['foreign_field_name']=>array_unique($ids)));
 			$counter_arr=array();
 			if (isset($this->links)) foreach ($this->links as $link) {
@@ -524,6 +541,7 @@ class gs_rs_links extends gs_recordset{
 				if (isset($counter_fieldname)) $prec[$id]->$counter_fieldname+=$cnt;
 			}
 			$prec->commit();
+			*/
 		}
 		$ret=parent::commit();
 		if (isset($this->links)) foreach ($this->links as $l) $l->commit();
@@ -632,7 +650,6 @@ class gs_recordset_short extends gs_recordset {
 		field_interface::lMany2One('Lang',$ml_opts,$this->structure,$this->init_opts);
 		$this->structure['recordsets']['Lang']['index_field_name']='lang';
 
-		//md($this->structure,1);
 
 
 	}
@@ -669,7 +686,6 @@ class gs_recordset_short extends gs_recordset {
 		}
 		$ml_options=str_replace('multilang=true','',$ml_options);
 		if(count($ml_options)<=2) return;
-		md($ml_options,1);
 
 		$tpl= '<?php
 class %s extends gs_recordset_i18n {

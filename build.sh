@@ -1,5 +1,6 @@
 #!/bin/sh
-REPO="file:///home/pahomov/www/phpbee.org/svn/phpbee.org"
+
+REPO="file:///home/www/phpbee.org/svn/phpbee.org"
 LASTFNAME="public_html/download/`ls -tr public_html/download/ | tail -n1`";
 MTIME=`stat -c '%z' $LASTFNAME`
 LASTDATE=`date -d "$MTIME" "+%Y-%m-%d"  `

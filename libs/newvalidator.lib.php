@@ -397,7 +397,6 @@ function validate($field,$value,$data=array(),$params=array(),$record=null) {
 
 class gs_validate_isEqual  extends gs_validate {
 function validate($field,$value,$data=array(),$params=array(),$record=null) {
-		md($field,1);
         if(!isset($params['field2'])) {
                 trigger_error("SmartyValidate: [isEqual] parameter 'field2' is missing.");            
                 return false;

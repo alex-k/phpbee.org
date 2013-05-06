@@ -7,6 +7,7 @@
 <html lang="ru">
   <head>
     <meta charset="utf-8">
+	{block baseurl}<base href="/">{/block}
     <title>{$smarty.server.HTTP_HOST} : PHPBee default templat 1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
@@ -74,7 +75,6 @@
     <div class="container-narrow">
 
     {block page}
-    {block content}
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
           <li class="active"><a href="#">Home</a></li>
@@ -85,6 +85,7 @@
       </div>
 
       <hr>
+    {block content}
 
       <div class="jumbotron">
         <h1>{$smarty.server.HTTP_HOST}!</h1>
@@ -148,4 +149,4 @@
     <script src="/bootstrap/js/bootstrap.min.js"></script>
   </body>
 </html>
-
+{/if}

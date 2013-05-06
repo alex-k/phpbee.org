@@ -33,6 +33,7 @@ class gs_record implements arrayaccess {
 	private $gs_recordset;
 	private $values=array();
 	private $modified_values=array();
+	public $modified_links=array();
 	private $old_values=array();
 	public $recordstate=RECORD_UNCHANGED;  // !!!!!!!!!!!!!!!!!! private!
 	private $recordsets_array=array();
@@ -97,13 +98,15 @@ class gs_record implements arrayaccess {
 	}
 
 	public function fill_values($values) {
-		/*
-		md('==fill_values=='.get_class($this->get_recordset()),1); 
-		md($values,1);
-		*/
 		if (!is_array($values)) return FALSE;
 		foreach ($values as $field=>$value) {
 			$this->__get($field);
+			/*
+			if (!isset($this->gs_recordset->structure['fields'][$name]['multilang'])
+				|| !$this->gs_recordset->structure['fields'][$name]['multilang']
+				) {
+			}
+			*/
 			if (isset($this->recordsets_array[$field]) && $this->recordsets_array[$field] && is_array($value) && $this->__get($field)!==NULL) {
 				$struct=$this->get_recordset()->structure['recordsets'][$field];
 				$local_field_name=$this->__get($field)->local_field_name;
@@ -147,12 +150,20 @@ class gs_record implements arrayaccess {
 	public function get_modified_values($name=null) {
 		return $name===null ? $this->modified_values : $this->modified_values[$name];
 	}
+	public function get_modified_links($name=null) {
+		if ($name===null) return $this->modified_links;
+		if (isset($this->modified_links[$name])) return $this->modified_links[$name];
+		return array();
+	}
 
 	public function get_recordset() {
 		return $this->gs_recordset;
 	}
 	public function get_recordset_name() {
 		return get_class($this->get_recordset());
+	}
+	public function set_modified_links($name,$type,$l,$fieldname) {
+		$this->modified_links[$name][$type][$l->$fieldname]=$l;
 	}
 
 	private function unescape($val) {
@@ -233,7 +244,6 @@ class gs_record implements arrayaccess {
 	}
 
 	private function lazy_load($name) {
-		//md('lazy_load:'.$name);
 		$rs=$this->init_linked_recordset($name);
 		$structure=$this->gs_recordset->structure['recordsets'][$name];
 		$id=$this->is_set($rs->local_field_name) ? $this->__get($rs->local_field_name) : NULL;
@@ -259,7 +269,7 @@ class gs_record implements arrayaccess {
 			$language=null;
 			if (!$language) $language=gs_var_storage::load('multilanguage_lang');
 			//if (!$language) $language=gs_session::load('multilanguage_lang');
-			if (!$language) $language=cfg('multilang_default_language');
+			//if (!$language) $language=cfg('multilang_default_language');
 
 
 			if ($this->disable_multilang) {
@@ -270,24 +280,18 @@ class gs_record implements arrayaccess {
 					$default_lang=key($langs);
 					array_shift($langs);
 					if ($langs && $language!=$default_lang) {
+						$rec_lan=$this->__get('Lang');
+
+						$lang_value=$rec_lan[$language]->$name;
+						if (!is_a($lang_value,'gs_null')) {
+							return trim($lang_value);
+						}
 
 						/*
-						$a=$this->__get('Lang');
-
-						$lname='i18n_'.$this->get_recordset_name();
-						$l=new $lname;
-						$l->find_records(array('Parent_id'=>$this->get_id(),'lang'=>$language));
-
-						if ($l->first()) return $l->first()->$name;
-
-
-						*/
-
-
-						$rec_lan=$this->__get('Lang');
-						if ($rec_lan[$language]) {
+						if (isset($rec_lan[$language])) {
 							return $rec_lan[$language]->$name;
 						}
+						*/
 					}
 				}
 			}
@@ -388,6 +392,7 @@ class gs_record implements arrayaccess {
 		if ($level==0 && ($this->recordstate & RECORD_CHILDMOD)) {
 			$this->recordstate=RECORD_UNCHANGED;
 			$this->commit_childrens();
+			gs_eventer::send('record_after_update',$this);
 		}
 		$this->recordstate=RECORD_UNCHANGED;
 		$this->old_values=$this->modified_values=array();

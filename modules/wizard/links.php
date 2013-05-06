@@ -74,11 +74,13 @@ class wz_link_images extends wz_link {
 
 	function lMany2One($rec,$l121=false) { 
 
-		$name_rs_images=$rec->Recordset->first().'_images';
+
+		//$name_rs_images=$rec->Recordset->first().'_images';
+		$name_rs_images=$rec->Recordset->first().'_'.strtolower($rec->name);
 		$name_rs_images_files=$name_rs_images.'_files';
 
+
 		$module=$rec->Recordset->first()->Module->first();
-		md($name_rs_images,1);
 		
 		$wz_rs=new wz_recordsets();
 

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 mv default.config.php config.php
+mkdir var
 chmod 777 config.php var modules
 mv html/index_page_default.html html/index.html
 mv html/404_default.html html/404.html

@@ -157,6 +157,8 @@ class module_wizard extends gs_base_module implements gs_module {
 						),
 			'/admin/wizard/module'=>'gs_base_handler.show',
 			'/admin/wizard/commit'=>array(
+					'gs_base_handler.xml_export:{classname:wz_modules:return:notfalse}',
+					'gs_wizard_handler.xml_save_file_to_module_dir:return:notfalse',
 					'gs_wizard_handler.commit:return:true',
 					'gs_base_handler.redirect',
 					),
@@ -266,12 +268,27 @@ class module_wizard extends gs_base_module implements gs_module {
 
 
 class gs_wizard_handler extends gs_handler {
+    function xml_save_file_to_module_dir($ret) {
+		$module=record_by_id($this->data['gspgid_va'][0],'wz_modules');
+
+        $x=xml_print($ret['last']->asXML());
+		$dirname=cfg('lib_modules_dir').$module->name.DIRECTORY_SEPARATOR;
+		check_and_create_dir($dirname);
+        $filename='wizard_module_'.$module->name.'.xml';
+        if (!file_put_contents_perm($dirname.$filename,$x)) return false;
+		return $x;
+    }
 	function module_xml_import() {
 		$bh=new gs_base_handler($this->data,$this->params);
 		$f=$bh->validate();
 		if (!is_object($f) || !is_a($f,'g_forms')) return $f;
 		$d=$f->clean();
 		$xml=!empty($d['xmlfile_data']) ? $d['xmlfile_data'] : $d['xml'];
+		if (!$xml && $d['xmlpath']) $xml=file_get_contents($d['xmlpath']);
+		
+		$xml=trim($xml);
+		if(!$xml) throw new gs_exception('empty XML');
+
 		$newrs=xml_import(trim($xml));
 		$newrs->commit();
 		return TRUE;
@@ -315,7 +332,7 @@ class gs_wizard_handler extends gs_handler {
 		$out=beautify($out);
 
 
-		//md($out,1); die();
+		//md($out,1); md($dirname,1); die();
 
 		return file_put_contents($dirname.'module.phps',$out)!==FALSE;
 
@@ -662,11 +679,23 @@ class wz_handler_mc extends gs_handler {
 
 class form_modules_import  extends g_forms_table{
 	function __construct($hh,$params=array(),$data=array()) {
+
+		$xmlfiles=glob(cfg('lib_modules_dir').'*'.DIRECTORY_SEPARATOR."*.xml");
+		array_unshift($xmlfiles,'');
+
+
 		$hh=array(
 		    'xmlfile' => Array
 			(
 			    'type' => 'file',
 				'validate' => 'dummyValid',
+			),
+		    'xmlpath' => Array
+			(
+			    'type' => 'select',
+				'verbose_name'=>'xml filename',
+				'validate' => 'dummyValid',
+				'options'=> array_combine($xmlfiles,$xmlfiles),
 			),
 		    'xml' => Array
 			(

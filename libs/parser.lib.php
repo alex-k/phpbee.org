@@ -74,6 +74,7 @@ class gs_parser {
 
         if (!$gspgtype && isset($data['gspgtype'])) $gspgtype=$data['gspgtype'];
         if (!$gspgtype) $gspgtype='get';
+		gs_var_storage::save('gspgtype',$gspgtype);
 
 		$result=$this->find_handler($this->registered_handlers[$gspgtype],$data['gspgid']);
 
@@ -82,6 +83,9 @@ class gs_parser {
 		$this->current_handler=$result['handler'];
 	
 		$data['handler_key']=$result['key'];
+		gs_var_storage::save('handler_key',$data['handler_key']);
+		if (!gs_var_storage::load('top_handler_key')) gs_var_storage::save('top_handler_key',$data['handler_key']);
+
 		$len=count(explode('/',$result['key']));
 		$data['gspgid_v']=implode('/',array_slice(explode('/',$data['gspgid']),$len));
 		$data['gspgid_va']=explode('/',$data['gspgid_v']);

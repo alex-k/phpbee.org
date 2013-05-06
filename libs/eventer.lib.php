@@ -32,16 +32,16 @@ class gs_eventer {
         return $instance;
     }
 
-    public function make_event($event_name,$data) {
+    public function make_event($event_name,$data,$generator) {
         if (isset($this->events[$event_name])) {
             foreach ($this->events[$event_name] as $method) {
                 mlog("eventer.make_event $event_name");
                 switch ($method['type']) {
                 case 'function':
-                    call_user_func($method['method'],$data,$event_name);
+                    call_user_func($method['method'],$data,$event_name,$generator);
                     break;
                 case 'static':
-                    call_user_func(array($method['classname'],$method['method']),$data,$event_name);
+                    call_user_func(array($method['classname'],$method['method']),$data,$event_name,$generator);
                     break;
                 }
             }
@@ -53,7 +53,7 @@ class gs_eventer {
         if (!$data) $data=$generator;
 
         $ev=gs_eventer::get_instance();
-        $ev->make_event($event,$data);
+        $ev->make_event($event,$data,$generator);
 
         if (!is_object($generator)) return;
 
@@ -61,9 +61,9 @@ class gs_eventer {
         $classes[]=get_class($generator);
         foreach ($classes as $class) {
             $event_name=$class.'_'.$event;
-            $ev->make_event($event_name,$data);
+            $ev->make_event($event_name,$data,$generator);
         }
-        mlog("eventer.send finished $event");
+        //mlog("eventer.send finished $event");
     }
 
     static public function subscribe ($event_name,$method) {

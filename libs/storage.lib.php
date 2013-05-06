@@ -82,7 +82,11 @@ abstract class gs_recordset_base extends gs_iterator {
 		return $this;
 	}
 
-	function get_name_field(){
+	function get_name_field() {
+		$fields=array_keys($this->structure['fields']);
+		return isset($fields[1]) ? $fields[1] : $this->id_field_name;
+
+
 		reset($this->structure['fields']);
 		next($this->structure['fields']);
 		$fieldname=key($this->structure['fields']);
@@ -274,7 +278,6 @@ abstract class gs_recordset_base extends gs_iterator {
 		if (is_string($fields)) $fields=explode(',',$fields);
 		if (is_array($fields)) $fields=array_unique($fields);
 		$this->query_options['fields']=$fields;
-		//md($this->query_options['fields'],1);
 		return $this;
 	}
 
@@ -676,7 +679,7 @@ abstract class gs_prepare_sql {
 		$table_fields=array();
 		if (is_array($options['fields'])) foreach ($options['fields'] as $key=>$field) {
 			if (!isset($this->_field_types[$field['type']])) {
-				throw new gs_dbd_exception('gs_recordset.construct_createtable: can not find definition for _field_types '.$field['type']);
+				throw new gs_dbd_exception('gs_recordset.construct_createtable: can not find definition for _field_types "'.$field['type'].'" (field '.$key.')');
 			}
 			$k=$this->_field_types[$field['type']];
 			if (isset($field['options'])) {

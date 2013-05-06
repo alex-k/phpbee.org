@@ -9,10 +9,14 @@ interface g_forms_interface {
 }
 
 abstract class g_forms implements g_forms_interface{
-	public $error_template='<div class="form_error" id="err" style="display: block; "><i></i>%s</div>';
+	public $error_template='<span class="label label-warning">%s</span>';
 	public $clean_data=array();
 	public $validate_errors=array();
 	public $rec;
+
+	function __toString() {
+		return "";
+	}
 
 	function __construct($h,$params=array(),$data=array()) {
 		$this->rec=new gs_null(GS_NULL_XML);
@@ -49,11 +53,15 @@ abstract class g_forms implements g_forms_interface{
 		$this->htmlforms[$field]['validate'][]=$value;
 		if (!is_array($this->htmlforms[$field]['validate_params'])) $this->htmlforms[$field]['validate_params']=array();
 		$this->htmlforms[$field]['validate_params']=array_merge($this->htmlforms[$field]['validate_params'],$params);
+
+		return $this;
 	}
 	function add_field($name,$params) {
+		if (!is_array($params)) $params=string_to_params($params);
 		if (isset($this->field_options[$name])) $params=array_merge_recursive($this->field_options[$name],$params);
 		$this->htmlforms[$name]=$params;
 		$this->addNode(array($name));
+		return $this;
 	}
 	function get_fields() {
 		return $this->htmlforms;
@@ -174,7 +182,7 @@ abstract class g_forms implements g_forms_interface{
 			$value=null;
 			try {
 				$value=$w->clean();
-				if (is_array($value) && !is_numeric(key($value))) {
+				if (is_array($value) && $value && !is_numeric(key($value))) {
 					foreach ($value as $vk=>$vv) {
 						$this->clean_data[$vk]=$this->postfilter($k,$vv);
 					}

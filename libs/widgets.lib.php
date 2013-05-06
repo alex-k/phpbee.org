@@ -594,9 +594,11 @@ class gs_widget_gallery extends gs_widget {
 	}
 }
 
+
+
 class gs_widget_parent_list extends gs_widget_lOne2One {}
 
-class gs_data_widget_parent_list {
+class gs_data_widget_parent_list{
 	function gd($rec,$k,$hh,$params,$data) {
 		$v=$hh[$k];
 		if (method_exists($rec->get_recordset(),'form_variants_'.$v['linkname'])) {
@@ -622,18 +624,66 @@ class gs_data_widget_parent_list {
 		return $hh;
 	}
 }
+class gs_widget_parent_list_notnull extends gs_widget_parent_list {}
+
+class gs_data_widget_parent_list_notnull extends gs_data_widget_parent_list {
+	function gd($rec,$k,$hh,$params,$data) {
+		$hh=parent::gd($rec,$k,$hh,$params,$data);
+		if (isset($hh[$k]['variants'][0]) && !$hh[$k]['variants'][0]) unset($hh[$k]['variants'][0]);
+		return $hh;
+	}
+}
 
 class gs_widget_121_radio extends gs_widget_lOne2One {
 	function html() {
 		$ret="";
 		foreach ($this->params['variants'] as $k=>$v) {
-			$ret.=sprintf("<label class=\"radio_121 radio\"><span><input type=\"radio\" name=\"%s\" value=\"%d\" %s>%s</span></label>\n",$this->fieldname, $k, ($this->value==$k) ? 'checked="checked"' : '',$v);
+			$ret.=sprintf("<label class=\"%s\"><input type=\"radio\" name=\"%s\" value=\"%d\" %s>%s</label>\n",
+			isset($this->params['cssclass']) ? $this->params['cssclass'] : 'radio_121 radio',
+			$this->fieldname, $k, ($this->value==$k) ? 'checked="checked"' : '',$v);
 		}
 		$ret.='<div class="radio_121_end"></div>';
 		return $ret;
 	}
 }
 class gs_data_widget_121_radio extends gs_data_widget_parent_list {}
+
+class gs_widget_121_radio_notnull extends gs_widget_121_radio{}
+class gs_data_widget_121_radio_notnull extends gs_data_widget_parent_list_notnull{}
+
+
+class gs_widget_121_segmented extends gs_widget_parent_list_notnull{
+	function html() {
+		$ret=sprintf ('
+					<div class="btn-group 121_segmented" data-toggle="buttons-radio">
+					<input type="hidden" name="%s" value="%s">
+				', $this->fieldname, $this->value);
+
+		foreach ($this->params['variants'] as $k=>$v) {
+			$ret.=sprintf('<button type="button" class="%s %s" value="%s">%s</button>',
+								isset($this->params['cssclass']) ? $this->params['cssclass'] : 'btn',
+								($this->value==$k) ? 'active' : '',
+								$k, $v);
+		}
+		$ret.="</div>
+
+			<script>
+				$(document).ready(function() {
+					var sel=$('div.121_segmented button');
+					sel.live('click',function() {
+						var inp=$(this).closest('div.121_segmented').find('input');
+						inp.val(this.value);
+						inp.change();
+					});
+				});
+			</script>	
+		
+		";
+
+		return $ret;
+	}
+}
+class gs_data_widget_121_segmented extends gs_data_widget_parent_list_notnull {}
 
 
 class gs_widget_include_form extends gs_widget {}

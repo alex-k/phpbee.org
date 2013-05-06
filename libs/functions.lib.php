@@ -376,6 +376,22 @@ function languages() {
 
     return $langs;
 }
+function ml() {
+	$cl=gs_var_storage::load('multilanguage_lang');
+	if (!$cl) return func_get_arg(0);
+	$values=func_get_args();
+	$langs=languages();
+	foreach($langs as $l=>$name) {
+		if ($l==$cl) {
+			$v=current($values);
+			return $v;
+		}
+		next($values);
+	}
+	return func_get_arg(0);
+
+}
+
 
 function rs($name) {
     return new $name;
@@ -554,6 +570,16 @@ function gs_setcookie($name,$new_id) {
 			setcookie($name,$new_id,$t,cfg('www_dir'),cfg('host'));
 }
 
+function object_id($obj) {
+	ob_start();
+	var_dump($obj);
+	$ret=ob_get_clean();
+	preg_match('/^[^\s]+/',$ret,$m);
+	$r=reset($m);
+	if (is_a($obj,'gs_record')) $r.='#'.$obj->get_recordset_name();
+	return $r;
+
+}
 
 
 ?>

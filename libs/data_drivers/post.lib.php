@@ -21,6 +21,8 @@ class gs_data_driver_post implements gs_data_driver {
 			$_POST['gspgid_form']=$_GET['gspgid_form'];
 		}
 
+		//if (isset($_POST['gspgid_form'])) gs_var_storage::save('gspgid',$_POST['gspgid_form']);
+
 		return get_magic_quotes_gpc() ? stripslashes_deep($_POST) : $_POST;
 	}
 }

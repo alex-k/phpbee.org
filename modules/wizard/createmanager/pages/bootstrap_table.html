@@ -40,7 +40,7 @@
 
 
 
-	{if $_gsdata.gspgid_va.0=='modify'}
+	{if $_gsdata.gspgid_va.0=='modify' &&  $_gsdata.gspgid_va.1==0}
 		<a name="form"></a>
 		<div class="well">
 		{handler gspgid="/{%$module%}/{%$prefix%}/form/{%$rs.name%}/edit/`$_gsdata.gspgid_va.1`" {%$manager_link%}  _default="{%$default_values%}"}
@@ -68,7 +68,6 @@
 		{handler gspgid="/filter/show" name="offset" tpl="offset_bootstrap.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
 	</div>	
 
-	<div class="row">
 	<table {%if $rs->sortkey%}class="table table-hover sortkey-table" sortkey_id="{%$rs->name%}"{%else%}class="tb"{%/if%}>
 	<thead>
 		<tr><th>#</th>
@@ -88,7 +87,7 @@
 	</thead>
 	
 	{foreach from=${%$rs.name%} item="e"}
-	<tr class="{cycle values='odd,even'}" record_id="{$e->get_id()}">
+	<tr record_id="{$e->get_id()}">
 			<td>{$e->get_id()}</td>
 			{%foreach from=$fields item=f%}
 				<td class="frm_{%$f.type%}">
@@ -111,6 +110,16 @@
 			<a href="{gl rec_delete=$e}" onclick="return confirm('{'Delete record'|gsdict}?');"><i class="icon-remove"></i></a>
 			</td>
 	</tr>
+	{if $_gsdata.gspgid_va.0=='modify' &&  $_gsdata.gspgid_va.1==$e->get_id()}
+	<tr>
+		<td colspan=100>
+			<a name="form"></a>
+			<div class="well">
+			{handler gspgid="/{%$module%}/{%$prefix%}/form/{%$rs.name%}/edit/{$e->get_id()}"}
+			</div>
+		</td>
+	</tr>	
+	{/if}
 	{/foreach}
 	<tfoot>
 		<tr><th></th>
@@ -129,14 +138,12 @@
 		</tr>
 	</tfoot>
 	</table>
-	</div>
 
 	<div class="row" style="text-align:right">
 		{handler gspgid="/filter/show" name="offset" tpl="offset_bootstrap.html" page_title='Page' page_prev='previous' page_next='next' page_between='from' pages_count=21 recordset=${%$rs.name%}}
 		{handler gspgid="/filter/show" name="limit" tpl="limit_bootstrap.html" prelabel='show by' label='records'}
 	</div>	
 
-	</div>
 
 	{/if}
 	

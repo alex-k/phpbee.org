@@ -251,7 +251,7 @@ class gs_base_handler extends gs_handler {
                     foreach ($data['handler_params'] as $hp_k=>$hp_v) {
                         if(!strpos($hp_k,'__')) continue;
                         list($hp_link,$hp_field) = explode ('__',$hp_k);
-                        if ($hp_link==$k) $options[$hp_field]=$hp_v;
+                        if ($hp_link==$k) $options[$hp_field]=explode(':',$hp_v);
                     }
                     $rsl=$rec->init_linked_recordset($k);
                     $rsname=$rsl->structure['recordsets']['childs']['recordset'];
@@ -330,7 +330,6 @@ class gs_base_handler extends gs_handler {
         $hh_fields=array_keys($hh);
         $hh_fields=self::minus_fields($hh_fields,$params,$data,$hh);
 
-        //md($hh_fields,1);
         if (!count($f->htmlforms)) foreach ($hh_fields as $name) {
             $params=$hh[$name];
             if (!(isset($params['hidden']) && $params['hidden']) && !isset($data['handler_params'][$name])) {
@@ -358,10 +357,6 @@ class gs_base_handler extends gs_handler {
             $rec_values['Lang'][$default_lang]=$rec->get_values();
         }
         
-        /*md($fields,1);
-        md($rec_values,1);*/
-        
-
 
 
         $f->set_values($rec_default_values);
@@ -386,6 +381,7 @@ class gs_base_handler extends gs_handler {
         $tpl->assign('formerrors',$f->validate_errors['FIELDS']);
         */
         $tpl->assign('form',$f);
+		//if (isset($this->data['handler_params']['name'])) $this->params['name']=$this->data['handler_params']['name'];
         if(!isset($this->params['name'])) $this->params['name']=$this->data['handler_params']['name'];
         if(!isset($this->params['name'])) $this->params['name']='form_empty.html';
 
@@ -431,7 +427,8 @@ class gs_base_handler extends gs_handler {
 
         foreach ($f->htmlforms as $fieldname=>$field) {
             if ($field['type']=='lMany2Many') {
-                if (isset($cleandata[$fieldname])) {
+                //if (isset($cleandata[$fieldname])) {
+                if (array_key_exists($fieldname,$cleandata)) {
                     //$data[$k]=(is_array($data[$k])) ? array_combine($data[$k],$data[$k]) : array();
                     $f->rec->$fieldname->flush($cleandata[$fieldname]);
                 }
@@ -446,6 +443,8 @@ class gs_base_handler extends gs_handler {
         		$this->redirect_if($ret);
         }
          */
+
+		//die();
 
         return $f->rec;
     }
@@ -606,7 +605,6 @@ class gs_base_handler extends gs_handler {
     }
     function xml_clone() {
         $xml=$this->xml_export();
-        //md($xml,1);
         $newrs=xml_import($xml);
         $newrs->commit();
         return $newrs->first();
@@ -934,7 +932,10 @@ function hpar($data,$name='hkey',$default=null) {
         //gs_session::clear('login_'.$this->params['classname']);
         gs_session::save(NULL,'login_'.$this->params['classname']);
 
-        if(function_exists('person') && isset($this->params['role'])) person()->remove_role($this->params['role']);
+        if(function_exists('person') && isset($this->params['role'])) {
+			$roles=explode(',',$this->params['role']);
+			foreach ($roles as $role) person()->remove_role($role);
+		}
 
         return true;
     }
@@ -947,6 +948,7 @@ function hpar($data,$name='hkey',$default=null) {
 	*/
 
         $rec=$this->post_find_record($data);
+		if (is_object($rec) && is_a($rec,'g_forms')) return $this->showform($rec);
         if (!is_object($rec) || !is_a($rec,'gs_record')) return $rec;
         gs_session::save($rec->get_id(),'login_'.$this->params['classname']);
 
@@ -964,9 +966,9 @@ function hpar($data,$name='hkey',$default=null) {
             $u=array_search('checkUnique',$v['validate']);
             if ($u!==FALSE) unset($f->htmlforms[$k]['validate'][$u]);
         }
-        $f=$bh->validate($f);
+        $fv=$bh->validate($f);
 
-        if (!is_object($f) || !is_a($f,'g_forms')) return $f;
+        if (!is_object($fv) || !is_a($fv,'g_forms')) return $f;
 
         $d=$f->clean();
 
@@ -990,17 +992,19 @@ function hpar($data,$name='hkey',$default=null) {
         $e=array_filter($d);
         if (!$e) {
             $f->trigger_error('FORM_ERROR','EMPTY_SEARCH');
-            return $this->showform($f);
+			return $f;
+            //return $this->showform($f);
 
         }
         $rec=$rs->find_records($d)->first();
 
         if (!$rec) {
             $f->trigger_error('FORM_ERROR','REC_NOTFOUND');
-            return $this->showform($f);
+			return $f;
+            //return $this->showform($f);
         }
 
-	foreach ($password_fields as $n=>$v) {
+		foreach ($password_fields as $n=>$v) {
 			if ($rec->$n == $v) {
 				$rec->$n=FALSE;
 				$rec->$n=$v;
@@ -1008,9 +1012,10 @@ function hpar($data,$name='hkey',$default=null) {
 			}
 			if ($rec->$n != $rs->encode_password($rec,$v)) {
 					$f->trigger_error('FORM_ERROR','REC_NOTFOUND');
-					return $this->showform($f);
+					return $f;
+					//return $this->showform($f);
 			}
-	}
+		}
 
 
         return $rec;

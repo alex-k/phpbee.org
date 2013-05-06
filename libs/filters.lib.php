@@ -202,17 +202,37 @@ class gs_filter_like_by_link extends gs_filter {
 			foreach ($real_ids as $rid) {
 				$ids[]=$rid[$link['foreign_field_name']];
 			}
+			$to=array(
+				'type'=>'value',
+				'field'=>$rs->id_field_name,
+				'value'=>$ids,
+			);
+			$options[$this->name]=$to;
 		} else {
 			//$rsname=$link['recordset'];
 			// надо сделать
+			md($link,1);
+			$rsname=$link['recordset'];
+			$ors=new $rsname;
+			$opts[$this->fieldname]=array(
+				'type'=>'value',
+				'field'=>$this->fieldname,
+				'value'=>$this->value,
+				'case'=>'LIKE',
+			);
+			$real_ids=$ors->find_records($opts)->get_values($link['foreign_field_name']);
+			$ids=array();
+			foreach ($real_ids as $rid) {
+				$ids[]=$rid[$link['foreign_field_name']];
+			}
+			$to=array(
+				'type'=>'value',
+				'field'=>$rs->id_field_name,
+				'value'=>$ids,
+			);
+			$options[$link['local_field_name']]=$to;
 		}
 		
-		$to=array(
-			'type'=>'value',
-			'field'=>$rs->id_field_name,
-			'value'=>$ids,
-		);
-		$options[$this->name]=$to;
 		return $options;
 	}
 }
@@ -239,6 +259,7 @@ class gs_filter_like extends gs_filter {
 		$tpl->assign('keyname',$this->name);
 		$tpl->assign('prelabel',isset($ps['prelabel']) ? $ps['prelabel'] : null);
 		$tpl->assign('label',isset($ps['label']) ? $ps['label'] : null);
+        if(isset($ps['values'])) $tpl->assign('values',string_to_params($ps['values']));
 		$tpl->assign('params',$ps);
         if(isset($ps['options'])) $tpl->assign('options',string_to_params($ps['options']));
 		$tplname=isset($ps['tpl']) ? $ps['tpl'] : str_replace('gs_filter_','',get_class($this)).'.html';
@@ -522,8 +543,24 @@ class gs_filter_select_by_links extends gs_filter {
 			$rec_rs_name=$link['recordset'];
 			$rec_rs=new $rec_rs_name();
 			$values=array();
-			foreach ($rec_rs->find_records(array($fieldname=>$this->value)) as $rec) {
-				$values[]=$rec->{$link['foreign_field_name']};
+			if ($rec_rs->structure['fields'][$fieldname]['multilang']) {
+				foreach ($rec_rs->find_records(array()) as $rec) {
+
+					if (stripos($rec->$fieldname,$this->value)!==FALSE) {
+						$values[]=$rec->{$link['foreign_field_name']};
+					} else {
+						foreach ($rec->Lang as $l) {
+							if (stripos($l->$fieldname,$this->value)!==FALSE) {
+								$values[]=$rec->{$link['foreign_field_name']};
+								break;
+							} 
+						}
+					}
+				}
+			} else {
+				foreach ($rec_rs->find_records(array($fieldname=>$this->value)) as $rec) {
+					$values[]=$rec->{$link['foreign_field_name']};
+				}
 			}
 			$options[]=array(
 					'type'=>'value',
@@ -567,6 +604,7 @@ class gs_filter_select_by_links extends gs_filter {
 		$links=array();
 		$count_all=0;
 
+
 		foreach ($rec_rs as $rec) {
 			$arr=$this->va;
 			$key=$rec->{$this->fieldname};
@@ -600,8 +638,11 @@ class gs_filter_select_by_links extends gs_filter {
 				$count=$rs->count_records($count_array);
 			}
 
-			$name=trim($rec);
+			//$name=trim($rec);
+			$fname=$rec->get_recordset()->get_name_field();
+			$name=$rec->$fname;
 			$arr[$this->name]=$key;
+
 
 			$links[]=array('name'=>$name,'keyname'=>$this->name,'key'=>$key,'count'=>$count, 'va'=>$arr,'rec'=>null,);
 		}

@@ -3,6 +3,14 @@ define('GS_DATE_TIMESTAMP','Y-m-d H:i:s');
 
 
 class query_handler extends gs_handler {
+
+	function subscribe($d) {
+		$rec=$d['last'];
+		query_handler::add($rec,$this->params['name']);
+		return $rec;
+	}
+
+
 	static function add($rec,$name,$email=null) {
 		$cfg=record_by_field('name',$name,'sb_config');
 		if (!$cfg) return $rec;
@@ -28,6 +36,8 @@ class query_handler extends gs_handler {
 			$q->email=$email;
 		}
 		$que->commit();
+
+		return $rec;
 
 
 	}

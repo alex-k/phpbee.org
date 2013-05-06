@@ -98,17 +98,27 @@ class person {
         return new gs_null(GS_NULL_XML);
     }
 
-    function add_role($role,$rec) {
-        $rs=new person_role;
-        $role=$rs->find_records(array('role'=>$role,'recordset_name'=>$rec->get_recordset_name(),'record_id'=>$rec->get_id()))->first(true);
-        if (!$role->cookie) $role->cookie=substr(md5(rand(0,time())),-8);
-        gs_setcookie(PERSON_COOKIE.'_'.$role,$role->cookie);
+	function get_roles() {
+		return $this->roles;
+	}
 
+    function add_role($rolename,$rec) {
+        $rs=new person_role;
+        $role=$rs->find_records(array('role'=>$rolename,'recordset_name'=>$rec->get_recordset_name(),'record_id'=>$rec->get_id()))->first(true);
+		$this->roles[$rolename]=$rec;
+
+        if (!$role->cookie) $role->cookie=substr(md5(rand(0,time())),-8);
+		$cname=PERSON_COOKIE.'_'.$rolename;
+        gs_setcookie($cname,$role->cookie);
         $role->commit();
+
+		gs_eventer::send('person_add_role',$rec);
+		//gs_eventer::send('person_add_role',$this,$role);
     }
     function remove_role($role) {
         $cname=PERSON_COOKIE.'_'.$role;
         if (isset($_COOKIE[$cname])) {
+			gs_eventer::send('person_remove_role',$this->__get($role));
             //$rs=new person_role;
             //$rs->find_records(array('role'=>$role,'cookie'=>$_COOKIE[$cname]))->first()->delete()->commit();
             gs_setcookie(PERSON_COOKIE.'_'.$role,NULL);
