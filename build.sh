@@ -1,5 +1,4 @@
 #!/bin/sh
-
 REPO="file:///home/www/phpbee.org/svn/phpbee.org"
 LASTFNAME="public_html/download/`ls -tr public_html/download/ | tail -n1`";
 MTIME=`stat -c '%z' $LASTFNAME`
@@ -58,11 +57,12 @@ zip phpbee.zip var
 mv phpbee.zip ..
 cd ..
 cp build/Changelog.html public_html/download/Changelog-$FNAME.html
-rm -fr build
-rm -fr build_test
-
-
 cp phpbee.zip public_html/download/$FNAME
+
+php public_html/index.php downloads/submit_phpbee file=public_html/download/$FNAME xml=build/Changelog.xml
+
+#rm -fr build
+#rm -fr build_test
 echo $FNAME > html/last_build.html
 
 echo "Build $FNAME created and uploaded" 

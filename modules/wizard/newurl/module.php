@@ -7,6 +7,10 @@ class module_wizard_newurl extends gs_base_module implements gs_module {
 	static function get_handlers() {
 		$data=array(
 		'handler'=>array(
+			'/admin/wizard/newurl/simpleform'=>array(
+				'handler_wizard_newurl.form:name:admin_form.html:form_class:form_wizard_newurl:return:gs_record',
+				'gs_base_handler.redirect_gl:gl:back',
+				),
 			'/admin/wizard/newurl/form'=>array(
 				'handler_wizard_newurl.form:name:newurl_form.html:form_class:form_wizard_newurl:return:gs_record',
 				//'gs_wizard_handler.commit:return:true',

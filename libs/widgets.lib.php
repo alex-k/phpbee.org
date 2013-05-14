@@ -137,6 +137,17 @@ class gs_widget_plaintext  extends gs_widget_text {
 	}
 }
 
+class gs_widget_fetch extends gs_widget_text{
+	function clean() {
+		$url=parent::clean();
+		if ($url && parse_url($url,PHP_URL_SCHEME)=='http') {
+			$r=file_get_contents($url);
+			if ($r!==FALSE) return $r;
+		}
+		return $url;
+	}
+}
+
 class gs_widget_file extends gs_widget {
 	function html() {
 		return sprintf('<input class="fFile" type="file" name="%s" >', $this->fieldname);
