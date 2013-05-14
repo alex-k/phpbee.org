@@ -16,17 +16,17 @@ class gs_data_driver_sef implements gs_data_driver {
 
 		if (class_exists('urlprefix_cfg')) {
 			$px=new urlprefix_cfg();
-            if ($px->get_connector()->table_exists($px->table_name)) {
-                $gspgid_old=$gspgid;
-                foreach ($px->find_records(array()) as $pf) {
-                    if (stripos($gspgid,$pf->prefix)===0) {
-                        gs_var_storage::save($pf->variable_name,$pf->value);
-                        $gspgid=substr($gspgid,strlen($pf->prefix));
-                        $gspgid=trim($gspgid,'/');
-                    }
-                }
-                gs_var_storage::save('urlprefix',str_replace($gspgid,'',$gspgid_old));
-            }
+			if ($px->get_connector()->table_exists($px->table_name)) {
+				$gspgid_old=$gspgid;
+				foreach ($px->find_records(array()) as $pf) {
+				    if (stripos($gspgid,$pf->prefix)===0) {
+					gs_var_storage::save($pf->variable_name,$pf->value);
+					$gspgid=substr($gspgid,strlen($pf->prefix));
+					$gspgid=trim($gspgid,'/');
+				    }
+				}
+				gs_var_storage::save('urlprefix',str_replace($gspgid,'',$gspgid_old));
+			}
 		}
 
 		$this->gspgid=trim($gspgid,'/');
